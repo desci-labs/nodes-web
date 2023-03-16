@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" height="48" width="48" viewBox="0 0 48 48">
+    <title>row table</title>
+    <g stroke-linecap="square" stroke-width="2" stroke-miterlimit="10" fill="none" stroke="#ffffff" stroke-linejoin="miter" class="nc-icon-wrapper" transform="translate(0.5 0.5)">
+        <line x1="4" y1="14" x2="44" y2="14" data-cap="butt" stroke-linecap="butt" stroke="#ffffff"></line>
+        <line x1="4" y1="24" x2="44" y2="24" data-cap="butt" stroke-linecap="butt" stroke="#ffffff"></line>
+        <line x1="4" y1="34" x2="44" y2="34" data-cap="butt" stroke-linecap="butt" stroke="#ffffff"></line>
+        <line x1="15" y1="4" x2="15" y2="44" data-cap="butt" stroke-linecap="butt" stroke="#ffffff"></line>
+        <rect x="4" y="4" width="40" height="40" rx="4"></rect>
+    </g>
+</svg>

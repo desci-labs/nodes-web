@@ -1,0 +1,23 @@
+
+
+.e-radio:checked + label::after { /* csslint allow: adjoining-classes */
+  background-color: #2196f3;
+  border-color: red;
+}
+
+.e-radio:checked:focus + label::after, .e-info .e-radio:checked + label:hover::after { /* csslint allow: adjoining-classes */
+  background-color: #0b7dda;
+  border-color: red;
+}
+
+.e-radio:checked + label::before {
+  border-color: red;
+}
+
+.e-radio:checked:focus + label::before, .e-info .e-radio:checked + label:hover::before {
+  border-color: red;
+}
+
+.e-radio + label:hover::before {
+  border-color: #b1afaf
+}

@@ -1,0 +1,52 @@
+{
+    "compilerOptions": {
+        "baseUrl": "./src",
+        "paths": {
+            "@src/*": [
+                "./*"
+            ],
+            "@components/*": [
+                "./components/*"
+            ],
+            "@hooks/*": [
+                "./hooks/*"
+            ],
+            "@contexts/*": [
+                "./contexts/*"
+            ],
+            "@hocs/*": [
+                "./hocs/*"
+            ],
+            "@lib/*": [
+                "./lib/*"
+            ],
+            "@hardhat/*": [
+                "./hardhat/*"
+            ],
+            "@images/*": [
+                "./images/*"
+            ],
+            "@icons": [
+                "./icons.ts"
+            ],
+            "icons": [
+                "./icons.ts"
+            ],
+            "@api/*": [
+                "./api/*"
+            ],
+            "@contracts/*": [
+                "./contracts/*"
+            ],
+            "@connectors/*": [
+                "./connectors/*"
+            ],
+            "types": [
+                "./types/index.ts"
+            ],
+            "hooks": [
+                "./hooks.ts"
+            ]
+        }
+    }
+}

@@ -1,0 +1,15 @@
+.faded-video {
+  -webkit-mask: radial-gradient(ellipse 80vw 40vw, black 30%, transparent 50%) 0 50%;
+  mask-image: radial-gradient(ellipse 80vw 40vw, black 30%, transparent 50%) 0 50%;;
+}
+
+.logo-text::before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #ffffff;
+  height: 100%;
+  width: 1px;
+}

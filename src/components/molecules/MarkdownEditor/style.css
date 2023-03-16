@@ -1,0 +1,8 @@
+
+  .DraftEditor-editorContainer {
+    height: 250px;
+    overflow: auto;
+    font-family:  sans-serif;
+    letter-spacing: 0.2px;
+    font-size: 14px;
+  }

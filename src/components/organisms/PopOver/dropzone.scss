@@ -1,0 +1,29 @@
+$primary: #28aac4;
+.dzu-inputLabel {
+  color: $primary;
+}
+progress[value] {
+  /* Reset the default appearance */
+  -webkit-appearance: none;
+  appearance: none;
+}
+progress[value]::-webkit-progress-value {
+  background-color: $primary;
+}
+
+.dzu-previewButton {
+  filter: contrast(1) brightness(1000);
+}
+
+.dzu-inputLabelWithFiles {
+  background-color: $primary;
+  color: white;
+  font-weight: normal;
+}
+
+.dzu-submitButtonContainer {
+}
+
+.dzu-previewFileName {
+  color: white;
+}

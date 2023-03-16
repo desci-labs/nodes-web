@@ -1,0 +1,4 @@
+.FolderTree .TreeNode {
+  display: flex;
+  align-items: center;
+}
