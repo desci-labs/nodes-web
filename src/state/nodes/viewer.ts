@@ -4,7 +4,12 @@ import {
   ResearchObjectV1,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { updateDraft } from "@src/api";
+import { cleanupManifestUrl } from "@src/components/utils";
+import { RootState } from "@src/store";
+import axios from "axios";
+// import { saveManifestDraft } from "./saveManifestDraft";
 
 type ReaderMode = "reader" | "editor";
 
@@ -14,6 +19,12 @@ export enum ResearchTabs {
   source = "source",
 }
 
+export enum ManifestDataStatus {
+  Idle = "Idle",
+  Pending = "Pending",
+  Fulfilled = "Fulfilled",
+  Rejected = "Rejected",
+}
 interface NodeReaderPref {
   isNew: boolean;
   mode: ReaderMode;
@@ -28,6 +39,7 @@ interface NodeReaderPref {
   lastScrollTop: Record<string, number>;
   componentStack: ResearchObjectV1Component[];
   startedNewAnnotationViaButton: boolean;
+  manifestStatus: ManifestDataStatus;
 }
 
 const initialState: NodeReaderPref = {
@@ -43,6 +55,7 @@ const initialState: NodeReaderPref = {
   isResearchPanelOpen: true,
   researchPanelTab: ResearchTabs.current,
   startedNewAnnotationViaButton: false,
+  manifestStatus: ManifestDataStatus.Idle,
 };
 
 export const nodeReaderSlice = createSlice({
@@ -58,8 +71,10 @@ export const nodeReaderSlice = createSlice({
     ) => {
       state.manifest = payload.manifest;
       state.manifestCid = payload.cid;
+      state.manifestStatus = ManifestDataStatus.Idle;
     },
     setManifest: (state, { payload }: PayloadAction<ResearchObjectV1>) => {
+      state.manifestStatus = ManifestDataStatus.Idle;
       state.manifest = payload;
     },
     updateComponent: (
@@ -261,7 +276,54 @@ export const nodeReaderSlice = createSlice({
       return state;
     },
   },
+  extraReducers(builder) {
+    builder
+      .addCase(saveManifestDraft.pending, (state) => {
+        state.manifestStatus = ManifestDataStatus.Pending;
+      })
+      .addCase(saveManifestDraft.fulfilled, (state, action) => {
+        state.manifestStatus = ManifestDataStatus.Fulfilled;
+      })
+      .addCase(saveManifestDraft.rejected, (state, action) => {
+        state.manifestStatus = ManifestDataStatus.Rejected;
+      });
+  },
 });
+
+type SaveManifestProps = {
+  uuid?: string;
+  onSucess?: () => void;
+  onError?: (error?: any) => void;
+};
+
+export const saveManifestDraft = createAsyncThunk(
+  `${nodeReaderSlice.name}/saveManifestDraft`,
+  async (args: SaveManifestProps, { dispatch, getState }) => {
+    const state = getState() as RootState;
+    const { manifest: manifestData, currentObjectId } = state.nodes.nodeReader;
+
+    if (!manifestData) return;
+    const res = await updateDraft({
+      manifest: manifestData!,
+      uuid: args?.uuid ?? currentObjectId!,
+    });
+
+    const manifestUrl = cleanupManifestUrl(res.uri || res.manifestUrl);
+    let response = res.manifestData;
+
+    if (res.manifestData) {
+      dispatch(setManifest(res.manifestData));
+    } else {
+      const { data } = await axios.get(manifestUrl);
+      response = data;
+      dispatch(setManifest(data));
+    }
+    dispatch(setManifestCid(res.uri));
+    localStorage.setItem("manifest-url", manifestUrl);
+    args?.onSucess?.();
+    return response;
+  }
+);
 
 export default nodeReaderSlice.reducer;
 

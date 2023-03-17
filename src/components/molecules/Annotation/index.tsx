@@ -19,8 +19,8 @@ import AnnotationHidden from "@components/atoms/AnnotationHidden";
 import AnnotationExpanded from "@components/atoms/AnnotationExpanded";
 import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
-import { saveAnnotation, deleteAnnotation } from "@src/state/nodes/viewer";
-import { saveManifestDraft } from "@src/state/nodes/saveManifestDraft";
+import { saveAnnotation, deleteAnnotation, saveManifestDraft } from "@src/state/nodes/viewer";
+// import { saveManifestDraft } from "@src/state/nodes/saveManifestDraft";
 import {
   setIsEditingAnnotation,
   setKeepAnnotating,

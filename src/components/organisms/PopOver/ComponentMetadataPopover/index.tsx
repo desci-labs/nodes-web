@@ -18,11 +18,9 @@ import InsetLabelInput from "../../../molecules/FormInputs/InsetLabelInput";
 import SelectMenu from "../../../molecules/FormInputs/SelectMenu";
 import ReadOnlyComponent from "./ReadOnlyComponent";
 import axios from "axios";
-import useSaveManifest from "@src/hooks/useSaveManifest";
-import { useNodeReader } from "@src/state/nodes/hooks";
+import { useManifestStatus, useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
-import { updateComponent } from "@src/state/nodes/viewer";
-import { saveManifestDraft } from "@src/state/nodes/saveManifestDraft";
+import { updateComponent, saveManifestDraft } from "@src/state/nodes/viewer";
 
 export const PDF_LICENSE_TYPES = [
   { id: 1, name: "CC BY" },
@@ -296,7 +294,7 @@ const ComponentMetadataPopover = (
 ) => {
   const dispatch = useSetter();
   const formRef = useRef<HTMLFormElement | null>(null);
-  const { saveManifest, isSaving } = useSaveManifest();
+  const { isLoading: isSaving } = useManifestStatus();
   const [component, setComponent] = useState<
     ResearchObjectV1Component | undefined
   >();
@@ -343,12 +341,7 @@ const ComponentMetadataPopover = (
         })
       );
 
-      try {
-        dispatch(saveManifestDraft({}));
-        props.onClose();
-      } catch (e: any) {
-        alert(e.message);
-      }
+      dispatch(saveManifestDraft({ onSucess: () => props.onClose() }));
     }
   };
 
