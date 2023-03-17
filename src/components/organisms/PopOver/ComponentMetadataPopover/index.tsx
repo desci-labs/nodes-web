@@ -1,6 +1,5 @@
 import DefaultSpinner from "@components/atoms/DefaultSpinner";
 import PrimaryButton from "@components/atoms/PrimaryButton";
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { EMPTY_FUNC } from "@components/utils";
 import { IconViewLink, IconX } from "@icons";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
@@ -21,6 +20,9 @@ import ReadOnlyComponent from "./ReadOnlyComponent";
 import axios from "axios";
 import useSaveManifest from "@src/hooks/useSaveManifest";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import { useSetter } from "@src/store/accessors";
+import { updateComponent } from "@src/state/nodes/viewer";
+import { saveManifestDraft } from "@src/state/nodes/saveManifestDraft";
 
 export const PDF_LICENSE_TYPES = [
   { id: 1, name: "CC BY" },
@@ -292,6 +294,7 @@ const defaultProps = {
 const ComponentMetadataPopover = (
   props: ComponentMetadataPopoverProps & typeof defaultProps
 ) => {
+  const dispatch = useSetter();
   const formRef = useRef<HTMLFormElement | null>(null);
   const { saveManifest, isSaving } = useSaveManifest();
   const [component, setComponent] = useState<
@@ -323,16 +326,25 @@ const ComponentMetadataPopover = (
 
   const onSubmit = async (data: CommonComponentPayload) => {
     if (manifestData && componentIndex !== undefined) {
-      // const { keywords, description, licenseType } = data;
       const manifestDataClone = { ...manifestData };
 
       const componentPayload = {
         ...manifestData?.components[componentIndex].payload,
         ...data,
       };
-      manifestDataClone.components[componentIndex].payload = componentPayload;
+
+      dispatch(
+        updateComponent({
+          index: componentIndex,
+          update: {
+            ...manifestDataClone.components[componentIndex],
+            payload: componentPayload,
+          },
+        })
+      );
+
       try {
-        await saveManifest(manifestDataClone);
+        dispatch(saveManifestDraft({}));
         props.onClose();
       } catch (e: any) {
         alert(e.message);
