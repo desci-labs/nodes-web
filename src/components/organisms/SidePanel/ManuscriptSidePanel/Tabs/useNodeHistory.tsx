@@ -15,8 +15,9 @@ import { useNodeReader } from "@src/state/nodes/hooks";
 const LS_HISTORY_MAP = "DESCI::node-version-history";
 
 export default function useNodeHistory() {
-  const { publishMap, pendingCommits, setPendingCommits } =
-    useManuscriptController(["pendingCommits", "publishMap"]);
+  const { pendingCommits, setPendingCommits } = useManuscriptController([
+    "pendingCommits",
+  ]);
   const { currentObjectId } = useNodeReader();
   const [historys, setHistory] = useLocalStorageState<
     Record<string, ResearchObjectV1History[]>
@@ -116,7 +117,7 @@ export default function useNodeHistory() {
       loadRef.current = true;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentObjectId, publishMap]);
+  }, [currentObjectId]);
 
   return { loadingChain, history, pendingHistory, isFetching };
 }

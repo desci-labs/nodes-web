@@ -228,7 +228,7 @@ const CommitStatusPopover = (props: any) => {
         setPrivCidMap({});
         setTimeout(() => setForceRefreshDrive(true));
 
-        props.onSuccess && props.onSuccess();
+        props.onSuccess?.();
         close();
       } else {
         toast.error("You must connect a wallet first", {

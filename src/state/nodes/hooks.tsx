@@ -1,7 +1,7 @@
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { PDF_PAGE_SPACING } from "@src/components/organisms/Paper/constants";
 import { useGetter } from "@src/store/accessors";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { ManifestDataStatus } from "./viewer";
 
 export const useNodeReader = () => {
@@ -38,4 +38,18 @@ export const useManifestStatus = () => {
     isSuccess: manifestStatus === ManifestDataStatus.Fulfilled,
     isError: manifestStatus === ManifestDataStatus.Rejected,
   };
+};
+
+export const useNodeVersions = (uuid: string = "") => {
+  const { publishMap } = useGetter((state) => state.nodes.nodeHistory);
+  return useMemo(() => publishMap[uuid], [publishMap, uuid]);
+};
+
+export const useCurrentNodeVersion = () => {
+  const { currentObjectId } = useGetter((state) => state.nodes.nodeReader);
+  const { publishMap } = useGetter((state) => state.nodes.nodeHistory);
+  return useMemo(
+    () => publishMap[currentObjectId ?? ""],
+    [publishMap, currentObjectId]
+  );
 };

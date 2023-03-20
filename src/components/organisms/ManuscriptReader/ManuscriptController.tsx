@@ -53,7 +53,6 @@ interface State {
   showWalletManager: boolean;
   selectingWallet: boolean;
   wallets: Wallet[];
-  publishMap: { [uuid: string]: IndexedNode };
   showShareMenu: boolean;
   pageMetadata: PageMetadata[];
   lastScrollTop: { [componentId: string]: number };
@@ -93,7 +92,6 @@ export const initialState: State = {
   pendingCommits: JSON.parse(
     localStorage.getItem(LS_PENDING_COMMITS_KEY) || "{}"
   ),
-  publishMap: {},
   validations: [],
   scrollToPage$: new Subject<number | null>(),
   scrollRef: undefined,

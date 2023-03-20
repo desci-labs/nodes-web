@@ -28,7 +28,7 @@ import { useParams } from "react-router-dom";
 import { useCopier } from "./Copier";
 import { CheckIcon } from "@heroicons/react/outline";
 import { useGetNodesQuery } from "@src/state/api/nodes";
-import { useNodeReader } from "@src/state/nodes/hooks";
+import { useNodeReader, useNodeVersions } from "@src/state/nodes/hooks";
 
 function CopyButton(
   props: ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -74,8 +74,10 @@ const PopOverShareMenu = () => {
     currentObjectId,
     publicView,
   } = useNodeReader();
-  const { showShareMenu, setShowShareMenu, publishMap, setPublishMap } =
-    useManuscriptController(["showShareMenu", "publishMap"]);
+  const versions = useNodeVersions(currentObjectId);
+  const { showShareMenu, setShowShareMenu } = useManuscriptController([
+    "showShareMenu",
+  ]);
   const [lastManifest, setLastManifest] = useState<
     ResearchObjectV1 | undefined
   >();
@@ -117,16 +119,16 @@ const PopOverShareMenu = () => {
   useEffect(() => {
     setLoading(true);
     setLastManifest(undefined);
-    if (publishMap["force"]) {
-      /**
-       * Trigger share link update after publish
-       */
-      setRequestedVersion(undefined);
-      const newPubMap = Object.assign({}, publishMap);
-      delete newPubMap.force;
-      setPublishMap(newPubMap);
-      return;
-    }
+    // if (publishMap["force"]) {
+    //   /**
+    //    * Trigger share link update after publish
+    //    */
+    //   setRequestedVersion(undefined);
+    //   const newPubMap = Object.assign({}, publishMap);
+    //   delete newPubMap.force;
+    //   setPublishMap(newPubMap);
+    //   return;
+    // }
 
     (async () => {
       try {
@@ -167,7 +169,7 @@ const PopOverShareMenu = () => {
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentObjectId, nodeCollection, publicView, publishMap]);
+  }, [currentObjectId, nodeCollection, publicView, versions]);
 
   let body = (
     <div className="flex items-center justify-center h-full flex-grow">
@@ -176,11 +178,7 @@ const PopOverShareMenu = () => {
   );
   if (!loading) {
     // debugger;
-    if (
-      lastManifest &&
-      currentObjectId &&
-      (publicView || (publishMap && publishMap[currentObjectId]))
-    ) {
+    if (lastManifest && currentObjectId && (publicView || versions)) {
       const versionCount = numVersions;
       body = (
         <PerfectScrollbar className="flex items-center w-full h-full flex-grow flex-col justify-evenly">
