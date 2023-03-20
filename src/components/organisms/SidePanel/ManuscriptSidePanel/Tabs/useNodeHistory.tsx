@@ -16,11 +16,7 @@ const LS_HISTORY_MAP = "DESCI::node-version-history";
 
 export default function useNodeHistory() {
   const { publishMap, pendingCommits, setPendingCommits } =
-    useManuscriptController([
-      "selectedHistoryId",
-      "pendingCommits",
-      "publishMap",
-    ]);
+    useManuscriptController(["pendingCommits", "publishMap"]);
   const { currentObjectId } = useNodeReader();
   const [historys, setHistory] = useLocalStorageState<
     Record<string, ResearchObjectV1History[]>

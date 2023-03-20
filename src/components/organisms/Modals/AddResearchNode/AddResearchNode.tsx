@@ -52,7 +52,7 @@ export default function AddResearchNode(props: ModalProps) {
   const [manifestLicense, setManifestLicense] = useState<any>();
   const [researchFields, setResearchFields] = useState<string[]>([]);
 
-  const { setIsAddingComponent } = useManuscriptController(["publishMap"]);
+  const { setIsAddingComponent } = useManuscriptController();
 
   useEffect(() => {
     //only applies for edit mode, fetches manifest of target node
@@ -95,6 +95,7 @@ export default function AddResearchNode(props: ModalProps) {
       }
     }
     getManifest();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.editModalInfo]);
 
   const onClose = (dontHideToolbar?: boolean) => {

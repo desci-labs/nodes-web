@@ -74,21 +74,8 @@ const PopOverShareMenu = () => {
     currentObjectId,
     publicView,
   } = useNodeReader();
-  const {
-    // currentObjectId,
-    showShareMenu,
-    setShowShareMenu,
-    // manifestData,
-    publishMap,
-    setPublishMap,
-    // publicView,
-  } = useManuscriptController([
-    // "currentObjectId",
-    "showShareMenu",
-    // "manifestData",
-    "publishMap",
-    // "publicView",
-  ]);
+  const { showShareMenu, setShowShareMenu, publishMap, setPublishMap } =
+    useManuscriptController(["showShareMenu", "publishMap"]);
   const [lastManifest, setLastManifest] = useState<
     ResearchObjectV1 | undefined
   >();
@@ -140,8 +127,10 @@ const PopOverShareMenu = () => {
       setPublishMap(newPubMap);
       return;
     }
+
     (async () => {
       try {
+        console.log("Get Versions", currentObjectId);
         if (currentObjectId) {
           const versionData = await getPublishedVersions(currentObjectId!);
           console.log("published versions", versionData);
