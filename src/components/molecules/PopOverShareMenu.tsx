@@ -119,16 +119,6 @@ const PopOverShareMenu = () => {
   useEffect(() => {
     setLoading(true);
     setLastManifest(undefined);
-    // if (publishMap["force"]) {
-    //   /**
-    //    * Trigger share link update after publish
-    //    */
-    //   setRequestedVersion(undefined);
-    //   const newPubMap = Object.assign({}, publishMap);
-    //   delete newPubMap.force;
-    //   setPublishMap(newPubMap);
-    //   return;
-    // }
 
     (async () => {
       try {

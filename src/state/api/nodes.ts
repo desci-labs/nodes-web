@@ -16,7 +16,6 @@ export const nodesApi = api.injectEndpoints({
       async onQueryStarted(args, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          console.log("Set Nodes", data);
 
           const publishedNodes = data
             .filter((n: any) => n.isPublished)
@@ -26,7 +25,6 @@ export const nodesApi = api.injectEndpoints({
             publishedNodes.forEach((n: any) => {
               map[n.uuid] = n.index;
             });
-            console.log("PublishNodes", map, publishedNodes);
             dispatch(setPublishedNodes(map));
           }
         } catch (error) {}
