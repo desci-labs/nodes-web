@@ -29,9 +29,10 @@ import axios from "axios";
 import { ResearchObjectV1 } from "@desci-labs/desci-models";
 import { SpinnerCircular } from "spinners-react";
 import { Wallet } from "@src/state/api/types";
-import { useNodeReader } from "@src/state/nodes/hooks";
+import { useNodeReader, useNodeVersionHistory } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { setManifest } from "@src/state/nodes/viewer";
+import { setPendingCommits } from "@src/state/nodes/history";
 
 export const LOCALSTORAGE_TXN_LIST = "desci:txn-list";
 
@@ -39,13 +40,8 @@ const CommitStatusPopover = (props: any) => {
   const [loading, setLoading] = useState(false);
   const [address, setAddress] = useState<string>("0x");
   const [error, setError] = useState<string>();
-  const {
-    setShowWalletManager,
-    setPendingCommits,
-    pendingCommits,
-    setPrivCidMap,
-    setForceRefreshDrive,
-  } = useManuscriptController(["pendingCommits"]);
+  const { setShowWalletManager, setPrivCidMap, setForceRefreshDrive } =
+    useManuscriptController();
 
   const dispatch = useSetter();
   const {
@@ -53,6 +49,7 @@ const CommitStatusPopover = (props: any) => {
     currentObjectId,
     manifestCid,
   } = useNodeReader();
+  const { pendingCommits } = useNodeVersionHistory(currentObjectId);
 
   const close = () => {
     // setGateway(undefined);
@@ -179,11 +176,23 @@ const CommitStatusPopover = (props: any) => {
 
         // const md = { ...manifestData! };
         /** Keep track of pending transactions */
-        const newPendingCommits = { ...pendingCommits };
-        if (!newPendingCommits[currentObjectId!]) {
-          newPendingCommits[currentObjectId!] = [];
-        }
-        newPendingCommits[currentObjectId!].push({
+        // const newPendingCommits = { ...pendingCommits };
+        // if (!newPendingCommits[currentObjectId!]) {
+        //   newPendingCommits[currentObjectId!] = [];
+        // }
+        // newPendingCommits[currentObjectId!].push({
+        //   author: {
+        //     id: address,
+        //     name: address,
+        //   },
+        //   content: "",
+        //   title: "Published",
+        //   date: new Date().getTime(),
+        //   transaction: {
+        //     id: tx.hash,
+        //   },
+        // });
+        const commit = {
           author: {
             id: address,
             name: address,
@@ -194,13 +203,18 @@ const CommitStatusPopover = (props: any) => {
           transaction: {
             id: tx.hash,
           },
-        });
-        setPendingCommits(newPendingCommits);
-        // store locally in case of refresh or new tab
-        localStorage.setItem(
-          LS_PENDING_COMMITS_KEY,
-          JSON.stringify(newPendingCommits)
+        };
+        dispatch(
+          setPendingCommits({
+            id: currentObjectId!,
+            commits: [...(pendingCommits[currentObjectId!] ?? []), commit],
+          })
         );
+        // store locally in case of refresh or new tab
+        // localStorage.setItem(
+        //   LS_PENDING_COMMITS_KEY,
+        //   JSON.stringify(newPendingCommits)
+        // );
 
         if (currentObjectId && manifestCid && manifestData) {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars

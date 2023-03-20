@@ -1,3 +1,5 @@
+import { ResearchObjectV1History } from "@src/../../nodes/desci-models/dist";
+
 export interface IndexedNodeVersion {
   cid?: string;
   id?: string;
@@ -12,3 +14,12 @@ export interface IndexedNode {
 }
 
 export type PublishedMap = { [uuid: string]: IndexedNode };
+
+export type HistoryMap = Record<string, ResearchObjectV1History[]>;
+
+export interface HistoryEntryProps {
+  index: number;
+  pending: boolean;
+  data: ResearchObjectV1History;
+  selected: boolean;
+}

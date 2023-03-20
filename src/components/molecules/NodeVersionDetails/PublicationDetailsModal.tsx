@@ -7,15 +7,16 @@ import Copier from "../Copier";
 import useVersionDetails from "./useVersionDetails";
 import { CHAINS } from "@connectors/../chains";
 import { DEFAULT_CHAIN } from "../ConnectWithSelect";
-import { useNodeReader } from "@src/state/nodes/hooks";
+import { useNodeReader, useNodeVersionHistory } from "@src/state/nodes/hooks";
 
 const ACTIVE_CHAIN = CHAINS[DEFAULT_CHAIN] as any;
 const BLOCK_EXPLORER_URL = ACTIVE_CHAIN && ACTIVE_CHAIN.blockExplorerUrls[0];
 
 export default function PublicationDetailsModal(props: any) {
-  const { showPublicationDetails, setShowPublicationDetails, selectedHistory } =
-    useManuscriptController(["showPublicationDetails", "selectedHistory"]);
+  const { showPublicationDetails, setShowPublicationDetails } =
+    useManuscriptController(["showPublicationDetails"]);
   const { manifest: manifestData } = useNodeReader();
+  const { selectedHistory } = useNodeVersionHistory();
 
   const { size, copies, node } = useVersionDetails(
     selectedHistory?.data?.transaction?.id ?? ""

@@ -1,4 +1,3 @@
-import { ResearchObjectV1History } from "@desci-labs/desci-models";
 import { SpinnerCircularFixed } from "spinners-react";
 import Section from "../Section";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -10,18 +9,14 @@ import {
   DateText,
 } from "./Timeline";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
-
-export interface HistoryEntryProps {
-  index: number;
-  pending: boolean;
-  data: ResearchObjectV1History;
-  selected: boolean;
-}
+import { HistoryEntryProps } from "@src/state/nodes/types";
+import { selectHistory } from "@src/state/nodes/history";
+import { useSetter } from "@src/store/accessors";
 
 export default function HistoryEntry(historyEntry: HistoryEntryProps) {
+  const dispatch = useSetter();
   const { index, data, pending, selected } = historyEntry;
-  const { setShowPublicationDetails, setSelectedHistory } =
-    useManuscriptController([]);
+  const { setShowPublicationDetails } = useManuscriptController([]);
   return (
     <div key={index} className="relative">
       <TimelineGutterBulletLayer>
@@ -46,7 +41,12 @@ export default function HistoryEntry(historyEntry: HistoryEntryProps) {
               className="bg-black hover:bg-neutrals-gray-2 rounded-md py-1 px-2 font-semibold text-xs font-inter"
               onClick={() => {
                 if (data?.transaction) {
-                  setSelectedHistory(historyEntry);
+                  dispatch(
+                    selectHistory({
+                      history: historyEntry,
+                      id: index.toString(),
+                    })
+                  );
                   setShowPublicationDetails(true);
                 }
               }}

@@ -53,3 +53,24 @@ export const useCurrentNodeVersion = () => {
     [publishMap, currentObjectId]
   );
 };
+
+export const useNodeVersionHistory = (uuid: string = "") => {
+  const {
+    histories,
+    selectedHistory,
+    selectedHistoryId,
+    pendingCommits: commits,
+  } = useGetter((state) => state.nodes.nodeHistory);
+
+  console.log("history", histories[uuid]);
+  return useMemo(
+    () => ({
+      selectedHistory,
+      selectedHistoryId,
+      history: histories[uuid] ?? [],
+      pendingCommits: commits,
+      pendingHistory: commits[uuid] ?? [],
+    }),
+    [commits, histories, selectedHistory, selectedHistoryId, uuid]
+  );
+};

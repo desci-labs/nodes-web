@@ -1,42 +1,41 @@
-import {
-  LS_PENDING_COMMITS_KEY,
-  useManuscriptController,
-} from "@src/components/organisms/ManuscriptReader/ManuscriptController";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { LS_PENDING_COMMITS_KEY } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "./history.scss";
 import { ResearchObjectV1History } from "@desci-labs/desci-models";
 import { CHAIN_DEPLOYMENT } from "@components/../chains";
 import { ethers } from "ethers";
 import { getResearchObjectVersions } from "@src/api";
-import useLocalStorageState from "@src/hooks/useLocalStorageState";
 import { VersionResponse } from "@src/state/api/types";
-import { useNodeReader } from "@src/state/nodes/hooks";
+import { useNodeReader, useNodeVersionHistory } from "@src/state/nodes/hooks";
+import { useSetter } from "@src/store/accessors";
+import { setNodeHistory, setPendingCommits } from "@src/state/nodes/history";
 
 const LS_HISTORY_MAP = "DESCI::node-version-history";
 
 export default function useNodeHistory() {
-  const { pendingCommits, setPendingCommits } = useManuscriptController([
-    "pendingCommits",
-  ]);
+  const dispatch = useSetter();
+  // const { pendingCommits } = useManuscriptController(["pendingCommits"]);
   const { currentObjectId } = useNodeReader();
-  const [historys, setHistory] = useLocalStorageState<
-    Record<string, ResearchObjectV1History[]>
-  >(LS_HISTORY_MAP, {});
-  const history = useMemo(
-    () => historys[currentObjectId ?? ""] ?? [],
-    [historys, currentObjectId]
-  );
+  // const [historys, setHistory] = useLocalStorageState<
+  //   Record<string, ResearchObjectV1History[]>
+  // >(LS_HISTORY_MAP, {});
+  // const history = useMemo(
+  //   () => historys[currentObjectId ?? ""] ?? [],
+  //   [historys, currentObjectId]
+  // );
+  const { history, pendingCommits, pendingHistory } =
+    useNodeVersionHistory(currentObjectId);
 
   const loadRef = useRef(false);
   const [loadingChain, setLoadingChain] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
-  const [pendingHistory, setPendingHistory] = useState<
-    ResearchObjectV1History[]
-  >(() => {
-    return pendingCommits[currentObjectId ?? ""]
-      ? pendingCommits[currentObjectId ?? ""]
-      : [];
-  });
+  // const [pendingHistory, setPendingHistory] = useState<
+  //   ResearchObjectV1History[]
+  // >(() => {
+  //   return pendingCommits[currentObjectId ?? ""]
+  //     ? pendingCommits[currentObjectId ?? ""]
+  //     : [];
+  // });
 
   const transformVersions = (vr: VersionResponse): ResearchObjectV1History[] =>
     vr.versions.map((v) => ({
@@ -49,9 +48,10 @@ export default function useNodeHistory() {
 
   const updatePendingCommits = useCallback(
     (update: ResearchObjectV1History[]) => {
-      const pending = { ...pendingCommits, [currentObjectId ?? ""]: update };
-      setPendingHistory(update);
-      setPendingCommits(pending);
+      // const pending = { [currentObjectId ?? ""]: update };
+      // setPendingHistory(update);
+      // setPendingCommits(pending);
+      dispatch(setPendingCommits({ id: currentObjectId!, commits: update }));
       localStorage.setItem(LS_PENDING_COMMITS_KEY, JSON.stringify(pending));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -82,7 +82,10 @@ export default function useNodeHistory() {
           try {
             const versions = await getResearchObjectVersions(currentObjectId);
             const currentHistory = transformVersions(versions);
-            setHistory({ ...historys, [currentObjectId]: currentHistory });
+            dispatch(
+              setNodeHistory({ id: currentObjectId, history: currentHistory })
+            );
+            // setHistory({ ...historys, [currentObjectId]: currentHistory });
           } catch (e) {
             console.log("ERROR", e);
           } finally {

@@ -5,16 +5,16 @@ import { ResearchObjectV1History } from "@desci-labs/desci-models";
 import HistoryEntry from "./HistoryEntry";
 import { TimelineGutter } from "./Timeline";
 import useNodeHistory from "./useNodeHistory";
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import LoaderHistoryEntry from "@src/components/molecules/LoaderHistoryEntry";
+import { useNodeVersionHistory } from "@src/state/nodes/hooks";
 
-interface HistoryTabProps { }
+interface HistoryTabProps {}
 
 const HistoryTab = (props: HistoryTabProps) => {
   const [height] = useState(0);
   const { loadingChain, history, pendingHistory } = useNodeHistory();
-  const { selectedHistoryId } = useManuscriptController(["selectedHistoryId"]);
-
+  const { selectedHistoryId } = useNodeVersionHistory();
+  console.log("selectedHistoryId", selectedHistoryId);
   return (
     <div className="flex flex-row">
       <TimelineGutter style={{ height: height }}></TimelineGutter>
@@ -49,7 +49,7 @@ const HistoryTab = (props: HistoryTabProps) => {
             data={data}
             index={history.length - index}
             pending={false}
-            selected={selectedHistoryId === `${index}`}
+            selected={selectedHistoryId === `${index + 1}`}
           />
         ))}
       </div>
