@@ -14,7 +14,8 @@ const HistoryTab = (props: HistoryTabProps) => {
   const [height] = useState(0);
   const { loadingChain, history, pendingHistory } = useNodeHistory();
   const { selectedHistoryId } = useNodeVersionHistory();
-  console.log("selectedHistoryId", selectedHistoryId);
+  const selectedId = selectedHistoryId || history.length.toString();
+
   return (
     <div className="flex flex-row">
       <TimelineGutter style={{ height: height }}></TimelineGutter>
@@ -49,7 +50,7 @@ const HistoryTab = (props: HistoryTabProps) => {
             data={data}
             index={history.length - index}
             pending={false}
-            selected={selectedHistoryId === `${index + 1}`}
+            selected={selectedId === `${history.length - index}`}
           />
         ))}
       </div>

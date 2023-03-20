@@ -62,7 +62,7 @@ export const useNodeVersionHistory = (uuid: string = "") => {
     pendingCommits: commits,
   } = useGetter((state) => state.nodes.nodeHistory);
 
-  console.log("history", histories[uuid]);
+  console.log("history", selectedHistoryId, histories[uuid]);
   return useMemo(
     () => ({
       selectedHistory,

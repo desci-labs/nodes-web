@@ -33,6 +33,8 @@ import { useNodeReader, useNodeVersionHistory } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { setManifest } from "@src/state/nodes/viewer";
 import { setPendingCommits } from "@src/state/nodes/history";
+import { tags } from "@src/state/api/tags";
+import { api } from "@src/state/api";
 
 export const LOCALSTORAGE_TXN_LIST = "desci:txn-list";
 
@@ -210,6 +212,8 @@ const CommitStatusPopover = (props: any) => {
             commits: [...(pendingCommits[currentObjectId!] ?? []), commit],
           })
         );
+        api.util.invalidateTags([{ type: tags.nodes }]);
+
         // store locally in case of refresh or new tab
         // localStorage.setItem(
         //   LS_PENDING_COMMITS_KEY,
@@ -281,6 +285,7 @@ const CommitStatusPopover = (props: any) => {
   const switchChain = useCallback(doSwitchChain, [connector, setError]);
   const usingAssociatedAccount = !!wallets.filter((w) => w.address === address)
     .length;
+
   return (
     <PopOver
       {...props}

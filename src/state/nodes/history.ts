@@ -14,7 +14,7 @@ const initialState: HistoryState = {
   publishMap: {},
   histories: {},
   pendingCommits: {},
-  selectedHistoryId: "1",
+  selectedHistoryId: "",
   selectedHistory: null,
 };
 
@@ -63,7 +63,7 @@ export const historyReducer = historySlice.reducer;
 
 export const {
   setPublishedNodes,
-  setVersionHistories,
+  // setVersionHistories,
   setNodeHistory,
   resetHistory,
   setPendingCommits,

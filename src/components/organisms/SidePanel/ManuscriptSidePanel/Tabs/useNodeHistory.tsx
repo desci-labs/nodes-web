@@ -9,6 +9,8 @@ import { VersionResponse } from "@src/state/api/types";
 import { useNodeReader, useNodeVersionHistory } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { setNodeHistory, setPendingCommits } from "@src/state/nodes/history";
+import { api } from "@src/state/api";
+import { tags } from "@src/state/api/tags";
 
 const LS_HISTORY_MAP = "DESCI::node-version-history";
 
@@ -48,11 +50,8 @@ export default function useNodeHistory() {
 
   const updatePendingCommits = useCallback(
     (update: ResearchObjectV1History[]) => {
-      // const pending = { [currentObjectId ?? ""]: update };
-      // setPendingHistory(update);
-      // setPendingCommits(pending);
       dispatch(setPendingCommits({ id: currentObjectId!, commits: update }));
-      localStorage.setItem(LS_PENDING_COMMITS_KEY, JSON.stringify(pending));
+      // localStorage.setItem(LS_PENDING_COMMITS_KEY, JSON.stringify(pending));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [pendingCommits]
@@ -85,7 +84,6 @@ export default function useNodeHistory() {
             dispatch(
               setNodeHistory({ id: currentObjectId, history: currentHistory })
             );
-            // setHistory({ ...historys, [currentObjectId]: currentHistory });
           } catch (e) {
             console.log("ERROR", e);
           } finally {
@@ -115,6 +113,7 @@ export default function useNodeHistory() {
         // wait for graph node index
         setTimeout(refresh, 5000);
         setTimeout(refresh, 10000);
+        api.util.invalidateTags([{ type: tags.nodes }]);
       });
 
       loadRef.current = true;
