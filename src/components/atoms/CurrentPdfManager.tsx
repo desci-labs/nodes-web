@@ -5,7 +5,7 @@ import {
 } from "@desci-labs/desci-models";
 import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
-import { setCurrentPdf } from "@src/state/nodes/pdf";
+import { setCurrentPage, setCurrentPdf } from "@src/state/nodes/pdf";
 import { useEffect } from "react";
 
 const CurrentPdfManager = () => {
@@ -31,6 +31,7 @@ const CurrentPdfManager = () => {
 
       if (currentPdf !== targetPdf) {
         dispatch(setCurrentPdf(targetPdf));
+        dispatch(setCurrentPage(1));
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

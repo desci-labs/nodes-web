@@ -27,7 +27,7 @@ export const usePageZoomedOffset = () => {
     (index: number) => {
       const totalSpacing = PDF_PAGE_SPACING * index;
       return (
-        (pageMetadata[index].documentOffset - totalSpacing) * zoom +
+        ((pageMetadata[index]?.documentOffset ?? 0) - totalSpacing) * zoom +
         totalSpacing
       );
     },

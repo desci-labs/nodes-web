@@ -76,6 +76,23 @@ export const nodeReaderSlice = createSlice({
       state.manifestStatus = ManifestDataStatus.Idle;
       state.manifest = payload;
     },
+    deleteComponent: (
+      state,
+      { payload }: PayloadAction<{ componentId: string }>
+    ) => {
+      console.log(
+        "delete",
+        payload.componentId,
+        state.manifest?.components.filter(
+          (component) => component.id !== payload.componentId
+        )
+      );
+      if (state.manifest) {
+        state.manifest.components = state.manifest.components.filter(
+          (component) => component.id !== payload.componentId
+        );
+      }
+    },
     updateComponent: (
       state,
       {
@@ -302,6 +319,7 @@ export const saveManifestDraft = createAsyncThunk(
     const { manifest: manifestData, currentObjectId } = state.nodes.nodeReader;
 
     if (!manifestData) return;
+    // console.log("Save Manifest", manifestData);
     const res = await updateDraft({
       manifest: manifestData!,
       uuid: args?.uuid ?? currentObjectId!,
@@ -333,6 +351,7 @@ export const {
   setPublicView,
   setManifestCid,
   saveAnnotation,
+  deleteComponent,
   updateComponent,
   setManifestData,
   deleteAnnotation,
