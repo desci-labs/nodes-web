@@ -20,7 +20,7 @@ const initialState: HistoryState = {
 
 export const historySlice = createSlice({
   initialState,
-  name: "nodeHistorySlice",
+  name: "nodeHistory",
   reducers: {
     resetHistory: () => initialState,
     setPublishedNodes: (state, { payload }: PayloadAction<PublishedMap>) => {

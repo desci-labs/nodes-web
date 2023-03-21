@@ -9,7 +9,6 @@ import { updateDraft } from "@src/api";
 import { cleanupManifestUrl } from "@src/components/utils";
 import { RootState } from "@src/store";
 import axios from "axios";
-// import { saveManifestDraft } from "./saveManifestDraft";
 
 type ReaderMode = "reader" | "editor";
 
@@ -60,7 +59,7 @@ const initialState: NodeReaderPref = {
 
 export const nodeReaderSlice = createSlice({
   initialState,
-  name: "nodeViewerSlice",
+  name: "nodeViewer",
   reducers: {
     toggleMode: (state) => {
       state.mode = state.mode === "reader" ? "editor" : "reader";

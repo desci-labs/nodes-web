@@ -4,6 +4,13 @@ import { api } from "@src/state/api";
 import { nodesReducer } from "@src/state/nodes/root";
 import preferenceSlice from "@src/state/preferences/preferencesSlice";
 import userSlice from "@src/state/user/userSlice";
+import {
+  persistReducer,
+  persistStore,
+  createMigrate,
+  PersistedState,
+} from "redux-persist";
+import storage from "redux-persist/lib/storage";
 
 const rootReducer = combineReducers({
   user: userSlice,
@@ -13,11 +20,36 @@ const rootReducer = combineReducers({
   nodes: nodesReducer,
 });
 
+const migrations = {
+  1: (state: PersistedState) => {
+    console.log("migrate, ", state);
+    return {} as PersistedState; // reset all state, except version
+  },
+};
+
+const persistConfig = {
+  key: "root",
+  version: 1,
+  storage,
+  migrate: createMigrate(migrations),
+  blacklist: [
+    "user",
+    "preferences",
+    "pdfViewer",
+    "nodeViewer",
+    api.reducerPath,
+  ],
+};
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
 export const store = configureStore({
-  reducer: rootReducer,
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat([api.middleware]),
 });
+
+export const persistor = persistStore(store);
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;
