@@ -6,14 +6,14 @@ import HistoryEntry from "./HistoryEntry";
 import { TimelineGutter } from "./Timeline";
 import useNodeHistory from "./useNodeHistory";
 import LoaderHistoryEntry from "@src/components/molecules/LoaderHistoryEntry";
-import { useNodeVersionHistory } from "@src/state/nodes/hooks";
+import { useHistoryReader } from "@src/state/nodes/hooks";
 
 interface HistoryTabProps {}
 
 const HistoryTab = (props: HistoryTabProps) => {
   const [height] = useState(0);
+  const { selectedHistoryId } = useHistoryReader();
   const { loadingChain, history, pendingHistory } = useNodeHistory();
-  const { selectedHistoryId } = useNodeVersionHistory();
   const selectedId = selectedHistoryId || history.length.toString();
 
   return (

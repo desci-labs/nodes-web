@@ -22,7 +22,8 @@ const CurrentPdfManager = () => {
       [...componentStack]
         .reverse()
         .filter((a) => a.type === ResearchObjectComponentType.PDF)[0];
-    console.log("[selectedComponent]::", selectedComponent);
+    // console.log("[selectedComponent]::", selectedComponent);
+
     if (selectedComponent) {
       let targetPdf = cleanupManifestUrl(
         (selectedComponent.payload as PdfComponentPayload).url

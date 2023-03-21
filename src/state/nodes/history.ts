@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ResearchObjectV1History } from "@src/../../nodes/desci-models/dist";
+import { ResearchObjectV1History } from "@desci-labs/desci-models";
 import { HistoryEntryProps, HistoryMap, PublishedMap } from "./types";
 
 interface HistoryState {
@@ -31,10 +31,6 @@ export const historySlice = createSlice({
       { payload }: PayloadAction<{ id: string; history: HistoryEntryProps }>
     ) => {
       state.selectedHistory = payload.history;
-      state.selectedHistoryId = payload.id.toString();
-    },
-    setVersionHistories: (state, { payload }: PayloadAction<HistoryMap>) => {
-      state.histories = { ...state.histories, ...payload };
     },
     setNodeHistory: (
       state,
@@ -63,7 +59,6 @@ export const historyReducer = historySlice.reducer;
 
 export const {
   setPublishedNodes,
-  // setVersionHistories,
   setNodeHistory,
   resetHistory,
   setPendingCommits,

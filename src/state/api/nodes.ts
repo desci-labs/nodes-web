@@ -20,13 +20,14 @@ export const nodesApi = api.injectEndpoints({
           const publishedNodes = data
             .filter((n: any) => n.isPublished)
             .map((n: any) => ({ uuid: n.uuid, index: n.index }));
-          if (publishedNodes.length) {
-            const map: PublishedMap = {};
-            publishedNodes.forEach((n: any) => {
-              map[n.uuid] = n.index;
-            });
-            dispatch(setPublishedNodes(map));
-          }
+
+            if (publishedNodes.length) {
+              const map: PublishedMap = {};
+              publishedNodes.forEach((n: any) => {
+                map[n.uuid] = n.index;
+              });
+              dispatch(setPublishedNodes(map));
+            }
         } catch (error) {}
       },
     }),

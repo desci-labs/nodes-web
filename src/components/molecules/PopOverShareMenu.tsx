@@ -114,7 +114,7 @@ const PopOverShareMenu = () => {
   );
   const dpidSplit = dpidLink.split("/");
   const dpidLinkLatest = dpidSplit.slice(0, 4).join("/");
-  console.log("CITE::", dpidLink, dpidSplit, dpidLinkLatest);
+  // console.log("CITE::", dpidLink, dpidSplit, dpidLinkLatest);
 
   useEffect(() => {
     setLoading(true);
@@ -122,10 +122,10 @@ const PopOverShareMenu = () => {
 
     (async () => {
       try {
-        console.log("Get Versions", currentObjectId);
+        // console.log("Get Versions", currentObjectId);
         if (currentObjectId) {
           const versionData = await getPublishedVersions(currentObjectId!);
-          console.log("published versions", versionData);
+          // console.log("published versions", versionData);
           setNumVersions(versionData.versions.length);
           if (requestedVersion === undefined) {
             setRequestedVersion(versionData.versions.length - 1);

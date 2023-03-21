@@ -91,7 +91,6 @@ const NodeCard = ({
                             uuid: uuid!,
                             licenseType: undefined,
                           });
-                          // setCurrentObjectId(uuid!);
                           setShowAddNewNode(true);
                         },
                       },

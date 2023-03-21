@@ -109,10 +109,10 @@ export default function useManuscriptReader(publicView: boolean = false) {
                 getNonDataComponentsFromManifest(targetData)[0];
 
               dispatch(setComponentStack([firstNonDataComponent]));
-              __log(
-                "ManuscriptReader::useEffect[params] Reset componentStack",
-                JSON.stringify(firstNonDataComponent)
-              );
+              // __log(
+              //   "ManuscriptReader::useEffect[params] Reset componentStack",
+              //   JSON.stringify(firstNonDataComponent)
+              // );
               localStorage.setItem("manifest-url", manifestUrl);
               triggerTooltips();
             } catch (err) {
@@ -175,10 +175,10 @@ export default function useManuscriptReader(publicView: boolean = false) {
           dispatch(setManifest(targetData));
 
           setComponentStack([targetComponent]);
-          __log(
-            "ManuscriptReader::useEffect[params] Reset componentStack",
-            JSON.stringify(targetData.components[0])
-          );
+          // __log(
+          //   "ManuscriptReader::useEffect[params] Reset componentStack",
+          //   JSON.stringify(targetData.components[0])
+          // );
           triggerTooltips();
 
           if (secondParam) {

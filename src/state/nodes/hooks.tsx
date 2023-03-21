@@ -14,6 +14,11 @@ export const usePdfReader = () => {
   return state;
 };
 
+export const useHistoryReader = () => {
+  const state = useGetter((state) => state.nodes.nodeHistory);
+  return state;
+};
+
 export const usePageZoomedOffset = () => {
   const { zoom } = useGetter((state) => state.nodes.pdfViewer);
   const { pageMetadata } = useManuscriptController(["pageMetadata"]);
@@ -62,7 +67,7 @@ export const useNodeVersionHistory = (uuid: string = "") => {
     pendingCommits: commits,
   } = useGetter((state) => state.nodes.nodeHistory);
 
-  console.log("history", selectedHistoryId, histories[uuid]);
+  // console.log("history", uuid, histories, histories[uuid]);
   return useMemo(
     () => ({
       selectedHistory,

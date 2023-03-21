@@ -379,7 +379,7 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
     setHighlightPrompt(null);
   };
 
-  __log("Paper::beforeRender, currentPdf", currentPdf);
+  // __log("Paper::beforeRender, currentPdf", currentPdf);
 
   //listen for centered zoom calls and execute them
   useEffect(() => {
@@ -388,7 +388,7 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
         centeredZoom.zoomMagnitude,
         centeredZoom.centerCoords && centeredZoom.centerCoords
       );
-      console.log("exected centered zoom: ", centeredZoom.zoomMagnitude);
+      // console.log("exected centered zoom: ", centeredZoom.zoomMagnitude);
       dispatch(resetCenteredZoom());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

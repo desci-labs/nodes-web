@@ -29,12 +29,12 @@ import axios from "axios";
 import { ResearchObjectV1 } from "@desci-labs/desci-models";
 import { SpinnerCircular } from "spinners-react";
 import { Wallet } from "@src/state/api/types";
-import { useNodeReader, useNodeVersionHistory } from "@src/state/nodes/hooks";
+import { useHistoryReader, useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { setManifest } from "@src/state/nodes/viewer";
 import { setPendingCommits } from "@src/state/nodes/history";
 import { tags } from "@src/state/api/tags";
-import { api } from "@src/state/api";
+import { nodesApi } from "@src/state/api/nodes";
 
 export const LOCALSTORAGE_TXN_LIST = "desci:txn-list";
 
@@ -51,7 +51,7 @@ const CommitStatusPopover = (props: any) => {
     currentObjectId,
     manifestCid,
   } = useNodeReader();
-  const { pendingCommits } = useNodeVersionHistory(currentObjectId);
+  const { pendingCommits } = useHistoryReader();
 
   const close = () => {
     // setGateway(undefined);
@@ -212,7 +212,7 @@ const CommitStatusPopover = (props: any) => {
             commits: [...(pendingCommits[currentObjectId!] ?? []), commit],
           })
         );
-        api.util.invalidateTags([{ type: tags.nodes }]);
+        dispatch(nodesApi.util.invalidateTags([{ type: tags.nodes }]));
 
         // store locally in case of refresh or new tab
         // localStorage.setItem(

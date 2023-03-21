@@ -53,7 +53,7 @@ const initialState: NodeReaderPref = {
   isDraggingFiles: false,
   isCommitPanelOpen: false,
   isResearchPanelOpen: true,
-  researchPanelTab: ResearchTabs.current,
+  researchPanelTab: ResearchTabs.history,
   startedNewAnnotationViaButton: false,
   manifestStatus: ManifestDataStatus.Idle,
 };

@@ -6,6 +6,7 @@ import { Toaster } from "react-hot-toast";
 import ReactTooltip from "react-tooltip";
 import PreferencUpdater from "@src/state/preferences/updater";
 import UserUpdater from "@src/state/user/updater";
+import NodesUpdater from "@src/state/nodes/updater/versions";
 export const USE_ORCID_JWT = true;
 
 const DEFAULT_THEME = {
@@ -24,6 +25,7 @@ function Updaters() {
     <>
       <PreferencUpdater />
       <UserUpdater />
+      <NodesUpdater />
     </>
   );
 }

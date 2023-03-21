@@ -32,6 +32,7 @@ import {
   setManifest,
   setPublicView,
 } from "@src/state/nodes/viewer";
+import { nodesApi } from "@src/state/api/nodes";
 
 export type ModalProps = PopOverProps & {
   toggleModal: (status: boolean) => void;
@@ -237,7 +238,9 @@ export default function AddResearchNode(props: ModalProps) {
                   setIsLoading(false);
 
                   // refresh node collection
-                  dispatch(api.util.invalidateTags([{ type: tags.nodes }]));
+                  dispatch(
+                    nodesApi.util.invalidateTags([{ type: tags.nodes }])
+                  );
                   navigate(
                     `${site.app}${app.nodes}/${RESEARCH_OBJECT_NODES_PREFIX}${ro}`
                   );

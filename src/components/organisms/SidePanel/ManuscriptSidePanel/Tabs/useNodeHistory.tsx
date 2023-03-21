@@ -1,43 +1,36 @@
 import { LS_PENDING_COMMITS_KEY } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./history.scss";
 import { ResearchObjectV1History } from "@desci-labs/desci-models";
 import { CHAIN_DEPLOYMENT } from "@components/../chains";
 import { ethers } from "ethers";
 import { getResearchObjectVersions } from "@src/api";
 import { VersionResponse } from "@src/state/api/types";
-import { useNodeReader, useNodeVersionHistory } from "@src/state/nodes/hooks";
+import { useHistoryReader, useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { setNodeHistory, setPendingCommits } from "@src/state/nodes/history";
-import { api } from "@src/state/api";
 import { tags } from "@src/state/api/tags";
+import { publishApi } from "@src/state/api/publish";
 
 const LS_HISTORY_MAP = "DESCI::node-version-history";
 
 export default function useNodeHistory() {
   const dispatch = useSetter();
-  // const { pendingCommits } = useManuscriptController(["pendingCommits"]);
   const { currentObjectId } = useNodeReader();
-  // const [historys, setHistory] = useLocalStorageState<
-  //   Record<string, ResearchObjectV1History[]>
-  // >(LS_HISTORY_MAP, {});
-  // const history = useMemo(
-  //   () => historys[currentObjectId ?? ""] ?? [],
-  //   [historys, currentObjectId]
-  // );
-  const { history, pendingCommits, pendingHistory } =
-    useNodeVersionHistory(currentObjectId);
+  const { histories, pendingCommits } = useHistoryReader();
+
+  const pendingHistory = useMemo(
+    () => pendingCommits[currentObjectId!] ?? [],
+    [currentObjectId, pendingCommits]
+  );
+  const history = useMemo(
+    () => histories[currentObjectId!] ?? [],
+    [currentObjectId, histories]
+  );
 
   const loadRef = useRef(false);
   const [loadingChain, setLoadingChain] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
-  // const [pendingHistory, setPendingHistory] = useState<
-  //   ResearchObjectV1History[]
-  // >(() => {
-  //   return pendingCommits[currentObjectId ?? ""]
-  //     ? pendingCommits[currentObjectId ?? ""]
-  //     : [];
-  // });
 
   const transformVersions = (vr: VersionResponse): ResearchObjectV1History[] =>
     vr.versions.map((v) => ({
@@ -51,6 +44,11 @@ export default function useNodeHistory() {
   const updatePendingCommits = useCallback(
     (update: ResearchObjectV1History[]) => {
       dispatch(setPendingCommits({ id: currentObjectId!, commits: update }));
+      dispatch(
+        publishApi.util.invalidateTags([
+          { type: tags.nodeVersions, id: currentObjectId },
+        ])
+      );
       // localStorage.setItem(LS_PENDING_COMMITS_KEY, JSON.stringify(pending));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -81,8 +79,15 @@ export default function useNodeHistory() {
           try {
             const versions = await getResearchObjectVersions(currentObjectId);
             const currentHistory = transformVersions(versions);
+            if (history.length === currentHistory.length) return;
+
             dispatch(
               setNodeHistory({ id: currentObjectId, history: currentHistory })
+            );
+            dispatch(
+              publishApi.util.invalidateTags([
+                { type: tags.nodeVersions, id: currentObjectId },
+              ])
             );
           } catch (e) {
             console.log("ERROR", e);
@@ -105,6 +110,7 @@ export default function useNodeHistory() {
       contract = contract.connect(readOnlyProvider);
       // const eventFilter = contract.filters.VersionPush();
       contract.on("VersionPush", (event) => {
+        console.log("Event VersionPush", event);
         const update = pendingHistory.filter(
           (commit) => commit.transaction?.id !== event.transactionHash
         );
@@ -113,7 +119,6 @@ export default function useNodeHistory() {
         // wait for graph node index
         setTimeout(refresh, 5000);
         setTimeout(refresh, 10000);
-        api.util.invalidateTags([{ type: tags.nodes }]);
       });
 
       loadRef.current = true;
@@ -121,5 +126,10 @@ export default function useNodeHistory() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentObjectId]);
 
-  return { loadingChain, history, pendingHistory, isFetching };
+  return {
+    history,
+    isFetching,
+    loadingChain,
+    pendingHistory: pendingCommits[currentObjectId!] ?? [],
+  };
 }

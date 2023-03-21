@@ -7,5 +7,8 @@ export const endpoints = {
     nodes: {
       index: "/nodes",
     },
+    pub: {
+      versions: "/pub/versions/",
+    },
   },
 } as const;
