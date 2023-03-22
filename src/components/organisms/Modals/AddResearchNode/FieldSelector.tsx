@@ -46,8 +46,9 @@ export default function FieldSelector(props: Props) {
 
     if (values.length === 0 && props?.defaultValues) {
       setValues(props.defaultValues);
+      onChange(props.defaultValues);
     }
-  }, [values, props.defaultValues]);
+  }, [values, props.defaultValues, onChange]);
 
   const onValueChanged = (value: string) => {
     if (values.includes(value)) return;

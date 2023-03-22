@@ -60,7 +60,6 @@ export default function AddResearchNode(props: ModalProps) {
     if (title) setManifestTitle(title);
 
     async function getManifest() {
-      console.log("Update Fetch Manifest again");
       try {
         let targetManifest: ResearchObjectV1;
         // const cid = convertHexToCID(decodeBase64UrlSafeToHex(uuid));
@@ -77,9 +76,7 @@ export default function AddResearchNode(props: ModalProps) {
         }
         if (!targetManifest) throw Error("[EDIT NODE]Failed fetching manifest");
         setEditManifest(targetManifest);
-        if (targetManifest.researchFields) {
-          setResearchFields(targetManifest.researchFields);
-        }
+
         if (targetManifest.defaultLicense) {
           const licenseType = PDF_LICENSE_TYPES.find(
             (l) => l.name === targetManifest.defaultLicense
@@ -96,6 +93,7 @@ export default function AddResearchNode(props: ModalProps) {
       }
     }
     getManifest();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, editingNodeParams]);
 
   const onClose = (dontHideToolbar?: boolean) => {
@@ -105,6 +103,7 @@ export default function AddResearchNode(props: ModalProps) {
     setManifestTitle("");
     setManifestLicense("");
     setEditManifest(null);
+    setResearchFields([]);
     dispatch(resetEditNode());
     props.toggleModal(false);
   };
@@ -125,6 +124,7 @@ export default function AddResearchNode(props: ModalProps) {
     try {
       editManifest.defaultLicense = manifestLicense.name;
       editManifest.title = manifestTitle;
+      editManifest.researchFields = researchFields;
 
       const updateRes = await updateDraft({
         manifest: editManifest,
@@ -155,7 +155,13 @@ export default function AddResearchNode(props: ModalProps) {
       if (props.onRequestClose) props.onRequestClose({} as any);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editingNodeParams, editingNodeParams, manifestLicense, manifestTitle]);
+  }, [
+    editingNodeParams,
+    editingNodeParams,
+    manifestLicense,
+    manifestTitle,
+    researchFields,
+  ]);
 
   return (
     <PopOver
@@ -254,10 +260,7 @@ export default function AddResearchNode(props: ModalProps) {
       <div className="px-6 pt-5 pb-2">
         <div className="flex flex-row justify-between items-center">
           <h1 className="text-lg font-bold">Name the Research Node</h1>
-          <IconX
-            className="cursor-pointer"
-            onClick={() => props.toggleModal(false)}
-          />
+          <IconX className="cursor-pointer" onClick={() => onClose(true)} />
         </div>
         <p className="text-neutrals-gray-5 text-sm mb-6">
           Enter the name of your research node. Ideally it would be the title of
@@ -276,11 +279,13 @@ export default function AddResearchNode(props: ModalProps) {
           Start typing the field of science that best describes your research
           node.
         </p>
-        <FieldSelector
-          onChange={setResearchFields}
-          defaultValues={editManifest?.researchFields}
-          placeholder="Field of Science"
-        />
+        {props.isVisible && (
+          <FieldSelector
+            onChange={setResearchFields}
+            defaultValues={editManifest?.researchFields}
+            placeholder="Field of Science"
+          />
+        )}
         <hr className="mt-6 mb-6 border-neutrals-gray-3" />
         <h1 className="text-base font-bold">Choose License</h1>
         <p className="text-neutrals-gray-5 text-sm">
