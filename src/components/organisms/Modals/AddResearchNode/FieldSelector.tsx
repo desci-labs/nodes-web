@@ -45,7 +45,6 @@ export default function FieldSelector(props: Props) {
     if (inputChangedRef.current === true) return;
 
     if (values.length === 0 && props?.defaultValues) {
-      console.log("Aumatice defaults", values, props.defaultValues);
       setValues(props.defaultValues);
     }
   }, [values, props.defaultValues]);
@@ -74,7 +73,6 @@ export default function FieldSelector(props: Props) {
     inputChangedRef.current = true;
   };
 
-  console.log("Values", values, props.defaultValues);
   return (
     <Combobox
       aria-label="Select Science field"
