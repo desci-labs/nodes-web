@@ -14,11 +14,19 @@ export enum ResearchTabs {
   source = "source",
 }
 
+export interface EditNodeParams {
+  uuid: string;
+  title: string;
+  licenseType: any;
+  // researchFields: string[];
+}
+
 interface NodeReaderPref {
   isNew: boolean;
   mode: ReaderMode;
   manifestCid: string;
   publicView: boolean;
+  editingNodeParams?: EditNodeParams | null;
   currentObjectId?: string;
   isDraggingFiles: boolean;
   isCommitPanelOpen: boolean;
@@ -26,15 +34,16 @@ interface NodeReaderPref {
   researchPanelTab: ResearchTabs;
   isResearchPanelOpen: boolean;
   lastScrollTop: Record<string, number>;
-  componentStack: ResearchObjectV1Component[];
   startedNewAnnotationViaButton: boolean;
+  componentStack: ResearchObjectV1Component[];
 }
 
 const initialState: NodeReaderPref = {
   isNew: false,
   mode: "reader",
-  currentObjectId: "",
   manifestCid: "",
+  editingNodeParams: null,
+  currentObjectId: "",
   lastScrollTop: {},
   publicView: false,
   componentStack: [],
@@ -51,6 +60,12 @@ export const nodeReaderSlice = createSlice({
   reducers: {
     toggleMode: (state) => {
       state.mode = state.mode === "reader" ? "editor" : "reader";
+    },
+    resetEditNode: (state) => {
+      state.editingNodeParams = null;
+    },
+    setEditNodeId: (state, { payload }: PayloadAction<EditNodeParams>) => {
+      state.editingNodeParams = payload;
     },
     setManifestData: (
       state,
@@ -270,6 +285,8 @@ export const {
   toggleMode,
   setManifest,
   setPublicView,
+  setEditNodeId,
+  resetEditNode,
   setManifestCid,
   saveAnnotation,
   updateComponent,

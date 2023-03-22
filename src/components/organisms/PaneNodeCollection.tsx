@@ -41,9 +41,6 @@ export default function PaneNodeCollection() {
 
   const { data: nodes, isLoading } = useGetNodesQuery();
   const [, setShowModal] = useState<boolean>(false);
-  const [editModalInfo, setEditModalInfo] = useState<
-    EditNodeInfo | undefined
-  >();
 
   const onClose = (dontHideToolbar?: boolean) => {
     if (!dontHideToolbar) {
@@ -98,7 +95,6 @@ export default function PaneNodeCollection() {
               });
               onClose();
             }}
-            setEditModalInfo={setEditModalInfo}
           />
         ))}
     </div>
@@ -144,8 +140,6 @@ export default function PaneNodeCollection() {
         </div>
         {isLoading ? <NodeCollectionLoader /> : <LoadedNodesCollection />}
         <AddResearchNode
-          setEditModalInfo={setEditModalInfo}
-          editModalInfo={editModalInfo}
           onRequestClose={() => {
             setShowModal(false);
             setShowAddNewNode(false);

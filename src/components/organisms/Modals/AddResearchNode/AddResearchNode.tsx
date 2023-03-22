@@ -18,7 +18,6 @@ import { useNavigate } from "react-router-dom";
 import { useManuscriptController } from "../../ManuscriptReader/ManuscriptController";
 import { PDF_LICENSE_TYPES } from "../../PopOver/ComponentMetadataPopover";
 import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
-import { EditNodeInfo } from "@src/components/organisms/PaneNodeCollection";
 import { cleanupManifestUrl } from "@src/components/utils";
 import axios from "axios";
 import PopOver, { PopOverProps } from "@components/organisms/PopOver";
@@ -27,23 +26,23 @@ import { api } from "@src/state/api";
 import { tags } from "@src/state/api/tags";
 import { toggleToolbar } from "@src/state/preferences/preferencesSlice";
 import {
+  resetEditNode,
   setComponentStack,
   setCurrentObjectId,
   setManifest,
   setPublicView,
 } from "@src/state/nodes/viewer";
+import { useNodeReader } from "@src/state/nodes/hooks";
 
 export type ModalProps = PopOverProps & {
   toggleModal: (status: boolean) => void;
-  editModalInfo?: EditNodeInfo;
-  setEditModalInfo: React.Dispatch<
-    React.SetStateAction<EditNodeInfo | undefined>
-  >;
   onRequestClose?: any;
 };
 
 export default function AddResearchNode(props: ModalProps) {
   const dispatch = useSetter();
+  const { editingNodeParams } = useNodeReader();
+
   const [manifestTitle, setManifestTitle] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [editManifest, setEditManifest] = useState<ResearchObjectV1 | null>(
@@ -56,11 +55,12 @@ export default function AddResearchNode(props: ModalProps) {
 
   useEffect(() => {
     //only applies for edit mode, fetches manifest of target node
-    if (!props.editModalInfo) return;
-    const { title, uuid } = props.editModalInfo;
+    if (!editingNodeParams) return;
+    const { title, uuid } = editingNodeParams;
     if (title) setManifestTitle(title);
 
     async function getManifest() {
+      console.log("Update Fetch Manifest again");
       try {
         let targetManifest: ResearchObjectV1;
         // const cid = convertHexToCID(decodeBase64UrlSafeToHex(uuid));
@@ -77,6 +77,9 @@ export default function AddResearchNode(props: ModalProps) {
         }
         if (!targetManifest) throw Error("[EDIT NODE]Failed fetching manifest");
         setEditManifest(targetManifest);
+        if (targetManifest.researchFields) {
+          setResearchFields(targetManifest.researchFields);
+        }
         if (targetManifest.defaultLicense) {
           const licenseType = PDF_LICENSE_TYPES.find(
             (l) => l.name === targetManifest.defaultLicense
@@ -88,14 +91,12 @@ export default function AddResearchNode(props: ModalProps) {
         console.log(`[EDIT NODE]Failed fetching manifest err: ${e}`);
         setEditManifest(null);
         setManifestTitle("");
-        props.setEditModalInfo(undefined);
+        dispatch(resetEditNode());
         setIsLoading(false);
-        // props.toggleModal(false);
-        return;
       }
     }
     getManifest();
-  }, [props.editModalInfo]);
+  }, [dispatch, editingNodeParams]);
 
   const onClose = (dontHideToolbar?: boolean) => {
     if (!dontHideToolbar) {
@@ -104,14 +105,14 @@ export default function AddResearchNode(props: ModalProps) {
     setManifestTitle("");
     setManifestLicense("");
     setEditManifest(null);
-    props.setEditModalInfo(undefined);
+    dispatch(resetEditNode());
     props.toggleModal(false);
   };
   const navigate = useNavigate();
 
   useEffect(() => {
     if (props.isVisible === true) {
-      navigate(`${site.app}${app.nodes}/start`);
+      navigate(`${site.app}/start`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.isVisible]);
@@ -119,7 +120,7 @@ export default function AddResearchNode(props: ModalProps) {
   const handleEdit = useCallback(async () => {
     // debugger;
     setIsLoading(true);
-    if (!props.editModalInfo || !props.editModalInfo.uuid || !editManifest)
+    if (!editingNodeParams || !editingNodeParams.uuid || !editManifest)
       return onClose();
     try {
       editManifest.defaultLicense = manifestLicense.name;
@@ -127,7 +128,7 @@ export default function AddResearchNode(props: ModalProps) {
 
       const updateRes = await updateDraft({
         manifest: editManifest,
-        uuid: props.editModalInfo.uuid,
+        uuid: editingNodeParams.uuid,
       });
       dispatch(api.util.invalidateTags([{ type: tags.nodes }]));
       if (updateRes.uri) {
@@ -149,21 +150,14 @@ export default function AddResearchNode(props: ModalProps) {
     } catch (e) {
       console.log(`[EDIT NODE]Failed fetching manifest err: ${e}`);
     } finally {
-      props.setEditModalInfo(undefined);
       setIsLoading(false);
       onClose();
       if (props.onRequestClose) props.onRequestClose({} as any);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    props.editModalInfo,
-    props.editModalInfo?.uuid,
-    editManifest,
-    // nodeCollection,
-    manifestLicense,
-    manifestTitle,
-  ]);
+  }, [editingNodeParams, editingNodeParams, manifestLicense, manifestTitle]);
 
+  console.log("researchFields", researchFields, editManifest?.researchFields);
   return (
     <PopOver
       displayCloseIcon={false}
@@ -194,7 +188,7 @@ export default function AddResearchNode(props: ModalProps) {
               ) || isLoading
             }
             onClick={() => {
-              if (props.editModalInfo) return handleEdit();
+              if (editingNodeParams) return handleEdit();
               /**
                * Handle create new node
                */
@@ -232,7 +226,6 @@ export default function AddResearchNode(props: ModalProps) {
                   setIsLoading(false);
 
                   onClose();
-                  // props?.onRequestClose && props.onRequestClose({} as any);
                   setIsLoading(false);
 
                   // refresh node collection
@@ -247,12 +240,9 @@ export default function AddResearchNode(props: ModalProps) {
                 } finally {
                   setIsLoading(false);
                 }
-
-                // dispatch(setCurrentObjectId(undefined));
               });
               dispatch(setCurrentObjectId(""));
               dispatch(setPublicView(false));
-              // props.toggleModal(false);
             }}
             className="h-10 text-lg flex gap-2"
           >
@@ -289,6 +279,7 @@ export default function AddResearchNode(props: ModalProps) {
         </p>
         <FieldSelector
           onChange={setResearchFields}
+          defaultValues={editManifest?.researchFields}
           placeholder="Field of Science"
         />
         <hr className="mt-6 mb-6 border-neutrals-gray-3" />

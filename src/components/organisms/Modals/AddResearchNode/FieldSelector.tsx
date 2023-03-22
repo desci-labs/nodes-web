@@ -1,5 +1,5 @@
 /* This example requires Tailwind CSS v2.0+ */
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { CheckIcon } from "@heroicons/react/solid";
 import {
   Combobox,
@@ -23,6 +23,7 @@ function classNames(...classes: any[]) {
 interface Props {
   placeholder?: string;
   onChange: (value: string[]) => void;
+  defaultValues?: string[];
 }
 
 export default function FieldSelector(props: Props) {
@@ -33,16 +34,28 @@ export default function FieldSelector(props: Props) {
   const [debouncedInput] = useDebouncer(input, 300);
   const { isFetching, data } = useSearchField(debouncedInput);
   const [customCategories, addCategory] = useState<ResearchFields[]>([]);
+  const inputChangedRef = useRef(false);
 
   const onHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value.trim());
   };
+
+  useEffect(() => {
+    // don't prefill default values if an edit has been made
+    if (inputChangedRef.current === true) return;
+
+    if (values.length === 0 && props?.defaultValues) {
+      console.log("Aumatice defaults", values, props.defaultValues);
+      setValues(props.defaultValues);
+    }
+  }, [values, props.defaultValues]);
 
   const onValueChanged = (value: string) => {
     if (values.includes(value)) return;
     setInput("");
     setValues((values) => values.concat(value));
     onChange(values.concat(value));
+    inputChangedRef.current = true;
   };
 
   const categories = useMemo(
@@ -58,8 +71,10 @@ export default function FieldSelector(props: Props) {
     update.splice(index, 1);
     setValues((_) => update);
     onChange(update);
+    inputChangedRef.current = true;
   };
 
+  console.log("Values", values, props.defaultValues);
   return (
     <Combobox
       aria-label="Select Science field"
@@ -150,14 +165,17 @@ export default function FieldSelector(props: Props) {
               }`}
             >
               <span>{input}</span>
-              <span className="block text-gray-400 text-sm">No results found</span>
+              <span className="block text-gray-400 text-sm">
+                No results found
+              </span>
               <PrimaryButton
                 className="block mt-1 cursor-pointer disabled:cursor-not-allowed"
-                onClick={() =>
+                onClick={() => {
                   addCategory((prev) =>
                     prev.concat([{ name: input, id: random(500, 600) }])
-                  )
-                }
+                  );
+                  inputChangedRef.current = true;
+                }}
               >
                 Add New Field of Science
               </PrimaryButton>
