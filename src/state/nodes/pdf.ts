@@ -59,7 +59,7 @@ export const initialState: PdfViewerState = {
 
 export const pdfViewerSlice = createSlice({
   initialState,
-  name: "pdfViewerSlice",
+  name: "pdfViewer",
   reducers: {
     resetState: (state) => {
       return initialState;

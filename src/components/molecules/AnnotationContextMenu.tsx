@@ -8,8 +8,7 @@ import {
 import { Fragment } from "react";
 import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
-import { deleteAnnotation } from "@src/state/nodes/viewer";
-import { saveManifestDraft } from "@src/state/nodes/saveManifestDraft";
+import { deleteAnnotation, saveManifestDraft } from "@src/state/nodes/viewer";
 import {
   setIsEditingAnnotation,
   updatePdfPreferences,

@@ -5,15 +5,16 @@ import { ResearchObjectV1History } from "@desci-labs/desci-models";
 import HistoryEntry from "./HistoryEntry";
 import { TimelineGutter } from "./Timeline";
 import useNodeHistory from "./useNodeHistory";
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import LoaderHistoryEntry from "@src/components/molecules/LoaderHistoryEntry";
+import { useHistoryReader } from "@src/state/nodes/hooks";
 
-interface HistoryTabProps { }
+interface HistoryTabProps {}
 
 const HistoryTab = (props: HistoryTabProps) => {
   const [height] = useState(0);
+  const { selectedHistoryId } = useHistoryReader();
   const { loadingChain, history, pendingHistory } = useNodeHistory();
-  const { selectedHistoryId } = useManuscriptController(["selectedHistoryId"]);
+  const selectedId = selectedHistoryId || history.length.toString();
 
   return (
     <div className="flex flex-row">
@@ -49,7 +50,7 @@ const HistoryTab = (props: HistoryTabProps) => {
             data={data}
             index={history.length - index}
             pending={false}
-            selected={selectedHistoryId === `${index}`}
+            selected={selectedId === `${history.length - index}`}
           />
         ))}
       </div>

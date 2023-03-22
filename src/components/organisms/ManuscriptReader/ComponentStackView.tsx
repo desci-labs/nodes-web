@@ -46,7 +46,7 @@ const ComponentStackView = (props: ComponentStackViewProps) => {
   // console.log("componentStack", JSON.stringify(componentStack));
 
   const renderComponent = (component: ResearchObjectV1Component) => {
-    __log("ComponentStackView::renderComponent", JSON.stringify(component));
+    // __log("ComponentStackView::renderComponent", JSON.stringify(component));
     switch (component.type) {
       case ResearchObjectComponentType.PDF:
         return <Paper {...component} />;
@@ -73,7 +73,7 @@ const ComponentStackView = (props: ComponentStackViewProps) => {
   //   `ComponentStackView::render componentStack=`,
   //   JSON.stringify(componentStack)
   // );
-  console.log("component stack", componentStack);
+  // console.log("component stack", componentStack);
 
   useEffect(() => {
     if (forceRefreshDrive) setTimeout(() => setForceRefreshDrive(false));

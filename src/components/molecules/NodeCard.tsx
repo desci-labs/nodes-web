@@ -82,7 +82,11 @@ const NodeCard = ({
                         label: <span>Edit</span>,
                         onClick: () => {
                           dispatch(
-                            setEditNodeId({ uuid, title, licenseType: null })
+                            setEditNodeId({
+                              uuid: uuid!,
+                              title,
+                              licenseType: null,
+                            })
                           );
                           setShowAddNewNode(true);
                         },

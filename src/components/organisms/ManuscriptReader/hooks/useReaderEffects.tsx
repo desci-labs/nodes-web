@@ -153,7 +153,7 @@ export default function useReaderEffects(publicView: boolean = false) {
       : [];
 
     if (nonDataComponents.length < 1 && componentStack.length > 0) {
-      console.log("Clear component stack", nonDataComponents);
+      // console.log("Clear component stack", nonDataComponents);
       // setComponentStack([]);
       dispatch(setComponentStack([]));
     }

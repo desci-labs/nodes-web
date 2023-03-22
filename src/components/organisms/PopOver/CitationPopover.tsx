@@ -314,7 +314,6 @@ function Box(props: PropsWithChildren<{}>) {
 
 const CitationPopover = (props: PopOverProps) => {
   const { showCitationModal, setShowCitationModal } = useManuscriptController([
-    "pendingCommits",
     "showCitationModal",
   ]);
   const close = () => {

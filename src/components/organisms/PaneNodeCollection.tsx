@@ -7,7 +7,7 @@ import { useEffectOnce } from "react-use";
 import NodeCollectionEmptyState from "../atoms/NodeCollectionEmptyState";
 import NodeCardLoader from "../molecules/NodeCardLoader";
 import { useGetter, useSetter } from "@src/store/accessors";
-import { useGetNodesQuery } from "@src/state/api/nodes";
+import { nodesApi, useGetNodesQuery } from "@src/state/api/nodes";
 import { toggleToolbar } from "@src/state/preferences/preferencesSlice";
 import AddResearchNode from "@src/components/organisms/Modals/AddResearchNode/AddResearchNode";
 import { useNodeReader } from "@src/state/nodes/hooks";
@@ -16,6 +16,8 @@ import {
   setPublicView,
   toggleResearchPanel,
 } from "@src/state/nodes/viewer";
+import { tags } from "@src/state/api/tags";
+import { api } from "@src/state/api";
 
 export interface EditNodeInfo {
   uuid: string;
@@ -25,13 +27,11 @@ export interface EditNodeInfo {
 
 export default function PaneNodeCollection() {
   const {
-    publishMap,
-    setPublishMap,
     setIsAddingComponent,
     setIsAddingSubcomponent,
     showAddNewNode,
     setShowAddNewNode,
-  } = useManuscriptController(["publishMap", "showAddNewNode"]);
+  } = useManuscriptController(["showAddNewNode"]);
 
   const dispatch = useSetter();
   const { isNew, currentObjectId } = useNodeReader();
@@ -55,29 +55,18 @@ export default function PaneNodeCollection() {
   /**
    * Refresh node list when we view this screen
    */
-  useEffect(() => {}, [dispatch, isToolbarVisible]);
+  useEffect(() => {
+    // dispatch(nodesApi.util.invalidateTags([{ type: tags.nodes }]));
+  }, [dispatch, isToolbarVisible]);
 
   useEffect(() => {
     if (nodes && nodes.length > 0) {
       if (!currentObjectId) {
         dispatch(setCurrentObjectId(nodes[0]?.uuid));
       }
-      /**
-       * Update which nodes we know are published based on graph index
-       */
-      const publishedNodes = nodes
-        .filter((n: any) => n.isPublished)
-        .map((n: any) => ({ uuid: n.uuid, index: n.index }));
-      if (publishedNodes.length) {
-        const newPublishMap = { ...publishMap };
-        publishedNodes.forEach((n: any) => {
-          newPublishMap[n.uuid] = n.index;
-        });
-        setPublishMap(newPublishMap);
-      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isNew, nodes, setPublishMap]);
+  }, [isNew, nodes]);
 
   const NodeCollectionView = () => (
     <div className="max-w-2xl w-full self-center flex flex-col gap-6 pb-10">

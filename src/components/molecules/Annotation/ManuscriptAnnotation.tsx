@@ -18,10 +18,8 @@ const AnnotationWrapper: StyledComponent<
   never
 > = styled.div`
   ${(props: { isHidden: boolean }) =>
-    props.isHidden
-      ? `transform: translate(calc(100% - 0.5rem));`
-      : "transform: none"};
-  transition: transform ease-out 250ms;
+    props.isHidden ? `display: none` : "transform: none;"};
+  transition: none;
   position: relative;
 `;
 const ManuscriptAnnotationContainer: StyledComponent<
@@ -37,9 +35,9 @@ const ManuscriptAnnotationContainer: StyledComponent<
     overflow: hidden;
     position: absolute;
     transform: translateX(-1rem);
-    &:hover ${AnnotationWrapper} {
-     transform: translateX(0.5rem);
-    }
+    // &:hover ${AnnotationWrapper} {
+    //  transform: translateX(0.5rem);
+    // }
   `
       : "transform: translateX(0rem)"}
 `;
@@ -72,8 +70,10 @@ const ManuscriptAnnotation = (props: ManuscriptAnnotationProps) => {
   const isCode =
     componentStack[componentStack.length - 1].type ===
     ResearchObjectComponentType.CODE;
-  const isSelected = selectedAnnotationId === annotationWithLayoutMeta.data.id;
   const isHovered = hoveredAnnotationId === annotationWithLayoutMeta.data.id;
+  const isSelected =
+    selectedAnnotationId === annotationWithLayoutMeta.data.id || isHovered;
+
   // const TARGET_SIZE = -250;
   // const annotationMargin = (1 - 0.1) * TARGET_SIZE * zoom + 20;
   // const ANNOTATION_MARGIN_MAX = 90000;
@@ -82,16 +82,6 @@ const ManuscriptAnnotation = (props: ManuscriptAnnotationProps) => {
   const [shiftable, setShiftable] = useState(false);
   const [isDelayedEditingAnnotation, setIsDelayedEditingAnnotation] =
     useState<boolean>(false);
-  useEffect(() => {
-    if (isSelected && isCode) {
-      setShiftable(true);
-    } else {
-      setTimeout(() => {
-        setShiftable(false);
-      }, 100);
-    }
-    return () => {};
-  }, [isSelected, isCode, shiftable]);
 
   useEffect(() => {
     if (!isEditingAnnotation) {
@@ -196,7 +186,13 @@ const ManuscriptAnnotation = (props: ManuscriptAnnotationProps) => {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [containerRef, zoom, selectedAnnotationId, dimensions]);
+  }, [
+    containerRef,
+    zoom,
+    selectedAnnotationId,
+    hoveredAnnotationId,
+    dimensions,
+  ]);
 
   // const ANNOTATION_MARGIN_MAX = (0.24 * TARGET_SIZE * zoom);
 
@@ -229,32 +225,36 @@ const ManuscriptAnnotation = (props: ManuscriptAnnotationProps) => {
     right: 0,
     top: 0,
     transformOrigin: "center right",
-    transform: `scale(${zoom < 1 ? zoom : 1}) ${
-      isSelected
-        ? SELECTED_ANNOTATION_TRANSFORM
-        : UNSELECTED_ANNOTATION_TRANSFORM
-    }`,
+    transform: `scale(${zoom < 1 ? zoom : 1}) ${SELECTED_ANNOTATION_TRANSFORM}`,
+    zIndex:
+      selectedAnnotationId != annotationWithLayoutMeta.data.id &&
+      hoveredAnnotationId != annotationWithLayoutMeta.data.id
+        ? 0
+        : hoveredAnnotationId == annotationWithLayoutMeta.data.id
+        ? 100
+        : 99,
   };
 
   return (
     <ManuscriptAnnotationContainer
-      isHidden={isHidden}
+      isHidden={false}
       ref={(r) => (containerRef.current = r)}
       className={`
         ${
-          isEditingAnnotation || isDelayedEditingAnnotation
+          isSelected && (isEditingAnnotation || isDelayedEditingAnnotation)
             ? `w-[745px] h-[100vh] ${
                 isDelayedEditingAnnotation ? `left-0` : `left-0 top-[56px]`
               }  z-10 fixed pr-[325px]`
             : "absolute w-fit"
         }
         ${
-          !selectedAnnotationId || isSelected
+          true
             ? "z-10 opacity-100 annotation-selected"
             : "z-0 opacity-0 pointer-events-none"
         }
+        
       `}
-      isSelected={isSelected}
+      isSelected={true}
       style={
         isEditingAnnotation || isDelayedEditingAnnotation
           ? {}
@@ -263,9 +263,7 @@ const ManuscriptAnnotation = (props: ManuscriptAnnotationProps) => {
           : PDF_VIEW_ANNOTATION_POSITION
       }
     >
-      <AnnotationWrapper
-        isHidden={isHidden && !isSelected && !selectedAnnotationId}
-      >
+      <AnnotationWrapper isHidden={isEditingAnnotation && !isSelected}>
         <div
           className={`fixed top-[-23px] left-[-22px] w-[406px]   ${
             isSelected && isCode
@@ -276,12 +274,13 @@ const ManuscriptAnnotation = (props: ManuscriptAnnotationProps) => {
         <AnnotationComponent
           annotation={annotationWithLayoutMeta.data}
           selected={isSelected}
-          hovered={isHovered}
+          hovered={false}
           onSelected={() =>
             __log(
               "ManuscriptAnnotation::onSelected, selectedAnnotationId=",
               annotationWithLayoutMeta.data.id
             ) &&
+            dispatch(setHoveredAnnotationId("")) &&
             dispatch(setSelectedAnnotationId(annotationWithLayoutMeta.data.id))
           }
           onMouseEnter={() => {
@@ -289,6 +288,7 @@ const ManuscriptAnnotation = (props: ManuscriptAnnotationProps) => {
               "ManuscriptAnnotation::onMouseEnter, hoveredAnnotationId=",
               annotationWithLayoutMeta.data.id
             ) &&
+              selectedAnnotationId != annotationWithLayoutMeta.data.id &&
               dispatch(
                 setHoveredAnnotationId(annotationWithLayoutMeta.data.id)
               );

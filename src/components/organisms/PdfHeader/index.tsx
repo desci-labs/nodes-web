@@ -20,7 +20,11 @@ import {
   toggleToolbar,
 } from "@src/state/preferences/preferencesSlice";
 import { useUser } from "@src/state/user/hooks";
-import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
+import {
+  useCurrentNodeVersion,
+  useNodeReader,
+  usePdfReader,
+} from "@src/state/nodes/hooks";
 import { setLoadState } from "@src/state/nodes/pdf";
 
 const HeadWrapper = styled.div.attrs({
@@ -57,6 +61,7 @@ const NavStart = styled.div.attrs({
 const PdfHeader = () => {
   const userProfile = useUser();
   const dispatch = useSetter();
+  const nodeVersion = useCurrentNodeVersion();
   const {
     orcid: { loading: orcidLoading, orcidData },
     hideHeader,
@@ -65,18 +70,11 @@ const PdfHeader = () => {
   const {
     loadState: { loadPercent, loadError, loadProgressTaken },
   } = usePdfReader();
-
-  const {
-    setShowShareMenu,
-    publishMap,
-    isAddingComponent,
-    isAddingSubcomponent,
-  } = useManuscriptController([
-    "publishMap",
-    "isAddingComponent",
-    "isAddingSubcomponent",
-  ]);
   const { componentStack, publicView, currentObjectId } = useNodeReader();
+
+  const { setShowShareMenu, isAddingComponent, isAddingSubcomponent } =
+    useManuscriptController(["isAddingComponent", "isAddingSubcomponent"]);
+
   const isPdfActiveComponent =
     componentStack[componentStack.length - 1]?.type ===
       ResearchObjectComponentType.PDF &&
@@ -124,7 +122,7 @@ const PdfHeader = () => {
     }
   }, [loadProgressTaken, loadError, dispatch]);
 
-  const canShare = publicView || (publishMap && publishMap[currentObjectId!]);
+  const canShare = publicView || !!nodeVersion;
 
   const openMenu = () => {
     if (userProfile.userId > 0) {

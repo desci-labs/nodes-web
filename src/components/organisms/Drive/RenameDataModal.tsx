@@ -8,8 +8,7 @@ import PrimaryButton from "@src/components/atoms/PrimaryButton";
 import PopoverFooter from "@src/components/molecules/Footer";
 import InsetLabelInput from "@src/components/molecules/FormInputs/InsetLabelInput";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import { saveManifestDraft } from "@src/state/nodes/saveManifestDraft";
-import { updateComponent } from "@src/state/nodes/viewer";
+import { updateComponent, saveManifestDraft } from "@src/state/nodes/viewer";
 import { useSetter } from "@src/store/accessors";
 import React, { useEffect, useState } from "react";
 import { DriveObject } from "./types";
@@ -77,7 +76,7 @@ const RenameDataModal: React.FC<RenameDataModalProps> = ({
     try {
       dispatch(
         saveManifestDraft({
-          onSaveCallback: () => {
+          onSucess: () => {
             setLoading(false);
             setDirectory((oldDir) => {
               let compCid = renameComponentId;

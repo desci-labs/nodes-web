@@ -33,6 +33,7 @@ import {
   setPublicView,
 } from "@src/state/nodes/viewer";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import { nodesApi } from "@src/state/api/nodes";
 
 export type ModalProps = PopOverProps & {
   toggleModal: (status: boolean) => void;
@@ -51,7 +52,7 @@ export default function AddResearchNode(props: ModalProps) {
   const [manifestLicense, setManifestLicense] = useState<any>();
   const [researchFields, setResearchFields] = useState<string[]>([]);
 
-  const { setIsAddingComponent } = useManuscriptController(["publishMap"]);
+  const { setIsAddingComponent } = useManuscriptController();
 
   useEffect(() => {
     //only applies for edit mode, fetches manifest of target node
@@ -133,20 +134,7 @@ export default function AddResearchNode(props: ModalProps) {
       dispatch(api.util.invalidateTags([{ type: tags.nodes }]));
       if (updateRes.uri) {
         console.log("NOde Update", updateRes);
-        // Todo: move reactive UI update to redux
-        //reactive update ui
-        // const newCollection = [...nodeCollection];
-        // const targetNodeIdx = newCollection.findIndex(
-        //   (n) => (n.uuid = props.editModalInfo!.uuid)
-        // );
-        // if (targetNodeIdx !== -1) {
-        //   newCollection[targetNodeIdx].title = manifestTitle;
-        //   setNodeCollection(newCollection);
-        // }
       }
-      // props.mutateCollectionState();
-
-      // dispatch(api.util.invalidateTags([{ type: tags.nodes }]));
     } catch (e) {
       console.log(`[EDIT NODE]Failed fetching manifest err: ${e}`);
     } finally {
@@ -234,7 +222,9 @@ export default function AddResearchNode(props: ModalProps) {
                   setIsLoading(false);
 
                   // refresh node collection
-                  dispatch(api.util.invalidateTags([{ type: tags.nodes }]));
+                  dispatch(
+                    nodesApi.util.invalidateTags([{ type: tags.nodes }])
+                  );
                   navigate(
                     `${site.app}${app.nodes}/${RESEARCH_OBJECT_NODES_PREFIX}${ro}`
                   );
