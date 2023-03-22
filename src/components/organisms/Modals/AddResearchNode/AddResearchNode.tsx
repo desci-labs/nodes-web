@@ -96,8 +96,7 @@ export default function AddResearchNode(props: ModalProps) {
       }
     }
     getManifest();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.editModalInfo]);
+  }, [props, props.editModalInfo]);
 
   const onClose = (dontHideToolbar?: boolean) => {
     if (!dontHideToolbar) {
@@ -113,7 +112,7 @@ export default function AddResearchNode(props: ModalProps) {
 
   useEffect(() => {
     if (props.isVisible === true) {
-      navigate(`${site.app}${app.nodes}/start`);
+      navigate(`${site.app}/start`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.isVisible]);
@@ -134,20 +133,7 @@ export default function AddResearchNode(props: ModalProps) {
       dispatch(api.util.invalidateTags([{ type: tags.nodes }]));
       if (updateRes.uri) {
         console.log("NOde Update", updateRes);
-        // Todo: move reactive UI update to redux
-        //reactive update ui
-        // const newCollection = [...nodeCollection];
-        // const targetNodeIdx = newCollection.findIndex(
-        //   (n) => (n.uuid = props.editModalInfo!.uuid)
-        // );
-        // if (targetNodeIdx !== -1) {
-        //   newCollection[targetNodeIdx].title = manifestTitle;
-        //   setNodeCollection(newCollection);
-        // }
       }
-      // props.mutateCollectionState();
-
-      // dispatch(api.util.invalidateTags([{ type: tags.nodes }]));
     } catch (e) {
       console.log(`[EDIT NODE]Failed fetching manifest err: ${e}`);
     } finally {
