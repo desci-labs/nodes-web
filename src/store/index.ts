@@ -1,6 +1,7 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import adminAnalyticsReducer from "@src/state/analytics/analyticsSlice";
 import { api } from "@src/state/api";
+import driveReducer from "@src/state/drive/driveSlice";
 import { nodesReducer } from "@src/state/nodes/root";
 import preferenceSlice from "@src/state/preferences/preferencesSlice";
 import userSlice from "@src/state/user/userSlice";
@@ -11,6 +12,7 @@ const rootReducer = combineReducers({
   adminAnalytics: adminAnalyticsReducer,
   [api.reducerPath]: api.reducer,
   nodes: nodesReducer,
+  drive: driveReducer,
 });
 
 export const store = configureStore({
