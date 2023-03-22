@@ -157,7 +157,6 @@ export default function AddResearchNode(props: ModalProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editingNodeParams, editingNodeParams, manifestLicense, manifestTitle]);
 
-  console.log("researchFields", researchFields, editManifest?.researchFields);
   return (
     <PopOver
       displayCloseIcon={false}
