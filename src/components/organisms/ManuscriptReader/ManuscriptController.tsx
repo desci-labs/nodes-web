@@ -3,16 +3,13 @@ import { BehaviorSubject, Subject } from "rxjs";
 import {
   ResearchObjectComponentSubtypes,
   ResearchObjectComponentType,
-  ResearchObjectV1History,
   ResearchObjectV1Validation,
 } from "@desci-labs/desci-models";
 import { EditorHistory } from "@components/organisms/ManuscriptComponentsSection";
 import { PageMetadata } from "@components/organisms/Paper/usePageMetadata";
-import { HistoryEntryProps } from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/HistoryEntry";
 import { UploadQueueItem } from "@components/organisms/UploadPanel";
 import { DriveJumpingParams, DriveObject } from "@components/organisms/Drive";
 import { Wallet } from "@src/state/api/types";
-
 
 /* ########################### Customizable options ################################ */
 
@@ -35,9 +32,9 @@ interface CodeFileTabs {
  * `?:` in State, use `| undefined` instead.
  */
 interface State {
-  pendingCommits: { [uuid: string]: ResearchObjectV1History[] };
+  // pendingCommits: { [uuid: string]: ResearchObjectV1History[] };
   scrollRef: MutableRefObject<any> | undefined;
-  selectedHistoryId: string | undefined;
+  // selectedHistoryId: string | undefined;
   validations: ResearchObjectV1Validation[]; // TODO Remove;
   editorHistory: EditorHistory[];
   codeViewState: {
@@ -53,7 +50,6 @@ interface State {
   showWalletManager: boolean;
   selectingWallet: boolean;
   wallets: Wallet[];
-  publishMap: { [uuid: string]: IndexedNode };
   showShareMenu: boolean;
   pageMetadata: PageMetadata[];
   lastScrollTop: { [componentId: string]: number };
@@ -65,7 +61,7 @@ interface State {
   addComponentType: ResearchObjectComponentType | null;
   addComponentSubType: ResearchObjectComponentSubtypes | null;
   showCitationModal: boolean;
-  selectedHistory: HistoryEntryProps | null;
+  // selectedHistory: HistoryEntryProps | null;
   showPublicationDetails: boolean;
   showUploadPanel: boolean;
   uploadQueue: UploadQueueItem[];
@@ -90,16 +86,16 @@ export const LS_VSCODE_ENABLED = "desci:vscode:enable";
  */
 export const initialState: State = {
   requestedCodeFile: null,
-  pendingCommits: JSON.parse(
-    localStorage.getItem(LS_PENDING_COMMITS_KEY) || "{}"
-  ),
-  publishMap: {},
+  // pendingCommits: JSON.parse(
+  //   localStorage.getItem(LS_PENDING_COMMITS_KEY) || "{}"
+  // ),
   validations: [],
   scrollToPage$: new Subject<number | null>(),
   scrollRef: undefined,
   droppedFileList: null,
   droppedTransferItemList: null,
-  selectedHistoryId: "0",
+  // selectedHistory: null,
+  // selectedHistoryId: "0",
   lastScrollTop: {},
   editorHistory: [],
   dialogs: [],
@@ -123,7 +119,6 @@ export const initialState: State = {
   addComponentSubType: null,
   componentToCite: null,
   showCitationModal: false,
-  selectedHistory: null,
   showPublicationDetails: false,
   showUploadPanel: false,
   uploadQueue: [],

@@ -15,7 +15,8 @@ import AppProviders from "./App/Providers/AppProviders";
 import PublicViewer from "./App/PublicViewer";
 import Placeholder from "./components/organisms/ManuscriptReader/Placeholder";
 import { Provider } from "react-redux";
-import { store } from "./store";
+import { persistor, store } from "./store";
+import { PersistGate } from "redux-persist/integration/react";
 const Terms = lazy(() => import("./components/screens/Terms"));
 const Privacy = lazy(() => import("./components/screens/Privacy"));
 const App = lazy(() => import("@src/App/App"));
@@ -44,19 +45,21 @@ if (
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <AppProviders>
-        <BrowserRouter>
-          <Suspense fallback={<Placeholder isLoading={true} fullHeight />}>
-            <Routes>
-              <Route path={`${site.app}/*`} element={<App />} />
-              <Route path={`${site.web}/*`} element={<BetaWeb />} />
-              <Route path={site.terms} element={<Terms />} />
-              <Route path={site.privacy} element={<Privacy />} />
-              <Route path="/*" element={<PublicViewer />} />
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-      </AppProviders>
+      <PersistGate loading={null} persistor={persistor}>
+        <AppProviders>
+          <BrowserRouter>
+            <Suspense fallback={<Placeholder isLoading={true} fullHeight />}>
+              <Routes>
+                <Route path={`${site.app}/*`} element={<App />} />
+                <Route path={`${site.web}/*`} element={<BetaWeb />} />
+                <Route path={site.terms} element={<Terms />} />
+                <Route path={site.privacy} element={<Privacy />} />
+                <Route path="/*" element={<PublicViewer />} />
+              </Routes>
+            </Suspense>
+          </BrowserRouter>
+        </AppProviders>
+      </PersistGate>
     </Provider>
   </React.StrictMode>,
   document.getElementById("root")

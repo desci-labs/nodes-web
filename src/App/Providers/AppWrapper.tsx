@@ -12,7 +12,7 @@ import { useGetter } from "@src/store/accessors";
 export default function AppWrapper(props: PropsWithChildren<{}>) {
   const userProfile = useUser();
   const { hideFooter, checkingCode } = useGetter((state) => state.preferences);
-  console.log("profile", checkingCode, userProfile);
+  // console.log("profile", checkingCode, userProfile);
   // page scroll behaviour init hook
   useScroll();
 

@@ -19,7 +19,7 @@ import {
   DatasetMetadataInfo,
   MetaStaging,
 } from "@components/organisms/PaneDrive";
-import useSaveManifest from "@src/hooks/useSaveManifest";
+// import useSaveManifest from "@src/hooks/useSaveManifest";
 import { ComponentMetadataForm } from "./DatasetMetadataForm";
 import OverwriteMetadataDialog from "./OverwriteMetadataDialog";
 import {
@@ -28,6 +28,8 @@ import {
 } from "@src/components/driveUtils";
 import { FileType } from "@src/components/organisms/Drive";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import { saveManifestDraft, updateComponent } from "@src/state/nodes/viewer";
+import { useSetter } from "@src/store/accessors";
 
 export const DATASET_METADATA_FORM_DEFAULTS = {
   title: "",
@@ -55,8 +57,10 @@ const defaultProps = {
 const DriveDatasetMetadataPopOver = (
   props: DriveDatasetMetadataPopoverProps & typeof defaultProps
 ) => {
+  const dispatch = useSetter();
   const { publicView } = useNodeReader();
-  const { saveManifest, isSaving } = useSaveManifest();
+  // const { saveManifest, isSaving } = useSaveManifest();
+  const [isSaving, setIsSaving] = useState(false);
   const formRef = useRef<HTMLFormElement | null>(null);
   const [componentIndexes, setComponentIndexes] = useState<
     number[] | undefined
@@ -108,7 +112,7 @@ const DriveDatasetMetadataPopOver = (
 
   const onSubmit = useCallback(
     async (data: DataComponent["payload"]) => {
-      // console.log("[DRIVE METADATA] ON SUBMIT HIT");
+      console.log("[DRIVE METADATA] ON SUBMIT HIT");
       // debugger;
       if (manifestData && componentIndexes?.length) {
         if (props.metaStaging.length !== 1) delete data.title;
@@ -117,6 +121,8 @@ const DriveDatasetMetadataPopOver = (
         //handle overwriting, both normal metadata and submetadata
         if (overWrite) {
           componentIndexes.forEach((idx) => {
+            const payload = { ...manifestDataClone.components[idx].payload };
+            const meta: any = {};
             props.metaStaging.forEach((file) => {
               const subMeta =
                 manifestDataClone.components[idx].payload.subMetadata;
@@ -126,11 +132,26 @@ const DriveDatasetMetadataPopOver = (
                 splitPath.splice(0, 1);
               const neutralPath = splitPath.join("/");
 
-              const removeMetaKeys = Object.keys(subMeta).filter((k) =>
-                k.includes(neutralPath)
-              );
-              removeMetaKeys.forEach((k) => delete subMeta[k]);
+              // const removeMetaKeys = Object.keys(subMeta).filter((k) =>
+              //   k.includes(neutralPath)
+              // );
+
+              Object.keys(subMeta).forEach((k) => {
+                if (!k.includes(neutralPath)) {
+                  meta[k] = subMeta[k];
+                }
+              });
+              // removeMetaKeys.forEach((k) => delete subMeta[k]);
             });
+            dispatch(
+              updateComponent({
+                index: idx,
+                update: {
+                  ...manifestDataClone.components[idx],
+                  payload: { ...payload, subMetadata: meta },
+                },
+              })
+            );
           });
         }
 
@@ -141,48 +162,78 @@ const DriveDatasetMetadataPopOver = (
               ...manifestData?.components[cI].payload,
               ...data,
             };
-            manifestDataClone.components[cI].payload = newPayload;
+            // console.log("components", manifestDataClone.components[cI]);
+            // manifestDataClone.components[cI].payload = newPayload;
+            dispatch(
+              updateComponent({
+                index: cI,
+                update: {
+                  ...manifestDataClone.components[cI],
+                  payload: newPayload,
+                },
+              })
+            );
           });
         }
 
         //subMetadata
         if (rootCid) {
           const idx = componentIndexes[0];
+          let payload = { ...manifestDataClone.components[idx].payload };
           props.metaStaging.forEach((file) => {
             if (file.file.path) {
               const newSubMetadata = {
-                ...manifestData?.components[idx].payload.subMetadata[
-                  file.file.path
-                ],
+                ...payload.subMetadata[file.file.path],
                 ...data,
               };
 
-              manifestDataClone.components[idx].payload.subMetadata[
-                file.file.path
-              ] = newSubMetadata;
+              payload = {
+                ...payload,
+                subMetadata: {
+                  ...payload.subMetadata,
+                  [file.file.path]: newSubMetadata,
+                },
+              };
             }
           });
+          dispatch(
+            updateComponent({
+              index: idx,
+              update: { ...manifestData.components[idx], payload },
+            })
+          );
         }
 
         try {
-          await saveManifest(manifestDataClone);
+          // await saveManifest(manifestDataClone);
+          setIsSaving(true);
+          dispatch(
+            saveManifestDraft({
+              onError: () => {
+                setIsSaving(false);
+              },
+              onSucess: () => {
+                setIsSaving(false);
+                if (hasDirs) {
+                  props.metaStaging.forEach((f) => {
+                    if (f.file.type === FileType.Dir)
+                      findAndInheritSubMetadata(manifestData, f.file);
+                  });
+                }
 
-          if (hasDirs) {
-            props.metaStaging.forEach((f) => {
-              if (f.file.type === FileType.Dir)
-                findAndInheritSubMetadata(manifestData, f.file);
-            });
-          }
+                props.metaStaging.forEach((f) => {
+                  f.file.metadata = data;
+                });
 
-          props.metaStaging.forEach((f) => {
-            f.file.metadata = data;
-          });
-
-          setOverWrite(false);
-          setShowOverwriteDialog(false);
-          props.onClose();
+                setOverWrite(false);
+                setShowOverwriteDialog(false);
+                props.onClose();
+              },
+            })
+          );
         } catch (e: any) {
           alert(e.message);
+          setIsSaving(false);
         }
       }
     },
@@ -221,6 +272,7 @@ const DriveDatasetMetadataPopOver = (
           <PopoverFooter>
             <PrimaryButton
               onClick={() => {
+                console.log("submit");
                 // debugger;
                 if (publicView) {
                   props.onClose();

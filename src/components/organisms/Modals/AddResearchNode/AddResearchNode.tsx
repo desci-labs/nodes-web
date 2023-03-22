@@ -32,6 +32,7 @@ import {
   setManifest,
   setPublicView,
 } from "@src/state/nodes/viewer";
+import { nodesApi } from "@src/state/api/nodes";
 
 export type ModalProps = PopOverProps & {
   toggleModal: (status: boolean) => void;
@@ -52,7 +53,7 @@ export default function AddResearchNode(props: ModalProps) {
   const [manifestLicense, setManifestLicense] = useState<any>();
   const [researchFields, setResearchFields] = useState<string[]>([]);
 
-  const { setIsAddingComponent } = useManuscriptController(["publishMap"]);
+  const { setIsAddingComponent } = useManuscriptController();
 
   useEffect(() => {
     //only applies for edit mode, fetches manifest of target node
@@ -223,7 +224,9 @@ export default function AddResearchNode(props: ModalProps) {
                   setIsLoading(false);
 
                   // refresh node collection
-                  dispatch(api.util.invalidateTags([{ type: tags.nodes }]));
+                  dispatch(
+                    nodesApi.util.invalidateTags([{ type: tags.nodes }])
+                  );
                   navigate(
                     `${site.app}${app.nodes}/${RESEARCH_OBJECT_NODES_PREFIX}${ro}`
                   );

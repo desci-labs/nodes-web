@@ -208,34 +208,35 @@ const PageComponentHOC = React.memo(
       return a.pageIndex == pageNumber - 1;
     });
 
-    __log("[Page.tsx] PageComponentHOC::render index=", pageNumber);
+    // __log("[Page.tsx] PageComponentHOC::render index=", pageNumber);
 
-    const onPageClick: MouseEventHandler<HTMLDivElement> = useCallback((
-      e: MouseEvent<HTMLDivElement>
-    ) => {
-      /**
-       * Handle external links in new browser tab
-       */
-      const target = e.target as HTMLAnchorElement;
-      if (target.tagName.toLowerCase() === "a") {
-        if (target.classList.contains("internalLink")) return;
-        e.preventDefault();
-        window.open(target.href);
-      } else {
+    const onPageClick: MouseEventHandler<HTMLDivElement> = useCallback(
+      (e: MouseEvent<HTMLDivElement>) => {
         /**
-         * Dismiss highlight prompt unless text is still selected
+         * Handle external links in new browser tab
          */
+        const target = e.target as HTMLAnchorElement;
+        if (target.tagName.toLowerCase() === "a") {
+          if (target.classList.contains("internalLink")) return;
+          e.preventDefault();
+          window.open(target.href);
+        } else {
+          /**
+           * Dismiss highlight prompt unless text is still selected
+           */
 
-        e.stopPropagation();
-        setTimeout(() => {
-          const selection = window.getSelection()!;
+          e.stopPropagation();
+          setTimeout(() => {
+            const selection = window.getSelection()!;
 
-          if (selection.toString().trim() === "" && setHighlightPrompt) {
-            setHighlightPrompt(null);
-          }
-        }, 0);
-      }
-    }, [setHighlightPrompt]);
+            if (selection.toString().trim() === "" && setHighlightPrompt) {
+              setHighlightPrompt(null);
+            }
+          }, 0);
+        }
+      },
+      [setHighlightPrompt]
+    );
 
     return (
       <>

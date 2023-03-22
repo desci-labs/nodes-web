@@ -1,4 +1,5 @@
 import MarkdownRender from "@components/molecules/MarkdownRender";
+import React from "react";
 
 interface AnnotationVisibleProps {
   DURATION_BASE_MS: number;
@@ -30,7 +31,7 @@ const AnnotationVisible = ({
             }}
           >
             <div
-              className={`text-sm font-bold py-2 px-3 pr-5 transition-font-size ease break-words ${
+              className={`text-sm font-bold py-2 px-3 pr-5 !min-h-8 ease break-words ${
                 darkMode
                   ? "bg-neutrals-gray-1 text-white"
                   : "bg-white text-black"
@@ -55,4 +56,4 @@ const AnnotationVisible = ({
   );
 };
 
-export default AnnotationVisible;
+export default React.memo(AnnotationVisible);

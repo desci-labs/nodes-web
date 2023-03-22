@@ -18,7 +18,7 @@ const initialState: IUserState = {
 
 export const userSlice = createSlice({
   initialState,
-  name: "userSlice",
+  name: "user",
   reducers: {
     logout: (state) => {
       localStorage.removeItem("auth");

@@ -63,6 +63,7 @@ export const ComponentMetadataForm = React.forwardRef(
     watch("description");
 
     const onSubmitHandler = handleSubmit((data: any) => {
+      console.log("submit", data.licenseType);
       data.licenseType = data.licenseType?.name;
       // props.setNewMetadata(data);
       props.onSubmit(data);

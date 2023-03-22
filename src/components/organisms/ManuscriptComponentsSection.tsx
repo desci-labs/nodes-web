@@ -11,10 +11,14 @@ import {
 import { IconData, IconDeleteForever, IconInfo, IconPen } from "icons";
 import React, { useState } from "react";
 import ComponentRenamePopover from "./PopOver/ComponentRenamePopover";
-import useSaveManifest from "@src/hooks/useSaveManifest";
+// import useSaveManifest from "@src/hooks/useSaveManifest";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
-import { popFromComponentStack } from "@src/state/nodes/viewer";
+import {
+  deleteComponent,
+  popFromComponentStack,
+  saveManifestDraft,
+} from "@src/state/nodes/viewer";
 
 export enum EditorHistoryType {
   ADD_ANNOTATION,
@@ -33,24 +37,23 @@ export interface EditorHistory {
 const EditableHOC = (props: any) => {
   const { children, isEditable, id } = props;
   const dispatch = useSetter();
-  const { manifest: manifestData, componentStack } = useNodeReader();
+  const { componentStack, manifest: manifestData } = useNodeReader();
   const [showRenameModal, setShowRenameModal] = useState<boolean>(false);
-  const { saveManifest } = useSaveManifest();
 
   const { dialogs, setDialogs } = useManuscriptController(["dialogs"]);
 
   const doDelete = () => {
-    if (componentStack[componentStack.length - 1].id === id) {
+    // console.log(componentStack);
+    if (componentStack[componentStack.length - 1]?.id === id) {
       dispatch(popFromComponentStack());
     }
 
-    const manifestDataCopy = Object.assign({}, manifestData);
-    if (manifestDataCopy) {
-      const index = manifestDataCopy.components.findIndex((c) => c.id === id);
+    if (manifestData) {
+      const index = manifestData.components.findIndex((c) => c.id === id);
       if (index > -1) {
-        manifestDataCopy.components.splice(index, 1);
+        dispatch(deleteComponent({ componentId: id }));
+        dispatch(saveManifestDraft({}));
       }
-      saveManifest(manifestDataCopy);
     }
   };
 

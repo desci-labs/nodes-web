@@ -5,8 +5,8 @@ import ButtonCopyLink from "@components/atoms/ButtonCopyLink";
 import { IconLeftArrowThin, IconRightArrowThin } from "@icons";
 import AnnotationEditor from "@components/molecules/AnnotationEditor";
 import { getPublishedVersions } from "@api/index";
-import { useEffect, useState } from "react";
-import { useNodeReader } from "@src/state/nodes/hooks";
+import React, { useEffect, useState } from "react";
+import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { setAnnotationSwitchCall } from "@src/state/nodes/pdf";
 interface AnnotationExpandedProps {
@@ -33,7 +33,9 @@ const AnnotationExpanded = ({
     currentObjectId,
     componentStack,
   } = useNodeReader();
+  const { hoveredAnnotationId, selectedAnnotationId } = usePdfReader();
   const [copyLink, setCopyLink] = useState<string>("");
+  const [visible, setVisible] = useState(hoveredAnnotationId != annotation.id);
 
   useEffect(() => {
     const getCopyLink = async () => {
@@ -68,17 +70,23 @@ const AnnotationExpanded = ({
       setCopyLink(link);
     };
     getCopyLink();
+
+    setVisible(true);
   }, []);
 
+  const isHovered = hoveredAnnotationId === annotation.id;
+  const isSelected = selectedAnnotationId === annotation.id;
+
   return (
-    <>
+    <div className={`${isHovered && !isSelected ? "cursor-pointer" : ""}`}>
       <div
-        className={`rounded-xl px-4 shadow-2xl annotation-item ${
+        className={`rounded-xl px-4 shadow-2xl annotation-item 
+        ${isHovered && !isSelected ? "pointer-events-none" : ""} ${
           darkMode ? "bg-neutrals-gray-1" : "bg-white"
-        } opacity-100 duration-100 relative`}
+        } ${visible ? "opacity-100" : "opacity-0"} duration-100 relative`}
         style={{
           width: 355,
-          transition: `opacity ease-in 0.25s, width ${DURATION_BASE_MS}ms ease, border-bottom-right-radius 0s`,
+          transition: `opacity ease-in 250ms, width 0ms ease, border-bottom-right-radius 0s`,
         }}
       >
         <header
@@ -139,8 +147,8 @@ const AnnotationExpanded = ({
           </SlideDown>
         </main>
       </div>
-    </>
+    </div>
   );
 };
 
-export default AnnotationExpanded;
+export default React.memo(AnnotationExpanded);

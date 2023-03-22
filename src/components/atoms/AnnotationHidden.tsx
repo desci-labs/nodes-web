@@ -14,30 +14,9 @@ const AnnotationHidden = ({
   annotationTitle,
   darkMode,
 }: AnnotationHiddenProps) => {
-  const [short, setShort] = useState(false);
-  const { selectedAnnotationId } = usePdfReader();
-  const mountRef = useRef(true);
-
-  useEffect(() => {
-    if (mountRef.current === false) return;
-    mountRef.current = true;
-
-    if (!selectedAnnotationId) {
-      setShort(true);
-      setTimeout(() => {
-        setShort(false);
-      }, 500);
-    }
-
-    return () => {
-      mountRef.current = false;
-    };
-  }, [selectedAnnotationId]);
   return (
     <div
-      className={`rounded-md overflow-hidden shadow-2xl annotation-item cursor-pointer mx-auto transition-none ${
-        short ? "w-5" : ""
-      }`}
+      className={`absolute left-[-290px] py-2 !cursor-pointer !z-[0] mx-auto pl-[288px] w-[300px] rounded-md-r overflow-hidden h-18 annotation-item cursor-pointer transition-transform duration-1000`}
     >
       <div
         className={`rounded-lg border-l-8 ${
@@ -48,17 +27,17 @@ const AnnotationHidden = ({
       >
         <div className={`rounded-r-lg select-none`}>
           <div
-            className={`rounded-tr-lg opacity-100 duration-100 overflow-hidden ${
+            className={`rounded-tr-lg opacity-100 duration-100 overflow-visible h-18 ${
               darkMode ? "bg-neutrals-gray-1" : "bg-white"
             }`}
             style={{
               width: 242,
-              height: 15,
+              height: 18,
               transition: `opacity ease-in 0.25s`,
             }}
           >
             <div
-              className={`text-white text-sm font-bold py-2 px-3 pr-5 transition-font-size ease`}
+              className={`text-black text-sm font-bold py-2 px-3 pr-5 ease h-18`}
               style={{
                 transitionDuration: `${DURATION_BASE_MS}ms`,
                 maxWidth: "100%",
@@ -68,7 +47,7 @@ const AnnotationHidden = ({
             </div>
 
             <div
-              className={`bg-[rgb(216,216,216)] h-px ease-out`}
+              className={`bg-[rgb(216,216,216)] h-18 ease-out`}
               style={{
                 width: 0,
                 transitionDuration: `${DURATION_BASE_MS}ms`,

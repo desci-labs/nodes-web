@@ -19,13 +19,13 @@ export default function PreferencUpdater() {
   const checkOrcid = useCallback(async () => {
     dispatch(setOrcid({ checking: false }));
 
-    __log("CHECK ORCID");
+    // __log("CHECK ORCID");
     /**
      * Local storage variables set in OrcIdCapture
      */
     const orcidToken = localStorage.getItem(LOCALSTORAGE_ORCID_ACCESS_TOKEN);
     if (orcidToken) {
-      return await (async () => {
+      return await(async () => {
         // setOrcidLoading(true);
         dispatch(setOrcid({ loading: true }));
         const orcid = localStorage.getItem(LOCALSTORAGE_ORCID_ID);
@@ -55,7 +55,7 @@ export default function PreferencUpdater() {
   }, [orcidData]);
 
   useEffect(() => {
-    console.log("Check orcid", checking);
+    // console.log("Check orcid", checking);
     if (checking) {
       checkOrcid();
     }

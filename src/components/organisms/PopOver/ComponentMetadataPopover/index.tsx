@@ -1,6 +1,5 @@
 import DefaultSpinner from "@components/atoms/DefaultSpinner";
 import PrimaryButton from "@components/atoms/PrimaryButton";
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { EMPTY_FUNC } from "@components/utils";
 import { IconViewLink, IconX } from "@icons";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
@@ -19,8 +18,9 @@ import InsetLabelInput from "../../../molecules/FormInputs/InsetLabelInput";
 import SelectMenu from "../../../molecules/FormInputs/SelectMenu";
 import ReadOnlyComponent from "./ReadOnlyComponent";
 import axios from "axios";
-import useSaveManifest from "@src/hooks/useSaveManifest";
-import { useNodeReader } from "@src/state/nodes/hooks";
+import { useManifestStatus, useNodeReader } from "@src/state/nodes/hooks";
+import { useSetter } from "@src/store/accessors";
+import { updateComponent, saveManifestDraft } from "@src/state/nodes/viewer";
 
 export const PDF_LICENSE_TYPES = [
   { id: 1, name: "CC BY" },
@@ -292,8 +292,9 @@ const defaultProps = {
 const ComponentMetadataPopover = (
   props: ComponentMetadataPopoverProps & typeof defaultProps
 ) => {
+  const dispatch = useSetter();
   const formRef = useRef<HTMLFormElement | null>(null);
-  const { saveManifest, isSaving } = useSaveManifest();
+  const { isLoading: isSaving } = useManifestStatus();
   const [component, setComponent] = useState<
     ResearchObjectV1Component | undefined
   >();
@@ -323,20 +324,24 @@ const ComponentMetadataPopover = (
 
   const onSubmit = async (data: CommonComponentPayload) => {
     if (manifestData && componentIndex !== undefined) {
-      // const { keywords, description, licenseType } = data;
       const manifestDataClone = { ...manifestData };
 
       const componentPayload = {
         ...manifestData?.components[componentIndex].payload,
         ...data,
       };
-      manifestDataClone.components[componentIndex].payload = componentPayload;
-      try {
-        await saveManifest(manifestDataClone);
-        props.onClose();
-      } catch (e: any) {
-        alert(e.message);
-      }
+
+      dispatch(
+        updateComponent({
+          index: componentIndex,
+          update: {
+            ...manifestDataClone.components[componentIndex],
+            payload: componentPayload,
+          },
+        })
+      );
+
+      dispatch(saveManifestDraft({ onSucess: () => props.onClose() }));
     }
   };
 
