@@ -5,9 +5,14 @@ import {
   OrcIdConnectUpdateProfile,
 } from "@src/components/screens/OrcIdOAuth/OrcIdOAuthScreen";
 import PoiLookup from "@src/components/screens/PoiLookup";
-import { Navigate, useNavigate } from "react-router-dom";
+import {
+  createRoutesFromElements,
+  Navigate,
+  RouterProvider,
+  useNavigate,
+} from "react-router-dom";
 import { Route, Routes, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import Nodes from "@src/components/screens/RouteNodes";
 import { app, site } from "@src/constants/routes";
 import { useGetUser } from "@src/hooks/useGetUser";
@@ -41,15 +46,57 @@ export default function Views() {
     }
   }, [userData, error, location.pathname, navigate]);
 
+  const router = useMemo(
+    () =>
+      createRoutesFromElements(
+        <>
+          <Route
+            path="/orcid/connect"
+            element={<OrcIdConnectUpdateProfile />}
+          />
+          <Route path="/orcid/auth" element={<OrcIdAuthParseJwt />} />
+          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/admin/analytics" element={<AdminAnalyticsScreen />} />
+          <Route path="/invite" element={<Invite />} />
+          <Route path="/poi-lookup" element={<PoiLookup />} />
+          <Route
+            path="/nodes/*"
+            loader={(args) => {
+              console.log("Load Nodes Data", args);
+              return { args };
+            }}
+            element={<Nodes />}
+          />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/updateEmail" element={<UpdateEmailScreen />} />
+          <Route path={app.help} element={<PaneHelp />} />
+          <Route
+            path="/:url*(/+)"
+            element={<Navigate replace to={location.pathname.slice(0, -1)} />}
+          />
+          <Route path="/*" element={<Nodes />} />
+        </>
+      ),
+    [location.pathname]
+  );
+
   return (
-    <Routes>
+    // <RouterProvider router={router} />
+    <>
       <Route path="/orcid/connect" element={<OrcIdConnectUpdateProfile />} />
       <Route path="/orcid/auth" element={<OrcIdAuthParseJwt />} />
       <Route path="/admin" element={<AdminPanel />} />
       <Route path="/admin/analytics" element={<AdminAnalyticsScreen />} />
       <Route path="/invite" element={<Invite />} />
       <Route path="/poi-lookup" element={<PoiLookup />} />
-      <Route path="/nodes/*" element={<Nodes />} />
+      <Route
+        path="/nodes/*"
+        loader={(args) => {
+          console.log("Load Nodes Data", args);
+          return { args };
+        }}
+        element={<Nodes />}
+      />
       <Route path="/profile" element={<Profile />} />
       <Route path="/updateEmail" element={<UpdateEmailScreen />} />
       <Route path={app.help} element={<PaneHelp />} />
@@ -58,6 +105,6 @@ export default function Views() {
         element={<Navigate replace to={location.pathname.slice(0, -1)} />}
       />
       <Route path="/*" element={<Nodes />} />
-    </Routes>
+    </>
   );
 }

@@ -20,24 +20,8 @@ import { setComponentStack, toggleMode } from "@src/state/nodes/viewer";
 export default function useReaderEffects(publicView: boolean = false) {
   const cid = useParseObjectID();
   const dispatch = useSetter();
-  const {
-    // mode,
-    // manifestData,
-    // componentStack,
-    // currentObjectId,
-    isAddingComponent,
-    isAddingSubcomponent,
-    // toggleMode,
-    // setComponentStack,
-    setIsAddingComponent,
-  } = useManuscriptController([
-    // "manifestData",
-    // "mode",
-    "isAddingComponent",
-    "isAddingSubcomponent",
-    // "componentStack",
-    // "currentObjectId",
-  ]);
+  const { isAddingComponent, isAddingSubcomponent, setIsAddingComponent } =
+    useManuscriptController(["isAddingComponent", "isAddingSubcomponent"]);
   const {
     manifest: manifestData,
     mode,

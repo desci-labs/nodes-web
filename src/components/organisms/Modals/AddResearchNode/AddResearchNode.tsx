@@ -112,7 +112,7 @@ export default function AddResearchNode(props: ModalProps) {
 
   useEffect(() => {
     if (props.isVisible === true) {
-      navigate(`${site.app}/start`);
+      navigate(`${site.app}/nodes/start`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.isVisible]);

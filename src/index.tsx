@@ -1,6 +1,6 @@
-import React, { lazy, Suspense } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
 
 import "flowbite"; // required for react tooltip
 import "react-loading-skeleton/dist/skeleton.css";
@@ -10,19 +10,11 @@ import "./index.css";
 import * as Sentry from "@sentry/react";
 import { BrowserTracing } from "@sentry/tracing";
 import reportWebVitals from "./reportWebVitals";
-import { site } from "./constants/routes";
-import AppProviders from "./App/Providers/AppProviders";
-import PublicViewer from "./App/PublicViewer";
-import Placeholder from "./components/organisms/ManuscriptReader/Placeholder";
+import AppProviders from "@src/App/Providers/AppProviders";
 import { Provider } from "react-redux";
 import { persistor, store } from "./store";
 import { PersistGate } from "redux-persist/integration/react";
-const Terms = lazy(() => import("./components/screens/Terms"));
-const Privacy = lazy(() => import("./components/screens/Privacy"));
-const App = lazy(() => import("@src/App/App"));
-const BetaWeb = lazy(() => import("./components/screens/Web/BetaWeb"));
-const Web = lazy(() => import("./components/screens/Web"));
-
+import { appRouter } from "@src/App/Routes";
 if (
   process.env.REACT_APP_NODES_API &&
   process.env.REACT_APP_NODES_API.indexOf("localhost") < 0
@@ -47,7 +39,8 @@ ReactDOM.render(
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <AppProviders>
-          <BrowserRouter>
+          <RouterProvider router={appRouter} />
+          {/* <BrowserRouter>
             <Suspense fallback={<Placeholder isLoading={true} fullHeight />}>
               <Routes>
                 <Route path={`${site.app}/*`} element={<App />} />
@@ -57,7 +50,7 @@ ReactDOM.render(
                 <Route path="/*" element={<PublicViewer />} />
               </Routes>
             </Suspense>
-          </BrowserRouter>
+          </BrowserRouter> */}
         </AppProviders>
       </PersistGate>
     </Provider>
