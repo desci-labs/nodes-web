@@ -37,6 +37,7 @@ const persistConfig = {
     "preferences",
     "pdfViewer",
     "nodeViewer",
+    "adminAnalytics",
     api.reducerPath,
   ],
 };

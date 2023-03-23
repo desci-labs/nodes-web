@@ -19,6 +19,12 @@ interface AdminAnalyticsApiResp {
   activeUsersToday: number;
   activeUsersInLast7Days: number;
   activeUsersInLast30Days: number;
+  nodeViewsToday: number;
+  nodeViewsInLast7Days: number;
+  nodeViewsInLast30Days: number;
+  bytesToday: number;
+  bytesInLast7Days: number;
+  bytesInLast30Days: number;
 }
 interface AdminAnalyticsState extends AdminAnalyticsApiResp {
   status: RequestStatus;
@@ -35,6 +41,12 @@ const initialState: AdminAnalyticsState = {
   activeUsersToday: 0,
   activeUsersInLast7Days: 0,
   activeUsersInLast30Days: 0,
+  nodeViewsToday: 0,
+  nodeViewsInLast7Days: 0,
+  nodeViewsInLast30Days: 0,
+  bytesToday: 0,
+  bytesInLast7Days: 0,
+  bytesInLast30Days: 0,
   status: "idle",
   error: null,
 };
@@ -75,6 +87,12 @@ export const adminAnalyticsSlice = createSlice({
         state.activeUsersToday = action.payload.activeUsersToday;
         state.activeUsersInLast7Days = action.payload.activeUsersInLast7Days;
         state.activeUsersInLast30Days = action.payload.activeUsersInLast30Days;
+        state.nodeViewsToday = action.payload.nodeViewsToday;
+        state.nodeViewsInLast7Days = action.payload.nodeViewsInLast7Days;
+        state.nodeViewsInLast30Days = action.payload.nodeViewsInLast30Days;
+        state.bytesToday = action.payload.bytesToday;
+        state.bytesInLast7Days = action.payload.bytesInLast7Days;
+        state.bytesInLast30Days = action.payload.bytesInLast30Days;
       })
       .addCase(fetchAdminAnalytics.rejected, (state, action) => {
         state.status = "failed";
@@ -122,6 +140,12 @@ export const selectAdminAnalytics = createSelector(
       activeUsersToday: root.activeUsersToday,
       activeUsersInLast7Days: root.activeUsersInLast7Days,
       activeUsersInLast30Days: root.activeUsersInLast30Days,
+      nodeViewsToday: root.nodeViewsToday,
+      nodeViewsInLast7Days: root.nodeViewsInLast7Days,
+      nodeViewsInLast30Days: root.nodeViewsInLast30Days,
+      bytesToday: root.bytesToday,
+      bytesInLast7Days: root.bytesInLast7Days,
+      bytesInLast30Days: root.bytesInLast30Days,
     };
   }
 );
