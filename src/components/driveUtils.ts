@@ -187,7 +187,7 @@ export function manifestToVirtualDrives(
   return nodeDrived;
 }
 
-export const DRIVE_NODE_ROOT_PATH = "NodeRoot/";
+export const DRIVE_NODE_ROOT_PATH = "root";
 
 export function formatDbDate(date: string | Date | number) {
   if (typeof date === "string") date = new Date(date);

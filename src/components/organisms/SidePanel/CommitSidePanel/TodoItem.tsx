@@ -50,6 +50,7 @@ const TYPE_MAP: { [Property in ResearchObjectComponentType]: string } = {
   terminal: "Script",
   data: "Data",
   link: "External Link",
+  "data-bucket": "Data Bucket",
 };
 
 interface ComponentTodoItemProps {
