@@ -23,7 +23,6 @@ export default function PublicViewer() {
         }
       }
     } else if (location.pathname === "/") {
-      // location.serach includes the "?"
       navigate(`${site.web}${location.search}`);
     }
   }, [user, location.pathname, navigate, location.search]);

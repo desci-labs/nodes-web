@@ -127,14 +127,14 @@ export default function AddResearchNode(props: ModalProps) {
       editManifest.title = manifestTitle;
       editManifest.researchFields = researchFields;
 
-      const updateRes = await updateDraft({
+      await updateDraft({
         manifest: editManifest,
         uuid: editingNodeParams.uuid,
       });
       dispatch(api.util.invalidateTags([{ type: tags.nodes }]));
-      if (updateRes.uri) {
-        console.log("NOde Update", updateRes);
-      }
+      // if (updateRes.uri) {
+      //   console.log("NOde Update", updateRes);
+      // }
     } catch (e) {
       console.log(`[EDIT NODE]Failed fetching manifest err: ${e}`);
     } finally {

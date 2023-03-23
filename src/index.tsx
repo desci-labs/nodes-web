@@ -40,17 +40,6 @@ ReactDOM.render(
       <PersistGate loading={null} persistor={persistor}>
         <AppProviders>
           <RouterProvider router={appRouter} />
-          {/* <BrowserRouter>
-            <Suspense fallback={<Placeholder isLoading={true} fullHeight />}>
-              <Routes>
-                <Route path={`${site.app}/*`} element={<App />} />
-                <Route path={`${site.web}/*`} element={<BetaWeb />} />
-                <Route path={site.terms} element={<Terms />} />
-                <Route path={site.privacy} element={<Privacy />} />
-                <Route path="/*" element={<PublicViewer />} />
-              </Routes>
-            </Suspense>
-          </BrowserRouter> */}
         </AppProviders>
       </PersistGate>
     </Provider>

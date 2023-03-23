@@ -3,7 +3,6 @@ import React, { useEffect } from "react";
 import "react-pdf/dist/umd/Page/AnnotationLayer.css";
 import styled from "styled-components";
 import { FlexRow } from "@components/styled";
-import { useManuscriptController } from "./ManuscriptController";
 import { APPROXIMATED_HEADER_HEIGHT } from "@components/utils";
 import { AvailableUserActionLogTypes, postUserAction } from "@api/index";
 import LoadProgressManager from "@components/molecules/LoadProgressManager";

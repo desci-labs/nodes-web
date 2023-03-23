@@ -11,7 +11,6 @@ const App = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { userData, error } = useGetUser();
-  console.log("Render app");
 
   useEffect(() => {
     if (error) {
