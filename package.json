@@ -55,6 +55,7 @@
     "lodash.maxby": "^4.6.0",
     "lodash.transform": "^4.6.0",
     "lodash.uniq": "^4.5.0",
+    "pretty-bytes": "^6.1.0",
     "process": "^0.11.10",
     "query-string": "^7.1.1",
     "react": "^17.0.2",

@@ -14,12 +14,12 @@ const HelpCard = ({ icon, title, subtitle, url }: HelpCardProps) => {
       href={url}
       rel="noreferrer noopener"
       target="_blank"
-      className="cursor-pointer text-center flex flex-col w-full py-5 px-12 gap-5 border-gray-400 border rounded-md hover:border-gray-200 hover:bg-black align-center justify-center"
+      className="cursor-pointer text-center flex flex-col w-full py-10 px-8 gap-3 border-gray-400 border rounded-md hover:border-gray-200 hover:bg-black align-center justify-center"
     >
       <div className="w-full text-center">{icon}</div>
       <span className="font-bold text-center">{title}</span>
 
-      <span className="text-md text-center">{subtitle}</span>
+      <span className="text-xs text-center">{subtitle}</span>
     </a>
   );
 };
@@ -38,7 +38,7 @@ const HELP_ITEMS: HelpCardProps[] = [
     url: "https://docs.desci.com/find-help/faq",
   },
   {
-    icon: <IconDiscord  className="mx-auto" />,
+    icon: <IconDiscord className="mx-auto" />,
     title: "Community Support",
     subtitle: "Problems? Chat with us on Discord and we'll help!",
     url: "https://docs.desci.com/find-help/community-support",
