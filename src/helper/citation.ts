@@ -2,7 +2,7 @@ import {
   ResearchObjectComponentType,
   ResearchObjectV1,
 } from "@desci-labs/desci-models";
-import { DriveNonComponentTypes } from "@src/components/organisms/DriveFilePicker";
+import { DriveNonComponentTypes } from "@src/components/organisms/Drive";
 
 export type CitationFormats = "BibTex" | "Datacite" | "APA" | "MLA";
 

@@ -21,7 +21,7 @@ import {
 
 import { useEffect, useState } from "react";
 import ReactTooltip from "react-tooltip";
-import { DriveObject, FileType } from "./Drive";
+import { DriveNonComponentTypes, DriveObject, FileType } from "./Drive";
 import { useNodeReader } from "@src/state/nodes/hooks";
 
 export interface FileDir {
@@ -32,10 +32,6 @@ export interface FileDir {
   type: FileType;
   contains?: Array<FileDir | DriveObject>;
   parent?: DriveObject | FileDir | null;
-}
-
-export enum DriveNonComponentTypes {
-  MANIFEST = "manifest",
 }
 
 const Empty = () => {

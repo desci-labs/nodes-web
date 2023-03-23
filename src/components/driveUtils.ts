@@ -39,6 +39,7 @@ interface VirtualDriveArgs {
   parent?: DriveObject | FileDir | null;
   path?: string;
   uid?: string;
+  starred?: boolean;
 }
 export function createVirtualDrive({
   name,
@@ -52,6 +53,7 @@ export function createVirtualDrive({
   parent,
   path,
   uid,
+  starred,
 }: VirtualDriveArgs): DriveObject {
   return {
     name: name,
@@ -66,6 +68,7 @@ export function createVirtualDrive({
     parent: parent || null,
     path: path || undefined,
     uid: uid || uuidv4(),
+    starred: starred || false,
   };
 }
 

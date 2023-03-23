@@ -24,6 +24,7 @@ export interface FileDir {
 
 export enum DriveNonComponentTypes {
   MANIFEST = "manifest",
+  UNKNOWN = "unknown",
 }
 
 export type DriveMetadata = CommonComponentPayload & DataComponentMetadata;
@@ -41,6 +42,7 @@ export interface DriveObject {
   contains?: Array<DriveObject>;
   parent?: DriveObject | FileDir | null;
   path?: string;
+  starred?: boolean;
 }
 
 export enum AccessStatus {
