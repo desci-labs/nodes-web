@@ -46,7 +46,7 @@ export default function useManuscriptReader(publicView: boolean = false) {
     "showUploadPanel",
   ]);
 
-  const loadDraft = async (cid: string) => {
+  const initPrivateReader = async (cid: string) => {
     if (
       !publicView &&
       "manifest" in parsedManuscript &&
@@ -83,7 +83,7 @@ export default function useManuscriptReader(publicView: boolean = false) {
     }
   };
 
-  const loadPublic = async (cid: string) => {
+  const initPublicViewer = async (cid: string) => {
     if ("uuid" in parsedManuscript && !!parsedManuscript.uuid) {
       const { uuid } = parsedManuscript;
 
@@ -181,10 +181,10 @@ export default function useManuscriptReader(publicView: boolean = false) {
   useEffect(() => {
     if (publicView) {
       const uuid = "uuid" in parsedManuscript ? parsedManuscript.uuid : "";
-      loadPublic(uuid || (cid?.split("/")[0] as string));
+      initPublicViewer(uuid || (cid?.split("/")[0] as string));
     } else {
       const parsedCid = "cid" in parsedManuscript ? parsedManuscript.cid : "";
-      loadDraft(parsedCid ?? (cid as string));
+      initPrivateReader(parsedCid ?? (cid as string));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cid, parsedManuscript, publicView]);
