@@ -2,7 +2,12 @@ import {
   ResearchObjectV1,
   RESEARCH_OBJECT_NODES_PREFIX,
 } from "@desci-labs/desci-models";
-import { getPublishStatus, getResearchObjectStub } from "@src/api";
+import {
+  getPublishStatus,
+  getRecentPublishedManifest,
+  getResearchObjectStub,
+  resolvePublishedManifest,
+} from "@src/api";
 import axios from "axios";
 import { LoaderFunctionArgs, Outlet, Params } from "react-router-dom";
 import { cleanupManifestUrl } from "../utils";
@@ -17,11 +22,12 @@ export type ManuscriptLoaderData =
       params: Params<string>;
     }
   | {
+      mode: "reader";
       uuid: string;
       version: string;
       componentIndex: string;
       annotationIndex: string;
-      mode: "reader";
+      manifest: ResearchObjectV1;
       params: Params<string>;
     }
   | {
@@ -33,7 +39,7 @@ export type ManuscriptLoaderData =
 export const manuscriptLoader = async ({
   params,
 }: LoaderFunctionArgs): Promise<ManuscriptLoaderData> => {
-  console.log("Manuscript Loader Mode: IsPrivate:", !!params.cid);
+  const splet = params["*"];
 
   try {
     if (!!params.cid) {
@@ -58,11 +64,20 @@ export const manuscriptLoader = async ({
         mode: "editor",
       };
     } else {
+      if (!splet) throw Error("Couldn't parse route");
+
+      const [uuid, version, componentIndex, annotationIndex] = splet.split("/");
+
+      const manifest: ResearchObjectV1 = version
+        ? await resolvePublishedManifest(uuid, version)
+        : await getRecentPublishedManifest(uuid);
+
       return {
-        uuid: "",
-        version: "",
-        componentIndex: "",
-        annotationIndex: "",
+        uuid,
+        version,
+        manifest,
+        componentIndex,
+        annotationIndex,
         mode: "reader",
         params,
       };
