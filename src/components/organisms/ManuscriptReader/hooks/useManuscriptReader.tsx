@@ -179,7 +179,6 @@ export default function useManuscriptReader(publicView: boolean = false) {
    * Read the research object id from URL and make backend request
    */
   useEffect(() => {
-    // if ("error" in parsedManuscript) return;
     if (publicView) {
       const uuid = "uuid" in parsedManuscript ? parsedManuscript.uuid : "";
       loadPublic(uuid || (cid?.split("/")[0] as string));
