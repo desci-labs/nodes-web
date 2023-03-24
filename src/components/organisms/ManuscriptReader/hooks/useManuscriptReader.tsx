@@ -40,9 +40,12 @@ import {
 import { useSetter } from "@src/store/accessors";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import useParseObjectID from "@src/components/organisms/ManuscriptReader/useParseObjectID";
+import { manuscriptLoader } from "@src/components/screens/Nodes";
 
 export default function useManuscriptReader(publicView: boolean = false) {
-  const parsedManuscript = useLoaderData();
+  const parsedManuscript = useLoaderData() as Awaited<
+    ReturnType<typeof manuscriptLoader>
+  >;
   const cid = useParseObjectID();
   console.log("Parsed loader Result", parsedManuscript, cid);
   const [isLoading, setIsLoading] = useState(false);
@@ -58,90 +61,34 @@ export default function useManuscriptReader(publicView: boolean = false) {
 
   // get manifest, cid, manifestUri, privCidMaps
   const loadDraft = async (cid: string) => {
-    if (!publicView) {
-      if (cid && cid !== "start") {
-        __log("ManuscriptReader -> load", cid);
-        // get research object id
-        let ro = `${RESEARCH_OBJECT_NODES_PREFIX}${cid}`;
-        const currentId = cid; //  ro.substring(RESEARCH_OBJECT_NODES_PREFIX.length);
+    if (!publicView && "manifest" in parsedManuscript) {
+      dispatch(setIsNew(false));
+      dispatch(setCurrentPdf(""));
 
-        if (ro) {
-          dispatch(setIsNew(false));
-          dispatch(setCurrentPdf(""));
-          // turn off editor mode if we switch ROs
-          if (mode !== "editor") {
-            dispatch(toggleMode());
-          }
-          dispatch(setIsAnnotating(false));
+      dispatch(setCurrentObjectId(parsedManuscript.cid));
+      dispatch(setResearchPanelTab(ResearchTabs.current));
 
-          // setViewLoading(true);
-
-          (async () => {
-            let manifestUrl: string | undefined = undefined;
-            try {
-              const res: any = await getResearchObjectStub(ro);
-              console.log(
-                ["GET RESEARCH_OBJECT_STUB=====================>"],
-                cid,
-                ro,
-                res
-              );
-              const manifestCidUri = res.uri || res.manifestUrl;
-              // setManifestCid(manifestCidUri);
-              dispatch(setManifestCid(manifestCidUri));
-              // const parsed = JSON.parse(roData.restBody);
-              // const pdf = parsed.links.pdf[0];
-
-              const { privCids } = await getPublishStatus(
-                manifestCidUri,
-                currentId
-              );
-              console.log("PRIVATE CID MAPS", privCids);
-              if (!privCids) return;
-              const cidMap: Record<string, boolean> = {};
-              privCids.forEach((c: string) => (cidMap[c] = true));
-              setPrivCidMap(cidMap);
-              // debugger;
-
-              manifestUrl = cleanupManifestUrl(manifestCidUri);
-              let targetData = res.manifestData;
-              if (targetData) {
-                dispatch(setManifest(targetData));
-              } else {
-                const { data } = await axios.get(manifestUrl);
-                dispatch(setManifest(data));
-                targetData = data;
-              }
-              console.log("TARGET DATA", targetData);
-
-              const firstNonDataComponent =
-                getNonDataComponentsFromManifest(targetData)[0];
-
-              dispatch(setComponentStack([firstNonDataComponent]));
-              // __log(
-              //   "ManuscriptReader::useEffect[params] Reset componentStack",
-              //   JSON.stringify(firstNonDataComponent)
-              // );
-              localStorage.setItem("manifest-url", manifestUrl);
-              triggerTooltips();
-            } catch (err) {
-              console.error(
-                "ManuscriptReader: manifest load err",
-                err,
-                manifestUrl
-              );
-            } finally {
-              // setViewLoading(false);
-            }
-          })();
-        } else {
-          // load default data here
-          console.log("Load default Manuscript data here");
-        }
-
-        dispatch(setCurrentObjectId(currentId));
-        dispatch(setResearchPanelTab(ResearchTabs.current));
+      if (mode !== "editor") {
+        dispatch(toggleMode());
       }
+      dispatch(setIsAnnotating(false));
+
+      if ("privateCids" in parsedManuscript) {
+        const cidMap: Record<string, boolean> = {};
+        parsedManuscript.privateCids.forEach((c: string) => (cidMap[c] = true));
+        setPrivCidMap(cidMap);
+      }
+
+      dispatch(setManifest(parsedManuscript.manifest));
+
+      const firstNonDataComponent = getNonDataComponentsFromManifest(
+        parsedManuscript.manifest
+      )[0];
+
+      dispatch(setComponentStack([firstNonDataComponent]));
+
+      localStorage.setItem("manifest-url", parsedManuscript.manifestUrl);
+      triggerTooltips();
     }
   };
 
@@ -266,7 +213,8 @@ export default function useManuscriptReader(publicView: boolean = false) {
    * Read the research object id from URL and make backend request
    */
   useEffect(() => {
-    if (publicView) {
+    if ("error" in parsedManuscript) return;
+    if (publicView && "uuid" in parsedManuscript) {
       loadPublic(cid as string);
     } else {
       loadDraft(cid as string);

@@ -7,7 +7,7 @@ import axios from "axios";
 import { LoaderFunctionArgs, Outlet, Params } from "react-router-dom";
 import { cleanupManifestUrl } from "../utils";
 
-type ManuscriptLoaderResult =
+export type ManuscriptLoaderData =
   | {
       cid: string;
       manifestUrl: string;
@@ -32,11 +32,13 @@ type ManuscriptLoaderResult =
 
 export const manuscriptLoader = async ({
   params,
-}: LoaderFunctionArgs): Promise<ManuscriptLoaderResult> => {
+}: LoaderFunctionArgs): Promise<ManuscriptLoaderData> => {
   console.log("Manuscript Loader Mode: IsPrivate:", !!params.cid);
 
   try {
     if (!!params.cid) {
+      if (params.cid.includes("start"))
+        throw Error("New Research object detected.");
       let researchObject = `${RESEARCH_OBJECT_NODES_PREFIX}${params.cid}`;
       const res: any = await getResearchObjectStub(researchObject);
       const cidUri = res.uri || res.manifestUrl;
@@ -52,7 +54,7 @@ export const manuscriptLoader = async ({
         manifest,
         manifestUrl,
         params,
-        privateCids: privCids,
+        privateCids: privCids ?? [],
         mode: "editor",
       };
     } else {
