@@ -1,7 +1,4 @@
-import {
-  ResearchObjectComponentType,
-  RESEARCH_OBJECT_NODES_PREFIX,
-} from "@desci-labs/desci-models";
+import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import { site } from "@src/constants/routes";
 import { useSetter } from "@src/store/accessors";
 import { setPreferences } from "@src/state/preferences/preferencesSlice";
@@ -54,7 +51,8 @@ export default function useReaderEffects(publicView: boolean = false) {
   // TODO: move to auth provider logic to refresh expired jwt token
   useEffect(() => {
     if (userProfile) {
-      if (!cid || !cid.length || cid.startsWith(RESEARCH_OBJECT_NODES_PREFIX)) {
+      if (!cid || !cid.length) {
+        //  || cid.startsWith(RESEARCH_OBJECT_NODES_PREFIX)
         console.log(
           "RESOLVE::=====================================================>",
           cid

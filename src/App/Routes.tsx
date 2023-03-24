@@ -20,12 +20,14 @@ import {
   OrcIdConnectUpdateProfile,
 } from "@src/components/screens/OrcIdOAuth/OrcIdOAuthScreen";
 import PoiLookup from "@src/components/screens/PoiLookup";
-import Nodes from "@src/components/screens/RouteNodes";
+import Nodes, { manuscriptLoader } from "@src/components/screens/Nodes";
 import Profile from "@src/components/organisms/PaneUserProfile";
 import UpdateEmailScreen from "@src/components/organisms/UpdateEmail/UpdateEmailScreen";
 import AdminAnalyticsScreen from "@src/components/screens/adminAnalyticsScreen";
 import PaneHelp from "@src/components/organisms/PaneHelp";
 import AppWrapper from "@src/App/Providers/AppWrapper";
+import PaneNodeCollection from "@src/components/organisms/PaneNodeCollection";
+import ManuscriptReader from "@src/components/organisms/ManuscriptReader";
 
 const Terms = lazy(() => import("@src/components/screens/Terms"));
 const Privacy = lazy(() => import("@src/components/screens/Privacy"));
@@ -57,14 +59,17 @@ export const appRouter = createBrowserRouter(
         <Route path="admin/analytics" element={<AdminAnalyticsScreen />} />
         <Route path="invite" element={<Invite />} />
         <Route path="poi-lookup" element={<PoiLookup />} />
-        <Route
-          path="nodes/*"
-          loader={(args) => {
-            console.log("Load Nodes Data", args);
-            return { args };
-          }}
-          element={<Nodes />}
-        />
+        <Route path="nodes/*" element={<Nodes />}>
+          <Route path="start" element={<PaneNodeCollection />} />
+          <Route path="objects/*">
+            <Route
+              path=":cid"
+              loader={manuscriptLoader}
+              element={<ManuscriptReader />}
+            />
+          </Route>
+          <Route index element={<Navigate to="start" />} />
+        </Route>
         <Route path="profile" element={<Profile />} />
         <Route path="updateEmail" element={<UpdateEmailScreen />} />
         <Route path="help" element={<PaneHelp />} />
@@ -95,7 +100,7 @@ export const appRouter = createBrowserRouter(
           </Suspense>
         }
       />
-      <Route path="/*" element={<PublicViewer />} />
+      <Route path="/*" element={<PublicViewer />} loader={manuscriptLoader} />
     </>
   )
 );
