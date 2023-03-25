@@ -31,7 +31,6 @@ import { useSetter } from "@src/store/accessors";
 import axios from "axios";
 import { memo, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useWindowSize } from "react-use";
 import { useManuscriptController } from "../ManuscriptReader/ManuscriptController";
 import FieldSelector from "../Modals/AddResearchNode/FieldSelector";
 import { PDF_LICENSE_TYPES } from "../PopOver/ComponentMetadataPopover";
@@ -149,16 +148,10 @@ export default memo(function CreateNodeModal({
     researchFields,
   ]);
 
-  const { height: windowHeight } = useWindowSize();
-  // const modalHeight = Math.min(Math.round((612 / windowHeight) * 100), 80);
-  console.log("CreateNodeModal", isOpen);
-
   return (
     <Modal
       isOpen={isOpen}
       onDismiss={onDismiss}
-      // $minHeight={modalHeight}
-      // $maxHeight={modalHeight}
       $scrollOverlay={true}
       $maxWidth={700}
     >

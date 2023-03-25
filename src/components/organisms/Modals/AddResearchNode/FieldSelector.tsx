@@ -108,12 +108,18 @@ export default function FieldSelector(props: Props) {
       </div>
 
       {(data || isFetching) && (
-        <ComboboxPopover portal={false}>
+        <ComboboxPopover
+          portal={true}
+          style={{
+            minHeight: "200px",
+            zIndex: 1046,
+          }}
+        >
           <ComboboxList
             onBlur={() => {
               setTouched(true);
             }}
-            className="absolute z-10 mt-1 w-full bg-white dark:bg-[#272727] shadow-lg max-h-52 rounded-md py-1 text-base overflow-y-scroll focus:outline-none sm:text-sm list-none"
+            className="absolute z-10 mt-1 w-full bg-white dark:bg-[#272727] shadow-lg max-h-52  rounded-md py-1 text-base overflow-y-scroll focus:outline-none sm:text-sm list-none"
           >
             {isFetching && (
               <div className="w-full flex justify-center">
@@ -159,7 +165,7 @@ export default function FieldSelector(props: Props) {
           </ComboboxList>
           {categories.length === 0 && !isFetching ? (
             <div
-              className={`flex flex-col justify-center items-center absolute z-10 mt-1 p-2 w-full gap-2 bg-white dark:bg-[#272727] shadow-lg max-h-96 rounded-md py-2 text-base ${
+              className={`flex flex-col justify-center items-center absolute z-10 mt-1 p-2 w-full gap-2 bg-white dark:bg-[#272727] shadow-lg max-h-96rounded-md py-2 text-base ${
                 isFetching && "hidden"
               }`}
             >
