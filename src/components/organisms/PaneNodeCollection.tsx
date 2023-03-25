@@ -18,6 +18,7 @@ import {
 } from "@src/state/nodes/viewer";
 import { tags } from "@src/state/api/tags";
 import { api } from "@src/state/api";
+import CreateNodeModal from "./CreateNodeModal/CreateNodeModal";
 
 export interface EditNodeInfo {
   uuid: string;
@@ -32,6 +33,7 @@ export default function PaneNodeCollection() {
     showAddNewNode,
     setShowAddNewNode,
   } = useManuscriptController(["showAddNewNode"]);
+  const [isOpen, setOpen] = useState(false);
 
   const dispatch = useSetter();
   const { isNew, currentObjectId } = useNodeReader();
@@ -76,6 +78,7 @@ export default function PaneNodeCollection() {
             {...node}
             key={`node-card-sidepanel-${node.uuid}`}
             isCurrent={node.uuid === currentObjectId}
+            onHandleEdit={() => setOpen(true)}
             onClick={() => {
               setTimeout(() => {
                 setIsAddingComponent(false);
@@ -121,6 +124,7 @@ export default function PaneNodeCollection() {
             onClick={() => {
               dispatch(setPublicView(false));
               setShowAddNewNode(true);
+              setOpen(true);
             }}
             className="h-10 text-lg"
           >
@@ -128,14 +132,15 @@ export default function PaneNodeCollection() {
           </PrimaryButton>
         </div>
         {isLoading ? <NodeCollectionLoader /> : <LoadedNodesCollection />}
-        <AddResearchNode
+        {/* <AddResearchNode
           onRequestClose={() => {
             setShowModal(false);
             setShowAddNewNode(false);
           }}
           isVisible={showAddNewNode}
           toggleModal={setShowAddNewNode}
-        />
+        /> */}
+        <CreateNodeModal isOpen={isOpen} onDismiss={() => setOpen(false)} />
       </div>
     </div>
   );

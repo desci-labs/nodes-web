@@ -1337,6 +1337,13 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
+"@babel/runtime@^7.12.13":
+  version "7.21.0"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.21.0.tgz#5b55c9d394e5fcf304909a8b00c07dc217b56673"
+  integrity sha512-xwII0//EObnq89Ji5AKYQaRYiW/nZ3llSv29d49IuxPhKbtJoLP+9QUUZ4nVragQVtaVGeZrpB+ZtG/Pdy/POw==
+  dependencies:
+    regenerator-runtime "^0.13.11"
+
 "@babel/runtime@^7.3.1":
   version "7.17.8"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.17.8.tgz#3e56e4aff81befa55ac3ac6a0967349fd1c5bca2"
@@ -3261,6 +3268,17 @@
   dependencies:
     "@reach/utils" "0.18.0"
 
+"@reach/dialog@^0.18.0":
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/@reach/dialog/-/dialog-0.18.0.tgz#373ece8851c2e2bf5868de319102ed163918f2f6"
+  integrity sha512-hWhzmBK8VJj+yf6OivFqHFZIV4q9TISZrkPaglKE5oFYtrr75lxWjrBTA+BshL0r/FfKodvNtdT8yq4vj/6Gcw==
+  dependencies:
+    "@reach/polymorphic" "0.18.0"
+    "@reach/portal" "0.18.0"
+    "@reach/utils" "0.18.0"
+    react-focus-lock "2.5.2"
+    react-remove-scroll "2.4.3"
+
 "@reach/observe-rect@1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@reach/observe-rect/-/observe-rect-1.2.0.tgz#d7a6013b8aafcc64c778a0ccb83355a11204d3b2"
@@ -3301,6 +3319,92 @@
   version "0.18.0"
   resolved "https://registry.yarnpkg.com/@reach/utils/-/utils-0.18.0.tgz#4f3cebe093dd436eeaff633809bf0f68f4f9d2ee"
   integrity sha512-KdVMdpTgDyK8FzdKO9SCpiibuy/kbv3pwgfXshTI6tEcQT1OOwj7BAksnzGC0rPz0UholwC+AgkqEl3EJX3M1A==
+
+"@react-spring/animated@~9.7.1":
+  version "9.7.1"
+  resolved "https://registry.yarnpkg.com/@react-spring/animated/-/animated-9.7.1.tgz#0f2d78184ee0cce703acd41abb87ea56765b5713"
+  integrity sha512-EX5KAD9y7sD43TnLeTNG1MgUVpuRO1YaSJRPawHNRgUWYfILge3s85anny4S4eTJGpdp5OoFV2kx9fsfeo0qsw==
+  dependencies:
+    "@react-spring/shared" "~9.7.1"
+    "@react-spring/types" "~9.7.1"
+
+"@react-spring/core@~9.7.1":
+  version "9.7.1"
+  resolved "https://registry.yarnpkg.com/@react-spring/core/-/core-9.7.1.tgz#cfe176a48ee0a05545b1af5f2fbae718b50e9a99"
+  integrity sha512-8K9/FaRn5VvMa24mbwYxwkALnAAyMRdmQXrARZLcBW2vxLJ6uw9Cy3d06Z8M12kEqF2bDlccaCSDsn2bSz+Q4A==
+  dependencies:
+    "@react-spring/animated" "~9.7.1"
+    "@react-spring/rafz" "~9.7.1"
+    "@react-spring/shared" "~9.7.1"
+    "@react-spring/types" "~9.7.1"
+
+"@react-spring/konva@~9.7.1":
+  version "9.7.1"
+  resolved "https://registry.yarnpkg.com/@react-spring/konva/-/konva-9.7.1.tgz#25640892f88bde06c3ab96c875e5f7408abbce43"
+  integrity sha512-74svXHtUJi6Tvk9mNLUV1/1WfU8MdWsTK6JUpvmJr/rUr8r3FdOokk22icbgEg6AjxCkIf5e2WFovCCHUSyS0w==
+  dependencies:
+    "@react-spring/animated" "~9.7.1"
+    "@react-spring/core" "~9.7.1"
+    "@react-spring/shared" "~9.7.1"
+    "@react-spring/types" "~9.7.1"
+
+"@react-spring/native@~9.7.1":
+  version "9.7.1"
+  resolved "https://registry.yarnpkg.com/@react-spring/native/-/native-9.7.1.tgz#3f397f946fc9a7dd4d7d432f8c0a4726d7723751"
+  integrity sha512-dHWeH0UuE+Rxc3YZFLp8Aq0RBP07sdOgI7pLVG46OzkMRs2RtJeWJxB6UXIWAgcYDqWDk2REAPhLD3ItDl0tDQ==
+  dependencies:
+    "@react-spring/animated" "~9.7.1"
+    "@react-spring/core" "~9.7.1"
+    "@react-spring/shared" "~9.7.1"
+    "@react-spring/types" "~9.7.1"
+
+"@react-spring/rafz@~9.7.1":
+  version "9.7.1"
+  resolved "https://registry.yarnpkg.com/@react-spring/rafz/-/rafz-9.7.1.tgz#bdfea463fcb5ddc4e7253a8fa3870dd52ebbc59a"
+  integrity sha512-JSsrRfbEJvuE3w/uvU3mCTuWwpQcBXkwoW14lBgzK9XJhuxmscGo59AgJUpFkGOiGAVXFBGB+nEXtSinFsopgw==
+
+"@react-spring/shared@~9.7.1":
+  version "9.7.1"
+  resolved "https://registry.yarnpkg.com/@react-spring/shared/-/shared-9.7.1.tgz#29611bb63d0c9e1ac18b6ced7aa4db1d48d136f3"
+  integrity sha512-R2kZ+VOO6IBeIAYTIA3C1XZ0ZVg/dDP5FKtWaY8k5akMer9iqf5H9BU0jyt3Qtxn0qQY7whQdf6MTcWtKeaawg==
+  dependencies:
+    "@react-spring/rafz" "~9.7.1"
+    "@react-spring/types" "~9.7.1"
+
+"@react-spring/three@~9.7.1":
+  version "9.7.1"
+  resolved "https://registry.yarnpkg.com/@react-spring/three/-/three-9.7.1.tgz#0dab3b5e96bb6e10db0a1363938e46fc68a861e4"
+  integrity sha512-5leUe0PDwIIw1M3GN3788zwTY4Ykyy+kNvQmg9+Hqs1DN3T8J1ovRTGwqWfGAu4ApTta9p5BH7SWNxxt3NO59Q==
+  dependencies:
+    "@react-spring/animated" "~9.7.1"
+    "@react-spring/core" "~9.7.1"
+    "@react-spring/shared" "~9.7.1"
+    "@react-spring/types" "~9.7.1"
+
+"@react-spring/types@~9.7.1":
+  version "9.7.1"
+  resolved "https://registry.yarnpkg.com/@react-spring/types/-/types-9.7.1.tgz#b540752a479d210c6fb68d2b1d5ff35556df4308"
+  integrity sha512-yBcyfKUeZv9wf/ZFrQszvhSPuDx6Py6yMJzpMnS+zxcZmhXPeOCKZSHwqrUz1WxvuRckUhlgb7eNI/x5e1e8CA==
+
+"@react-spring/web@~9.7.1":
+  version "9.7.1"
+  resolved "https://registry.yarnpkg.com/@react-spring/web/-/web-9.7.1.tgz#a9ee730d06c686b8432cd20f41683b1acb9b6300"
+  integrity sha512-6uUE5MyKqdrJnIJqlDN/AXf3i8PjOQzUuT26nkpsYxUGOk7c+vZVPcfrExLSoKzTb9kF0i66DcqzO5fXz/Z1AA==
+  dependencies:
+    "@react-spring/animated" "~9.7.1"
+    "@react-spring/core" "~9.7.1"
+    "@react-spring/shared" "~9.7.1"
+    "@react-spring/types" "~9.7.1"
+
+"@react-spring/zdog@~9.7.1":
+  version "9.7.1"
+  resolved "https://registry.yarnpkg.com/@react-spring/zdog/-/zdog-9.7.1.tgz#474a1366d7b71d623e0dff0e37a243b505e8c1a6"
+  integrity sha512-FeDws+7ZSoi91TUjxKnq3xmdOW6fthmqky6zSPIZq1NomeyO7+xwbxjtu15IqoWG4DJ9pouVZDijvBQXUNl0Mw==
+  dependencies:
+    "@react-spring/animated" "~9.7.1"
+    "@react-spring/core" "~9.7.1"
+    "@react-spring/shared" "~9.7.1"
+    "@react-spring/types" "~9.7.1"
 
 "@reduxjs/toolkit@^1.9.3":
   version "1.9.3"
@@ -6790,6 +6894,11 @@ detect-newline@^3.0.0:
   resolved "https://registry.yarnpkg.com/detect-newline/-/detect-newline-3.1.0.tgz#576f5dfc63ae1a192ff192d8ad3af6308991b651"
   integrity sha512-TLz+x/vEXm/Y7P7wn1EJFNLxYpUD4TgMosxY6fAVJUnJMbupHBOncxyWUG9OpTaH9EBD7uFI5LfEgmMOc54DsA==
 
+detect-node-es@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/detect-node-es/-/detect-node-es-1.1.0.tgz#163acdf643330caa0b4cd7c21e7ee7755d6fa493"
+  integrity sha512-ypdmJU/TbBby2Dxibuv7ZLW3Bs1QEmM7nHjEANfohJLvE0XVujisn1qPJcZxg+qDucsr+bP6fLD1rPS3AhJ7EQ==
+
 detect-node@^2.0.4:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.1.0.tgz#c9c70775a49c3d03bc2c06d9a73be550f978f8b1"
@@ -8111,6 +8220,13 @@ flowbite@^1.3.4:
     "@popperjs/core" "^2.9.3"
     mini-svg-data-uri "^1.4.3"
 
+focus-lock@^0.9.1:
+  version "0.9.2"
+  resolved "https://registry.yarnpkg.com/focus-lock/-/focus-lock-0.9.2.tgz#9d30918aaa99b1b97677731053d017f82a540d5b"
+  integrity sha512-YtHxjX7a0IC0ZACL5wsX8QdncXofWpGPNoVMuI/nZUrPGp6LmNI6+D5j0pPj+v8Kw5EpweA+T5yImK0rnWf7oQ==
+  dependencies:
+    tslib "^2.0.3"
+
 follow-redirects@^1.0.0:
   version "1.14.9"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.9.tgz#dd4ea157de7bfaf9ea9b3fbd85aa16951f78d8d7"
@@ -8236,6 +8352,11 @@ get-intrinsic@^1.0.2, get-intrinsic@^1.1.0, get-intrinsic@^1.1.1:
     function-bind "^1.1.1"
     has "^1.0.3"
     has-symbols "^1.0.1"
+
+get-nonce@^1.0.0:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/get-nonce/-/get-nonce-1.0.1.tgz#fdf3f0278073820d2ce9426c18f07481b1e0cdf3"
+  integrity sha512-FJhYRoDaiatfEkUK8HKlicmu/3SGFD51q3itKDGoSTysQJBnfOcxU5GxnhE1E6soB76MbT0MBtnKJuXyAx+96Q==
 
 get-own-enumerable-property-symbols@^3.0.0:
   version "3.0.2"
@@ -12249,6 +12370,13 @@ react-app-polyfill@^3.0.0:
     regenerator-runtime "^0.13.9"
     whatwg-fetch "^3.6.2"
 
+react-clientside-effect@^1.2.5:
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/react-clientside-effect/-/react-clientside-effect-1.2.6.tgz#29f9b14e944a376b03fb650eed2a754dd128ea3a"
+  integrity sha512-XGGGRQAKY+q25Lz9a/4EPqom7WRjz3z9R2k4jhVKA/puQFH/5Nt27vFZYql4m4NVNdUvX8PS3O7r/Zzm7cjUlg==
+  dependencies:
+    "@babel/runtime" "^7.12.13"
+
 react-content-loader@^6.0.3:
   version "6.0.3"
   resolved "https://registry.yarnpkg.com/react-content-loader/-/react-content-loader-6.0.3.tgz#32e28ca7120e0a2552fc26655d0d4448cc1fc0c5"
@@ -12357,6 +12485,18 @@ react-error-overlay@^6.0.10:
   version "6.0.10"
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-6.0.10.tgz#0fe26db4fa85d9dbb8624729580e90e7159a59a6"
   integrity sha512-mKR90fX7Pm5seCOfz8q9F+66VCc1PGsWSBxKbITjfKVQHMNF2zudxHnMdJiB1fRCb+XsbQV9sO9DCkgsMQgBIA==
+
+react-focus-lock@2.5.2:
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/react-focus-lock/-/react-focus-lock-2.5.2.tgz#f1e4db5e25cd8789351f2bd5ebe91e9dcb9c2922"
+  integrity sha512-WzpdOnEqjf+/A3EH9opMZWauag7gV0BxFl+EY4ElA4qFqYsUsBLnmo2sELbN5OC30S16GAWMy16B9DLPpdJKAQ==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    focus-lock "^0.9.1"
+    prop-types "^15.6.2"
+    react-clientside-effect "^1.2.5"
+    use-callback-ref "^1.2.5"
+    use-sidecar "^1.0.5"
 
 react-folder-tree@^5.0.3:
   version "5.0.3"
@@ -12538,6 +12678,25 @@ react-refresh@^0.11.0:
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.11.0.tgz#77198b944733f0f1f1a90e791de4541f9f074046"
   integrity sha512-F27qZr8uUqwhWZboondsPx8tnC3Ct3SxZA3V5WyEvujRyyNv0VYPhoBg1gZ8/MV5tubQp76Trw8lTv9hzRBa+A==
 
+react-remove-scroll-bar@^2.1.0:
+  version "2.3.4"
+  resolved "https://registry.yarnpkg.com/react-remove-scroll-bar/-/react-remove-scroll-bar-2.3.4.tgz#53e272d7a5cb8242990c7f144c44d8bd8ab5afd9"
+  integrity sha512-63C4YQBUt0m6ALadE9XV56hV8BgJWDmmTPY758iIJjfQKt2nYwoUrPk0LXRXcB/yIj82T1/Ixfdpdk68LwIB0A==
+  dependencies:
+    react-style-singleton "^2.2.1"
+    tslib "^2.0.0"
+
+react-remove-scroll@2.4.3:
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/react-remove-scroll/-/react-remove-scroll-2.4.3.tgz#83d19b02503b04bd8141ed6e0b9e6691a2e935a6"
+  integrity sha512-lGWYXfV6jykJwbFpsuPdexKKzp96f3RbvGapDSIdcyGvHb7/eqyn46C7/6h+rUzYar1j5mdU+XECITHXCKBk9Q==
+  dependencies:
+    react-remove-scroll-bar "^2.1.0"
+    react-style-singleton "^2.1.0"
+    tslib "^1.0.0"
+    use-callback-ref "^1.2.3"
+    use-sidecar "^1.0.1"
+
 react-responsive@^9.0.0-beta.10:
   version "9.0.0-beta.10"
   resolved "https://registry.yarnpkg.com/react-responsive/-/react-responsive-9.0.0-beta.10.tgz#892db936da48eb30babf5cb7e31737c7b5677209"
@@ -12686,6 +12845,27 @@ react-slidedown@^2.4.7:
   resolved "https://registry.yarnpkg.com/react-slidedown/-/react-slidedown-2.4.7.tgz#c09e72bba8aac25018fd644ece041da771854589"
   integrity sha512-HGDfrqo70r1WVE0DwrySPdCT27/2wcZaJYh5kOnmuPSCtjDDJrNkDdn4Ep/cma2VVfwupeAGhbc2pbrGThU6VQ==
   dependencies:
+    tslib "^2.0.0"
+
+react-spring@^9.7.1:
+  version "9.7.1"
+  resolved "https://registry.yarnpkg.com/react-spring/-/react-spring-9.7.1.tgz#8acfed700823490a4d9d4cf131c5fea12d1aaa93"
+  integrity sha512-o2+r2DNQDVEuefiz33ZF76DPd/gLq3kbdObJmllGF2IUfv2W6x+ZP0gR97QYCSR4QLbmOl1mPKUBbI+FJdys2Q==
+  dependencies:
+    "@react-spring/core" "~9.7.1"
+    "@react-spring/konva" "~9.7.1"
+    "@react-spring/native" "~9.7.1"
+    "@react-spring/three" "~9.7.1"
+    "@react-spring/web" "~9.7.1"
+    "@react-spring/zdog" "~9.7.1"
+
+react-style-singleton@^2.1.0, react-style-singleton@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/react-style-singleton/-/react-style-singleton-2.2.1.tgz#f99e420492b2d8f34d38308ff660b60d0b1205b4"
+  integrity sha512-ZWj0fHEMyWkHzKYUr2Bs/4zU6XLmq9HsgBURm7g5pAVfyn49DgUiNgY2d4lXRlYSiCif9YBGpQleewkcqddc7g==
+  dependencies:
+    get-nonce "^1.0.0"
+    invariant "^2.2.4"
     tslib "^2.0.0"
 
 react-syntax-highlighter@^15.5.0:
@@ -12874,6 +13054,11 @@ regenerator-runtime@^0.11.0:
   version "0.11.1"
   resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.11.1.tgz#be05ad7f9bf7d22e056f9726cee5017fbf19e2e9"
   integrity sha512-MguG95oij0fC3QV3URf4V2SDYGJhJnJGqvIIgdECeODCT98wSWDAJ94SSuVpYQUoTcGUIL6L4yNB7j1DFFHSBg==
+
+regenerator-runtime@^0.13.11:
+  version "0.13.11"
+  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.11.tgz#f6dca3e7ceec20590d07ada785636a90cdca17f9"
+  integrity sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==
 
 regenerator-runtime@^0.13.4, regenerator-runtime@^0.13.9:
   version "0.13.9"
@@ -14386,7 +14571,7 @@ tsconfig-paths@^3.12.0:
     minimist "^1.2.0"
     strip-bom "^3.0.0"
 
-tslib@^1.8.1, tslib@^1.9.0, tslib@^1.9.3:
+tslib@^1.0.0, tslib@^1.8.1, tslib@^1.9.0, tslib@^1.9.3:
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
@@ -14685,6 +14870,13 @@ url@^0.11.0:
     punycode "1.3.2"
     querystring "0.2.0"
 
+use-callback-ref@^1.2.3, use-callback-ref@^1.2.5:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/use-callback-ref/-/use-callback-ref-1.3.0.tgz#772199899b9c9a50526fedc4993fc7fa1f7e32d5"
+  integrity sha512-3FT9PRuRdbB9HfXhEq35u4oZkvpJ5kuYbpqhCfmiZyReuRgpnhDlbr2ZEnnuS0RrJAPn6l23xjFg9kpDM+Ms7w==
+  dependencies:
+    tslib "^2.0.0"
+
 use-deep-compare-effect@^1.8.1:
   version "1.8.1"
   resolved "https://registry.yarnpkg.com/use-deep-compare-effect/-/use-deep-compare-effect-1.8.1.tgz#ef0ce3b3271edb801da1ec23bf0754ef4189d0c6"
@@ -14692,6 +14884,14 @@ use-deep-compare-effect@^1.8.1:
   dependencies:
     "@babel/runtime" "^7.12.5"
     dequal "^2.0.2"
+
+use-sidecar@^1.0.1, use-sidecar@^1.0.5:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/use-sidecar/-/use-sidecar-1.1.2.tgz#2f43126ba2d7d7e117aa5855e5d8f0276dfe73c2"
+  integrity sha512-epTbsLuzZ7lPClpz2TyryBfztm7m+28DlEv2ZCQ3MDr5ssiwyOwGH/e5F9CkfWjJ1t4clvI58yF822/GUkjjhw==
+  dependencies:
+    detect-node-es "^1.1.0"
+    tslib "^2.0.0"
 
 use-sync-external-store@1.2.0, use-sync-external-store@^1.0.0:
   version "1.2.0"
