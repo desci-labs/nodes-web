@@ -100,9 +100,10 @@ export default function FieldSelector(props: Props) {
         </div>
         <ComboboxInput
           type="text"
-          placeholder="Enter category..."
+          placeholder="Search category..."
           selectOnClick
           onChange={onHandleChange}
+          value={input}
           className="block grow text-sm w-full bg-transparent ring-0 focus:ring-0 border-none focus:border-none"
         />
       </div>
@@ -163,13 +164,15 @@ export default function FieldSelector(props: Props) {
               </ComboboxOption>
             ))}
           </ComboboxList>
-          {categories.length === 0 && !isFetching ? (
+          {categories.length === 0 &&
+          !isFetching &&
+          debouncedInput === input ? (
             <div
               className={`flex flex-col justify-center items-center absolute z-10 mt-1 p-2 w-full gap-2 bg-white dark:bg-[#272727] shadow-lg max-h-96rounded-md py-2 text-base ${
                 isFetching && "hidden"
               }`}
             >
-              <span>{input}</span>
+              <span className="text-white font-bold">{input}</span>
               <span className="block text-gray-400 text-sm">
                 No results found
               </span>
@@ -179,6 +182,7 @@ export default function FieldSelector(props: Props) {
                   addCategory((prev) =>
                     prev.concat([{ name: input, id: random(500, 600) }])
                   );
+                  onValueChanged(input);
                   inputChangedRef.current = true;
                 }}
               >
