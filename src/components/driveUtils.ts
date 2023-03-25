@@ -40,6 +40,7 @@ interface VirtualDriveArgs {
   path?: string;
   uid?: string;
   starred?: boolean;
+  type?: FileType;
 }
 export function createVirtualDrive({
   name,
@@ -54,6 +55,7 @@ export function createVirtualDrive({
   path,
   uid,
   starred,
+  type,
 }: VirtualDriveArgs): DriveObject {
   return {
     name: name,
@@ -64,7 +66,7 @@ export function createVirtualDrive({
     accessStatus: accessStatus || AccessStatus.PRIVATE,
     metadata: metadata || {},
     cid: cid || "",
-    type: FileType.Dir,
+    type: type || FileType.Dir,
     parent: parent || null,
     path: path || undefined,
     uid: uid || uuidv4(),

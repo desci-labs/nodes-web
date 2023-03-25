@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { getDatasetTree } from "@src/api";
 import {
   AccessStatus,
+  DriveNonComponentTypes,
   DriveObject,
   FileType,
 } from "@src/components/organisms/Drive";
@@ -21,8 +22,13 @@ import {
   manifestToVirtualDrives,
   SessionStorageKeys,
 } from "@src/components/driveUtils";
-import { deprecate } from "util";
-import { cidString, generateCidTypeMap } from "./utils";
+import {
+  cidString,
+  convertIpfsTreeToDriveObjectTree,
+  DRIVE_EXTERNAL_LINKS_PATH,
+  extractComponentMetadata,
+  generateCidCompMap,
+} from "./utils";
 interface DriveState {
   nodeTree: DriveObject | null;
   status: RequestStatus;
@@ -53,9 +59,9 @@ export const driveSlice = createSlice({
       .addCase(fetchTreeThunk.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.error = null;
-
+        const { tree } = action.payload;
         if (action.payload.deprecated) {
-          state.nodeTree = action.payload.tree;
+          state.nodeTree = tree as DriveObject;
           return;
         }
 
@@ -65,22 +71,44 @@ export const driveSlice = createSlice({
           name: "Node Root",
           componentType: ResearchObjectComponentType.DATA_BUCKET,
           path: DRIVE_NODE_ROOT_PATH,
+          contains: [],
         });
-        const contents = [];
 
         //Generate a map of existing components
-        const cidToTypeMap = generateCidTypeMap(manifest);
+        const cidToCompMap = generateCidCompMap(manifest);
+
+        //Convert IPFS tree to DriveObject tree
+        const driveObjectTree = convertIpfsTreeToDriveObjectTree(
+          tree as DriveObject[],
+          cidToCompMap
+        );
+        //Reassign parent to top level
+        driveObjectTree.forEach((branch) => (branch.parent = root));
+        root.contains = driveObjectTree;
 
         //Add links
+        const externalLinks = createVirtualDrive({
+          name: "External Links",
+          componentType: ResearchObjectComponentType.LINK,
+          path: DRIVE_NODE_ROOT_PATH + "/" + DRIVE_EXTERNAL_LINKS_PATH,
+          contains: [],
+        });
         manifest.components.forEach((c) => {
-          if (c.type === ResearchObjectComponentType.LINK)
-            contents.push(
+          if (c.type === ResearchObjectComponentType.LINK) {
+            externalLinks.contains!.push(
               createVirtualDrive({
                 name: c.name,
                 componentType: ResearchObjectComponentType.LINK,
+                cid: c.payload.url,
+                type: FileType.File,
+                path:
+                  DRIVE_NODE_ROOT_PATH + "/" + DRIVE_EXTERNAL_LINKS_PATH + c.id,
+                parent: externalLinks,
               })
             );
+          }
         });
+        if (externalLinks.contains?.length) root.contains?.push(externalLinks);
       })
       .addCase(fetchTreeThunk.rejected, (state, action) => {
         state.status = "failed";
@@ -114,7 +142,7 @@ export const fetchTreeThunk = createAsyncThunk(
       //WIP
       // const { data } = await getDatasetTree(rootCid, currentObjectId!);
       // return data;
-      return { tree: {} as DriveObject, manifest: manifest }; //remove
+      return { tree: {} as DriveObject[], manifest: manifest }; //remove
     } else {
       //fallback to construct deprecated tree
       const root = manifestToVirtualDrives(manifest!, manifestCid, {});
