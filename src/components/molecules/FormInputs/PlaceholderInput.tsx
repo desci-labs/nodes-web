@@ -51,7 +51,7 @@ export default function PlaceholderInput(props: PlaceholderInputProps) {
     >
       <InputComponent
         type="text"
-        className={`relative block w-full border-0 p-0 text-sm bg-transparent font-medium placeholder-white text-gray-900 dark:text-white focus:outline-none  focus:group:bg-black focus:ring-0 outline-none shadow-none ${props.textClassName} placeholderOptional`}
+        className={`relative block w-full border-0 p-0 text-sm bg-transparent font-medium placeholder-neutrals-gray-4 text-gray-900 dark:text-white focus:outline-none  focus:group:bg-black focus:ring-0 outline-none shadow-none ${props.textClassName} placeholderOptional`}
         placeholder={placeholder}
         value={value}
         onChange={onChange}

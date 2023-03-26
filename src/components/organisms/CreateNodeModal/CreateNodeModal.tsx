@@ -10,7 +10,7 @@ import {
 import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
 import PlaceholderInput from "@src/components/molecules/FormInputs/PlaceholderInput";
-import SelectMenu from "@src/components/molecules/FormInputs/SelectMenu";
+import SelectList from "@src/components/molecules/FormInputs/SelectList";
 import Modal from "@src/components/molecules/Modal/Modal";
 import { cleanupManifestUrl } from "@src/components/utils";
 import { app, site } from "@src/constants/routes";
@@ -34,8 +34,6 @@ import { useNavigate } from "react-router-dom";
 import { useManuscriptController } from "../ManuscriptReader/ManuscriptController";
 import FieldSelector from "../Modals/AddResearchNode/FieldSelector";
 import { PDF_LICENSE_TYPES } from "../PopOver/ComponentMetadataPopover";
-// import { useWindowSize } from "react-use";
-
 interface CreateNodeModalProps {
   isOpen: boolean;
   onDismiss: () => void;
@@ -111,7 +109,7 @@ export default memo(function CreateNodeModal({
     setEditManifest(null);
     setResearchFields([]);
     dispatch(resetEditNode());
-    // props.toggleModal(false);
+    onDismiss?.();
   };
 
   const handleEdit = useCallback(async () => {
@@ -151,7 +149,7 @@ export default memo(function CreateNodeModal({
   return (
     <Modal
       isOpen={isOpen}
-      onDismiss={onDismiss}
+      onDismiss={onClose}
       $scrollOverlay={true}
       $maxWidth={700}
     >
@@ -159,7 +157,7 @@ export default memo(function CreateNodeModal({
         <div className="px-6 pt-5 pb-2 text-white">
           <div className="flex flex-row justify-between items-center">
             <h1 className="text-lg font-bold">Name the Research Node</h1>
-            <IconX className="cursor-pointer" onClick={() => onDismiss()} />
+            <IconX className="cursor-pointer" onClick={() => onClose()} />
           </div>
           <p className="text-neutrals-gray-5 text-sm mb-6">
             Enter the name of your research node. Ideally it would be the title
@@ -200,10 +198,10 @@ export default memo(function CreateNodeModal({
           >
             Learn More
           </a>
-          <SelectMenu
+          <SelectList
             label="License Type"
             data={PDF_LICENSE_TYPES}
-            className="mt-6"
+            className="mt-2"
             value={manifestLicense}
             onSelect={(value: any) => setManifestLicense(value)}
           />

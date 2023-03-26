@@ -8,6 +8,7 @@ const StyledDialogOverlay = styled(AnimatedDialogOverlay)<{
   $scrollOverlay?: boolean;
 }>`
   &[data-reach-dialog-overlay] {
+    backdrop-filter: blur(3px);
     background-color: transparent;
     overflow: hidden;
     z-index: 1044;

@@ -17,6 +17,7 @@
     "@heroicons/react": "^1.0.3",
     "@reach/combobox": "^0.18.0",
     "@reach/dialog": "^0.18.0",
+    "@reach/listbox": "^0.18.0",
     "@reduxjs/toolkit": "^1.9.3",
     "@sentry/react": "^7.38.0",
     "@sentry/tracing": "^7.38.0",
