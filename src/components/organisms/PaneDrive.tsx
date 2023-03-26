@@ -121,7 +121,7 @@ const PaneDrive = () => {
     mode,
   } = useNodeReader();
 
-  const { nodeTree } = useDrive();
+  const { nodeTree, status } = useDrive();
 
   const [directory, setDirectory] = useState<Array<DriveObject>>([]);
   const [renameComponentId, setRenameComponentId] = useState<string | null>(
@@ -154,8 +154,8 @@ const PaneDrive = () => {
   }
 
   useEffect(() => {
-    if (!nodeTree) {
-      dispatch(fetchTreeThunk);
+    if (!nodeTree && status === "idle") {
+      dispatch(fetchTreeThunk());
     }
   }, [nodeTree]);
 

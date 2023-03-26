@@ -25,6 +25,7 @@ import {
 import {
   cidString,
   convertIpfsTreeToDriveObjectTree,
+  deleteAllParents,
   DRIVE_EXTERNAL_LINKS_PATH,
   extractComponentMetadata,
   generateCidCompMap,
@@ -59,12 +60,13 @@ export const driveSlice = createSlice({
       .addCase(fetchTreeThunk.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.error = null;
+        // debugger;
         const { tree } = action.payload;
+        debugger;
         if (action.payload.deprecated) {
           state.nodeTree = tree as DriveObject;
           return;
         }
-
         const manifest = action.payload.manifest!;
         //Process the IPFS tree into a DriveObject tree
         const root = createVirtualDrive({
@@ -129,7 +131,7 @@ export const fetchTreeThunk = createAsyncThunk(
   async (_, { getState }) => {
     const state = getState() as RootState;
     const { manifest, currentObjectId, manifestCid } = state.nodes.nodeReader;
-    debugger;
+    // debugger;
     //determines if it's a old or new manifest
     const hasDataBucket =
       manifest?.components[0].type === ResearchObjectComponentType.DATA_BUCKET
@@ -163,7 +165,8 @@ export const fetchTreeThunk = createAsyncThunk(
         pathUidMap: provideMap,
         public: false, //FIXME, HARDCODED
       });
-      return { tree: root, deprecated: true };
+
+      return { tree: deleteAllParents(root), deprecated: true };
     }
   }
 );

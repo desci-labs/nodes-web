@@ -90,3 +90,14 @@ export function convertIpfsTreeToDriveObjectTree(
   });
   return tree;
 }
+
+export function deleteAllParents(tree: DriveObject) {
+  delete tree.parent;
+  tree.contains?.forEach((f) => {
+    delete f.parent;
+    if (f.type === FileType.Dir && f.contains?.length) {
+      f = deleteAllParents(f);
+    }
+  });
+  return tree;
+}

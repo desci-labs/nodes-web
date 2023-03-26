@@ -157,6 +157,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
 
   //loads all dataset trees, and fills data sizes
   useEffect(() => {
+    // debugger;
     if (!nodeTree) return;
     if (!manifestData?.components) {
       setLoading(false);
@@ -194,6 +195,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
       setLoading(false);
       return newDir;
     });
+    setLoading(false);
   }, [nodeTree]);
 
   function toggleSelected(
