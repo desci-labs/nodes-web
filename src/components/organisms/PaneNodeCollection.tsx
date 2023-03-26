@@ -24,12 +24,8 @@ export interface EditNodeInfo {
 }
 
 export default function PaneNodeCollection() {
-  const {
-    setIsAddingComponent,
-    setIsAddingSubcomponent,
-    showAddNewNode,
-    setShowAddNewNode,
-  } = useManuscriptController(["showAddNewNode"]);
+  const { setIsAddingComponent, setIsAddingSubcomponent, setShowAddNewNode } =
+    useManuscriptController(["showAddNewNode"]);
   const [isOpen, setOpen] = useState(false);
 
   const dispatch = useSetter();
@@ -39,7 +35,6 @@ export default function PaneNodeCollection() {
   const [, setMounted] = useState(false);
 
   const { data: nodes, isLoading } = useGetNodesQuery();
-  const [, setShowModal] = useState<boolean>(false);
 
   const onClose = (dontHideToolbar?: boolean) => {
     if (!dontHideToolbar) {
@@ -129,14 +124,6 @@ export default function PaneNodeCollection() {
           </PrimaryButton>
         </div>
         {isLoading ? <NodeCollectionLoader /> : <LoadedNodesCollection />}
-        {/* <AddResearchNode
-          onRequestClose={() => {
-            setShowModal(false);
-            setShowAddNewNode(false);
-          }}
-          isVisible={showAddNewNode}
-          toggleModal={setShowAddNewNode}
-        /> */}
         <CreateNodeModal isOpen={isOpen} onDismiss={() => setOpen(false)} />
       </div>
     </div>

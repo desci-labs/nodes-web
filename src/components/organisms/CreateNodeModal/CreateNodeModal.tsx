@@ -100,6 +100,13 @@ export default memo(function CreateNodeModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, editingNodeParams]);
 
+  useEffect(() => {
+    if (isOpen === true) {
+      navigate(`${site.app}/start`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
   const onClose = (dontHideToolbar?: boolean) => {
     if (!dontHideToolbar) {
       dispatch(toggleToolbar(false));
