@@ -129,7 +129,7 @@ export const fetchTreeThunk = createAsyncThunk(
   async (_, { getState }) => {
     const state = getState() as RootState;
     const { manifest, currentObjectId, manifestCid } = state.nodes.nodeReader;
-
+    debugger;
     //determines if it's a old or new manifest
     const hasDataBucket =
       manifest?.components[0].type === ResearchObjectComponentType.DATA_BUCKET
@@ -161,6 +161,7 @@ export const fetchTreeThunk = createAsyncThunk(
       //options also takes in a public view boolean
       await getAllTrees(root, currentObjectId!, manifest!, {
         pathUidMap: provideMap,
+        public: false, //FIXME, HARDCODED
       });
       return { tree: root, deprecated: true };
     }

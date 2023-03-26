@@ -32,6 +32,9 @@ import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
 import { IconCirclePlus } from "@src/icons";
 import RenameDataModal from "./RenameDataModal";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import { useDrive } from "@src/state/drive/hooks";
+import { dispatch } from "react-hot-toast/dist/core/store";
+import { fetchTreeThunk } from "@src/state/drive/driveSlice";
 
 const Empty = () => {
   return <div className="p-5 text-xs">No files</div>;
@@ -40,8 +43,6 @@ const Empty = () => {
 interface DriveTableProps {
   directory: DriveObject[];
   setDirectory: React.Dispatch<React.SetStateAction<DriveObject[]>>;
-  nodeDrived: DriveObject | null;
-  setNodeDrived: React.Dispatch<React.SetStateAction<DriveObject | null>>;
   setShowEditMetadata: React.Dispatch<React.SetStateAction<boolean>>;
   datasetMetadataInfoRef: React.MutableRefObject<DatasetMetadataInfo>;
   setMetaStaging: React.Dispatch<React.SetStateAction<MetaStaging[]>>;
@@ -59,8 +60,6 @@ interface DriveTableProps {
 const DriveTable: React.FC<DriveTableProps> = ({
   directory,
   setDirectory,
-  nodeDrived,
-  setNodeDrived,
   setShowEditMetadata,
   datasetMetadataInfoRef,
   setMetaStaging,
@@ -80,6 +79,8 @@ const DriveTable: React.FC<DriveTableProps> = ({
     publicView,
     currentObjectId,
   } = useNodeReader();
+
+  const { nodeTree } = useDrive();
 
   const [selected, setSelected] = useState<
     Record<number, ResearchObjectComponentType | DriveNonComponentTypes>
@@ -109,7 +110,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
   }
 
   //converts manifest to driveObj on component mount or nodeId change
-  useEffect(() => {
+  /*   useEffect(() => {
     if (!manifestData?.components) return;
     const localNodeDrived = manifestToVirtualDrives(
       manifestData,
@@ -136,7 +137,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
 
     if (setNodeDrived) setNodeDrived(localNodeDrived);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentObjectId]);
+  }, [currentObjectId]); */
 
   //resume from previous dir when ready
   useEffect(() => {
@@ -156,71 +157,44 @@ const DriveTable: React.FC<DriveTableProps> = ({
 
   //loads all dataset trees, and fills data sizes
   useEffect(() => {
+    if (!nodeTree) return;
     if (!manifestData?.components) {
       setLoading(false);
       return;
     }
-    if (setNodeDrived)
-      setNodeDrived((nodeDrived) => {
-        if (!nodeDrived) return nodeDrived;
 
-        if (
-          (window as any).lastObjectId !== currentObjectId ||
-          !breadCrumbs.length
-        ) {
-          (window as any).lastObjectId = currentObjectId!;
+    if (
+      (window as any).lastObjectId !== currentObjectId ||
+      !breadCrumbs.length
+    ) {
+      (window as any).lastObjectId = currentObjectId!;
 
-          setDirectory(nodeDrived.contains!);
-          setBreadCrumbs([{ name: "Research Node", drive: nodeDrived }]);
-          //* Populate virtual node drive for data components
-          fetchTrees();
-        }
-        async function fetchTrees() {
-          const lastPathUidMap = JSON.parse(
-            sessionStorage.getItem(SessionStorageKeys.pathUidMap)!
-          );
-          const lastNodeId = JSON.parse(
-            sessionStorage.getItem(SessionStorageKeys.lastNodeId)!
-          );
+      setDirectory(nodeTree!.contains!);
+      setBreadCrumbs([{ name: "Research Node", drive: nodeTree! }]);
+      //* Populate virtual node drive for data components
+    }
 
-          // if (lastNodeId === currentObjectId! && lastPathUidMap)
-          const provideMap =
-            lastNodeId === currentObjectId! && lastPathUidMap
-              ? lastPathUidMap
-              : undefined;
-          //getAllTrees mutates nodeDrived
-          await getAllTrees(nodeDrived!, currentObjectId!, manifestData!, {
-            pathUidMap: provideMap,
-            public: publicView,
-          });
+    //fill sizes and metadata (dont remove for now)
+    setDirectory((old) => {
+      if (!old) return old;
+      const isNodeRoot = old.findIndex((fd) => fd.name === "Research Reports");
+      if (isNodeRoot === -1) return old;
 
-          //fill sizes and metadata (dont remove for now)
-          setDirectory((old) => {
-            if (!old) return old;
-            const isNodeRoot = old.findIndex(
-              (fd) => fd.name === "Research Reports"
-            );
-            if (isNodeRoot === -1) return old;
-
-            const virtualData = createVirtualDrive({
-              name: "Data",
-              path: DRIVE_DATA_PATH,
-              componentType: ResearchObjectComponentType.DATA,
-              contains: old,
-            });
-
-            resetAccessStatus(virtualData);
-            const sizesFilledDrive = fillOuterSizes(virtualData);
-            const newDir = [...sizesFilledDrive.contains!];
-            setJumpReady(true);
-            setLoading(false);
-            return newDir;
-          });
-        }
-
-        return nodeDrived;
+      const virtualData = createVirtualDrive({
+        name: "Data",
+        path: DRIVE_DATA_PATH,
+        componentType: ResearchObjectComponentType.DATA,
+        contains: old,
       });
-  }, [nodeDrived, manifestData]);
+
+      resetAccessStatus(virtualData);
+      const sizesFilledDrive = fillOuterSizes(virtualData);
+      const newDir = [...sizesFilledDrive.contains!];
+      setJumpReady(true);
+      setLoading(false);
+      return newDir;
+    });
+  }, [nodeTree]);
 
   function toggleSelected(
     index: number,
@@ -245,6 +219,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
 
   //handles jumping to dirs (upload panel click for instance)
   useEffect(() => {
+    if (!nodeTree) return;
     if (driveJumpDir && jumpReady) {
       // debugger;
       setLoading(true);
@@ -257,64 +232,59 @@ const DriveTable: React.FC<DriveTableProps> = ({
           }`
         );
         //try find freshest via bfs
-        setNodeDrived((nDrive) => {
-          const latestByUid = driveBfsByUid(nDrive!, driveJumpDir.targetUid!);
+        const latestByUid = driveBfsByUid(nodeTree!, driveJumpDir.targetUid!);
 
-          const latest = latestByUid
-            ? latestByUid
-            : driveBfsByPath(nDrive!, driveJumpDir.targetPath!);
-          if (latest) {
-            setDirectory(latest.contains!);
-            console.log(
-              `[DRIVE JUMPING] LATEST FOUND BY ${latestByUid ? "UID" : "PATH"}`
+        const latest = latestByUid
+          ? latestByUid
+          : driveBfsByPath(nodeTree!, driveJumpDir.targetPath!);
+        if (latest) {
+          setDirectory(latest.contains!);
+          console.log(
+            `[DRIVE JUMPING] LATEST FOUND BY ${latestByUid ? "UID" : "PATH"}`
+          );
+        }
+
+        //select item
+        setDirectory((current) => {
+          // debugger;
+          if (current) {
+            const containedIdxUid = current.findIndex(
+              (item) => item.uid === driveJumpDir.itemUid
             );
-          }
 
-          //select item
-          setDirectory((current) => {
-            // debugger;
-            if (current) {
-              const containedIdxUid = current.findIndex(
-                (item) => item.uid === driveJumpDir.itemUid
-              );
-
-              const itemIdxFound = containedIdxUid
-                ? containedIdxUid
-                : current.findIndex((drv: DriveObject) =>
-                    drv.path?.includes(driveJumpDir.itemPath!)
-                  );
-
-              if (itemIdxFound !== -1) {
-                console.log(
-                  `[DRIVE JUMPING] ITEM FOUND BY ${
-                    containedIdxUid ? "UID" : "PATH"
-                  }: ${
-                    containedIdxUid
-                      ? driveJumpDir.itemUid
-                      : driveJumpDir.itemPath
-                  }`
+            const itemIdxFound = containedIdxUid
+              ? containedIdxUid
+              : current.findIndex((drv: DriveObject) =>
+                  drv.path?.includes(driveJumpDir.itemPath!)
                 );
-                setSelected({
-                  [itemIdxFound]: current[itemIdxFound].componentType,
-                });
-              }
-            }
-            return current;
-          });
 
-          //update breadcrumbs
-          if (latest) {
-            const newCrumbs = constructBreadCrumbs(latest);
-            setBreadCrumbs(newCrumbs);
+            if (itemIdxFound !== -1) {
+              console.log(
+                `[DRIVE JUMPING] ITEM FOUND BY ${
+                  containedIdxUid ? "UID" : "PATH"
+                }: ${
+                  containedIdxUid ? driveJumpDir.itemUid : driveJumpDir.itemPath
+                }`
+              );
+              setSelected({
+                [itemIdxFound]: current[itemIdxFound].componentType,
+              });
+            }
           }
-          return nDrive;
+          return current;
         });
+
+        //update breadcrumbs
+        if (latest) {
+          const newCrumbs = constructBreadCrumbs(latest);
+          setBreadCrumbs(newCrumbs);
+        }
       }
       setLoading(false);
       setDriveJumpDir(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [driveJumpDir, nodeDrived, jumpReady]);
+  }, [driveJumpDir, nodeTree, jumpReady]);
 
   return (
     <div className="w-full h-full">

@@ -59,6 +59,8 @@ import LoaderDrive from "../molecules/LoaderDrive";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { setManifestCid, setManifestData } from "@src/state/nodes/viewer";
+import { useDrive } from "@src/state/drive/hooks";
+import { fetchTreeThunk } from "@src/state/drive/driveSlice";
 
 export interface DatasetMetadataInfo {
   prepopulateFromName?: string;
@@ -119,11 +121,12 @@ const PaneDrive = () => {
     mode,
   } = useNodeReader();
 
+  const { nodeTree } = useDrive();
+
   const [directory, setDirectory] = useState<Array<DriveObject>>([]);
   const [renameComponentId, setRenameComponentId] = useState<string | null>(
     null
   );
-  const [nodeDrived, setNodeDrived] = useState<DriveObject | null>(null);
   const [showEditMetadata, setShowEditMetadata] = useState<boolean>(false);
   const [metaStaging, setMetaStaging] = useState<MetaStaging[]>([]);
   const [breadCrumbs, setBreadCrumbs] = useState<BreadCrumb[]>([]);
@@ -150,19 +153,26 @@ const PaneDrive = () => {
     setBatchUploadProgress({ ...batchUploadProgress, [batch]: progress });
   }
 
+  useEffect(() => {
+    if (!nodeTree) {
+      dispatch(fetchTreeThunk);
+    }
+  }, [nodeTree]);
+
   const handleUpload = useCallback(
     async (
       files: FileList | FileSystemEntry[],
       errorHandle: (err: any) => void
     ) => {
+      if (!nodeTree) return;
       console.log("files passed in");
       const snapshotNodeUuid = currentObjectId!;
-      const dataDriveIdx = nodeDrived?.contains?.findIndex(
+      const dataDriveIdx = nodeTree?.contains?.findIndex(
         (d) => d.path === DRIVE_DATA_PATH
       );
       const dataDrive =
         dataDriveIdx !== undefined
-          ? nodeDrived?.contains![dataDriveIdx]
+          ? nodeTree?.contains![dataDriveIdx]
           : undefined;
 
       const placeHolder = dataDrive
@@ -266,9 +276,7 @@ const PaneDrive = () => {
           dispatch(setManifestData({ manifest, cid: manifestCid }));
           return old;
         });
-        resetAccessStatus(nodeDrived!);
-        // if (snapshotNodeUuid === currentObjectId!) {
-        // }
+        resetAccessStatus(nodeTree!);
       } catch (e: any) {
         console.log(e);
         updateProgress(batchUid, -1);
@@ -291,7 +299,7 @@ const PaneDrive = () => {
         throw e;
       }
     },
-    [setDirectory, nodeDrived, currentObjectId, manifestData]
+    [setDirectory, nodeTree, currentObjectId, manifestData]
   );
 
   const handleUpdate = useCallback(
@@ -300,6 +308,7 @@ const PaneDrive = () => {
       updateContext: UpdateDataContext,
       errorHandle: (err: any) => void
     ) => {
+      if (!nodeTree) return;
       const updateQueued = uploadQueue.some(
         (queuedItem) =>
           queuedItem.uploadQueueType &&
@@ -421,12 +430,12 @@ const PaneDrive = () => {
         setDirectory((old) => {
           // debugger;
           console.log("dsRootCid: ", oldDatasetRootCid);
-          const dataDriveIdx = nodeDrived?.contains?.findIndex(
+          const dataDriveIdx = nodeTree?.contains?.findIndex(
             (d) => d.name === "Data"
           );
           const dataDrive =
             dataDriveIdx !== undefined
-              ? nodeDrived?.contains![dataDriveIdx]
+              ? nodeTree?.contains![dataDriveIdx]
               : undefined;
           if (dataDrive) {
             const datasetIndex = dataDrive.contains?.findIndex(
@@ -495,7 +504,7 @@ const PaneDrive = () => {
         if (snapshotNodeUuid === currentObjectId!) {
           dispatch(setManifestData({ manifest, cid: manifestCid }));
         }
-        resetAccessStatus(nodeDrived!);
+        resetAccessStatus(nodeTree!);
       } catch (e: any) {
         console.log(e);
         setUploadQueue(removeFromUploadQueue(uploadQueue, batchUid));
@@ -514,8 +523,7 @@ const PaneDrive = () => {
     [
       directory,
       setDirectory,
-      nodeDrived,
-      setNodeDrived,
+      nodeTree,
       currentObjectId,
       setManifestData,
       setManifestCid,
@@ -614,8 +622,8 @@ const PaneDrive = () => {
     return () => {
       //save pathUidMap
       if (componentUnmounting) {
-        if (nodeDrived) {
-          const pathUidMap = generateFlatPathUidMap(nodeDrived);
+        if (nodeTree) {
+          const pathUidMap = generateFlatPathUidMap(nodeTree);
           sessionStorage.setItem(
             "Drive::pathUidMap",
             JSON.stringify(pathUidMap)
@@ -638,7 +646,7 @@ const PaneDrive = () => {
         componentUnmounting.current = false;
       }
     };
-  }, [nodeDrived, directory, currentObjectId]);
+  }, [nodeTree, directory, currentObjectId]);
 
   const memoizedSetDirectory = useCallback(
     (args: any) => setDirectory(args),
@@ -676,8 +684,6 @@ const PaneDrive = () => {
                 setOldComponentMetadata={setOldComponentMetadata}
                 directory={directory}
                 setDirectory={setDirectory}
-                nodeDrived={nodeDrived}
-                setNodeDrived={setNodeDrived}
                 setShowEditMetadata={setShowEditMetadata}
                 datasetMetadataInfoRef={datasetMetadataInfoRef}
                 setMetaStaging={setMetaStaging}
