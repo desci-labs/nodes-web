@@ -1,7 +1,6 @@
 import PrimaryButton from "@components/atoms/PrimaryButton";
 import { useManuscriptController } from "@components/organisms/ManuscriptReader/ManuscriptController";
 import { IconWarning, IconX } from "@icons";
-import PopOver, { PopOverProps } from ".";
 import PopoverFooter from "@components/molecules/Footer";
 import {
   ButtonHTMLAttributes,
@@ -27,7 +26,7 @@ import { BsClipboard } from "react-icons/bs";
 import { CheckIcon } from "@heroicons/react/solid";
 import { useUser } from "@src/state/user/hooks";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import Modal from "@src/components/molecules/Modal/Modal";
+import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 
 // Todo: implement a useNodeDetails hook to get the details of a the currentObjectId like (owner etc)
 // Todo: use the owner details to determine if the current user is the owner
@@ -35,15 +34,17 @@ import Modal from "@src/components/molecules/Modal/Modal";
 // Todo: completion shortcut if user has not completed their  profile
 
 const CitationComponent = () => {
-  // const { userProfile } = useDesciProvider();
   const userProfile = useUser();
   const { componentToCite, setShowProfileUpdater } = useManuscriptController([
     "componentToCite",
     "showProfileUpdater",
   ]);
-  const { manifest: manifestData, currentObjectId } = useNodeReader();
+  const {
+    manifest: manifestData,
+    currentObjectId,
+    publicView,
+  } = useNodeReader();
 
-  // console.log(manifestData?.components, componentToCite);
   const { control, watch } = useForm({
     defaultValues: {
       format: CITATION_FORMATS[0],
@@ -168,7 +169,7 @@ const CitationComponent = () => {
     version,
   ]);
 
-  const canCite = userProfile?.profile.name && manifestData;
+  const canCite = (publicView || userProfile?.profile.name) && manifestData;
   const formatter = useMemo(() => getFormatter(format.name), [format.name]);
   const { citation } = useMemo(
     () =>
@@ -228,7 +229,7 @@ const CitationComponent = () => {
             />
           </div>
         </Box>
-        {!userProfile?.profile.name && (
+        {!publicView && !userProfile?.profile.name && (
           <div>
             <div className="text-neutrals-gray-7 text-sm border-yellow-300 gap-2 bg-neutrals-gray-3 p-2 rounded-md flex flex-row items-center">
               <IconWarning height={16} /> Complete your profile to cite this
@@ -313,12 +314,12 @@ function Box(props: PropsWithChildren<{}>) {
   );
 }
 
-const CitationPopover = (props: PopOverProps) => {
+const CitationPopover = (props: ModalProps) => {
   const { showCitationModal, setShowCitationModal } = useManuscriptController([
     "showCitationModal",
   ]);
   const close = () => {
-    props?.onClose?.();
+    props?.onDismiss?.();
     setShowCitationModal(false);
   };
 

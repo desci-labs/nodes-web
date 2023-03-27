@@ -62,9 +62,9 @@ const StyledDialogContent = styled(AnimatedDialogContent)<StyledDialogProps>`
   }
 `;
 
-interface ModalProps {
+export interface ModalProps {
   isOpen?: boolean;
-  onDismiss: () => void;
+  onDismiss?: () => void;
   initialFocusRef?: React.RefObject<any>;
   children?: React.ReactNode;
   $scrollOverlay?: boolean;
