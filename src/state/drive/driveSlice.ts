@@ -26,6 +26,7 @@ import {
   cidString,
   convertIpfsTreeToDriveObjectTree,
   deleteAllParents,
+  driveBfsByPath,
   DRIVE_EXTERNAL_LINKS_PATH,
   extractComponentMetadata,
   generateCidCompMap,
@@ -34,14 +35,14 @@ interface DriveState {
   nodeTree: DriveObject | null;
   status: RequestStatus;
   error: null | undefined | string;
-  directory: DriveObject[];
+  currentDrive: DriveObject | null;
 }
 
 const initialState: DriveState = {
   nodeTree: null,
   status: "idle",
   error: null,
-  directory: [],
+  currentDrive: null,
 };
 
 export const driveSlice = createSlice({
@@ -50,6 +51,25 @@ export const driveSlice = createSlice({
   reducers: {
     reset: () => {
       return initialState;
+    },
+    navigateToDriveByPath: (state, action) => {
+      if (state.status !== "succeeded" || !state.nodeTree) return;
+      const { path } = action.payload;
+
+      let driveFound = driveBfsByPath(state.nodeTree!, path);
+      if (driveFound && driveFound.type === FileType.File) {
+        const pathSplit = path.split("/");
+        pathSplit.pop();
+        const parentPath = pathSplit.join("/");
+        driveFound = driveBfsByPath(state.nodeTree!, parentPath);
+      }
+      if (!driveFound) {
+        console.error(
+          `[DRIVE NAVIGATE] Error: Target Path: ${path} not found in drive tree: ${state.nodeTree}`
+        );
+        return;
+      }
+      state.currentDrive = driveFound;
     },
   },
   extraReducers: (builder) => {
@@ -119,7 +139,7 @@ export const driveSlice = createSlice({
   },
 });
 
-export const { reset } = driveSlice.actions;
+export const { reset, navigateToDriveByPath } = driveSlice.actions;
 
 export interface FetchTreeThunkParams {
   manifest: ResearchObjectV1;

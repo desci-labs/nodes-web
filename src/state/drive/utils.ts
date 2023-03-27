@@ -91,6 +91,7 @@ export function convertIpfsTreeToDriveObjectTree(
   return tree;
 }
 
+//Delete later
 export function deleteAllParents(tree: DriveObject) {
   delete tree.parent;
   tree.contains?.forEach((f) => {
@@ -100,4 +101,13 @@ export function deleteAllParents(tree: DriveObject) {
     }
   });
   return tree;
+}
+
+export function driveBfsByPath(rootDrive: DriveObject, targetPath: string) {
+  const queue = [rootDrive];
+  while (queue.length) {
+    const node = queue.shift() as DriveObject;
+    if (node.path && node.path === targetPath) return node;
+    if (node.contains && node.contains?.length) queue.push(...node.contains);
+  }
 }
