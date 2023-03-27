@@ -3,7 +3,6 @@ import PrimaryButton from "@components/atoms/PrimaryButton";
 import Footer from "@components/molecules/Footer";
 import CommitAdditionalInfoPopOver from "@components/organisms/PopOver/CommitAdditionalInfoPopover";
 import CommitStatusPopover from "@components/organisms/PopOver/CommitStatusPopover";
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
 import { useNodeValidator } from "@src/hooks/useNodeValidator";
 import { useEffect, useState } from "react";
@@ -138,8 +137,8 @@ const CommitSidePanel = (props: CommitSidePanelProps) => {
           </ContentWrapper>
         </div>
         <CommitAdditionalInfoPopOver
-          isVisible={showAdditionalInfoPopover}
-          onClose={() => {
+          isOpen={showAdditionalInfoPopover}
+          onDismiss={() => {
             setShowAdditionalInfoPopover(false);
           }}
           onSuccess={() => {

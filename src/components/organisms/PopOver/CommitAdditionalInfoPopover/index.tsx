@@ -11,8 +11,6 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import toast from "react-hot-toast";
 import SlideDown from "react-slidedown";
 import styled from "styled-components";
-
-import PopOver from "../";
 import InsetLabelInput from "../../../molecules/FormInputs/InsetLabelInput";
 import { SpinnerCircular } from "spinners-react";
 import { useNodeReader } from "@src/state/nodes/hooks";
@@ -22,6 +20,7 @@ import {
   setResearchPanelTab,
   toggleResearchPanel,
 } from "@src/state/nodes/viewer";
+import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 
 // const GATEWAY_OPTIONS = [
 //   {
@@ -278,15 +277,17 @@ const AdditionalInfoForm = React.forwardRef((props: any, ref: any) => {
           {...register("hasAcceptedAlphaConditions", { required: true })}
         />
         <CheckBoxText htmlFor="hasAcceptedAlphaConditions">
-          This Research Node is only created for testing purposes and DeSci
-          Labs reserves the right to delete any content at any time
+          This Research Node is only created for testing purposes and DeSci Labs
+          reserves the right to delete any content at any time
         </CheckBoxText>
       </FlexRowAligned>
     </form>
   );
 });
 
-const CommitAdditionalInfoPopOver = (props: any) => {
+const CommitAdditionalInfoPopOver = (
+  props: ModalProps & { onSuccess: () => void }
+) => {
   const methods = useForm({
     mode: "onChange",
     reValidateMode: "onChange",
@@ -310,57 +311,12 @@ const CommitAdditionalInfoPopOver = (props: any) => {
     // setUrlOrDoi(undefined);
     // setSubType(undefined);
 
-    props.onClose();
+    props.onDismiss?.();
   };
 
   return (
-    <PopOver
-      {...props}
-      style={{ width: 550, padding: 0, marginLeft: 0, marginRight: 0 }}
-      containerStyle={{
-        backgroundColor: "#3A3A3ABF",
-      }}
-      displayCloseIcon={false}
-      className="rounded-lg bg-zinc-100 dark:bg-zinc-900"
-      footer={() => (
-        <PopoverFooter>
-          <PrimaryButton
-            disabled={loading || !methods.formState.isValid}
-            className={loading ? "w-[63px] justify-center flex" : ""}
-            onClick={async () => {
-              setLoading(true);
-              try {
-                await termsConsent(methods.getValues(), currentObjectId!);
-                dispatch(toggleResearchPanel(true));
-                dispatch(setResearchPanelTab(ResearchTabs.history));
-                props.onSuccess && props.onSuccess();
-                close();
-              } catch (err) {
-                toast.error("Error, please try again", {
-                  duration: 2000,
-                  position: "top-center",
-                  style: {
-                    marginTop: 0,
-                    borderRadius: "10px",
-                    background: "#111",
-                    color: "#fff",
-                  },
-                });
-              } finally {
-                setLoading(false);
-              }
-            }}
-          >
-            {loading ? (
-              <SpinnerCircular color="white" size={24} />
-            ) : (
-              "Review before publishing"
-            )}
-          </PrimaryButton>
-        </PopoverFooter>
-      )}
-    >
-      <div className="px-6 py-5">
+    <Modal $maxWidth={550} onDismiss={close} isOpen={props.isOpen}>
+      <div className="px-6 py-5 text-white">
         <div className="flex flex-row justify-between items-center">
           <div className="text-2xl font-bold">Additional Information</div>
           <IconX
@@ -375,12 +331,42 @@ const CommitAdditionalInfoPopOver = (props: any) => {
           <AdditionalInfoForm methods={methods} />
         </div>
       </div>
-      {/* {error ? (
-        <div className="text-states-error px-6 pb-3 -mt-7 text-xs">
-          Error: {error}
-        </div>
-      ) : null} */}
-    </PopOver>
+      <PopoverFooter>
+        <PrimaryButton
+          disabled={loading || !methods.formState.isValid}
+          className={loading ? "w-[63px] justify-center flex" : ""}
+          onClick={async () => {
+            setLoading(true);
+            try {
+              await termsConsent(methods.getValues(), currentObjectId!);
+              dispatch(toggleResearchPanel(true));
+              dispatch(setResearchPanelTab(ResearchTabs.history));
+              props.onSuccess && props.onSuccess();
+              close();
+            } catch (err) {
+              toast.error("Error, please try again", {
+                duration: 2000,
+                position: "top-center",
+                style: {
+                  marginTop: 0,
+                  borderRadius: "10px",
+                  background: "#111",
+                  color: "#fff",
+                },
+              });
+            } finally {
+              setLoading(false);
+            }
+          }}
+        >
+          {loading ? (
+            <SpinnerCircular color="white" size={24} />
+          ) : (
+            "Review before publishing"
+          )}
+        </PrimaryButton>
+      </PopoverFooter>
+    </Modal>
   );
 };
 
