@@ -3,7 +3,6 @@ import React, { useEffect } from "react";
 import "react-pdf/dist/umd/Page/AnnotationLayer.css";
 import styled from "styled-components";
 import { FlexRow } from "@components/styled";
-import { useManuscriptController } from "./ManuscriptController";
 import { APPROXIMATED_HEADER_HEIGHT } from "@components/utils";
 import { AvailableUserActionLogTypes, postUserAction } from "@api/index";
 import LoadProgressManager from "@components/molecules/LoadProgressManager";
@@ -36,8 +35,9 @@ interface ManuscriptReaderProps {
   publicView?: boolean;
 }
 const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
-  const { isLoading } = useManuscriptReader(publicView);
+  console.log("Render manuscript reader");
   const { currentObjectId } = useNodeReader();
+  const { isLoading } = useManuscriptReader(publicView);
 
   // trigger Reader side effects
   useReaderEffects(publicView);

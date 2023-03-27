@@ -1,21 +1,13 @@
+import { useEffect } from "react";
+import { useLoaderData } from "react-router-dom";
 import {
   PdfComponent,
   ResearchObjectComponentType,
-  ResearchObjectV1,
   ResearchObjectV1Component,
-  RESEARCH_OBJECT_NODES_PREFIX,
 } from "@desci-labs/desci-models";
 import {
-  getPublishStatus,
-  getRecentPublishedManifest,
-  getResearchObjectStub,
-  resolvePublishedManifest,
-} from "@src/api";
-import {
-  cleanupManifestUrl,
   getNonDataComponentsFromManifest,
   triggerTooltips,
-  __log,
 } from "@src/components/utils";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import {
@@ -26,23 +18,24 @@ import {
 import {
   pushToComponentStack,
   ResearchTabs,
+  resetNodeViewer,
   setComponentStack,
   setCurrentObjectId,
   setIsNew,
   setManifest,
-  setManifestCid,
   setResearchPanelTab,
   toggleMode,
 } from "@src/state/nodes/viewer";
 import { useSetter } from "@src/store/accessors";
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { useManuscriptController } from "../ManuscriptController";
-import useParseObjectID from "../useParseObjectID";
+import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
+import useParseObjectID from "@src/components/organisms/ManuscriptReader/useParseObjectID";
+import { manuscriptLoader } from "@src/components/screens/Nodes";
 
 export default function useManuscriptReader(publicView: boolean = false) {
+  const parsedManuscript = useLoaderData() as Awaited<
+    ReturnType<typeof manuscriptLoader>
+  >;
   const cid = useParseObjectID();
-  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useSetter();
   const { mode } = useNodeReader();
 
@@ -53,161 +46,102 @@ export default function useManuscriptReader(publicView: boolean = false) {
     "showUploadPanel",
   ]);
 
-  const loadDraft = async (cid: string) => {
-    if (!publicView) {
-      if (cid && cid !== "start") {
-        __log("ManuscriptReader -> load", cid);
-        // get research object id
-        let ro = cid;
-        const currentId = ro.substring(RESEARCH_OBJECT_NODES_PREFIX.length);
-        if (ro) {
-          dispatch(setIsNew(false));
-          dispatch(setCurrentPdf(""));
-          // turn off editor mode if we switch ROs
-          if (mode !== "editor") {
-            dispatch(toggleMode());
-          }
-          dispatch(setIsAnnotating(false));
+  const initPrivateReader = async (cid: string) => {
+    if (
+      !publicView &&
+      "manifest" in parsedManuscript &&
+      "cid" in parsedManuscript
+    ) {
+      dispatch(setIsNew(false));
+      dispatch(setCurrentPdf(""));
 
-          // setViewLoading(true);
+      dispatch(setCurrentObjectId(parsedManuscript.cid));
+      dispatch(setResearchPanelTab(ResearchTabs.current));
 
-          (async () => {
-            let manifestUrl: string | undefined = undefined;
-            try {
-              const res: any = await getResearchObjectStub(ro);
-              console.log(
-                ["GET RESEARCH_OBJECT_STUB=====================>"],
-                res
-              );
-              const manifestCidUri = res.uri || res.manifestUrl;
-              // setManifestCid(manifestCidUri);
-              dispatch(setManifestCid(manifestCidUri));
-              // const parsed = JSON.parse(roData.restBody);
-              // const pdf = parsed.links.pdf[0];
-
-              const { privCids } = await getPublishStatus(
-                manifestCidUri,
-                currentId
-              );
-              if (!privCids) return;
-              const cidMap: Record<string, boolean> = {};
-              privCids.forEach((c: string) => (cidMap[c] = true));
-              setPrivCidMap(cidMap);
-              // debugger;
-
-              manifestUrl = cleanupManifestUrl(manifestCidUri);
-              let targetData = res.manifestData;
-              if (targetData) {
-                dispatch(setManifest(targetData));
-              } else {
-                const { data } = await axios.get(manifestUrl);
-                dispatch(setManifest(data));
-                targetData = data;
-              }
-
-              const firstNonDataComponent =
-                getNonDataComponentsFromManifest(targetData)[0];
-
-              dispatch(setComponentStack([firstNonDataComponent]));
-              // __log(
-              //   "ManuscriptReader::useEffect[params] Reset componentStack",
-              //   JSON.stringify(firstNonDataComponent)
-              // );
-              localStorage.setItem("manifest-url", manifestUrl);
-              triggerTooltips();
-            } catch (err) {
-              console.error("ManuscriptReader: manifest load err", manifestUrl);
-            } finally {
-              // setViewLoading(false);
-            }
-          })();
-        } else {
-          // load default data here
-        }
-
-        dispatch(setCurrentObjectId(currentId));
-        dispatch(setResearchPanelTab(ResearchTabs.current));
+      if (mode !== "editor") {
+        dispatch(toggleMode());
       }
+      dispatch(setIsAnnotating(false));
+
+      if ("privateCids" in parsedManuscript) {
+        const cidMap: Record<string, boolean> = {};
+        parsedManuscript.privateCids.forEach((c: string) => (cidMap[c] = true));
+        setPrivCidMap(cidMap);
+      }
+
+      dispatch(setManifest(parsedManuscript.manifest));
+
+      const firstNonDataComponent = getNonDataComponentsFromManifest(
+        parsedManuscript.manifest
+      )[0];
+
+      dispatch(setComponentStack([firstNonDataComponent]));
+      triggerTooltips();
+
+      if ("manifestUrl" in parsedManuscript)
+        localStorage.setItem("manifest-url", parsedManuscript.manifestUrl);
     }
   };
 
-  const loadPublic = async (params: string) => {
-    setIsLoading(true);
-    const [uuid, firstParam, secondParam, thirdParam, ...rest] =
-      params.split("/");
-    __log(
-      "[ManuscriptReader -> LOAD PUBLIC]:::::::==================>",
-      uuid,
-      firstParam,
-      secondParam,
-      thirdParam,
-      rest
-    );
-    // get research object id
-    console.log("PUBLIC UUID", uuid, firstParam);
-    if (uuid) {
+  const initPublicViewer = async (cid: string) => {
+    if ("uuid" in parsedManuscript && !!parsedManuscript.uuid) {
+      const { uuid } = parsedManuscript;
+
       setCurrentPdf("");
       setIsNew(false);
       setIsAnnotating(false);
       const currentId = uuid;
-      (async () => {
-        try {
-          console.log(
-            "PRELOAD PULBIC::setManifestData",
-            uuid,
-            firstParam,
-            secondParam
-          );
-          const res: ResearchObjectV1 = firstParam
-            ? await resolvePublishedManifest(uuid, firstParam)
-            : await getRecentPublishedManifest(uuid);
 
-          // setManifestCid("tbd");
-          dispatch(setManifestCid("tbd"));
-          const targetData = res;
-          console.log("LOAD PULBIC::setManifestData", targetData);
+      if ("manifest" in parsedManuscript && !!parsedManuscript.manifest) {
+        const defaultComponent = parsedManuscript.manifest.components.find(
+          (c) => c.type === ResearchObjectComponentType.PDF
+        );
+        let targetComponent =
+          defaultComponent ?? parsedManuscript.manifest.components[0];
+        dispatch(setManifest(parsedManuscript.manifest));
 
-          const defaultComponent = targetData.components.find(
-            (c) => c.type === ResearchObjectComponentType.PDF
-          );
-          let targetComponent = defaultComponent ?? targetData.components[0];
-          console.log("targetComponent", targetComponent);
-          dispatch(setManifest(targetData));
+        // trigger tootipes
+        triggerTooltips();
 
-          setComponentStack([targetComponent]);
-          // __log(
-          //   "ManuscriptReader::useEffect[params] Reset componentStack",
-          //   JSON.stringify(targetData.components[0])
-          // );
-          triggerTooltips();
+        // assign component index
+        if (
+          "componentIndex" in parsedManuscript &&
+          parsedManuscript.componentIndex !== undefined
+        ) {
+          const componentIndex = parsedManuscript.componentIndex;
 
-          if (secondParam) {
-            const secondParamParsed = parseInt(secondParam);
-            const target: ResearchObjectV1Component =
-              targetData.components[secondParamParsed];
+          const componentIndexParsed = parseInt(componentIndex);
+          const target: ResearchObjectV1Component =
+            parsedManuscript.manifest.components[componentIndexParsed];
 
-            if (target) {
-              console.log("TARGET ================>", target);
-              switch (target.type) {
-                case ResearchObjectComponentType.CODE:
-                  console.log("TARGET COMPONENT SET ================>", target);
-                  dispatch(pushToComponentStack(target));
-                  break;
-                case ResearchObjectComponentType.PDF:
-                  setComponentStack([target]);
+          if (target) {
+            switch (target.type) {
+              case ResearchObjectComponentType.DATA:
+                dispatch(setComponentStack([]));
+                break;
+              case ResearchObjectComponentType.CODE:
+                dispatch(pushToComponentStack(target));
+                break;
+              case ResearchObjectComponentType.PDF:
+                dispatch(setComponentStack([target]));
 
-                  if (
-                    thirdParam &&
-                    thirdParam.charAt(0).toLowerCase() === "a"
-                  ) {
-                    const thirdParamParsed = parseInt(thirdParam.substring(1));
+                if (
+                  "annotationIndex" in parsedManuscript &&
+                  !!parsedManuscript.annotationIndex
+                ) {
+                  const annotationIndex = parsedManuscript.annotationIndex;
+
+                  if (annotationIndex.charAt(0).toLowerCase() === "a") {
+                    const annotationIndexParsed = parseInt(
+                      annotationIndex.substring(1)
+                    );
 
                     if (target && target.payload) {
                       const targetAnnotations = (target as PdfComponent).payload
                         .annotations;
                       if (targetAnnotations) {
                         const targetAnnotation =
-                          targetAnnotations[thirdParamParsed];
+                          targetAnnotations[annotationIndexParsed];
                         if (targetAnnotation) {
                           dispatch(
                             setSelectedAnnotationId(targetAnnotation.id)
@@ -217,32 +151,27 @@ export default function useManuscriptReader(publicView: boolean = false) {
                     }
                   } else {
                     // go to page
-                    const thirdParamParsed = parseInt(thirdParam);
+                    const annotationIndexParsed = parseInt(annotationIndex);
 
                     setTimeout(() => {
-                      scrollToPage$.next(thirdParamParsed);
+                      scrollToPage$.next(annotationIndexParsed);
                     }, 1000);
                   }
-                  break;
-              }
+                }
+                break;
             }
+          } else {
+            dispatch(setComponentStack([targetComponent]));
           }
-          setIsLoading(false);
-        } catch (err) {
-          setIsLoading(false);
-          console.error(
-            "ManuscriptReader: manifest load err",
-            uuid,
-            firstParam,
-            secondParam,
-            thirdParam,
-            rest
-          );
-        } finally {
-          dispatch(setCurrentObjectId(currentId));
-          dispatch(setResearchPanelTab(ResearchTabs.current));
+        } else {
+          dispatch(setComponentStack([targetComponent]));
         }
-      })();
+      }
+      dispatch(setCurrentObjectId(currentId));
+      dispatch(setResearchPanelTab(ResearchTabs.current));
+    } else {
+      dispatch(resetNodeViewer());
+      dispatch(setCurrentObjectId(cid));
     }
   };
 
@@ -251,12 +180,14 @@ export default function useManuscriptReader(publicView: boolean = false) {
    */
   useEffect(() => {
     if (publicView) {
-      loadPublic(cid as string);
+      const uuid = "uuid" in parsedManuscript ? parsedManuscript.uuid : "";
+      initPublicViewer(uuid || (cid?.split("/")[0] as string));
     } else {
-      loadDraft(cid as string);
+      const parsedCid = "cid" in parsedManuscript ? parsedManuscript.cid : "";
+      initPrivateReader(parsedCid ?? (cid as string));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cid, publicView]);
+  }, [cid, parsedManuscript, publicView]);
 
-  return { isLoading, cid };
+  return { isLoading: false, cid };
 }

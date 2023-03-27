@@ -1,7 +1,4 @@
-import {
-  ResearchObjectComponentType,
-  RESEARCH_OBJECT_NODES_PREFIX,
-} from "@desci-labs/desci-models";
+import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import { site } from "@src/constants/routes";
 import { useSetter } from "@src/store/accessors";
 import { setPreferences } from "@src/state/preferences/preferencesSlice";
@@ -20,24 +17,8 @@ import { setComponentStack, toggleMode } from "@src/state/nodes/viewer";
 export default function useReaderEffects(publicView: boolean = false) {
   const cid = useParseObjectID();
   const dispatch = useSetter();
-  const {
-    // mode,
-    // manifestData,
-    // componentStack,
-    // currentObjectId,
-    isAddingComponent,
-    isAddingSubcomponent,
-    // toggleMode,
-    // setComponentStack,
-    setIsAddingComponent,
-  } = useManuscriptController([
-    // "manifestData",
-    // "mode",
-    "isAddingComponent",
-    "isAddingSubcomponent",
-    // "componentStack",
-    // "currentObjectId",
-  ]);
+  const { isAddingComponent, isAddingSubcomponent, setIsAddingComponent } =
+    useManuscriptController(["isAddingComponent", "isAddingSubcomponent"]);
   const {
     manifest: manifestData,
     mode,
@@ -70,7 +51,8 @@ export default function useReaderEffects(publicView: boolean = false) {
   // TODO: move to auth provider logic to refresh expired jwt token
   useEffect(() => {
     if (userProfile) {
-      if (!cid || !cid.length || cid.startsWith(RESEARCH_OBJECT_NODES_PREFIX)) {
+      if (!cid || !cid.length) {
+        //  || cid.startsWith(RESEARCH_OBJECT_NODES_PREFIX)
         console.log(
           "RESOLVE::=====================================================>",
           cid

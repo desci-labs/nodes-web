@@ -14,7 +14,6 @@ export default function PublicViewer() {
   const user = useUser();
   const location = useLocation();
   const navigate = useNavigate();
-  console.log("PublicViewer", user, auth);
 
   useEffect(() => {
     if (auth) {
@@ -24,7 +23,6 @@ export default function PublicViewer() {
         }
       }
     } else if (location.pathname === "/") {
-      // location.serach includes the "?"
       navigate(`${site.web}${location.search}`);
     }
   }, [user, location.pathname, navigate, location.search]);

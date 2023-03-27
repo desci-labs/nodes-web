@@ -112,7 +112,7 @@ export default function AddResearchNode(props: ModalProps) {
 
   useEffect(() => {
     if (props.isVisible === true) {
-      navigate(`${site.app}/start`);
+      navigate(`${site.app}/nodes/start`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.isVisible]);
@@ -127,14 +127,14 @@ export default function AddResearchNode(props: ModalProps) {
       editManifest.title = manifestTitle;
       editManifest.researchFields = researchFields;
 
-      const updateRes = await updateDraft({
+      await updateDraft({
         manifest: editManifest,
         uuid: editingNodeParams.uuid,
       });
       dispatch(api.util.invalidateTags([{ type: tags.nodes }]));
-      if (updateRes.uri) {
-        console.log("NOde Update", updateRes);
-      }
+      // if (updateRes.uri) {
+      //   console.log("NOde Update", updateRes);
+      // }
     } catch (e) {
       console.log(`[EDIT NODE]Failed fetching manifest err: ${e}`);
     } finally {

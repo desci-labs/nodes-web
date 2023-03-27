@@ -7,7 +7,7 @@ import { useEffectOnce } from "react-use";
 import NodeCollectionEmptyState from "../atoms/NodeCollectionEmptyState";
 import NodeCardLoader from "../molecules/NodeCardLoader";
 import { useGetter, useSetter } from "@src/store/accessors";
-import { nodesApi, useGetNodesQuery } from "@src/state/api/nodes";
+import { useGetNodesQuery } from "@src/state/api/nodes";
 import { toggleToolbar } from "@src/state/preferences/preferencesSlice";
 import AddResearchNode from "@src/components/organisms/Modals/AddResearchNode/AddResearchNode";
 import { useNodeReader } from "@src/state/nodes/hooks";
@@ -16,8 +16,6 @@ import {
   setPublicView,
   toggleResearchPanel,
 } from "@src/state/nodes/viewer";
-import { tags } from "@src/state/api/tags";
-import { api } from "@src/state/api";
 
 export interface EditNodeInfo {
   uuid: string;
