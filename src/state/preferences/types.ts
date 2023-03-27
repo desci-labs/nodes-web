@@ -16,4 +16,5 @@ export type AppPreferences = {
   orcid: Orcid;
   isToolbarVisible: boolean;
   activeToolbar: TOOLBAR_ENTRY;
+  showReferralModal: boolean;
 };

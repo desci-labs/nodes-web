@@ -1,5 +1,4 @@
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
-import PopoverFooter from "@src/components/molecules/Footer";
 import { IconX } from "@src/icons";
 import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";

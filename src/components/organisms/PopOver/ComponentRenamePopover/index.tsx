@@ -1,5 +1,4 @@
 import PrimaryButton from "@components/atoms/PrimaryButton";
-import PopoverFooter from "@components/molecules/Footer";
 import InsetLabelInput from "@components/molecules/FormInputs/InsetLabelInput";
 import { IconX } from "@icons";
 import { useEffect, useState } from "react";

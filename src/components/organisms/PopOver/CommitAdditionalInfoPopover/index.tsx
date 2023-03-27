@@ -2,7 +2,6 @@
 import { termsConsent } from "@api/index";
 import PrimaryButton from "@components/atoms/PrimaryButton";
 import RadioButton from "@components/atoms/RadioButton";
-import PopoverFooter from "@components/molecules/Footer";
 import { FlexRowAligned } from "@components/styled";
 import { RadioGroup } from "@headlessui/react";
 import { IconX } from "@icons";

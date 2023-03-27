@@ -1,6 +1,5 @@
 import { addComponentToDraft } from "@api/index";
 import PrimaryButton from "@components/atoms/PrimaryButton";
-import PopoverFooter from "@components/molecules/Footer";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { capitalize, cleanupManifestUrl } from "@components/utils";
 import {
@@ -12,7 +11,6 @@ import {
 } from "@icons";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import PopOver from ".";
 import AddDocumentComponent from "@components/molecules/AddComponentFlow/AddDocumentComponent";
 import AddCodeComponent from "@components/molecules/AddComponentFlow/AddCodeComponent";
 

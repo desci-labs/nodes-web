@@ -4,7 +4,6 @@ import {
 } from "@desci-labs/desci-models";
 import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
-import PopoverFooter from "@src/components/molecules/Footer";
 import InsetLabelInput from "@src/components/molecules/FormInputs/InsetLabelInput";
 import Modal from "@src/components/molecules/Modal/Modal";
 import { IconX } from "@src/icons";

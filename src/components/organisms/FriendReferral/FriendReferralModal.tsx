@@ -9,20 +9,20 @@ import {
 } from "@src/api";
 
 import CreateableSelect from "@components/molecules/FormInputs/CreateableSelect";
-import PopOverBasic from "@components/atoms/PopOverBasic";
 import PrimaryButton from "@components/atoms/PrimaryButton";
 import { ReferralItem } from "@components/molecules/ReferAFriend/ReferralItem";
 import { ReferralSuccess } from "@components/molecules/ReferAFriend/ReferralSuccess";
 import { isMaybeValidEmail } from "@src/lib/validation";
 import Modal from "@src/components/molecules/Modal/Modal";
 import { IconX } from "@src/icons";
+import { useAppPreferences } from "@src/state/preferences/hooks";
 
 export const ReferAFriendModal = ({
   isVisible,
   onClose,
 }: {
-  isVisible: boolean;
-  onClose: () => void;
+  isVisible?: boolean;
+  onClose?: () => void;
 }) => {
   const [isSendInProgress, setIsSendInProgress] = useState(false);
   const [isSendComplete, setIsSendComplete] = useState(false);
@@ -30,6 +30,7 @@ export const ReferAFriendModal = ({
   const [existingReferrals, setExistingReferrals] = useState<FriendReferral[]>(
     []
   );
+  const { showReferralModal } = useAppPreferences();
 
   useEffect(() => {
     setIsSendComplete(false);
@@ -108,10 +109,10 @@ export const ReferAFriendModal = ({
         //   width: isSendComplete ? 400 : 600,
         // }}
         $maxWidth={isSendComplete ? 400 : 600}
-        isOpen={isVisible}
+        isOpen={showReferralModal}
         // title={isSendComplete ? "Invites Sent" : "Refer a Friend"}
         onDismiss={() => {
-          onClose();
+          onClose?.();
         }}
         // footer={() => (
         //   <ModalFooter
@@ -205,7 +206,7 @@ export const ReferAFriendModal = ({
             Boolean(formState.errors.emails)
           }
           onSubmit={onSubmitHandler}
-          onClose={onClose}
+          onClose={() => onClose?.()}
         />
       </Modal>
     </>

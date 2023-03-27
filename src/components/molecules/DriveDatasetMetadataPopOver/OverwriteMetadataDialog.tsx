@@ -3,7 +3,6 @@ import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
 import { IconWarning, IconX } from "@src/icons";
 import React from "react";
-import PopoverFooter from "@src/components/molecules/Footer";
 import Modal from "@src/components/molecules/Modal/Modal";
 
 interface OverwriteMetadataDialogProps {

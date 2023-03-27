@@ -1,7 +1,6 @@
 import PrimaryButton from "@components/atoms/PrimaryButton";
 import { useManuscriptController } from "@components/organisms/ManuscriptReader/ManuscriptController";
 import { IconWarning, IconX } from "@icons";
-import PopoverFooter from "@components/molecules/Footer";
 import {
   ButtonHTMLAttributes,
   PropsWithChildren,

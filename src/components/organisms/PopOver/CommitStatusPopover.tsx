@@ -32,7 +32,6 @@ import { setPendingCommits } from "@src/state/nodes/history";
 import { tags } from "@src/state/api/tags";
 import { nodesApi } from "@src/state/api/nodes";
 import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
-import PopoverFooter from "@src/components/molecules/Footer";
 
 export const LOCALSTORAGE_TXN_LIST = "desci:txn-list";
 

@@ -2,7 +2,6 @@ import PrimaryButton from "@components/atoms/PrimaryButton";
 import WalletManager from "@components/organisms/WalletManager";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { useEffect } from "react";
-import PopoverFooter from "@src/components/molecules/Footer";
 import Modal from "@src/components/molecules/Modal/Modal";
 
 const WalletManagerModal = (props: any) => {
