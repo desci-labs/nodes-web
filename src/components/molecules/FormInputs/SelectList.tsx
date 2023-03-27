@@ -98,12 +98,12 @@ export default function SelectList(props: SelectListProps) {
         </ListboxButton>
         <ListboxPopover
           portal={true}
-          className="relative mt-1 max-h-96 min-h-[200px]"
+          className="relative mt-1 max-h-96 min-h-[100px]"
           onBlur={() => {
             setTouched(true);
           }}
         >
-          <PerfectScrollbar className="max-h-96 min-h-[200px] h-fit overflow-hidden overflow-y-scroll">
+          <PerfectScrollbar className="max-h-96 min-h-[150px] h-fit overflow-hidden overflow-y-scroll">
             <Transition
               show={true}
               as={Fragment}

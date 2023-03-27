@@ -284,23 +284,7 @@ const AddComponentPopOver = (
   };
 
   return (
-    <Modal
-      $maxWidth={550}
-      onDismiss={() => close(false)}
-      isOpen={props.isOpen}
-      // style={{
-      //   width: 500,
-      //   maxWidth: "100%",
-      //   margin: "3rem 0.75rem",
-      //   overflow: "visible",
-      // }}
-      // containerStyle={{
-      //   backgroundColor: "#3A3A3ABF",
-      // }}
-      // zIndex={105}
-      // displayCloseIcon={false}
-      // className="rounded-lg bg-zinc-100 dark:bg-zinc-900"
-    >
+    <Modal $maxWidth={550} onDismiss={() => close(false)} isOpen={props.isOpen}>
       <div className="px-6 py-5 min-h-[280px]">
         <div className="flex flex-row justify-between items-center">
           <div className="text-2xl font-bold text-white">

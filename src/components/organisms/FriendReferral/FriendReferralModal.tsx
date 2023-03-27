@@ -104,28 +104,11 @@ export const ReferAFriendModal = ({
   return (
     <>
       <Modal
-        // styleOverride={{
-        //   backgroundColor: "#191B1C",
-        //   width: isSendComplete ? 400 : 600,
-        // }}
         $maxWidth={isSendComplete ? 400 : 600}
         isOpen={showReferralModal}
-        // title={isSendComplete ? "Invites Sent" : "Refer a Friend"}
         onDismiss={() => {
           onClose?.();
         }}
-        // footer={() => (
-        //   <ModalFooter
-        //     isSendComplete={isSendComplete}
-        //     isSendDisabled={
-        //       isSendInProgress ||
-        //       !hasEmailsInputted ||
-        //       Boolean(formState.errors.emails)
-        //     }
-        //     onSubmit={onSubmitHandler}
-        //     onClose={onClose}
-        //   />
-        // )}
       >
         <div className="px-6 py-5 text-white">
           <div className="flex flex-row justify-between items-center">

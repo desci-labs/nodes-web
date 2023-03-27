@@ -25,6 +25,7 @@ import { CheckIcon } from "@heroicons/react/solid";
 import { useUser } from "@src/state/user/hooks";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
+import SelectList from "@src/components/molecules/FormInputs/SelectList";
 
 // Todo: implement a useNodeDetails hook to get the details of a the currentObjectId like (owner etc)
 // Todo: use the owner details to determine if the current user is the owner
@@ -200,7 +201,7 @@ const CitationComponent = () => {
           name="format"
           control={control}
           render={({ field }: any) => (
-            <SelectMenu
+            <SelectList
               title="Choose citation format"
               label="Choose citation format"
               data={CITATION_FORMATS}
