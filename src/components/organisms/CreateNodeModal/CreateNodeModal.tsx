@@ -32,7 +32,7 @@ import axios from "axios";
 import { memo, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useManuscriptController } from "../ManuscriptReader/ManuscriptController";
-import FieldSelector from "../Modals/AddResearchNode/FieldSelector";
+import FieldSelector from "./FieldSelector";
 import { PDF_LICENSE_TYPES } from "../PopOver/ComponentMetadataPopover";
 interface CreateNodeModalProps {
   isOpen: boolean;
