@@ -12,7 +12,6 @@ import {
 } from "react";
 import { Controller, useForm } from "react-hook-form";
 import SelectMenu from "@src/components/molecules/FormInputs/SelectMenu";
-// import { useDesciProvider } from "@contexts/DesciContext";
 import { useCopier } from "@components/molecules/Copier";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import { getPublishedVersions } from "@src/api";

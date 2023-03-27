@@ -147,8 +147,8 @@ const CommitSidePanel = (props: CommitSidePanelProps) => {
           }}
         />
         <CommitStatusPopover
-          isVisible={showCommitStatusPopover}
-          onClose={() => {
+          isOpen={showCommitStatusPopover}
+          onDismiss={() => {
             setShowCommitStatusPopover(false);
           }}
           onSuccess={() => {
