@@ -4,7 +4,7 @@ import { Document } from "react-pdf/dist/esm/entry.webpack5";
 import "react-pdf/dist/umd/Page/AnnotationLayer.css";
 import "./style.scss";
 
-import { APPROXIMATED_HEADER_HEIGHT, __log } from "@components/utils";
+import { APPROXIMATED_HEADER_HEIGHT } from "@components/utils";
 import { ResearchObjectComponentAnnotation } from "@desci-labs/desci-models";
 import { useScrolling, useUpdateEffect } from "react-use";
 import { PageComponentHOC } from "./Page";

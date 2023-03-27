@@ -141,7 +141,7 @@ const PopOverShareMenu = () => {
           setLastManifest(manifest);
         }
       } catch (e) {
-        if (publicView) {
+        if (publicView && currentObjectId !== "drafts") {
           toast.error("Not found please check URL", {
             position: "top-center",
             duration: 500000,

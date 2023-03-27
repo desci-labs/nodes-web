@@ -2,10 +2,13 @@ import * as React from "react";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { updatePendingAnnotations } from "@src/state/nodes/viewer";
+import { ResearchObjectComponentAnnotation } from "@desci-labs/desci-models";
 
 interface ManifestUpdaterProps {
-  pendingAnnotations: any[];
-  setPendingAnnotations: any;
+  pendingAnnotations: ResearchObjectComponentAnnotation[];
+  setPendingAnnotations: React.Dispatch<
+    React.SetStateAction<ResearchObjectComponentAnnotation[]>
+  >;
   componentId: string;
 }
 
@@ -23,7 +26,7 @@ const ManifestUpdater = ({
         (c: any) => c.id === componentId
       );
       setPendingAnnotations(
-        manifestData?.components[index]?.payload?.annotations
+        manifestData?.components[index]?.payload?.annotations ?? []
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

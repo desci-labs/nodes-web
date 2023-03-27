@@ -70,6 +70,7 @@ export const nodeReaderSlice = createSlice({
   initialState,
   name: "nodeViewer",
   reducers: {
+    resetNodeViewer: (state) => initialState,
     toggleMode: (state) => {
       state.mode = state.mode === "reader" ? "editor" : "reader";
     },
@@ -368,6 +369,7 @@ export const {
   resetEditNode,
   setManifestCid,
   saveAnnotation,
+  resetNodeViewer,
   deleteComponent,
   updateComponent,
   setManifestData,

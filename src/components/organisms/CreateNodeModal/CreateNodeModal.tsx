@@ -119,6 +119,13 @@ export default memo(function CreateNodeModal({
     onDismiss?.();
   };
 
+  useEffect(() => {
+    if (isOpen === true) {
+      navigate(`${site.app}/nodes/start`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
   const handleEdit = useCallback(async () => {
     // debugger;
     setIsLoading(true);
@@ -129,14 +136,14 @@ export default memo(function CreateNodeModal({
       editManifest.title = manifestTitle;
       editManifest.researchFields = researchFields;
 
-      const updateRes = await updateDraft({
+      await updateDraft({
         manifest: editManifest,
         uuid: editingNodeParams.uuid,
       });
       dispatch(api.util.invalidateTags([{ type: tags.nodes }]));
-      if (updateRes.uri) {
-        console.log("NOde Update", updateRes);
-      }
+      // if (updateRes.uri) {
+      //   console.log("NOde Update", updateRes);
+      // }
     } catch (e) {
       console.log(`[EDIT NODE]Failed fetching manifest err: ${e}`);
     } finally {
