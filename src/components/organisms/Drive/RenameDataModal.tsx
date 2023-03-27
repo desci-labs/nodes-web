@@ -114,14 +114,14 @@ const RenameDataModal: React.FC<RenameDataModalProps> = ({
       <div className="py-3 px-6 !min-h-[70px] min-w-[400px]">
         <div className="flex flex-row justify-between items-center">
           <h1 className="text-lg font-bold text-white">{`Rename ${componentString}`}</h1>
-          <div
+          <button
             className="cursor-pointer p-5 -m-5 absolute right-5 top-5 stroke-black dark:stroke-white hover:stroke-muted-300 hover:dark:stroke-muted-300"
             onClick={() => {
               setRenameComponentId(null);
             }}
           >
             <IconX />
-          </div>
+          </button>
         </div>
         <div className="my-2">
           <InsetLabelInput

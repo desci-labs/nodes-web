@@ -1,6 +1,6 @@
 import PrimaryButton from "@components/atoms/PrimaryButton";
 import { useManuscriptController } from "@components/organisms/ManuscriptReader/ManuscriptController";
-import { IconWarning, IconX } from "@icons";
+import { IconWarning } from "@icons";
 import {
   ButtonHTMLAttributes,
   PropsWithChildren,
@@ -10,7 +10,6 @@ import {
   useState,
 } from "react";
 import { Controller, useForm } from "react-hook-form";
-import SelectMenu from "@src/components/molecules/FormInputs/SelectMenu";
 import { useCopier } from "@components/molecules/Copier";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import { getPublishedVersions } from "@src/api";
@@ -330,22 +329,11 @@ const CitationPopover = (props: ModalProps) => {
       $maxWidth={650}
     >
       <div className="px-6 py-5 text-white">
-        <div className="flex flex-row justify-between items-center">
-          <div className="">
-            <p className="text-xl font-bold">Cite</p>
-            <p className="text-neutrals-gray-5 text-sm">
-              Choose your citation format then click copy citation, or copy
-              dPID.
-            </p>
-          </div>
-          <IconX
-            fill="white"
-            width={20}
-            height={20}
-            className="cursor-pointer"
-            onClick={close}
-          />
-        </div>
+        <Modal.Header
+          title="Cite"
+          subTitle="Choose your citation format then click copy citation, or copy
+              dPID."
+        />
         <div className="py-2">
           <CitationComponent />
         </div>

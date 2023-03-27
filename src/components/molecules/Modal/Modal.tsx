@@ -3,6 +3,7 @@ import styled, { css } from "styled-components";
 import { animated, useTransition } from "react-spring";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { PropsWithChildren } from "react";
+import { IconX } from "@src/icons";
 
 const AnimatedDialogOverlay = animated(DialogOverlay);
 const StyledDialogOverlay = styled(AnimatedDialogOverlay)<{
@@ -124,6 +125,34 @@ export default function Modal({
   );
 }
 
+const ModalHeader = ({
+  hideCloseIcon = false,
+  onDismiss,
+  title,
+  subTitle,
+}: PropsWithChildren<{
+  title?: string;
+  subTitle?: string;
+  hideCloseIcon?: boolean;
+  onDismiss?: () => void;
+}>) => {
+  return (
+    <div className="flex flex-row justify-between items-center">
+      <div>
+        {title && <h1 className="text-lg font-bold text-white">{title}</h1>}
+        {subTitle && <p className="text-neutrals-gray-5 text-sm">{subTitle}</p>}
+      </div>
+      {!hideCloseIcon && (
+        <button
+          className="cursor-pointer p-5 -m-5 absolute right-5 top-5 stroke-black dark:stroke-white hover:stroke-muted-300 hover:dark:stroke-muted-300"
+          onClick={onDismiss}
+        >
+          <IconX />
+        </button>
+      )}
+    </div>
+  );
+};
 const ModalFooter = ({
   border = true,
   padded = true,
@@ -141,3 +170,4 @@ const ModalFooter = ({
 };
 
 Modal.Footer = ModalFooter;
+Modal.Header = ModalHeader;
