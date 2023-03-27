@@ -115,7 +115,7 @@ const CitationComponent = () => {
     }
 
     const index = manifestData?.components.findIndex(
-      (c) => c.id === component.cid || c.id == componentParent.cid
+      (c) => c.id === component.cid || c.id === componentParent.cid
     );
     const versionString =
       index === undefined || index < 0 ? version : `${version}/${index}`;
@@ -132,11 +132,11 @@ const CitationComponent = () => {
         ResearchObjectComponentType.DATA &&
       componentParent
     ) {
-      const splitPath = component.path?.split("/").filter((a) => a != "Data");
+      const splitPath = component.path?.split("/").filter((a) => a !== "Data");
       if (splitPath && splitPath.length > 1) {
         let newPath = splitPath.slice(1);
         newPath.unshift(componentParent.name);
-        if (componentToCite.type == FileType.Dir) {
+        if (componentToCite.type === FileType.Dir) {
           newPath = [componentParent.name];
         }
         fqiDataSuffix = newPath.join("/");

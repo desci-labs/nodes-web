@@ -5,9 +5,11 @@ import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
-import PopOver from "@src/components/organisms/PopOver";
 import ProfileInfo from "@src/components/organisms/ProfileInfo";
-import Profiler, { ProfileValues } from "@src/components/organisms/WrapperProfileModal";
+import Profiler, {
+  ProfileValues,
+} from "@src/components/organisms/WrapperProfileModal";
+import Modal from "@src/components/molecules/Modal/Modal";
 
 export interface ProfilePopOverProps {
   onClose: () => void;
@@ -36,36 +38,14 @@ export function ProfileInfoWrapper(props: ProfilePopOverProps) {
   if (!showProfileUpdater) return null;
 
   return (
-    <PopOver
-      {...props}
-      zIndex={121}
-      style={{
-        width: 700,
-        marginLeft: 0,
-        marginRight: 0,
-      }}
-      footer={() => (
-        <PopoverFooter>
-          <PrimaryButton
-            disabled={isSubmitting}
-            form="userProfileForm"
-            className="flex gap-2"
-          >
-            Save changes
-          </PrimaryButton>
-        </PopoverFooter>
-      )}
-      containerStyle={{
-        backgroundColor: "#3A3A3ABF",
-      }}
-      onClose={() => {
+    <Modal
+      onDismiss={() => {
         setShowProfileUpdater(false);
-        // props.onClose();
       }}
-      isVisible={showProfileUpdater}
-      className="rounded-lg bg-zinc-100 dark:bg-zinc-900 animate-slideFromBottom"
+      isOpen={showProfileUpdater}
+      $maxWidth={700}
     >
-      <div className="py-4 px-6 text-neutrals-gray-5">
+      <div className="py-4 px-6 text-neutrals-gray-5 lg:w-[700px]">
         <div className="flex flex-row justify-between items-center">
           <div className="text-lg font-bold text-white">
             Complete my profile
@@ -92,7 +72,16 @@ export function ProfileInfoWrapper(props: ProfilePopOverProps) {
           </div>
         </PerfectScrollbar>
       </div>
-    </PopOver>
+      <PopoverFooter>
+        <PrimaryButton
+          disabled={isSubmitting}
+          form="userProfileForm"
+          className="flex gap-2"
+        >
+          Save changes
+        </PrimaryButton>
+      </PopoverFooter>
+    </Modal>
   );
 }
 
