@@ -21,6 +21,7 @@ import axios from "axios";
 import { useManifestStatus, useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { updateComponent, saveManifestDraft } from "@src/state/nodes/viewer";
+import SelectList from "@src/components/molecules/FormInputs/SelectList";
 
 export const PDF_LICENSE_TYPES = [
   { id: 1, name: "CC BY" },
@@ -239,11 +240,20 @@ const ComponentMetadataForm = React.forwardRef(
             control={control}
             defaultValue={defaultLicense}
             render={({ field }: any) => (
-              <SelectMenu
-                label="Choose license"
-                data={getLicenseTypes()}
-                field={{ ...field, value: field.value || defaultLicense }}
+              // <SelectMenu
+              //   label="Choose license"
+              //   data={getLicenseTypes()}
+              //   field={{ ...field, value: field.value || defaultLicense }}
+              //   mandatory={true}
+              // />
+              <SelectList
+                label="License Type"
+                className="mt-2"
                 mandatory={true}
+                data={PDF_LICENSE_TYPES}
+                defaultValue={defaultLicense}
+                field={{ ...field, value: field.value || defaultLicense }}
+                // onSelect={(value: any) => setManifestLicense(value)}
               />
             )}
           />
