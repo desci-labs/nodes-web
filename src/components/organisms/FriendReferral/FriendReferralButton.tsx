@@ -5,17 +5,10 @@ const FriendReferralButton = () => {
   const [showPopOver, setShowPopOver] = useState(false);
 
   return (
-    <>
-      <ReferAFriendModal
-        isVisible={showPopOver}
-        onClose={() => {
-          setShowPopOver(false);
-          return;
-        }}
-      />
+    <div>
       <button
         className="text-left text-xs"
-        onClick={() => setShowPopOver(!showPopOver)}
+        onClick={() => setShowPopOver(true)}
       >
         <p className="px-4 text-white">Refer a Friend</p>
         <div className={"block px-4 text-xs mt-1"}>
@@ -29,7 +22,16 @@ const FriendReferralButton = () => {
           </p>
         </div>
       </button>
-    </>
+      {showPopOver && (
+        <ReferAFriendModal
+          isVisible={showPopOver}
+          onClose={() => {
+            console.log("Close Modal");
+            setShowPopOver(false);
+          }}
+        />
+      )}
+    </div>
   );
 };
 

@@ -14,6 +14,8 @@ import PrimaryButton from "@components/atoms/PrimaryButton";
 import { ReferralItem } from "@components/molecules/ReferAFriend/ReferralItem";
 import { ReferralSuccess } from "@components/molecules/ReferAFriend/ReferralSuccess";
 import { isMaybeValidEmail } from "@src/lib/validation";
+import Modal from "@src/components/molecules/Modal/Modal";
+import { IconX } from "@src/icons";
 
 export const ReferAFriendModal = ({
   isVisible,
@@ -100,93 +102,117 @@ export const ReferAFriendModal = ({
 
   return (
     <>
-      <PopOverBasic
-        styleOverride={{
-          backgroundColor: "#191B1C",
-          width: isSendComplete ? 400 : 600,
-        }}
-        isVisible={isVisible}
-        title={isSendComplete ? "Invites Sent" : "Refer a Friend"}
-        onClose={() => {
+      <Modal
+        // styleOverride={{
+        //   backgroundColor: "#191B1C",
+        //   width: isSendComplete ? 400 : 600,
+        // }}
+        $maxWidth={isSendComplete ? 400 : 600}
+        isOpen={isVisible}
+        // title={isSendComplete ? "Invites Sent" : "Refer a Friend"}
+        onDismiss={() => {
           onClose();
         }}
-        footer={() => (
-          <PopOverFooter
-            isSendComplete={isSendComplete}
-            isSendDisabled={
-              isSendInProgress ||
-              !hasEmailsInputted ||
-              Boolean(formState.errors.emails)
-            }
-            onSubmit={onSubmitHandler}
-            onClose={onClose}
-          />
-        )}
+        // footer={() => (
+        //   <ModalFooter
+        //     isSendComplete={isSendComplete}
+        //     isSendDisabled={
+        //       isSendInProgress ||
+        //       !hasEmailsInputted ||
+        //       Boolean(formState.errors.emails)
+        //     }
+        //     onSubmit={onSubmitHandler}
+        //     onClose={onClose}
+        //   />
+        // )}
       >
-        <div className="flex flex-col">
-          {isSendComplete ? (
-            <ReferralSuccess />
-          ) : (
-            <>
-              <p className="text-neutrals-gray-5 text-xs -mt-[3px] w-full">
-                Earn 5GB for free per friend that joins Desci Nodes. Up to a
-                maximum of 250GB. Invites you’ve sent for your current nodes
-                will also be included in the referral program.
-              </p>
+        <div className="px-6 py-5 text-white">
+          <div className="flex flex-row justify-between items-center">
+            <h1 className="text-lg font-bold text-white">
+              {isSendComplete ? "Invites Sent" : "Refer a Friend"}
+            </h1>
+            <div
+              className="cursor-pointer p-5 -m-5 absolute right-5 top-5 stroke-black dark:stroke-white hover:stroke-muted-300 hover:dark:stroke-muted-300"
+              onClick={onClose}
+            >
+              <IconX />
+            </div>
+          </div>
+          <div className="flex flex-col">
+            {isSendComplete ? (
+              <ReferralSuccess />
+            ) : (
+              <>
+                <p className="text-neutrals-gray-5 text-xs -mt-[3px] w-full">
+                  Earn 5GB for free per friend that joins Desci Nodes. Up to a
+                  maximum of 250GB. Invites you’ve sent for your current nodes
+                  will also be included in the referral program.
+                </p>
 
-              <div className="py-3 my-3 flex flex-col">
-                {/**
-                 * NOTE: This should really be in it's own component
-                 * But the way the modal is written with the header and footer
-                 * I'd have to pull that out to it's own component as well
-                 * Juice likely isn't worth the squeeze.
-                 */}
-                <form className="h-fit">
-                  <div className="mb-8">
-                    <Controller
-                      name="emails"
-                      control={control}
-                      render={({ field }: any) => (
-                        <CreateableSelect
-                          label="Enter emails"
-                          field={field}
-                          useSpaceAsSeparator
-                        />
-                      )}
-                    />
-                    <p className="text-red-400 text-xs">
-                      {/* @ts-ignore */}
-                      {formState.errors.emails?.message}
-                    </p>
-                    <span className="text-xs mt-1 text-neutrals-gray-5">
-                      Separate emails with a space to add multiple.
-                    </span>
-                  </div>
-                </form>
-                <hr className="border-neutrals-gray-3" />
-              </div>
+                <div className="py-3 my-3 flex flex-col">
+                  {/**
+                   * NOTE: This should really be in it's own component
+                   * But the way the modal is written with the header and footer
+                   * I'd have to pull that out to it's own component as well
+                   * Juice likely isn't worth the squeeze.
+                   */}
+                  <form className="h-fit">
+                    <div className="mb-8">
+                      <Controller
+                        name="emails"
+                        control={control}
+                        render={({ field }: any) => (
+                          <CreateableSelect
+                            label="Enter emails"
+                            field={field}
+                            useSpaceAsSeparator
+                          />
+                        )}
+                      />
+                      <p className="text-red-400 text-xs">
+                        {/* @ts-ignore */}
+                        {formState.errors.emails?.message}
+                      </p>
+                      <span className="text-xs mt-1 text-neutrals-gray-5">
+                        Separate emails with a space to add multiple.
+                      </span>
+                    </div>
+                  </form>
+                  <hr className="border-neutrals-gray-3" />
+                </div>
 
-              <div>
-                <h2 className="text-sm mb-4 font-semibold">Invites Sent</h2>
-                <ul className="list-none">
-                  {existingReferrals.map((referral) => {
-                    return (
-                      <li key={referral.id} className="my-4">
-                        <ReferralItem referral={referral} />
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            </>
-          )}
+                <div>
+                  <h2 className="text-sm mb-4 font-semibold">Invites Sent</h2>
+                  <ul className="list-none">
+                    {existingReferrals.map((referral) => {
+                      return (
+                        <li key={referral.id} className="my-4">
+                          <ReferralItem referral={referral} />
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              </>
+            )}
+          </div>
         </div>
-      </PopOverBasic>
+        <ModalFooter
+          isSendComplete={isSendComplete}
+          isSendDisabled={
+            isSendInProgress ||
+            !hasEmailsInputted ||
+            Boolean(formState.errors.emails)
+          }
+          onSubmit={onSubmitHandler}
+          onClose={onClose}
+        />
+      </Modal>
     </>
   );
 };
 
-const PopOverFooter = ({
+const ModalFooter = ({
   isSendComplete,
   isSendDisabled,
   onSubmit,
