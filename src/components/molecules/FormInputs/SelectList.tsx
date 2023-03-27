@@ -84,7 +84,7 @@ export default function SelectList(props: SelectListProps) {
                   {value ? chosen.avatar : null}
                 </div>
               ) : null}
-              <span className="block truncate font-bold">
+              <span className="block truncate font-bold text-white">
                 {value?.name || label}
               </span>
             </span>
