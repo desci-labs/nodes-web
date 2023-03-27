@@ -27,6 +27,7 @@ import { BsClipboard } from "react-icons/bs";
 import { CheckIcon } from "@heroicons/react/solid";
 import { useUser } from "@src/state/user/hooks";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import Modal from "@src/components/molecules/Modal/Modal";
 
 // Todo: implement a useNodeDetails hook to get the details of a the currentObjectId like (owner etc)
 // Todo: use the owner details to determine if the current user is the owner
@@ -322,31 +323,11 @@ const CitationPopover = (props: PopOverProps) => {
   };
 
   return (
-    <PopOver
+    <Modal
       {...props}
-      isVisible={showCitationModal}
-      style={{
-        width: 650,
-        padding: 0,
-        marginLeft: 0,
-        marginRight: 0,
-        position: "fixed",
-      }}
-      containerStyle={{
-        backgroundColor: "#3A3A3ABF",
-      }}
-      footer={() => (
-        <PopoverFooter>
-          <PrimaryButton
-            className="w-[63px] justify-center flex"
-            onClick={close}
-          >
-            Done
-          </PrimaryButton>
-        </PopoverFooter>
-      )}
-      displayCloseIcon={false}
-      className="rounded-lg bg-zinc-100 dark:bg-zinc-900"
+      isOpen={showCitationModal}
+      onDismiss={close}
+      $maxWidth={650}
     >
       <div className="px-6 py-5 text-white">
         <div className="flex flex-row justify-between items-center">
@@ -369,7 +350,12 @@ const CitationPopover = (props: PopOverProps) => {
           <CitationComponent />
         </div>
       </div>
-    </PopOver>
+      <PopoverFooter>
+        <PrimaryButton className="w-[63px] justify-center flex" onClick={close}>
+          Done
+        </PrimaryButton>
+      </PopoverFooter>
+    </Modal>
   );
 };
 
