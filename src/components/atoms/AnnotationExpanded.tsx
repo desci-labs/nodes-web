@@ -35,17 +35,17 @@ const AnnotationExpanded = ({
   } = useNodeReader();
   const { hoveredAnnotationId, selectedAnnotationId } = usePdfReader();
   const [copyLink, setCopyLink] = useState<string>("");
-  const [visible, setVisible] = useState(hoveredAnnotationId != annotation.id);
+  const [visible, setVisible] = useState(hoveredAnnotationId != annotation?.id);
 
   useEffect(() => {
     const getCopyLink = async () => {
       const selectedComponent = componentStack[0];
       const componentIndex = manifestData?.components.findIndex(
-        (c) => c.id === selectedComponent.id
+        (c) => c.id === selectedComponent?.id
       );
 
       const annotationIndex = selectedComponent?.payload.annotations.findIndex(
-        (a: any) => a.id === annotation.id
+        (a: any) => a.id === annotation?.id
       );
 
       //default set the version to 0, assuming no version has yet been published
@@ -74,8 +74,8 @@ const AnnotationExpanded = ({
     setVisible(true);
   }, []);
 
-  const isHovered = hoveredAnnotationId === annotation.id;
-  const isSelected = selectedAnnotationId === annotation.id;
+  const isHovered = hoveredAnnotationId === annotation?.id;
+  const isSelected = selectedAnnotationId === annotation?.id;
 
   return (
     <div className={`${isHovered && !isSelected ? "cursor-pointer" : ""}`}>
