@@ -1,10 +1,11 @@
 import PrimaryButton from "@components/atoms/PrimaryButton";
-import PopOver from "@components/organisms/PopOver";
 import WalletManager from "@components/organisms/WalletManager";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { useEffect } from "react";
+import PopoverFooter from "@src/components/molecules/Footer";
+import Modal from "@src/components/molecules/Modal/Modal";
 
-const PopOverWalletManager = (props: any) => {
+const WalletManagerModal = (props: any) => {
   const { showWalletManager, setShowWalletManager } = useManuscriptController([
     "showWalletManager",
   ]);
@@ -31,34 +32,9 @@ const PopOverWalletManager = (props: any) => {
     }
   }, [showWalletManager]);
 
-  // if (!showWalletManager) return null;
-
   return (
-    <PopOver
-      {...props}
-      zIndex={121}
-      containerStyle={{
-        backgroundColor: "#3A3A3ABF",
-      }}
-      onClose={onClose}
-      isVisible={showWalletManager}
-      displayCloseIcon={false}
-      style={{ marginLeft: 0, marginRight: 0, width: 720 }}
-      className="transition-all rounded-lg bg-zinc-100 dark:bg-zinc-900"
-      footer={() => (
-        <div
-          className={`flex flex-row justify-end items-center h-16 w-full p-4`}
-        >
-          <PrimaryButton
-            className={`w-[140px] flex justify-center`}
-            onClick={onClose}
-          >
-            Done
-          </PrimaryButton>
-        </div>
-      )}
-    >
-      <div className="px-6 py-5">
+    <Modal onDismiss={onClose} isOpen={showWalletManager}>
+      <div className="px-6 py-5 min-w-full lg:min-w-[700px]">
         <div className="flex flex-row justify-between items-center">
           <div className="text-lg font-bold text-white">
             Digital Signature Management
@@ -77,8 +53,16 @@ const PopOverWalletManager = (props: any) => {
           </div>
         </div>
       </div>
-    </PopOver>
+      <PopoverFooter>
+        <PrimaryButton
+          className={`w-[140px] flex justify-center`}
+          onClick={onClose}
+        >
+          Done
+        </PrimaryButton>
+      </PopoverFooter>
+    </Modal>
   );
 };
 
-export default PopOverWalletManager;
+export default WalletManagerModal;

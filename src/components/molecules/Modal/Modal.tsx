@@ -32,7 +32,7 @@ type StyledDialogProps = {
   $minHeight?: number | false;
   $maxHeight?: number;
   $scrollOverlay?: boolean;
-  $maxWidth: number;
+  $maxWidth?: number;
 };
 
 const AnimatedDialogContent = animated(DialogContent);
@@ -45,7 +45,8 @@ const StyledDialogContent = styled(AnimatedDialogContent)<StyledDialogProps>`
     padding: 0px;
     overflow-y: auto;
     overflow-x: hidden;
-    max-width: ${({ $maxWidth }) => $maxWidth}px;
+    max-width: ${({ $maxWidth }) =>
+      $maxWidth ? `${$maxWidth}px` : "max-content"};
     ${({ $maxHeight }) =>
       $maxHeight &&
       css`
@@ -75,7 +76,7 @@ export interface ModalProps {
 
 export default function Modal({
   children,
-  $maxWidth = 420,
+  $maxWidth,
   $maxHeight = 90,
   $minHeight,
   initialFocusRef,
