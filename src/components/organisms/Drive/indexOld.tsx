@@ -34,46 +34,42 @@ import RenameDataModal from "./RenameDataModal";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useDrive } from "@src/state/drive/hooks";
 import { dispatch } from "react-hot-toast/dist/core/store";
-import {
-  fetchTreeThunk,
-  navigateToDriveByPath,
-} from "@src/state/drive/driveSlice";
-import { useSetter } from "@src/store/accessors";
+import { fetchTreeThunk } from "@src/state/drive/driveSlice";
 
 const Empty = () => {
   return <div className="p-5 text-xs">No files</div>;
 };
 
 interface DriveTableProps {
-  // directory: DriveObject[];
-  // setDirectory: React.Dispatch<React.SetStateAction<DriveObject[]>>;
-  // setShowEditMetadata: React.Dispatch<React.SetStateAction<boolean>>;
-  // datasetMetadataInfoRef: React.MutableRefObject<DatasetMetadataInfo>;
-  // setMetaStaging: React.Dispatch<React.SetStateAction<MetaStaging[]>>;
-  // showEditMetadata: boolean;
+  directory: DriveObject[];
+  setDirectory: React.Dispatch<React.SetStateAction<DriveObject[]>>;
+  setShowEditMetadata: React.Dispatch<React.SetStateAction<boolean>>;
+  datasetMetadataInfoRef: React.MutableRefObject<DatasetMetadataInfo>;
+  setMetaStaging: React.Dispatch<React.SetStateAction<MetaStaging[]>>;
+  showEditMetadata: boolean;
   setBreadCrumbs: React.Dispatch<React.SetStateAction<BreadCrumb[]>>;
   breadCrumbs: BreadCrumb[];
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  // setOldComponentMetadata: (
-  //   value: React.SetStateAction<oldComponentMetadata | null>
-  // ) => void;
-  // renameComponentId: string | null;
-  // setRenameComponentId: React.Dispatch<React.SetStateAction<string | null>>;
+  setOldComponentMetadata: (
+    value: React.SetStateAction<oldComponentMetadata | null>
+  ) => void;
+  renameComponentId: string | null;
+  setRenameComponentId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const DriveTable: React.FC<DriveTableProps> = ({
-  // directory,
-  // setDirectory,
-  // setShowEditMetadata,
-  // datasetMetadataInfoRef,
-  // setMetaStaging,
-  // showEditMetadata,
+  directory,
+  setDirectory,
+  setShowEditMetadata,
+  datasetMetadataInfoRef,
+  setMetaStaging,
+  showEditMetadata,
   breadCrumbs,
   setBreadCrumbs,
   setLoading,
-  // setOldComponentMetadata,
-  // renameComponentId,
-  // setRenameComponentId,
+  setOldComponentMetadata,
+  renameComponentId,
+  setRenameComponentId,
 }) => {
   const { setIsAddingComponent, driveJumpDir, setDriveJumpDir, privCidMap } =
     useManuscriptController(["driveJumpDir", "privCidMap"]);
@@ -84,8 +80,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
     currentObjectId,
   } = useNodeReader();
 
-  const { nodeTree, status, currentDrive } = useDrive();
-  const dispatch = useSetter();
+  const { nodeTree } = useDrive();
 
   const [selected, setSelected] = useState<
     Record<number, ResearchObjectComponentType | DriveNonComponentTypes>
@@ -95,21 +90,21 @@ const DriveTable: React.FC<DriveTableProps> = ({
 
   const [jumpReady, setJumpReady] = useState<boolean>(false);
 
-  // useClickAway(containerRef, () => {
-  //   if (!showEditMetadata && Object.keys(selected).length) setSelected({});
-  // });
+  useClickAway(containerRef, () => {
+    if (!showEditMetadata && Object.keys(selected).length) setSelected({});
+  });
 
   function exploreDirectory(
     name: FileDir["name"] | DriveObject["name"],
     drive: DriveObject
   ) {
-    dispatch(navigateToDriveByPath({ path: drive.path! }));
+    setDirectory(drive.contains!);
     setSelected({});
     setBreadCrumbs([...breadCrumbs, { name: name, drive: drive }]);
   }
 
   function eatBreadCrumb(index: number) {
-    dispatch(navigateToDriveByPath({ path: breadCrumbs[index].drive.path! }));
+    setDirectory(breadCrumbs[index].drive.contains!);
     setSelected({});
     setBreadCrumbs(breadCrumbs.slice(0, index + 1));
   }
@@ -174,31 +169,33 @@ const DriveTable: React.FC<DriveTableProps> = ({
       !breadCrumbs.length
     ) {
       (window as any).lastObjectId = currentObjectId!;
+
+      setDirectory(nodeTree!.contains!);
       setBreadCrumbs([{ name: "Research Node", drive: nodeTree! }]);
       //* Populate virtual node drive for data components
     }
 
     //fill sizes and metadata (dont remove for now)
-    //   setDirectory((old) => {
-    //     if (!old) return old;
-    //     const isNodeRoot = old.findIndex((fd) => fd.name === "Research Reports");
-    //     if (isNodeRoot === -1) return old;
+    setDirectory((old) => {
+      if (!old) return old;
+      const isNodeRoot = old.findIndex((fd) => fd.name === "Research Reports");
+      if (isNodeRoot === -1) return old;
 
-    //     const virtualData = createVirtualDrive({
-    //       name: "Data",
-    //       path: DRIVE_DATA_PATH,
-    //       componentType: ResearchObjectComponentType.DATA,
-    //       contains: old,
-    //     });
+      const virtualData = createVirtualDrive({
+        name: "Data",
+        path: DRIVE_DATA_PATH,
+        componentType: ResearchObjectComponentType.DATA,
+        contains: old,
+      });
 
-    //     resetAccessStatus(virtualData);
-    //     const sizesFilledDrive = fillOuterSizes(virtualData);
-    //     const newDir = [...sizesFilledDrive.contains!];
-    //     setJumpReady(true);
-    //     setLoading(false);
-    //     return newDir;
-    //   });
-    //   setLoading(false);
+      resetAccessStatus(virtualData);
+      const sizesFilledDrive = fillOuterSizes(virtualData);
+      const newDir = [...sizesFilledDrive.contains!];
+      setJumpReady(true);
+      setLoading(false);
+      return newDir;
+    });
+    setLoading(false);
   }, [nodeTree]);
 
   function toggleSelected(
@@ -214,7 +211,6 @@ const DriveTable: React.FC<DriveTableProps> = ({
     setSelected(newSelected);
   }
 
-  //checks if selected is of the same type
   const canEditMetadata = useMemo(() => {
     return new Set(Object.values(selected)).size <= 1;
   }, [selected]);
@@ -244,39 +240,41 @@ const DriveTable: React.FC<DriveTableProps> = ({
           ? latestByUid
           : driveBfsByPath(nodeTree!, driveJumpDir.targetPath!);
         if (latest) {
-          navigateToDriveByPath({ path: latest.path! });
+          setDirectory(latest.contains!);
           console.log(
             `[DRIVE JUMPING] LATEST FOUND BY ${latestByUid ? "UID" : "PATH"}`
           );
         }
 
         //select item
-        // debugger;
-        if (currentDrive!.contains) {
-          const containedIdxUid = currentDrive!.contains.findIndex(
-            (item: any) => item.uid === driveJumpDir.itemUid
-          );
-
-          const itemIdxFound = containedIdxUid
-            ? containedIdxUid
-            : currentDrive!.contains.findIndex((drv: DriveObject) =>
-                drv.path?.includes(driveJumpDir.itemPath!)
-              );
-
-          if (itemIdxFound !== -1) {
-            console.log(
-              `[DRIVE JUMPING] ITEM FOUND BY ${
-                containedIdxUid ? "UID" : "PATH"
-              }: ${
-                containedIdxUid ? driveJumpDir.itemUid : driveJumpDir.itemPath
-              }`
+        setDirectory((current) => {
+          // debugger;
+          if (current) {
+            const containedIdxUid = current.findIndex(
+              (item) => item.uid === driveJumpDir.itemUid
             );
-            setSelected({
-              [itemIdxFound]:
-                currentDrive!.contains[itemIdxFound].componentType,
-            });
+
+            const itemIdxFound = containedIdxUid
+              ? containedIdxUid
+              : current.findIndex((drv: DriveObject) =>
+                  drv.path?.includes(driveJumpDir.itemPath!)
+                );
+
+            if (itemIdxFound !== -1) {
+              console.log(
+                `[DRIVE JUMPING] ITEM FOUND BY ${
+                  containedIdxUid ? "UID" : "PATH"
+                }: ${
+                  containedIdxUid ? driveJumpDir.itemUid : driveJumpDir.itemPath
+                }`
+              );
+              setSelected({
+                [itemIdxFound]: current[itemIdxFound].componentType,
+              });
+            }
           }
-        }
+          return current;
+        });
 
         //update breadcrumbs
         if (latest) {
@@ -344,8 +342,8 @@ const DriveTable: React.FC<DriveTableProps> = ({
           <li className={`${DRIVE_ROW_STYLES[7]}`}>Use</li>
         </ul>
         <StatusInfo />
-        {currentDrive?.contains?.length ? (
-          currentDrive.contains.map((f: DriveObject, idx: number) => {
+        {directory.length ? (
+          directory.map((f: DriveObject, idx: number) => {
             return (
               <DriveRow
                 key={`drive_row_${f.path + f.cid + idx || idx}`}
@@ -355,13 +353,13 @@ const DriveTable: React.FC<DriveTableProps> = ({
                 selected={!!selected[idx]}
                 toggleSelected={toggleSelected}
                 isMultiselecting={!!Object.keys(selected).length}
-                // setMetaStaging={setMetaStaging}
-                // setShowEditMetadata={setShowEditMetadata}
-                // datasetMetadataInfoRef={datasetMetadataInfoRef}
+                setMetaStaging={setMetaStaging}
+                setShowEditMetadata={setShowEditMetadata}
+                datasetMetadataInfoRef={datasetMetadataInfoRef}
                 selectedFiles={selected}
                 canEditMetadata={canEditMetadata}
                 canUse={canUse}
-                // setOldComponentMetadata={setOldComponentMetadata}
+                setOldComponentMetadata={setOldComponentMetadata}
               />
             );
           })
@@ -370,13 +368,13 @@ const DriveTable: React.FC<DriveTableProps> = ({
         )}
       </div>
       <PopOverUseMenu />
-      {/* {renameComponentId && (
+      {renameComponentId && (
         <RenameDataModal
           renameComponentId={renameComponentId}
           setRenameComponentId={setRenameComponentId}
           setDirectory={setDirectory}
         />
-      )} */}
+      )}
     </div>
   );
 };
