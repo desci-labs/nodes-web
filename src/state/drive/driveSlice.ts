@@ -31,6 +31,7 @@ import {
   extractComponentMetadata,
   generateCidCompMap,
 } from "./utils";
+import { NavigateToDriveByPathAction } from "./types";
 interface DriveState {
   nodeTree: DriveObject | null;
   status: RequestStatus;
@@ -52,7 +53,7 @@ export const driveSlice = createSlice({
     reset: () => {
       return initialState;
     },
-    navigateToDriveByPath: (state, action) => {
+    navigateToDriveByPath: (state, action: NavigateToDriveByPathAction) => {
       if (state.status !== "succeeded" || !state.nodeTree) return;
       const { path } = action.payload;
 
@@ -80,11 +81,12 @@ export const driveSlice = createSlice({
       .addCase(fetchTreeThunk.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.error = null;
-        // debugger;
         const { tree } = action.payload;
-        debugger;
+        // debugger;
         if (action.payload.deprecated) {
           state.nodeTree = tree as DriveObject;
+          state.currentDrive = tree as DriveObject;
+
           return;
         }
         const manifest = action.payload.manifest!;
@@ -131,6 +133,7 @@ export const driveSlice = createSlice({
           }
         });
         if (externalLinks.contains?.length) root.contains?.push(externalLinks);
+        state.currentDrive = root;
       })
       .addCase(fetchTreeThunk.rejected, (state, action) => {
         state.status = "failed";
