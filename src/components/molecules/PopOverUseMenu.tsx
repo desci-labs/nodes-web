@@ -4,7 +4,7 @@ import { useManuscriptController } from "@src/components/organisms/ManuscriptRea
 import { IconWarning, IconX } from "@src/icons";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import PopoverFooter from "./Footer";
-import Modal from "./Modal/Modal";
+import Modal from "@src/components/molecules/Modal/Modal";
 
 const PopOverUseMenu = () => {
   const { useMenuCids, setUseMenuCids } = useManuscriptController([
