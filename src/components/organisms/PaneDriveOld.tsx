@@ -121,24 +121,35 @@ const PaneDrive = () => {
     mode,
   } = useNodeReader();
 
-  const { nodeTree, status, currentDrive } = useDrive();
+  const { nodeTree, status } = useDrive();
 
-  // const [directory, setDirectory] = useState<Array<DriveObject>>([]);
-  // const [renameComponentId, setRenameComponentId] = useState<string | null>(
-  //   null
-  // );
-  // const [showEditMetadata, setShowEditMetadata] = useState<boolean>(false);
-  // const [metaStaging, setMetaStaging] = useState<MetaStaging[]>([]);
+  const [directory, setDirectory] = useState<Array<DriveObject>>([]);
+  const [renameComponentId, setRenameComponentId] = useState<string | null>(
+    null
+  );
+  const [showEditMetadata, setShowEditMetadata] = useState<boolean>(false);
+  const [metaStaging, setMetaStaging] = useState<MetaStaging[]>([]);
   const [breadCrumbs, setBreadCrumbs] = useState<BreadCrumb[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  // const [OldComponentMetadata, setOldComponentMetadata] =
-  //   useState<oldComponentMetadata | null>(null); //temporary fallback for old metadata used for documents and code
+  const [OldComponentMetadata, setOldComponentMetadata] =
+    useState<oldComponentMetadata | null>(null); //temporary fallback for old metadata used for documents and code
 
-  // const datasetMetadataInfoRef = useRef<DatasetMetadataInfo>(
-  //   datasetMetadataInfoRefDefaults
-  // );
+  const datasetMetadataInfoRef = useRef<DatasetMetadataInfo>(
+    datasetMetadataInfoRefDefaults
+  );
 
   function updateProgress(batch: string, progress: number) {
+    //change to useCb
+    // console.log(`batch ${batch} updated progress to ${progress}`);
+    // uploadQueue.forEach((qI) => {
+    //   if (qI.batchUid === batch) qI.progress = progress;
+    // });
+    // const newQueue = uploadQueue.map((qI) => {
+    //   if (qI.batchUid !== batch) return qI;
+    //   qI.progress = progress;
+    //   return qI;
+    // });
+    // setUploadQueue(newQueue);
     setBatchUploadProgress({ ...batchUploadProgress, [batch]: progress });
   }
 
@@ -226,15 +237,56 @@ const PaneDrive = () => {
           placeHolder.accessStatus = AccessStatus.PRIVATE;
         }
         if (dataDrive) fillOuterSizes(dataDrive);
-        //handle case of node switched mid upload
 
+        setDirectory((cwd) => {
+          if (cwd[0]?.parent?.path === VirtualDrivePaths.DRIVE_DATA_PATH) {
+            return dataDrive!.contains!;
+          }
+          return cwd;
+        });
+
+        //only handles if user is in the node root post upload, updates the size of data.
+        setDirectory((old) => {
+          const isNodeRoot = old.findIndex(
+            (fd) => fd.path === DRIVE_RESEARCH_REPORT_PATH
+          );
+          if (isNodeRoot === -1) return old;
+
+          const virtualData = createVirtualDrive({
+            name: "Data",
+            componentType: ResearchObjectComponentType.DATA,
+            contains: old,
+            path: DRIVE_DATA_PATH,
+          });
+          const sizesFilledDrive = fillOuterSizes(virtualData);
+          const newDir = [...sizesFilledDrive.contains!];
+          const newCrumbs = constructBreadCrumbs(
+            newDir[0].parent! as DriveObject
+          );
+          setBreadCrumbs(newCrumbs);
+          return newDir;
+          // return old;
+        });
+
+        //for edge case of switching node whilst uploading
+        setDirectory((old) => {
+          console.log(
+            `[SAVING]snapshotUuid: ${snapshotNodeUuid} currentObjId: ${currentObjectId!}`
+          );
+          dispatch(setManifestData({ manifest, cid: manifestCid }));
+          return old;
+        });
         resetAccessStatus(nodeTree!);
       } catch (e: any) {
         console.log(e);
         updateProgress(batchUid, -1);
         setUploadQueue(removeFromUploadQueue(uploadQueue, batchUid));
-        if (placeHolder) placeHolder.accessStatus = AccessStatus.FAILED;
-
+        setDirectory((prev) => {
+          if (placeHolder) placeHolder.accessStatus = AccessStatus.FAILED;
+          if (prev[0]?.parent?.path !== DRIVE_DATA_PATH) return prev;
+          const newDir = [...prev];
+          return newDir;
+        });
         __log(
           "PaneDrive::handleUpload",
           files,
@@ -247,7 +299,7 @@ const PaneDrive = () => {
         throw e;
       }
     },
-    [nodeTree, currentObjectId, manifestData]
+    [setDirectory, nodeTree, currentObjectId, manifestData]
   );
 
   const handleUpdate = useCallback(
@@ -304,8 +356,8 @@ const PaneDrive = () => {
       Object.keys(dirs).forEach((key) =>
         placeholderInfo.push({ isDirectory: true, name: key, path: dirs[key] })
       );
-      const oldDatasetRootCid = findRootComponentCid(currentDrive!); //moved
-      const splitCxtPath = currentDrive!.path!.split("/");
+      const oldDatasetRootCid = findRootComponentCid(directory[0]); //moved
+      const splitCxtPath = directory[0].path!.split("/");
       splitCxtPath.pop();
       const cxtPath = splitCxtPath.join("/");
 
@@ -321,13 +373,18 @@ const PaneDrive = () => {
           accessStatus: AccessStatus.UPLOADING,
           metadata: {}, //TO ADD METADATA
           cid: DEFAULT_CID_PENDING,
+          parent: directory[0]?.parent,
           type: p.isDirectory ? FileType.Dir : FileType.File,
           path: cxtPath + p.path,
           uid: uid,
         };
         return placeholder;
       });
-      const snapshotDirUid = currentDrive!.uid;
+      const snapshotDirUid = directory[0].parent?.uid;
+      setDirectory((dir) => {
+        return [...dir, ...placeholders];
+      });
+      // debugger;
 
       console.log("[DRIVE UPDATE] placeholders: ", placeholders);
       const batchUid = Date.now().toString();
@@ -370,70 +427,77 @@ const PaneDrive = () => {
         //   return cwd;
         // });
 
-        // debugger;
-        console.log("dsRootCid: ", oldDatasetRootCid);
-        const dataDriveIdx = nodeTree?.contains?.findIndex(
-          (d) => d.name === "Data"
-        );
-        const dataDrive =
-          dataDriveIdx !== undefined
-            ? nodeTree?.contains![dataDriveIdx]
-            : undefined;
-        if (dataDrive) {
-          const datasetIndex = dataDrive.contains?.findIndex(
-            (ds) => ds.cid === oldDatasetRootCid
+        setDirectory((old) => {
+          // debugger;
+          console.log("dsRootCid: ", oldDatasetRootCid);
+          const dataDriveIdx = nodeTree?.contains?.findIndex(
+            (d) => d.name === "Data"
           );
-          if (datasetIndex !== -1) {
-            const dataComp = dataDrive.contains![datasetIndex!];
-            const newPath = DRIVE_DATA_PATH + "/" + rootDataCid;
-
-            // save already asigned UIDs
-            const ltsDataCompContents = [
-              ...dataComp.contains!,
-              ...placeholders, //context doesn't matter here, gets flattened
-            ];
-            // debugger;
-            gracefullyAssignTreeUids(tree, ltsDataCompContents);
-            // debugger;
-            dataComp.contains = tree;
-            dataComp.cid = rootDataCid;
-            dataComp.path = newPath;
-            dataComp.contains?.forEach(
-              (fd, idx) =>
-                (dataComp.contains![idx] = ipfsTreeToDriveTree(
-                  fd,
-                  formatDbDate(date),
-                  manifest
-                ))
+          const dataDrive =
+            dataDriveIdx !== undefined
+              ? nodeTree?.contains![dataDriveIdx]
+              : undefined;
+          if (dataDrive) {
+            const datasetIndex = dataDrive.contains?.findIndex(
+              (ds) => ds.cid === oldDatasetRootCid
             );
+            if (datasetIndex !== -1) {
+              const dataComp = dataDrive.contains![datasetIndex!];
+              const newPath = "Data/" + rootDataCid;
 
-            currentDrive!.contains!.forEach((item) => {
-              const splitPath = item.path!.split("/");
-              splitPath[0] = rootDataCid;
-              item.path = splitPath.join("/");
-            });
-            fillOuterSizes(dataDrive);
-            // debugger;
-            if (currentDrive!.uid === snapshotDirUid) {
-              const pathSplit = currentDrive!.path?.split("/");
-              if (pathSplit) {
-                const cidIndex = pathSplit?.findIndex((s) => strIsCid(s));
-                if (cidIndex !== -1) pathSplit[cidIndex] = rootDataCid;
-                const updatedPath = pathSplit?.join("/");
-                const updatedDir = findDriveByPath(dataDrive, updatedPath);
+              //reattach parents
+              tree.forEach((fd: FileDir) => (fd.parent = dataComp));
+              // save already asigned UIDs
+              if (!dataComp.contains) return old;
+              const ltsDataCompContents = [
+                ...dataComp.contains!,
+                ...placeholders, //context doesn't matter here, gets flattened
+              ];
+              // debugger;
+              gracefullyAssignTreeUids(tree, ltsDataCompContents);
+              // debugger;
+              dataComp.contains = tree;
+              dataComp.cid = rootDataCid;
+              dataComp.path = newPath;
+              dataComp.contains?.forEach(
+                (fd, idx) =>
+                  (dataComp.contains![idx] = ipfsTreeToDriveTree(
+                    fd,
+                    formatDbDate(date),
+                    manifest
+                  ))
+              );
 
-                // if (updatedDir) newDirectory = updatedDir.contains!;
-                if (updatedDir) {
-                  const newCrumbs = constructBreadCrumbs(updatedDir);
-                  setBreadCrumbs(newCrumbs);
-                  return updatedDir.contains!;
+              old.forEach((item) => {
+                const splitPath = item.path!.split("/");
+                splitPath[0] = rootDataCid;
+                item.path = splitPath.join("/");
+              });
+              fillOuterSizes(dataDrive);
+              // debugger;
+              if (old[0].parent?.uid === snapshotDirUid) {
+                const pathSplit = old[0].parent?.path?.split("/");
+                if (pathSplit) {
+                  const cidIndex = pathSplit?.findIndex((s) => strIsCid(s));
+                  if (cidIndex !== -1) pathSplit[cidIndex] = rootDataCid;
+                  const updatedPath = pathSplit?.join("/");
+                  const updatedDir = findDriveByPath(dataDrive, updatedPath);
+
+                  // if (updatedDir) newDirectory = updatedDir.contains!;
+                  if (updatedDir) {
+                    const newCrumbs = constructBreadCrumbs(updatedDir);
+                    setBreadCrumbs(newCrumbs);
+                    return updatedDir.contains!;
+                  }
                 }
               }
             }
           }
-        }
-        placeholders.forEach((ph) => (ph.accessStatus = AccessStatus.PRIVATE));
-
+          placeholders.forEach(
+            (ph) => (ph.accessStatus = AccessStatus.PRIVATE)
+          );
+          return old;
+        });
         console.log(
           `snapshotUuid: ${snapshotNodeUuid} currentObjId: ${currentObjectId!}`
         );
@@ -445,9 +509,11 @@ const PaneDrive = () => {
         console.log(e);
         setUploadQueue(removeFromUploadQueue(uploadQueue, batchUid));
         updateProgress(batchUid, -1);
-
-        placeholders.forEach((ph) => (ph.accessStatus = AccessStatus.FAILED));
-
+        setDirectory((prev) => {
+          placeholders.forEach((ph) => (ph.accessStatus = AccessStatus.FAILED));
+          const newDir = [...prev];
+          return newDir;
+        });
         __log("PaneDrive::handleUpdate", files, updateContext, e);
         errorHandle(e);
         throw e;
@@ -455,6 +521,8 @@ const PaneDrive = () => {
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
+      directory,
+      setDirectory,
       nodeTree,
       currentObjectId,
       setManifestData,
@@ -464,10 +532,10 @@ const PaneDrive = () => {
     ]
   );
 
-  const directoryRef = useRef<DriveObject[]>();
+  const directoryRef = useRef<DriveObject[]>(directory);
   useEffect(() => {
-    directoryRef.current = currentDrive?.contains;
-  }, [currentDrive?.contains]);
+    directoryRef.current = directory;
+  }, [directory]);
 
   // handle file drop
   useEffect(() => {
@@ -485,7 +553,7 @@ const PaneDrive = () => {
       });
     };
 
-    const freshDir = directoryRef.current!;
+    const freshDir = directoryRef.current;
     if (!droppedFileList && !droppedTransferItemList) {
       return;
     }
@@ -567,8 +635,8 @@ const PaneDrive = () => {
             JSON.stringify(currentObjectId!)
           );
         }
-        if (currentDrive?.contains?.length) {
-          const dirUid = currentDrive.uid;
+        if (directory?.length) {
+          const dirUid = directory[0].parent?.uid;
           if (dirUid)
             sessionStorage.setItem(
               SessionStorageKeys.lastDirUid,
@@ -578,43 +646,57 @@ const PaneDrive = () => {
         componentUnmounting.current = false;
       }
     };
-  }, [nodeTree, currentObjectId]);
+  }, [nodeTree, directory, currentObjectId]);
 
+  const memoizedSetDirectory = useCallback(
+    (args: any) => setDirectory(args),
+    []
+  );
+  const memoizedSetRenameComponentId = useCallback(
+    (args: any) => setRenameComponentId(args),
+    []
+  );
   return (
-    <ContextMenuProvider>
-      <div className="flex flex-col relative">
-        {loading ? (
-          <div
-            className={`flex justify-center items-center flex-col w-[calc(100%-320px)] h-full fixed bg-neutrals-black overflow-hidden top-0 z-[50] gap-3 ${
-              loading ? "" : "hidden"
-            }`}
-          >
-            <LoaderDrive />
-          </div>
-        ) : null}
-        {isDraggingFiles ? <DropTargetFullScreen /> : null}
-        <PerfectScrollbar className="w-full self-center flex flex-col gap-6 px-20 text-white h-full bg-neutrals-black pb-20 !pb-[300px]">
-          <h1 className="text-[28px] font-bold text-white">Node Drive</h1>
-          <SpacerHorizontal />
-          <div id="tableWrapper" className="mt-5 h-full">
-            <DriveTable
-              setLoading={setLoading}
-              // setOldComponentMetadata={setOldComponentMetadata}
-              // directory={directory}
-              // setDirectory={setDirectory}
-              // setShowEditMetadata={setShowEditMetadata}
-              // datasetMetadataInfoRef={datasetMetadataInfoRef}
-              // setMetaStaging={setMetaStaging}
-              // showEditMetadata={showEditMetadata}
-              breadCrumbs={breadCrumbs}
-              setBreadCrumbs={setBreadCrumbs}
-              // renameComponentId={renameComponentId}
-              // setRenameComponentId={setRenameComponentId}
-            />
-          </div>
-        </PerfectScrollbar>
+    <nodeDriveSetContext.Provider
+      value={{
+        setDirectory: memoizedSetDirectory,
+        setRenameComponentId: memoizedSetRenameComponentId,
+      }}
+    >
+      <ContextMenuProvider>
+        <div className="flex flex-col relative">
+          {loading ? (
+            <div
+              className={`flex justify-center items-center flex-col w-[calc(100%-320px)] h-full fixed bg-neutrals-black overflow-hidden top-0 z-[50] gap-3 ${
+                loading ? "" : "hidden"
+              }`}
+            >
+              <LoaderDrive />
+            </div>
+          ) : null}
+          {isDraggingFiles ? <DropTargetFullScreen /> : null}
+          <PerfectScrollbar className="w-full self-center flex flex-col gap-6 px-20 text-white h-full bg-neutrals-black pb-20 !pb-[300px]">
+            <h1 className="text-[28px] font-bold text-white">Node Drive</h1>
+            <SpacerHorizontal />
+            <div id="tableWrapper" className="mt-5 h-full">
+              <DriveTable
+                setLoading={setLoading}
+                setOldComponentMetadata={setOldComponentMetadata}
+                directory={directory}
+                setDirectory={setDirectory}
+                setShowEditMetadata={setShowEditMetadata}
+                datasetMetadataInfoRef={datasetMetadataInfoRef}
+                setMetaStaging={setMetaStaging}
+                showEditMetadata={showEditMetadata}
+                breadCrumbs={breadCrumbs}
+                setBreadCrumbs={setBreadCrumbs}
+                renameComponentId={renameComponentId}
+                setRenameComponentId={setRenameComponentId}
+              />
+            </div>
+          </PerfectScrollbar>
 
-        {/* <DriveDatasetMetadataPopOver
+          <DriveDatasetMetadataPopOver
             currentObjectId={currentObjectId!}
             manifestData={manifestData!}
             mode={mode}
@@ -628,8 +710,8 @@ const PaneDrive = () => {
               datasetMetadataInfoRef.current = datasetMetadataInfoRefDefaults;
               setShowEditMetadata(false);
             }}
-          /> */}
-        {/* <ComponentMetadataPopover
+          />
+          <ComponentMetadataPopover
             currentObjectId={currentObjectId!}
             manifestData={manifestData!}
             mode={mode}
@@ -639,10 +721,11 @@ const PaneDrive = () => {
               if (OldComponentMetadata) OldComponentMetadata.cb();
               setOldComponentMetadata(null);
             }}
-          /> */}
-        <SidePanelStorage />
-      </div>
-    </ContextMenuProvider>
+          />
+          <SidePanelStorage />
+        </div>
+      </ContextMenuProvider>
+    </nodeDriveSetContext.Provider>
   );
 };
 export default PaneDrive;
