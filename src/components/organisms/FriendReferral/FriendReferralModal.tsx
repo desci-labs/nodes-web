@@ -110,7 +110,7 @@ export const ReferAFriendModal = ({
         onClose={() => {
           onClose();
         }}
-        footer={() =>
+        footer={() => (
           <PopOverFooter
             isSendComplete={isSendComplete}
             isSendDisabled={
@@ -121,7 +121,7 @@ export const ReferAFriendModal = ({
             onSubmit={onSubmitHandler}
             onClose={onClose}
           />
-        }
+        )}
       >
         <div className="flex flex-col">
           {isSendComplete ? (

@@ -331,7 +331,7 @@ const CommitAdditionalInfoPopOver = (
           <AdditionalInfoForm methods={methods} />
         </div>
       </div>
-      <PopoverFooter>
+      <Modal.Footer>
         <PrimaryButton
           disabled={loading || !methods.formState.isValid}
           className={loading ? "w-[63px] justify-center flex" : ""}
@@ -365,7 +365,7 @@ const CommitAdditionalInfoPopOver = (
             "Review before publishing"
           )}
         </PrimaryButton>
-      </PopoverFooter>
+      </Modal.Footer>
     </Modal>
   );
 };

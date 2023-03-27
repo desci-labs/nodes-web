@@ -350,11 +350,11 @@ const CitationPopover = (props: ModalProps) => {
           <CitationComponent />
         </div>
       </div>
-      <PopoverFooter>
+      <Modal.Footer>
         <PrimaryButton className="w-[63px] justify-center flex" onClick={close}>
           Done
         </PrimaryButton>
-      </PopoverFooter>
+      </Modal.Footer>
     </Modal>
   );
 };

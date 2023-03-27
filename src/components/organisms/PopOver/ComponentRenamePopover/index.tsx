@@ -82,7 +82,7 @@ const ComponentRenamePopover = (props: {
             onChange={(e: any) => setComponentName(e.target.value)}
           />
         </div>
-        <PopoverFooter>
+        <Modal.Footer>
           <PrimaryButton
             disabled={manifestStatus === ManifestDataStatus.Pending}
             onClick={() => {
@@ -93,7 +93,7 @@ const ComponentRenamePopover = (props: {
               ? "Saving..."
               : "Save Changes"}
           </PrimaryButton>
-        </PopoverFooter>
+        </Modal.Footer>
       </div>
     </Modal>
   );

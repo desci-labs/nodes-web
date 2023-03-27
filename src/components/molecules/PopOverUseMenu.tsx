@@ -3,7 +3,6 @@ import PrimaryButton from "@components/atoms/PrimaryButton";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { IconWarning, IconX } from "@src/icons";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import PopoverFooter from "./Footer";
 import Modal from "@src/components/molecules/Modal/Modal";
 
 const PopOverUseMenu = () => {
@@ -104,9 +103,9 @@ const PopOverUseMenu = () => {
           )}
         </section>
       </div>
-      <PopoverFooter>
+      <Modal.Footer>
         <PrimaryButton onClick={close}>Done</PrimaryButton>
-      </PopoverFooter>
+      </Modal.Footer>
     </Modal>
   );
 };

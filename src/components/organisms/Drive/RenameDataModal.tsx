@@ -133,11 +133,11 @@ const RenameDataModal: React.FC<RenameDataModalProps> = ({
           />
         </div>
       </div>
-      <PopoverFooter>
+      <Modal.Footer>
         <PrimaryButton onClick={handleSubmit}>
           {loading ? <DefaultSpinner color="black" size={24} /> : "Save"}
         </PrimaryButton>
-      </PopoverFooter>
+      </Modal.Footer>
     </Modal>
   );
 };

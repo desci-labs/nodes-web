@@ -53,14 +53,14 @@ const WalletManagerModal = (props: any) => {
           </div>
         </div>
       </div>
-      <PopoverFooter>
+      <Modal.Footer>
         <PrimaryButton
           className={`w-[140px] flex justify-center`}
           onClick={onClose}
         >
           Done
         </PrimaryButton>
-      </PopoverFooter>
+      </Modal.Footer>
     </Modal>
   );
 };

@@ -72,7 +72,7 @@ export const OverwriteMetadataForm: React.FC<OverwriteMetadataDialogProps> = ({
           or only edit the metadata for files with unmodified metadata?
         </p>
       </div>
-      <PopoverFooter>
+      <Modal.Footer>
         <div className="flex gap-3">
           <ButtonSecondary
             onClick={() => {
@@ -101,7 +101,7 @@ export const OverwriteMetadataForm: React.FC<OverwriteMetadataDialogProps> = ({
             )}
           </PrimaryButton>
         </div>
-      </PopoverFooter>
+      </Modal.Footer>
     </div>
   );
 };

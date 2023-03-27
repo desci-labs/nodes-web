@@ -31,6 +31,7 @@ import {
   setCurrentObjectId,
   setManifest,
 } from "@src/state/nodes/viewer";
+import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 
 export const componentData = {
   [ResearchObjectComponentType.PDF]: {
@@ -76,7 +77,9 @@ export const componentData = {
 
 //To add a new type to the popover, add the new component to the renderComponentFlow() fn,
 //and add its disabled conditions in the disabledConditions() fn
-const AddComponentPopOver = (props: any) => {
+const AddComponentPopOver = (
+  props: ModalProps & { onClose: (force: boolean) => void }
+) => {
   const {
     privCidMap,
     setPrivCidMap,
@@ -86,7 +89,11 @@ const AddComponentPopOver = (props: any) => {
     setIsAddingSubcomponent,
     setAddComponentType,
     setAddComponentSubType,
-  } = useManuscriptController(["privCidMap", "addComponentType", "addComponentSubType"]);
+  } = useManuscriptController([
+    "privCidMap",
+    "addComponentType",
+    "addComponentSubType",
+  ]);
 
   const dispatch = useSetter();
   const { manifest: manifestData, currentObjectId } = useNodeReader();
@@ -279,20 +286,22 @@ const AddComponentPopOver = (props: any) => {
   };
 
   return (
-    <PopOver
-      {...props}
-      style={{
-        width: 500,
-        maxWidth: "100%",
-        margin: "3rem 0.75rem",
-        overflow: "visible",
-      }}
-      containerStyle={{
-        backgroundColor: "#3A3A3ABF",
-      }}
-      zIndex={105}
-      displayCloseIcon={false}
-      className="rounded-lg bg-zinc-100 dark:bg-zinc-900"
+    <Modal
+      $maxWidth={550}
+      onDismiss={() => close(false)}
+      isOpen={props.isOpen}
+      // style={{
+      //   width: 500,
+      //   maxWidth: "100%",
+      //   margin: "3rem 0.75rem",
+      //   overflow: "visible",
+      // }}
+      // containerStyle={{
+      //   backgroundColor: "#3A3A3ABF",
+      // }}
+      // zIndex={105}
+      // displayCloseIcon={false}
+      // className="rounded-lg bg-zinc-100 dark:bg-zinc-900"
     >
       <div className="px-6 py-5 min-h-[280px]">
         <div className="flex flex-row justify-between items-center">
@@ -323,7 +332,7 @@ const AddComponentPopOver = (props: any) => {
         </div>
       ) : null}
       {addComponentType !== ResearchObjectComponentType.DATA ? (
-        <PopoverFooter>
+        <Modal.Footer>
           <PrimaryButton
             disabled={disabledConditions() || loading}
             className={`${
@@ -350,9 +359,9 @@ const AddComponentPopOver = (props: any) => {
               </>
             )}
           </PrimaryButton>
-        </PopoverFooter>
+        </Modal.Footer>
       ) : null}
-    </PopOver>
+    </Modal>
   );
 };
 

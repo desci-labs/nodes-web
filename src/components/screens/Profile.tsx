@@ -72,7 +72,7 @@ export function ProfileInfoWrapper(props: ProfilePopOverProps) {
           </div>
         </PerfectScrollbar>
       </div>
-      <PopoverFooter>
+      <Modal.Footer>
         <PrimaryButton
           disabled={isSubmitting}
           form="userProfileForm"
@@ -80,7 +80,7 @@ export function ProfileInfoWrapper(props: ProfilePopOverProps) {
         >
           Save changes
         </PrimaryButton>
-      </PopoverFooter>
+      </Modal.Footer>
     </Modal>
   );
 }

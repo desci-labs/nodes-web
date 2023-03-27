@@ -354,7 +354,7 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
           </div>
         </div>
       </div>
-      <PopoverFooter>
+      <Modal.Footer>
         <PrimaryButton
           onClick={createCommit}
           disabled={!usingAssociatedAccount || loading}
@@ -367,7 +367,7 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
             "Sign and Publish"
           )}
         </PrimaryButton>
-      </PopoverFooter>
+      </Modal.Footer>
     </Modal>
   );
 };
