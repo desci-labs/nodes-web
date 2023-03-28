@@ -5,7 +5,6 @@ import jsonwebtoken from "jsonwebtoken";
 import { useEffect, useRef, useState } from "react";
 import SwirlingUniverse from "@images/swirling-universe.png";
 import "./style.scss";
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { useWeb3React } from "@web3-react/core";
 import { useEffectOnce } from "react-use";
 import FriendReferralButton from "../../organisms/FriendReferral/FriendReferralButton";
@@ -26,6 +25,7 @@ import { useUser } from "@src/state/user/hooks";
 import { api } from "@src/state/api";
 import { tags } from "@src/state/api/tags";
 import { ReferAFriendModal } from "@src/components/organisms/FriendReferral/FriendReferralModal";
+import WalletManagerModal from "../WalletManagerModal";
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");
 }
@@ -38,7 +38,6 @@ const UserMenu = (props: Props) => {
   const dispatch = useSetter();
   const userProfile = useUser();
   const { torusKey } = useGetter((state) => state.preferences);
-  const { setShowWalletManager } = useManuscriptController([]);
 
   const { account } = useWeb3React();
   const [orcidJwt] = useState(localStorage.getItem(LOCALSTORAGE_ORCID_JWT));
@@ -49,6 +48,7 @@ const UserMenu = (props: Props) => {
   const [doPad, setDoPad] = useState(false);
   const [, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
+  const [openWalet, setOpenWallet] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffectOnce(() => {
@@ -109,7 +109,7 @@ const UserMenu = (props: Props) => {
         position: "absolute",
       }}
       onClick={() => {
-        setOpen(!open);
+        setOpen((opened) => !opened);
       }}
     >
       <>
@@ -164,7 +164,7 @@ const UserMenu = (props: Props) => {
         <div
           onClick={(e: any) => {
             e.stopPropagation();
-            setOpen(false);
+            setOpen((prev) => false);
           }}
           className={`z-50 duration-700 origin-top-right absolute -mr-[0.5px] -mt-0 ${
             open ? "w-56" : "w-36"
@@ -200,7 +200,7 @@ const UserMenu = (props: Props) => {
                 : `hover:bg-gray-800 cursor-default`
             }`}
             onClick={() => {
-              setShowWalletManager(true);
+              setOpenWallet(true);
             }}
           >
             <div className="">
@@ -224,6 +224,7 @@ const UserMenu = (props: Props) => {
                   )}
                   onClick={(e: any) => {
                     e.preventDefault();
+                    console.log("wallet click 2");
                   }}
                 >
                   <p className="text-xs font-medium text-gray-900 truncate justify-start flex w-48">
@@ -259,13 +260,24 @@ const UserMenu = (props: Props) => {
                   </p>
                 </a>
               </button>
+              <WalletManagerModal
+                isOpen={openWalet}
+                onDismiss={() => {
+                  setOpen((opened) => !opened);
+                  setOpenWallet(false);
+                }}
+              />
             </div>
           </div>
 
+          {process.env.REACT_APP_ENABLE_FRIEND_REFERRAL ? (
+            <FriendReferralButton
+              onHandleClick={() => {
+                setOpen((opened) => true);
+              }}
+            />
+          ) : null}
           <div className="py-0">
-            {process.env.REACT_APP_ENABLE_FRIEND_REFERRAL ? (
-              <FriendReferralButton />
-            ) : null}
             <NavLink
               to={`${site.app}${app.help}`}
               onClick={() => {
@@ -319,8 +331,8 @@ const UserMenu = (props: Props) => {
       </>
       <ReferAFriendModal
         onClose={() => {
-          setOpen(true);
           dispatch(setShowReferralModal(false));
+          setOpen((opened) => !opened);
         }}
       />
     </div>

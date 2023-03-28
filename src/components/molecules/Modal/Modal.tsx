@@ -157,10 +157,17 @@ const ModalFooter = ({
   border = true,
   padded = true,
   children,
-}: PropsWithChildren<{ border?: boolean; padded?: boolean }>) => {
+  collapse = false,
+}: PropsWithChildren<{
+  border?: boolean;
+  padded?: boolean;
+  collapse?: boolean;
+}>) => {
   return (
     <div
-      className={`flex flex-row justify-end gap-4 items-center h-16 w-full dark:bg-[#272727] ${
+      className={`flex flex-row justify-end gap-4 items-center ${
+        collapse ? "" : "h-16"
+      } w-full dark:bg-[#272727] ${
         border ? "border-t border-t-[#81C3C8]" : ""
       } rounded-b-lg ${padded ? "p-4" : ""}`}
     >
