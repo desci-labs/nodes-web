@@ -233,44 +233,46 @@ const ComponentMetadataForm = React.forwardRef(
           </div>
         </div>
 
-        <div className="py-3 my-3">
-          <Controller
-            name="licenseType"
-            control={control}
-            defaultValue={defaultLicense}
-            render={({ field }: any) => (
-              <SelectMenu
-                label="Choose license"
-                data={getLicenseTypes()}
-                field={{ ...field, value: field.value || defaultLicense }}
-                mandatory={true}
-              />
-            )}
-          />
-          <div className="text-xs mt-2">
-            Your Node's default license type is{" "}
-            <span className="text-gray-500">
-              {props.defaultLicense || "not set"}
-            </span>
-            <br />
-            You can change the license for this specific component, if
-            appropriate.
-            <a
-              href="https://creativecommons.org/licenses/"
-              rel="noreferrer"
-              target="_blank"
-              className="flex gap-1 text-xs mb-1 group hover:text-tint-primary-hover text-tint-primary"
-            >
-              Learn more about Creative Commons Licenses
-              <IconViewLink
-                stroke={"inherit"}
-                width={12}
-                strokeWidth={0.5}
-                className="-mt-0.5 stroke-current"
-              />
-            </a>
+        {props.component.type !== ResearchObjectComponentType.LINK && (
+          <div className="py-3 my-3">
+            <Controller
+              name="licenseType"
+              control={control}
+              defaultValue={defaultLicense}
+              render={({ field }: any) => (
+                <SelectMenu
+                  label="Choose license"
+                  data={getLicenseTypes()}
+                  field={{ ...field, value: field.value || defaultLicense }}
+                  mandatory={true}
+                />
+              )}
+            />
+            <div className="text-xs mt-2">
+              Your Node's default license type is{" "}
+              <span className="text-gray-500">
+                {props.defaultLicense || "not set"}
+              </span>
+              <br />
+              You can change the license for this specific component, if
+              appropriate.
+              <a
+                href="https://creativecommons.org/licenses/"
+                rel="noreferrer"
+                target="_blank"
+                className="flex gap-1 text-xs mb-1 group hover:text-tint-primary-hover text-tint-primary"
+              >
+                Learn more about Creative Commons Licenses
+                <IconViewLink
+                  stroke={"inherit"}
+                  width={12}
+                  strokeWidth={0.5}
+                  className="-mt-0.5 stroke-current"
+                />
+              </a>
+            </div>
           </div>
-        </div>
+        )}
         {/* <input type="submit" /> */}
       </div>
     );
