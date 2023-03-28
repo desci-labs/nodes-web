@@ -1,5 +1,5 @@
 import BlackGenericButton from "@components/atoms/BlackGenericButton";
-import StatusButton from "@components/atoms/StatusButton";
+import StatusButton, { ButtonState } from "@components/atoms/StatusButton";
 import {
   findRootComponentCid,
   getMetadataStatus,
@@ -64,15 +64,15 @@ export default function DriveRow({
   selected,
   isMultiselecting,
   toggleSelected,
-  setShowEditMetadata,
+  // setShowEditMetadata,
   exploreDirectory,
-  datasetMetadataInfoRef,
-  setMetaStaging,
+  // datasetMetadataInfoRef,
+  // setMetaStaging,
   selectedFiles,
   canEditMetadata,
   canUse,
-  setOldComponentMetadata,
-}: DriveRowProps) {
+}: // setOldComponentMetadata,
+DriveRowProps) {
   const contextRef = useRef<HTMLUListElement>();
   const { init } = useDriveContext(file);
   const { handleDbClick } = useInteractionHandler();
@@ -80,65 +80,65 @@ export default function DriveRow({
     useManuscriptController(["componentToCite"]);
   const { manifestCid, manifest: manifestData, publicView } = useNodeReader();
 
-  const handleEditMetadata = () => {
-    // debugger;
-    if (file.componentType !== ResearchObjectComponentType.DATA) {
-      const component = manifestData?.components.find((c) => c.id === file.cid);
-      if (!component) return;
-      setOldComponentMetadata({
-        componentId: component.id,
-        cb: () => {
-          const { keywords, description, licenseType } = component.payload;
+  // const handleEditMetadata = () => {
+  //   // debugger;
+  //   if (file.componentType !== ResearchObjectComponentType.DATA) {
+  //     const component = manifestData?.components.find((c) => c.id === file.cid);
+  //     if (!component) return;
+  //     setOldComponentMetadata({
+  //       componentId: component.id,
+  //       cb: () => {
+  //         const { keywords, description, licenseType } = component.payload;
 
-          const newMetadata = { keywords, description, licenseType };
-          file.metadata = newMetadata;
-        },
-      });
-    }
+  //         const newMetadata = { keywords, description, licenseType };
+  //         file.metadata = newMetadata;
+  //       },
+  //     });
+  //   }
 
-    if (file.componentType === ResearchObjectComponentType.DATA) {
-      // debugger;
-      if (!isMultiselecting)
-        setMetaStaging([
-          {
-            file: file,
-            index: index,
-          },
-        ]);
+  //   if (file.componentType === ResearchObjectComponentType.DATA) {
+  //     // debugger;
+  //     if (!isMultiselecting)
+  //       setMetaStaging([
+  //         {
+  //           file: file,
+  //           index: index,
+  //         },
+  //       ]);
 
-      if (isMultiselecting) {
-        datasetMetadataInfoRef.current.prepopulateFromName = file.name;
-        const staging = Object.keys(selectedFiles).map((fileIndex: string) => {
-          const parentDriveObj = file.parent;
-          const selectedFile = parentDriveObj?.contains![
-            parseInt(fileIndex)
-          ] as DriveObject;
-          return {
-            file: selectedFile!,
-          };
-        });
-        setMetaStaging(staging);
-      }
+  //     if (isMultiselecting) {
+  //       datasetMetadataInfoRef.current.prepopulateFromName = file.name;
+  //       const staging = Object.keys(selectedFiles).map((fileIndex: string) => {
+  //         const parentDriveObj = file.parent;
+  //         const selectedFile = parentDriveObj?.contains![
+  //           parseInt(fileIndex)
+  //         ] as DriveObject;
+  //         return {
+  //           file: selectedFile!,
+  //         };
+  //       });
+  //       setMetaStaging(staging);
+  //     }
 
-      //dag file/dir (submetadata)
-      if (!isRootComponentDrive(file)) {
-        const rootCid = findRootComponentCid(file);
-        if (rootCid) datasetMetadataInfoRef.current.rootCid = rootCid;
-      }
-      datasetMetadataInfoRef.current.prepopulateMetadata = file.metadata;
+  //     //dag file/dir (submetadata)
+  //     if (!isRootComponentDrive(file)) {
+  //       const rootCid = findRootComponentCid(file);
+  //       if (rootCid) datasetMetadataInfoRef.current.rootCid = rootCid;
+  //     }
+  //     datasetMetadataInfoRef.current.prepopulateMetadata = file.metadata;
 
-      if (setShowEditMetadata) setShowEditMetadata(true);
-    }
-  };
+  //     if (setShowEditMetadata) setShowEditMetadata(true);
+  //   }
+  // };
 
-  const metaStatus = useMemo(() => {
-    if (isNodeRootDrive(file)) return getVirtualDriveMetadataStatus(file);
-    return getMetadataStatus(file);
-    // DONT ADJUST DEPENDENCY ARRAY
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [file.metadata]);
+  // const metaStatus = useMemo(() => {
+  //   if (isNodeRootDrive(file)) return getVirtualDriveMetadataStatus(file);
+  //   return getMetadataStatus(file);
+  //   // DONT ADJUST DEPENDENCY ARRAY
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [file.metadata]);
 
-  const isNodeRoot = isNodeRootDrive(file);
+  // const isNodeRoot = isNodeRootDrive(file);
   const handleRef = useCallback(
     (node: HTMLUListElement) => {
       if (
@@ -218,20 +218,15 @@ export default function DriveRow({
         <>
           <li className={`${DRIVE_ROW_STYLES[5]}`}>
             <StatusButton
-              status={metaStatus}
+              status={ButtonState.SUCCESS}
               disabled={!canEditMetadata}
               className={`lg:w-[125px] justify-center ${
-                isNodeRoot ? "pointer-events-none" : "gap-2.5"
+                true ? "pointer-events-none" : "gap-2.5"
               }`}
-              onClick={handleEditMetadata}
+              // onClick={handleEditMetadata}
             >
               <>
-                <span className="hidden lg:block">
-                  {isNodeRoot ? "Metadata Status" : "Edit Metadata"}
-                </span>
-                <span className="lg:hidden">
-                  {isNodeRoot ? "Status" : "Edit"}
-                </span>
+                <span className="hidden lg:block">"Metadata Status"</span>
               </>
             </StatusButton>
           </li>

@@ -143,6 +143,10 @@ const PaneDrive = () => {
   }
 
   useEffect(() => {
+    if (loading) setLoading(false);
+  }, [loading]);
+
+  useEffect(() => {
     if (!nodeTree && status === "idle") {
       dispatch(fetchTreeThunk());
     }

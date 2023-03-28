@@ -66,18 +66,18 @@ export interface DriveRowProps {
     index: number,
     componentType: ResearchObjectComponentType | DriveNonComponentTypes
   ) => void;
-  setShowEditMetadata: React.Dispatch<React.SetStateAction<boolean>>;
-  datasetMetadataInfoRef: React.MutableRefObject<DatasetMetadataInfo>;
-  setMetaStaging: React.Dispatch<React.SetStateAction<MetaStaging[]>>;
+  // setShowEditMetadata: React.Dispatch<React.SetStateAction<boolean>>;
+  // datasetMetadataInfoRef: React.MutableRefObject<DatasetMetadataInfo>;
+  // setMetaStaging: React.Dispatch<React.SetStateAction<MetaStaging[]>>;
   selectedFiles: Record<
     number,
     ResearchObjectComponentType | DriveNonComponentTypes
   >;
   canEditMetadata: boolean;
   canUse: boolean;
-  setOldComponentMetadata: (
-    value: React.SetStateAction<oldComponentMetadata | null>
-  ) => void;
+  // setOldComponentMetadata: (
+  //   value: React.SetStateAction<oldComponentMetadata | null>
+  // ) => void;
 }
 
 export interface DriveJumpingParams {
