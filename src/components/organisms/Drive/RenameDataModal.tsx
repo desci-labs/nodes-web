@@ -6,7 +6,6 @@ import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
 import InsetLabelInput from "@src/components/molecules/FormInputs/InsetLabelInput";
 import Modal from "@src/components/molecules/Modal/Modal";
-import { IconX } from "@src/icons";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { updateComponent, saveManifestDraft } from "@src/state/nodes/viewer";
 import { useSetter } from "@src/store/accessors";
@@ -104,25 +103,11 @@ const RenameDataModal: React.FC<RenameDataModalProps> = ({
 
   const componentString = getComponentString(compType);
 
+  const close = () => setRenameComponentId(null);
   return (
-    <Modal
-      onDismiss={() => {
-        setRenameComponentId(null);
-      }}
-      isOpen
-    >
+    <Modal onDismiss={close} isOpen>
       <div className="py-3 px-6 !min-h-[70px] min-w-[400px]">
-        <div className="flex flex-row justify-between items-center">
-          <h1 className="text-lg font-bold text-white">{`Rename ${componentString}`}</h1>
-          <button
-            className="cursor-pointer p-5 -m-5 absolute right-5 top-5 stroke-black dark:stroke-white hover:stroke-muted-300 hover:dark:stroke-muted-300"
-            onClick={() => {
-              setRenameComponentId(null);
-            }}
-          >
-            <IconX />
-          </button>
-        </div>
+        <Modal.Header onDismiss={close} title={`Rename ${componentString}`} />
         <div className="my-2">
           <InsetLabelInput
             label={`${componentString} Name`}

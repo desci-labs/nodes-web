@@ -1,7 +1,6 @@
 import DefaultSpinner from "@components/atoms/DefaultSpinner";
 import PrimaryButton from "@components/atoms/PrimaryButton";
 import { EMPTY_FUNC } from "@components/utils";
-import { IconX } from "@icons";
 import React, {
   useCallback,
   useEffect,
@@ -270,24 +269,12 @@ const DriveDatasetMetadataPopOver = (
           }`}
         >
           <div className="py-4 px-6 text-neutrals-gray-5">
-            <div className="flex flex-row justify-end items-center">
-              <IconX
-                fill="white"
-                width={20}
-                height={20}
-                className="cursor-pointer"
-                onClick={() => {
-                  props.onClose();
-                }}
-              />
-            </div>
-
+            <Modal.Header
+              onDismiss={props.onClose}
+              title="Enter Metadatas"
+              subTitle=" Please fill in the metadata for open access data."
+            />
             <div className="px-1">
-              <h1 className="text-xl font-bold text-white">Enter Metadata</h1>
-              <div className="text-sm ">
-                Please fill in the metadata for open access data.
-              </div>
-
               {/**Have to force a re-render with props.isVisible */}
               {/* <PerfectScrollbar className="max-h-[calc(100vh-300px)] h-[calc(100vh-300px)] overflow-y-scroll"> */}
               {props.isVisible && mode === "editor" ? (

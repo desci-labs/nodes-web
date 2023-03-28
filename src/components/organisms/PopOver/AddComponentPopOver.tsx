@@ -285,7 +285,7 @@ const AddComponentPopOver = (
 
   return (
     <Modal $maxWidth={550} onDismiss={() => close(false)} isOpen={props.isOpen}>
-      <div className="px-6 py-5 min-h-[280px]">
+      <div className="px-6 py-5 min-h-[280px] w-[550px]">
         <div className="flex flex-row justify-between items-center">
           <div className="text-2xl font-bold text-white">
             New{" "}

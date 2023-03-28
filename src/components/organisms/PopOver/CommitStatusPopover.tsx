@@ -6,7 +6,6 @@ import {
   convertUUIDToHex,
   getBytesFromCIDString,
 } from "@components/utils";
-import { IconX } from "@icons";
 import { useWeb3React } from "@web3-react/core";
 
 import { ethers } from "ethers";
@@ -285,16 +284,7 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
   return (
     <Modal $maxWidth={550} onDismiss={close} isOpen={props.isOpen}>
       <div className="px-6 py-5 lg:w-[550px] text-white">
-        <div className="flex flex-row justify-between items-center">
-          <div className="text-2xl font-bold">Final Step</div>
-          <IconX
-            fill="white"
-            width={20}
-            height={20}
-            className="cursor-pointer"
-            onClick={close}
-          />
-        </div>
+        <Modal.Header title="Final Step" onDismiss={close} />
         <div className="py-8 px-12" style={{ width: 500 }}>
           <div className="flex flex-col gap-4">
             <div className="text-xs text-center">

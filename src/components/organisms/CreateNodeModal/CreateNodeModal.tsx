@@ -14,7 +14,6 @@ import SelectList from "@src/components/molecules/FormInputs/SelectList";
 import Modal from "@src/components/molecules/Modal/Modal";
 import { cleanupManifestUrl } from "@src/components/utils";
 import { app, site } from "@src/constants/routes";
-import { IconX } from "@src/icons";
 import { api } from "@src/state/api";
 import { nodesApi } from "@src/state/api/nodes";
 import { tags } from "@src/state/api/tags";
@@ -168,15 +167,16 @@ export default memo(function CreateNodeModal({
       $maxWidth={700}
     >
       <div className="flex flex-col">
+        <Modal.Header onDismiss={onClose} />
         <div className="px-6 pt-5 pb-2 text-white">
           <div className="flex flex-row justify-between items-center">
             <h1 className="text-lg font-bold">Name the Research Node</h1>
-            <IconX className="cursor-pointer" onClick={() => onClose()} />
           </div>
           <p className="text-neutrals-gray-5 text-sm mb-6">
             Enter the name of your research node. Ideally it would be the title
             of your research report.
           </p>
+
           <PlaceholderInput
             placeholder={"Research Node Name"}
             value={manifestTitle}

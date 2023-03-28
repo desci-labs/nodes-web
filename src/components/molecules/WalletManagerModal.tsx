@@ -34,11 +34,11 @@ const WalletManagerModal = (props: any) => {
   return (
     <Modal onDismiss={onClose} isOpen={showWalletManager}>
       <div className="px-6 py-5 min-w-full lg:min-w-[700px]">
-        <div className="flex flex-row justify-between items-center">
-          <div className="text-lg font-bold text-white">
-            Digital Signature Management
-          </div>
-        </div>
+        <Modal.Header
+          onDismiss={onClose}
+          title="Digital Signature Management"
+          hideCloseIcon
+        />
         <div className="py-2 text-white dark:text-white">
           <div className="py-1 text-sm">
             {showWalletManager ? (

@@ -14,7 +14,6 @@ import { ReferralItem } from "@components/molecules/ReferAFriend/ReferralItem";
 import { ReferralSuccess } from "@components/molecules/ReferAFriend/ReferralSuccess";
 import { isMaybeValidEmail } from "@src/lib/validation";
 import Modal from "@src/components/molecules/Modal/Modal";
-import { IconX } from "@src/icons";
 import { useAppPreferences } from "@src/state/preferences/hooks";
 
 export const ReferAFriendModal = ({
@@ -111,17 +110,10 @@ export const ReferAFriendModal = ({
         }}
       >
         <div className="px-6 py-5 text-white">
-          <div className="flex flex-row justify-between items-center">
-            <h1 className="text-lg font-bold text-white">
-              {isSendComplete ? "Invites Sent" : "Refer a Friend"}
-            </h1>
-            <div
-              className="cursor-pointer p-5 -m-5 absolute right-5 top-5 stroke-black dark:stroke-white hover:stroke-muted-300 hover:dark:stroke-muted-300"
-              onClick={onClose}
-            >
-              <IconX />
-            </div>
-          </div>
+          <Modal.Header
+            title={isSendComplete ? "Invites Sent" : "Refer a Friend"}
+            onDismiss={onClose}
+          />
           <div className="flex flex-col">
             {isSendComplete ? (
               <ReferralSuccess />

@@ -4,7 +4,6 @@ import PrimaryButton from "@components/atoms/PrimaryButton";
 import RadioButton from "@components/atoms/RadioButton";
 import { FlexRowAligned } from "@components/styled";
 import { RadioGroup } from "@headlessui/react";
-import { IconX } from "@icons";
 import React, { useCallback, useImperativeHandle, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -316,17 +315,8 @@ const CommitAdditionalInfoPopOver = (
   return (
     <Modal $maxWidth={550} onDismiss={close} isOpen={props.isOpen}>
       <div className="px-6 py-5 text-white">
-        <div className="flex flex-row justify-between items-center">
-          <div className="text-2xl font-bold">Additional Information</div>
-          <IconX
-            fill="white"
-            width={20}
-            height={20}
-            className="cursor-pointer"
-            onClick={close}
-          />
-        </div>
-        <div className="py-8 px-12" style={{ width: 500 }}>
+        <Modal.Header title="Additional Information" onDismiss={close} />
+        <div className="py-8" style={{ width: 500 }}>
           <AdditionalInfoForm methods={methods} />
         </div>
       </div>

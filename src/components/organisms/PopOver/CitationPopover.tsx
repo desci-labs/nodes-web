@@ -330,6 +330,7 @@ const CitationPopover = (props: ModalProps) => {
     >
       <div className="px-6 py-5 text-white">
         <Modal.Header
+          onDismiss={close}
           title="Cite"
           subTitle="Choose your citation format then click copy citation, or copy
               dPID."

@@ -1,6 +1,5 @@
 import PrimaryButton from "@components/atoms/PrimaryButton";
 import InsetLabelInput from "@components/molecules/FormInputs/InsetLabelInput";
-import { IconX } from "@icons";
 import { useEffect, useState } from "react";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
@@ -57,20 +56,7 @@ const ComponentRenamePopover = (props: {
     <Modal {...props} isOpen={props.isVisible} onDismiss={props?.onClose}>
       <div className="w-[400px]">
         <div className="px-6 py-5">
-          <div className="flex flex-row justify-between items-center">
-            <div className="text-2xl text-white font-bold">
-              Rename Component
-            </div>
-            <IconX
-              fill="white"
-              width={20}
-              height={20}
-              className="cursor-pointer"
-              onClick={() => {
-                props.onClose();
-              }}
-            />
-          </div>
+          <Modal.Header onDismiss={props?.onClose} title="Rename Component" />
           <div className="text-xs mt-6 text-neutrals-gray-5 mb-2">
             A short name for your component that best describes it.
           </div>

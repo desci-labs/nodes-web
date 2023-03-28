@@ -1,7 +1,7 @@
 import CopyBox from "@components/atoms/CopyBox";
 import PrimaryButton from "@components/atoms/PrimaryButton";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
-import { IconWarning, IconX } from "@src/icons";
+import { IconWarning } from "@src/icons";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import Modal from "@src/components/molecules/Modal/Modal";
 
@@ -26,22 +26,13 @@ const PopOverUseMenu = () => {
       $maxWidth={600}
     >
       <div className="px-6 py-5 text-white relative">
-        <div className="flex flex-row justify-between items-center ">
-          <div className="">
-            <p className="text-xl font-bold">Content Identifier</p>
-            <p className="text-neutrals-gray-5 text-sm">
-              Copy the CID (Content Identifier) link, which represents this file
+        <Modal.Header
+          title="Content Identifier"
+          subTitle="Copy the CID (Content Identifier) link, which represents this file
               on the IPFS network. Use the CID for compute over data (COD)
-              functionalities
-            </p>
-          </div>
-          <div
-            className="cursor-pointer p-5 absolute right-1 top-1 stroke-black dark:stroke-white hover:stroke-muted-300 hover:dark:stroke-muted-300"
-            onClick={close}
-          >
-            <IconX />
-          </div>
-        </div>
+              functionalities"
+          onDismiss={close}
+        />
         <section id="cid-use">
           <CopyBox
             className="mt-8 w-full"

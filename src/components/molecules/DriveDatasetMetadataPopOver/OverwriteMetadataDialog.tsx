@@ -1,7 +1,7 @@
 import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
 import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
-import { IconWarning, IconX } from "@src/icons";
+import { IconWarning } from "@src/icons";
 import React from "react";
 import Modal from "@src/components/molecules/Modal/Modal";
 
@@ -47,17 +47,11 @@ export const OverwriteMetadataForm: React.FC<OverwriteMetadataDialogProps> = ({
   return (
     <div className="max-w-[400px] animate-fadeIn">
       <div className="py-3 px-6">
-        <div className="flex flex-row justify-end items-center">
-          <IconX
-            fill="white"
-            width={20}
-            height={20}
-            className="cursor-pointer"
-            onClick={() => {
-              setShowOverwriteDialog(false);
-            }}
-          />
-        </div>
+        <Modal.Header
+          onDismiss={() => {
+            setShowOverwriteDialog(false);
+          }}
+        />
         <div className="flex items-center gap-2 p-2">
           <div>
             <IconWarning />
