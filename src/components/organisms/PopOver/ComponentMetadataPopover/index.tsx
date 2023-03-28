@@ -21,8 +21,8 @@ import SelectList from "@src/components/molecules/FormInputs/SelectList";
 import Modal from "@src/components/molecules/Modal/Modal";
 
 export const PDF_LICENSE_TYPES = [
-  { id: 1, name: "CC BY" },
   { id: 0, name: "CC0" },
+  { id: 1, name: "CC BY" },
   { id: 2, name: "CC BY-SA" },
   { id: 3, name: "CC BY-NC" },
   { id: 4, name: "CC BY-NC-SA" },

@@ -60,11 +60,17 @@ export default function SelectList(props: SelectListProps) {
 
   const labelId = `select-list-${1}`;
 
+  const onHandleChange = (value: any) => {
+    if (value === label) return;
+    onSelect?.(value);
+  };
+
   return (
     <div>
       <StyledListBoxInput
-        value={value}
-        onChange={(value) => onSelect?.(value)}
+        // value={value}
+        defaultValue={value}
+        onChange={onHandleChange}
         aria-labelledby={labelId}
         className="border-0 border-transparent relative mt-2"
         {...fieldWithoutRef}
@@ -98,7 +104,7 @@ export default function SelectList(props: SelectListProps) {
         </ListboxButton>
         <ListboxPopover
           portal={true}
-          className="relative mt-1 max-h-96 min-h-[100px]"
+          className="relative mt-4 max-h-96 min-h-[100px]"
           onBlur={() => {
             setTouched(true);
           }}
@@ -112,6 +118,25 @@ export default function SelectList(props: SelectListProps) {
               leaveTo="opacity-0"
             >
               <div className="absolute z-[1044] w-full h-full bg-white dark:bg-[#272727] shadow-lg rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm list-none">
+                {label && (
+                  <ListboxOption
+                    className={classNames(
+                      "hover:text-white hover:bg-indigo-600 hover:dark:bg-[#525659] text-gray-900 dark:text-white cursor-pointer select-none relative py-2 pl-3 pr-9"
+                    )}
+                    value={label}
+                  >
+                    <div className="flex items-center">
+                      <span
+                        className={classNames(
+                          "font-normal",
+                          "block truncate text-md"
+                        )}
+                      >
+                        <span className="pl-2">{label}</span>
+                      </span>
+                    </div>
+                  </ListboxOption>
+                )}
                 {data.map((person: SelectOption) => {
                   const selected = person.name === value?.name;
                   return (
