@@ -31,6 +31,7 @@ import { setPendingCommits } from "@src/state/nodes/history";
 import { tags } from "@src/state/api/tags";
 import { nodesApi } from "@src/state/api/nodes";
 import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
+import WalletManagerModal from "@src/components/molecules/WalletManagerModal";
 
 export const LOCALSTORAGE_TXN_LIST = "desci:txn-list";
 
@@ -38,8 +39,8 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
   const [loading, setLoading] = useState(false);
   const [address, setAddress] = useState<string>("0x");
   const [error, setError] = useState<string>();
-  const { setShowWalletManager, setPrivCidMap, setForceRefreshDrive } =
-    useManuscriptController();
+  const { setPrivCidMap, setForceRefreshDrive } = useManuscriptController();
+  const [openWalet, setOpenWallet] = useState(false);
 
   const dispatch = useSetter();
   const {
@@ -254,14 +255,14 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
             color: "#fff",
           },
         });
-        setShowWalletManager(true);
+        setOpenWallet(true);
       }
     } catch (err: any) {
       console.error(err);
       setError([err.message, err.data?.message].filter(Boolean).join(" -- "));
       if (err && err.code === "UNSUPPORTED_OPERATION") {
         if (err.reason.indexOf("unknown account") === 0) {
-          setShowWalletManager(true);
+          setOpenWallet(true);
         }
       }
     } finally {
@@ -282,82 +283,88 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
     .length;
 
   return (
-    <Modal $maxWidth={550} onDismiss={close} isOpen={props.isOpen}>
-      <div className="px-6 py-5 lg:w-[550px] text-white">
-        <Modal.Header title="Final Step" onDismiss={close} />
-        <div className="py-8 px-12" style={{ width: 500 }}>
-          <div className="flex flex-col gap-4">
-            <div className="text-xs text-center">
-              You are now committing your Node into a public blockchain
-            </div>
-            <div className="text-gray-500 text-xs -mb-4 ml-2">
-              Selected cryptographic identity
-            </div>
+    <>
+      <Modal $maxWidth={550} onDismiss={close} isOpen={props.isOpen}>
+        <div className="px-6 py-5 lg:w-[550px] text-white">
+          <Modal.Header title="Final Step" onDismiss={close} />
+          <div className="py-8 px-12" style={{ width: 500 }}>
+            <div className="flex flex-col gap-4">
+              <div className="text-xs text-center">
+                You are now committing your Node into a public blockchain
+              </div>
+              <div className="text-gray-500 text-xs -mb-4 ml-2">
+                Selected cryptographic identity
+              </div>
 
-            {wallets && address && usingAssociatedAccount ? (
-              <AccountCard
-                account={address}
-                className="pt-10 flex self-center"
-                associated={
-                  !!wallets.filter((w) => w.address === address).length
-                }
-                serverWallet={wallets.find((w) => w.address === address)}
-                active={true}
-                canAssociate={!hasAssociated}
-              />
-            ) : (
-              <b>
-                Error: Please select an associated account before continuing
-              </b>
-            )}
-            {error ? (
-              <span className="text-[10px] overflow-hidden">{error}</span>
-            ) : null}
-            {chainId !== DEFAULT_CHAIN ? (
-              <span className="text-red-400 text-xs">
-                Wrong network selected
-              </span>
-            ) : null}
-            {chainId !== DEFAULT_CHAIN ? (
-              <PrimaryButton
-                onClick={() =>
-                  switchChain(
-                    DEFAULT_CHAIN,
-                    connector.provider!,
-                    chainId!,
-                    setError
-                  )
-                }
-              >
-                Fix: Switch Network
-              </PrimaryButton>
-            ) : (
-              <>
-                <div className="text-black text-lg mt-2 border-2 px-5 py-4 items-center flex flex-col text-center bg-yellow-200 border-yellow-300 rounded-md">
-                  <WarningSign style={{ filter: "grayscale(1) invert(1)" }} />{" "}
-                  Your work will be <strong>visible to the public</strong> after
-                  this step is completed
-                </div>
-              </>
-            )}
+              {wallets && address && usingAssociatedAccount ? (
+                <AccountCard
+                  account={address}
+                  className="pt-10 flex self-center"
+                  associated={
+                    !!wallets.filter((w) => w.address === address).length
+                  }
+                  serverWallet={wallets.find((w) => w.address === address)}
+                  active={true}
+                  canAssociate={!hasAssociated}
+                />
+              ) : (
+                <b>
+                  Error: Please select an associated account before continuing
+                </b>
+              )}
+              {error ? (
+                <span className="text-[10px] overflow-hidden">{error}</span>
+              ) : null}
+              {chainId !== DEFAULT_CHAIN ? (
+                <span className="text-red-400 text-xs">
+                  Wrong network selected
+                </span>
+              ) : null}
+              {chainId !== DEFAULT_CHAIN ? (
+                <PrimaryButton
+                  onClick={() =>
+                    switchChain(
+                      DEFAULT_CHAIN,
+                      connector.provider!,
+                      chainId!,
+                      setError
+                    )
+                  }
+                >
+                  Fix: Switch Network
+                </PrimaryButton>
+              ) : (
+                <>
+                  <div className="text-black text-lg mt-2 border-2 px-5 py-4 items-center flex flex-col text-center bg-yellow-200 border-yellow-300 rounded-md">
+                    <WarningSign style={{ filter: "grayscale(1) invert(1)" }} />{" "}
+                    Your work will be <strong>visible to the public</strong>{" "}
+                    after this step is completed
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-      <Modal.Footer>
-        <PrimaryButton
-          onClick={createCommit}
-          disabled={!usingAssociatedAccount || loading}
-        >
-          {loading ? (
-            <div className="flex flex-row gap-2 items-center w-full justify-center">
-              Publishing <SpinnerCircular color="black" size={20} />
-            </div>
-          ) : (
-            "Sign and Publish"
-          )}
-        </PrimaryButton>
-      </Modal.Footer>
-    </Modal>
+        <Modal.Footer>
+          <PrimaryButton
+            onClick={createCommit}
+            disabled={!usingAssociatedAccount || loading}
+          >
+            {loading ? (
+              <div className="flex flex-row gap-2 items-center w-full justify-center">
+                Publishing <SpinnerCircular color="black" size={20} />
+              </div>
+            ) : (
+              "Sign and Publish"
+            )}
+          </PrimaryButton>
+        </Modal.Footer>
+      </Modal>
+      <WalletManagerModal
+        isOpen={openWalet}
+        onDismiss={() => setOpenWallet(false)}
+      />
+    </>
   );
 };
 

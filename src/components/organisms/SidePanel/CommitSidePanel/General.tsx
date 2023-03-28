@@ -8,14 +8,17 @@ import useConnectedWallet from "@src/hooks/useConnectedWallet";
 import { TodoItem } from "./TodoItem";
 import { useUser } from "@src/state/user/hooks";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import WalletManagerModal from "@src/components/molecules/WalletManagerModal";
 
 interface GeneralProps {
   className?: string;
 }
 
 const General = (props: GeneralProps) => {
-  const { setShowWalletManager, setShowProfileUpdater } =
-    useManuscriptController(["showProfileUpdater"]);
+  const { setShowProfileUpdater } = useManuscriptController([
+    "showProfileUpdater",
+  ]);
+  const [openWalet, setOpenWallet] = useState(false);
   const { currentObjectId, mode, manifest: manifestData } = useNodeReader();
   const userProfile = useUser();
   const { wallet, switchNetwork } = useConnectedWallet();
@@ -60,7 +63,7 @@ const General = (props: GeneralProps) => {
             subtitle="Wallet needed for commit"
             completed={wallet.isValidWallet}
             onFixClick={() => {
-              setShowWalletManager(true);
+              setOpenWallet(true);
             }}
           />
 
@@ -70,7 +73,7 @@ const General = (props: GeneralProps) => {
             completed={wallet.isValidNetwork}
             onFixClick={() => {
               if (!connector.provider) {
-                setShowWalletManager(true);
+                setOpenWallet(true);
                 return;
               }
               switchNetwork();
@@ -79,6 +82,10 @@ const General = (props: GeneralProps) => {
         </div>
       </CollapsibleSection>
       {/* {showProfileUpdater && <ProfilePopOver onClose={() => {}} />} */}
+      <WalletManagerModal
+        isOpen={openWalet}
+        onDismiss={() => setOpenWallet(false)}
+      />
       {selectedComponent && (
         <ComponentMetadataPopover
           currentObjectId={currentObjectId!}
