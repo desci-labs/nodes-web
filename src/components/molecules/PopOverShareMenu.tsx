@@ -1,6 +1,5 @@
 import { getPublishedVersions, resolvePublishedManifest } from "@api/index";
 import PaneInfo from "@components/atoms/PaneInfo";
-import PopOverBasic from "@components/atoms/PopOverBasic";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import {
   ResearchObjectComponentType,
@@ -12,6 +11,7 @@ import {
   IconDocument,
   IconFile,
   IconNetwork,
+  IconX,
 } from "@icons";
 import {
   ButtonHTMLAttributes,
@@ -23,12 +23,12 @@ import {
 import { SpinnerCircular } from "spinners-react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import toast from "react-hot-toast";
-// import InputInsetLabelIcon from "@components/atoms/InputInsetLabelIcon";
 import { useParams } from "react-router-dom";
 import { useCopier } from "./Copier";
 import { CheckIcon } from "@heroicons/react/outline";
 import { useGetNodesQuery } from "@src/state/api/nodes";
 import { useNodeReader, useNodeVersions } from "@src/state/nodes/hooks";
+import Modal from "@src/components/molecules/Modal/Modal";
 
 function CopyButton(
   props: ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -268,16 +268,28 @@ const PopOverShareMenu = () => {
     }
   }
 
+  const close = () => {
+    setShowShareMenu(false);
+  };
+
   return (
-    <PopOverBasic
-      isVisible={showShareMenu}
-      title="Share Node"
-      onClose={() => {
-        setShowShareMenu(false);
-      }}
-    >
-      {body}
-    </PopOverBasic>
+    <Modal isOpen={showShareMenu} onDismiss={close} $maxWidth={600}>
+      <div className="px-6 py-5 text-white relative min-w-[600px]">
+        <div className="flex flex-row justify-between items-center ">
+          <div>
+            <p className="text-xl font-bold">Share Node</p>
+          </div>
+          <div
+            className="cursor-pointer p-5 absolute right-1 top-1 stroke-black dark:stroke-white hover:stroke-muted-300 hover:dark:stroke-muted-300"
+            onClick={close}
+          >
+            <IconX />
+          </div>
+        </div>
+        {body}
+      </div>
+      <div className="w-full dark:bg-[#272727] border-t border-t-[#81C3C8] rounded-b-lg"></div>
+    </Modal>
   );
 };
 

@@ -8,7 +8,6 @@ import ManuscriptSidePanel from "../SidePanel/ManuscriptSidePanel";
 import Toolbar from "../Toolbar";
 import VSCodeViewer from "../VSCodeViewer";
 import ComponentStackView from "./ComponentStackView";
-import { useManuscriptController } from "./ManuscriptController";
 import Placeholder from "./Placeholder";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { setPublicView, toggleResearchPanel } from "@src/state/nodes/viewer";
@@ -36,7 +35,7 @@ export default function PublicViewer({ isLoading }: ReaderViewerProps) {
         <>
           <ComponentStackView />
           <Toolbar />
-          <CitationPopover footer={() => <></>} isVisible={true} />
+          <CitationPopover isOpen={true} />
           {!isLoading && !!manifestData && (
             <ManuscriptSidePanel
               onClose={() => {

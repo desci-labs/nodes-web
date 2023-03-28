@@ -4,7 +4,7 @@ import { PropsWithChildren } from "react";
 import useScroll from "@src/hooks/useScroll";
 import useCheckOrcid from "@src/hooks/useCheckOrcid";
 import Toolbar from "@src/components/organisms/Toolbar";
-import PopOverWalletManager from "@src/components/molecules/PopOverWalletManager";
+import WalletManagerModal from "@src/components/molecules/WalletManagerModal";
 import { useUser } from "@src/state/user/hooks";
 import ProfilePopOver from "@src/components/screens/Profile";
 import { useGetter } from "@src/store/accessors";
@@ -55,7 +55,7 @@ export default function AppWrapper(props: PropsWithChildren<{}>) {
 export function Popovers() {
   return (
     <>
-      <PopOverWalletManager />
+      <WalletManagerModal />
       <ProfilePopOver onClose={() => {}} />
     </>
   );

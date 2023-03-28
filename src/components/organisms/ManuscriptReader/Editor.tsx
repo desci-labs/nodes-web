@@ -46,13 +46,17 @@ export default function Editor({ isLoading }: ReaderViewerProps) {
     <DragDropZone>
       {!isToolbarVisible && isDraggingFiles ? <DropTargetFullScreen /> : null}
       <AddComponentPopOver
+        onDismiss={() => {
+          setIsAddingSubcomponent(false);
+          setIsAddingComponent(true);
+        }}
         onClose={(force: boolean) => {
           setIsAddingSubcomponent(false);
           if (!force) {
             setIsAddingComponent(true);
           }
         }}
-        isVisible={isAddingSubcomponent}
+        isOpen={isAddingSubcomponent}
       />
       <ComponentStackView />
 
@@ -71,7 +75,7 @@ export default function Editor({ isLoading }: ReaderViewerProps) {
 
         <PopOverAlphaConsent />
 
-        <CitationPopover footer={() => <></>} isVisible={true} />
+        <CitationPopover isOpen={true} />
         <PublicationDetailsModal />
 
         {(isAddingComponent || isAddingSubcomponent) && <ComponentAdd />}

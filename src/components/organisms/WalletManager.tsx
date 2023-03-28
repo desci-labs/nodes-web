@@ -181,7 +181,7 @@ const WalletManager = () => {
           className={`${
             !options
               ? "hidden"
-              : "-mb-[23rem] min-w-[482px] flex justify-center"
+              : "-mb-[23rem] md:min-w-[482px] flex justify-center"
           }`}
         >
           <WalletSwitcher />
@@ -197,7 +197,9 @@ const WalletManager = () => {
             </LinkExternal>
           </div>
         ) : null}
-        <div className={`${options ? "invisible h-96" : "flex min-w-[482px]"}`}>
+        <div
+          className={`${options ? "invisible h-96" : "flex md:min-w-[482px]"}`}
+        >
           <IdentityList setSelectingWallet={setOptions} />
         </div>
       </div>

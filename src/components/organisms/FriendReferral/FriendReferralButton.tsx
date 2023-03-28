@@ -1,21 +1,14 @@
-import { useState } from "react";
-import { ReferAFriendModal } from "./FriendReferralModal";
+import { setShowReferralModal } from "@src/state/preferences/preferencesSlice";
+import { useSetter } from "@src/store/accessors";
 
 const FriendReferralButton = () => {
-  const [showPopOver, setShowPopOver] = useState(false);
+  const dispatch = useSetter();
 
   return (
-    <>
-      <ReferAFriendModal
-        isVisible={showPopOver}
-        onClose={() => {
-          setShowPopOver(false);
-          return;
-        }}
-      />
+    <div className="hover:bg-[#222429] cursor-pointer w-full py-2">
       <button
         className="text-left text-xs"
-        onClick={() => setShowPopOver(!showPopOver)}
+        onClick={() => dispatch(setShowReferralModal(true))}
       >
         <p className="px-4 text-white">Refer a Friend</p>
         <div className={"block px-4 text-xs mt-1"}>
@@ -29,7 +22,7 @@ const FriendReferralButton = () => {
           </p>
         </div>
       </button>
-    </>
+    </div>
   );
 };
 

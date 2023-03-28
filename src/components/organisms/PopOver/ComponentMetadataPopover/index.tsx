@@ -3,8 +3,6 @@ import PrimaryButton from "@components/atoms/PrimaryButton";
 import { EMPTY_FUNC } from "@components/utils";
 import { IconViewLink, IconX } from "@icons";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
-
-import PopoverFooter from "@components/molecules/Footer";
 import CreateableSelect from "@components/molecules/FormInputs/CreateableSelect";
 import {
   CommonComponentPayload,
@@ -13,18 +11,18 @@ import {
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 import { Controller, useForm } from "react-hook-form";
-import PopOver from "..";
 import InsetLabelInput from "../../../molecules/FormInputs/InsetLabelInput";
-import SelectMenu from "../../../molecules/FormInputs/SelectMenu";
 import ReadOnlyComponent from "./ReadOnlyComponent";
 import axios from "axios";
 import { useManifestStatus, useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { updateComponent, saveManifestDraft } from "@src/state/nodes/viewer";
+import SelectList from "@src/components/molecules/FormInputs/SelectList";
+import Modal from "@src/components/molecules/Modal/Modal";
 
 export const PDF_LICENSE_TYPES = [
-  { id: 1, name: "CC BY" },
   { id: 0, name: "CC0" },
+  { id: 1, name: "CC BY" },
   { id: 2, name: "CC BY-SA" },
   { id: 3, name: "CC BY-NC" },
   { id: 4, name: "CC BY-NC-SA" },
@@ -239,11 +237,13 @@ const ComponentMetadataForm = React.forwardRef(
             control={control}
             defaultValue={defaultLicense}
             render={({ field }: any) => (
-              <SelectMenu
-                label="Choose license"
-                data={getLicenseTypes()}
-                field={{ ...field, value: field.value || defaultLicense }}
+              <SelectList
+                label="License Type"
+                className="mt-2"
                 mandatory={true}
+                data={PDF_LICENSE_TYPES}
+                defaultValue={defaultLicense}
+                field={{ ...field, value: field.value || defaultLicense }}
               />
             )}
           />
@@ -351,43 +351,12 @@ const ComponentMetadataPopover = (
   }
 
   return (
-    <PopOver
+    <Modal
       {...props}
-      style={{
-        width: 720,
-        marginLeft: 0,
-        marginRight: 0,
-      }}
-      containerStyle={{
-        backgroundColor: "#3A3A3ABF",
-      }}
-      onClose={() => {
-        // formRef?.current?.reset();
-        props.onClose();
-      }}
-      className="rounded-lg bg-zinc-100 dark:bg-zinc-900"
-      footer={() => (
-        <PopoverFooter>
-          <PrimaryButton
-            onClick={() => {
-              if (publicView) {
-                props.onClose();
-              } else {
-                formRef.current!.submit();
-              }
-            }}
-            disabled={isSaving && !publicView}
-          >
-            {isSaving ? (
-              <DefaultSpinner color="black" size={24} />
-            ) : mode === "editor" ? (
-              "Save Changes"
-            ) : (
-              "Done"
-            )}
-          </PrimaryButton>
-        </PopoverFooter>
-      )}
+      isOpen={props.isVisible}
+      onDismiss={() => props?.onClose()}
+      $scrollOverlay={true}
+      $maxWidth={720}
     >
       <div className="py-4 px-6 text-neutrals-gray-5">
         <div className="flex flex-row justify-end items-center">
@@ -444,7 +413,27 @@ const ComponentMetadataPopover = (
           )}
         </div>
       </div>
-    </PopOver>
+      <div className="flex flex-row justify-end gap-4 items-center h-16 w-full dark:bg-[#272727] border-t border-t-[#81C3C8] rounded-b-lg p-4">
+        <PrimaryButton
+          onClick={() => {
+            if (publicView) {
+              props.onClose();
+            } else {
+              formRef.current!.submit();
+            }
+          }}
+          disabled={isSaving && !publicView}
+        >
+          {isSaving ? (
+            <DefaultSpinner color="black" size={24} />
+          ) : mode === "editor" ? (
+            "Save Changes"
+          ) : (
+            "Done"
+          )}
+        </PrimaryButton>
+      </div>
+    </Modal>
   );
 };
 

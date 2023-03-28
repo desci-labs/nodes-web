@@ -1,22 +1,17 @@
 import AccountCard from "@components/atoms/AccountCard";
 import PrimaryButton from "@components/atoms/PrimaryButton";
-import {
-  LS_PENDING_COMMITS_KEY,
-  useManuscriptController,
-} from "@src/components/organisms/ManuscriptReader/ManuscriptController";
+import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import {
   cleanupManifestUrl,
   convertUUIDToHex,
   getBytesFromCIDString,
 } from "@components/utils";
-import { IconX } from "@icons";
 import { useWeb3React } from "@web3-react/core";
 
 import { ethers } from "ethers";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
-import PopOver from "./";
 import { DEFAULT_CHAIN } from "@components/molecules/ConnectWithSelect";
 import {
   CHAIN_DEPLOYMENT,
@@ -35,10 +30,11 @@ import { setManifest } from "@src/state/nodes/viewer";
 import { setPendingCommits } from "@src/state/nodes/history";
 import { tags } from "@src/state/api/tags";
 import { nodesApi } from "@src/state/api/nodes";
+import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 
 export const LOCALSTORAGE_TXN_LIST = "desci:txn-list";
 
-const CommitStatusPopover = (props: any) => {
+const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
   const [loading, setLoading] = useState(false);
   const [address, setAddress] = useState<string>("0x");
   const [error, setError] = useState<string>();
@@ -58,8 +54,7 @@ const CommitStatusPopover = (props: any) => {
     // setError(undefined);
     // setUrlOrDoi(undefined);
     // setSubType(undefined);
-
-    props.onClose();
+    props?.onDismiss?.();
   };
   const { hooks, chainId, connector, account } = useWeb3React();
   const { usePriorityProvider } = hooks;
@@ -287,42 +282,9 @@ const CommitStatusPopover = (props: any) => {
     .length;
 
   return (
-    <PopOver
-      {...props}
-      style={{ width: 550, padding: 0, marginLeft: 0, marginRight: 0 }}
-      containerStyle={{
-        backgroundColor: "#3A3A3ABF",
-      }}
-      displayCloseIcon={false}
-      className="rounded-lg bg-zinc-100 dark:bg-zinc-900"
-      footer={() => (
-        <div className={`flex flex-row justify-end items-center w-full p-4`}>
-          <PrimaryButton
-            onClick={createCommit}
-            disabled={!usingAssociatedAccount || loading}
-          >
-            {loading ? (
-              <div className="flex flex-row gap-2 items-center w-full justify-center">
-                Publishing <SpinnerCircular color="black" size={20} />
-              </div>
-            ) : (
-              "Sign and Publish"
-            )}
-          </PrimaryButton>
-        </div>
-      )}
-    >
-      <div className="px-6 py-5">
-        <div className="flex flex-row justify-between items-center">
-          <div className="text-2xl font-bold">Final Step</div>
-          <IconX
-            fill="white"
-            width={20}
-            height={20}
-            className="cursor-pointer"
-            onClick={close}
-          />
-        </div>
+    <Modal $maxWidth={550} onDismiss={close} isOpen={props.isOpen}>
+      <div className="px-6 py-5 lg:w-[550px] text-white">
+        <Modal.Header title="Final Step" onDismiss={close} />
         <div className="py-8 px-12" style={{ width: 500 }}>
           <div className="flex flex-col gap-4">
             <div className="text-xs text-center">
@@ -381,7 +343,21 @@ const CommitStatusPopover = (props: any) => {
           </div>
         </div>
       </div>
-    </PopOver>
+      <Modal.Footer>
+        <PrimaryButton
+          onClick={createCommit}
+          disabled={!usingAssociatedAccount || loading}
+        >
+          {loading ? (
+            <div className="flex flex-row gap-2 items-center w-full justify-center">
+              Publishing <SpinnerCircular color="black" size={20} />
+            </div>
+          ) : (
+            "Sign and Publish"
+          )}
+        </PrimaryButton>
+      </Modal.Footer>
+    </Modal>
   );
 };
 

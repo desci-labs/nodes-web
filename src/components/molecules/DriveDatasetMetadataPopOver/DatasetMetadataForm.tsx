@@ -5,14 +5,14 @@ import CreateableSelect from "@components/molecules/FormInputs/CreateableSelect"
 import {} from "@src/components/organisms/ManuscriptReader";
 import { DataComponent, DataComponentMetadata } from "@desci-labs/desci-models";
 import { Controller, useForm } from "react-hook-form";
-import SelectMenu from "../FormInputs/SelectMenu";
 import { PDF_LICENSE_TYPES } from "@components/organisms/PopOver/ComponentMetadataPopover";
 import InsetLabelSmallInput from "../FormInputs/InsetLabelSmallInput";
 import SpacerHorizontal from "@components/atoms/SpacerHorizontal";
 import { MetaStaging } from "@components/organisms/PaneDrive";
 import { DATASET_METADATA_FORM_DEFAULTS } from ".";
+import SelectList from "@src/components/molecules/FormInputs/SelectList";
 
-interface ComponentMetadataFormProps {
+interface DatasetMetadataFormProps {
   onSubmit: (data: DataComponent["payload"]) => void;
   loading?: boolean;
   currentObjectId: string;
@@ -25,8 +25,8 @@ interface ComponentMetadataFormProps {
   // >;
 }
 
-export const ComponentMetadataForm = React.forwardRef(
-  (props: ComponentMetadataFormProps, ref: any) => {
+export const DatasetMetadataForm = React.forwardRef(
+  (props: DatasetMetadataFormProps, ref: any) => {
     // const payload = props.component.payload as DataComponent["payload"];
     const licenseType = PDF_LICENSE_TYPES.find(
       (l) => l.name === props.prepopulate?.licenseType
@@ -258,7 +258,7 @@ export const ComponentMetadataForm = React.forwardRef(
             control={control}
             defaultValue={defaultLicense}
             render={({ field }: any) => (
-              <SelectMenu
+              <SelectList
                 label="Choose license"
                 data={PDF_LICENSE_TYPES}
                 field={{ ...field, value: field.value || defaultLicense }}

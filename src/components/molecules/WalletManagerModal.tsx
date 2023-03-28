@@ -1,10 +1,10 @@
 import PrimaryButton from "@components/atoms/PrimaryButton";
-import PopOver from "@components/organisms/PopOver";
 import WalletManager from "@components/organisms/WalletManager";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { useEffect } from "react";
+import Modal from "@src/components/molecules/Modal/Modal";
 
-const PopOverWalletManager = (props: any) => {
+const WalletManagerModal = (props: any) => {
   const { showWalletManager, setShowWalletManager } = useManuscriptController([
     "showWalletManager",
   ]);
@@ -31,39 +31,14 @@ const PopOverWalletManager = (props: any) => {
     }
   }, [showWalletManager]);
 
-  // if (!showWalletManager) return null;
-
   return (
-    <PopOver
-      {...props}
-      zIndex={121}
-      containerStyle={{
-        backgroundColor: "#3A3A3ABF",
-      }}
-      onClose={onClose}
-      isVisible={showWalletManager}
-      displayCloseIcon={false}
-      style={{ marginLeft: 0, marginRight: 0, width: 720 }}
-      className="transition-all rounded-lg bg-zinc-100 dark:bg-zinc-900"
-      footer={() => (
-        <div
-          className={`flex flex-row justify-end items-center h-16 w-full p-4`}
-        >
-          <PrimaryButton
-            className={`w-[140px] flex justify-center`}
-            onClick={onClose}
-          >
-            Done
-          </PrimaryButton>
-        </div>
-      )}
-    >
-      <div className="px-6 py-5">
-        <div className="flex flex-row justify-between items-center">
-          <div className="text-lg font-bold text-white">
-            Digital Signature Management
-          </div>
-        </div>
+    <Modal onDismiss={onClose} isOpen={showWalletManager}>
+      <div className="px-6 py-5 min-w-full lg:min-w-[700px]">
+        <Modal.Header
+          onDismiss={onClose}
+          title="Digital Signature Management"
+          hideCloseIcon
+        />
         <div className="py-2 text-white dark:text-white">
           <div className="py-1 text-sm">
             {showWalletManager ? (
@@ -77,8 +52,16 @@ const PopOverWalletManager = (props: any) => {
           </div>
         </div>
       </div>
-    </PopOver>
+      <Modal.Footer>
+        <PrimaryButton
+          className={`w-[140px] flex justify-center`}
+          onClick={onClose}
+        >
+          Done
+        </PrimaryButton>
+      </Modal.Footer>
+    </Modal>
   );
 };
 
-export default PopOverWalletManager;
+export default WalletManagerModal;

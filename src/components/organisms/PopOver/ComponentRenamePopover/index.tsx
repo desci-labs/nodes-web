@@ -1,9 +1,6 @@
 import PrimaryButton from "@components/atoms/PrimaryButton";
-import PopoverFooter from "@components/molecules/Footer";
 import InsetLabelInput from "@components/molecules/FormInputs/InsetLabelInput";
-import { IconX } from "@icons";
-import React, { useEffect, useState } from "react";
-import PopOver from "../.";
+import { useEffect, useState } from "react";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import {
@@ -11,8 +8,13 @@ import {
   saveManifestDraft,
   updateComponent,
 } from "@src/state/nodes/viewer";
+import Modal from "@src/components/molecules/Modal/Modal";
 
-const ComponentRenamePopover = (props: any) => {
+const ComponentRenamePopover = (props: {
+  isVisible: boolean;
+  onClose: () => void;
+  componentId: string;
+}) => {
   const { manifest: manifestData, manifestStatus } = useNodeReader();
   const dispatch = useSetter();
 
@@ -51,56 +53,34 @@ const ComponentRenamePopover = (props: any) => {
   };
 
   return (
-    <PopOver
-      {...props}
-      style={{
-        width: 375,
-        maxWidth: "100%",
-        margin: "3rem 0.75rem",
-        overflow: "visible",
-      }}
-      containerStyle={{
-        backgroundColor: "#3A3A3ABF",
-      }}
-      displayCloseIcon={true}
-      className="rounded-lg bg-zinc-100 dark:bg-zinc-900"
-    >
-      <div className="px-6 py-5">
-        <div className="flex flex-row justify-between items-center">
-          <div className="text-2xl font-bold">Rename Component</div>
-          <IconX
-            fill="white"
-            width={20}
-            height={20}
-            className="cursor-pointer"
-            onClick={() => {
-              props.onClose();
-            }}
+    <Modal {...props} isOpen={props.isVisible} onDismiss={props?.onClose}>
+      <div className="w-[400px]">
+        <div className="px-6 py-5">
+          <Modal.Header onDismiss={props?.onClose} title="Rename Component" />
+          <div className="text-xs mt-6 text-neutrals-gray-5 mb-2">
+            A short name for your component that best describes it.
+          </div>
+          <InsetLabelInput
+            label="Component Name"
+            className="mb-6"
+            value={componentName}
+            onChange={(e: any) => setComponentName(e.target.value)}
           />
         </div>
-        <div className="text-xs mt-6 text-neutrals-gray-5 mb-2">
-          A short name for your component that best describes it.
-        </div>
-        <InsetLabelInput
-          label="Component Name"
-          className="mb-6"
-          value={componentName}
-          onChange={(e: any) => setComponentName(e.target.value)}
-        />
+        <Modal.Footer>
+          <PrimaryButton
+            disabled={manifestStatus === ManifestDataStatus.Pending}
+            onClick={() => {
+              handleChangeName();
+            }}
+          >
+            {manifestStatus === ManifestDataStatus.Pending
+              ? "Saving..."
+              : "Save Changes"}
+          </PrimaryButton>
+        </Modal.Footer>
       </div>
-      <PopoverFooter>
-        <PrimaryButton
-          disabled={manifestStatus === ManifestDataStatus.Pending}
-          onClick={() => {
-            handleChangeName();
-          }}
-        >
-          {manifestStatus === ManifestDataStatus.Pending
-            ? "Saving..."
-            : "Save Changes"}
-        </PrimaryButton>
-      </PopoverFooter>
-    </PopOver>
+    </Modal>
   );
 };
 

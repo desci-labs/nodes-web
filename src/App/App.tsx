@@ -20,15 +20,17 @@ const App = () => {
       }
       return;
     }
+
     if (userData) {
       let user = userData;
       if (user) {
-        if (location.pathname === "/" || location.pathname === "/login") {
-          navigate(site.app);
+        if (
+          !location.pathname.includes("/app/") ||
+          location.pathname === "/login"
+        ) {
+          navigate(`${site.app}/nodes/start`);
         }
       }
-    } else {
-      // navigate(sie)
     }
   }, [userData, error, location.pathname, navigate]);
 

@@ -77,7 +77,6 @@ export default function SelectMenu(props: SelectMenuProps) {
                 />
               </span>
             </Listbox.Button>
-
             <Transition
               show={open}
               as={Fragment}
@@ -89,7 +88,7 @@ export default function SelectMenu(props: SelectMenuProps) {
                 onBlur={() => {
                   setTouched(true);
                 }}
-                className="absolute z-10 mt-1 w-full bg-white dark:bg-[#272727] shadow-lg max-h-96 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm list-none"
+                className="absolute z-[1044] w-full bg-white dark:bg-[#272727] shadow-lg max-h-96 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm list-none"
               >
                 {data.map((person: any) => (
                   <Listbox.Option

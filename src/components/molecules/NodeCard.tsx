@@ -14,6 +14,7 @@ export interface NodeProps {
   disabled?: boolean;
   isCurrent?: boolean;
   onClick?: () => void;
+  onHandleEdit?: () => void;
 }
 
 const NodeCard = ({
@@ -25,6 +26,7 @@ const NodeCard = ({
   isPublished,
   isCurrent,
   onClick,
+  onHandleEdit,
 }: ResearchNode & NodeProps) => {
   const dispatch = useSetter();
   const { setShowAddNewNode } = useManuscriptController([]);
@@ -88,6 +90,7 @@ const NodeCard = ({
                               licenseType: null,
                             })
                           );
+                          onHandleEdit?.();
                           setShowAddNewNode(true);
                         },
                       },
