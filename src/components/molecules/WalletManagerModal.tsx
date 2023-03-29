@@ -1,23 +1,14 @@
-import PrimaryButton from "@components/atoms/PrimaryButton";
 import WalletManager from "@components/organisms/WalletManager";
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { useEffect } from "react";
-import Modal from "@src/components/molecules/Modal/Modal";
+import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 
-const WalletManagerModal = (props: any) => {
-  const { showWalletManager, setShowWalletManager } = useManuscriptController([
-    "showWalletManager",
-  ]);
-  const onClose = () => {
-    setShowWalletManager(false);
-  };
-
+const WalletManagerModal = (props: ModalProps) => {
   useEffect(() => {
     const torus = (window as any).torus;
     if (torus) {
       try {
         if (
-          showWalletManager &&
+          props.isOpen &&
           torus.provider &&
           !!torus.provider.selectedAddress
         ) {
@@ -29,37 +20,27 @@ const WalletManagerModal = (props: any) => {
         console.error(err);
       }
     }
-  }, [showWalletManager]);
+  }, [props.isOpen]);
+
+  const close = () => {
+    props?.onDismiss?.();
+  };
 
   return (
-    <Modal onDismiss={onClose} isOpen={showWalletManager}>
+    <Modal onDismiss={close} isOpen={props.isOpen}>
       <div className="px-6 py-5 min-w-full lg:min-w-[700px]">
         <Modal.Header
-          onDismiss={onClose}
-          title="Digital Signature Management"
+          onDismiss={close}
           hideCloseIcon
+          title="Digital Signature Management"
         />
         <div className="py-2 text-white dark:text-white">
           <div className="py-1 text-sm">
-            {showWalletManager ? (
-              <WalletManager />
-            ) : (
-              <div className="invisible w-[450px] h-[200px]">
-                {" "}
-                {/* <WalletManager /> */}
-              </div>
-            )}
+            <WalletManager />
           </div>
         </div>
       </div>
-      <Modal.Footer>
-        <PrimaryButton
-          className={`w-[140px] flex justify-center`}
-          onClick={onClose}
-        >
-          Done
-        </PrimaryButton>
-      </Modal.Footer>
+      <Modal.Footer collapse padded={false} />
     </Modal>
   );
 };
