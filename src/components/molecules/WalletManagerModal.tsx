@@ -40,7 +40,7 @@ const WalletManagerModal = (props: ModalProps) => {
           </div>
         </div>
       </div>
-      <Modal.Footer collapse padded={false} />
+      <Modal.Footer padded={false} />
     </Modal>
   );
 };

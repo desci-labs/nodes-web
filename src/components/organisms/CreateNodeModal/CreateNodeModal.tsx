@@ -166,135 +166,128 @@ export default memo(function CreateNodeModal({
       $scrollOverlay={true}
       $maxWidth={700}
     >
-      <div className="flex flex-col">
-        <Modal.Header onDismiss={onClose} />
-        <div className="px-6 pt-5 pb-2 text-white">
-          <div className="flex flex-row justify-between items-center">
-            <h1 className="text-lg font-bold">Name the Research Node</h1>
-          </div>
-          <p className="text-neutrals-gray-5 text-sm mb-6">
-            Enter the name of your research node. Ideally it would be the title
-            of your research report.
-          </p>
-
-          <PlaceholderInput
-            placeholder={"Research Node Name"}
-            value={manifestTitle}
-            onChange={(e: any) => {
-              setManifestTitle(e.target.value);
-            }}
-          />
-          <hr className="mt-6 mb-6 border-neutrals-gray-3" />
-          <h1 className="text-base font-bold">Field of Science</h1>
-          <p className="text-neutrals-gray-5 text-sm mb-6">
-            Start typing the field of science that best describes your research
-            node.
-          </p>
-          {isOpen && (
-            <FieldSelector
-              onChange={setResearchFields}
-              defaultValues={editManifest?.researchFields}
-              placeholder="Field of Science"
-            />
-          )}
-          <hr className="mt-6 mb-6 border-neutrals-gray-3" />
-          <h1 className="text-base font-bold">Choose License</h1>
-          <p className="text-neutrals-gray-5 text-sm">
-            Choose the applicable license for this Research Node. Components you
-            add to this Node will automatically inherit this license type,
-            unless you edit the Licensing at the component level.
-          </p>
-          <a
-            href="https://creativecommons.org/licenses/"
-            rel="noreferrer"
-            target="_blank"
-            className="text-tint-primary text-sm"
-          >
-            Learn More
-          </a>
-          <SelectList
-            label="License Type"
-            data={PDF_LICENSE_TYPES}
-            className="mt-2"
-            value={manifestLicense}
-            onSelect={(value: any) => setManifestLicense(value)}
-          />
-          <hr className="mt-6 mb-6 border-neutrals-gray-3" />
+      <Modal.Header onDismiss={onClose} />
+      <div className="px-6 pt-5 pb-2 text-white">
+        <div className="flex flex-row justify-between items-center">
+          <h1 className="text-lg font-bold">Name the Research Node</h1>
         </div>
-        <div className="flex flex-row justify-end items-center bg-neutrals-gray-1 border-t border-t-tint-primary rounded-b-md px-4 py-3">
-          <PrimaryButton
-            disabled={
-              !(
-                manifestTitle &&
-                researchFields.length > 0 &&
-                manifestLicense
-              ) || isLoading
-            }
-            onClick={() => {
-              if (editingNodeParams) return handleEdit();
-              /**
-               * Handle create new node
-               */
-              setTimeout(async () => {
-                setIsLoading(true);
-                try {
-                  const payload = {
+        <p className="text-neutrals-gray-5 text-sm mb-6">
+          Enter the name of your research node. Ideally it would be the title of
+          your research report.
+        </p>
+
+        <PlaceholderInput
+          placeholder={"Research Node Name"}
+          value={manifestTitle}
+          onChange={(e: any) => {
+            setManifestTitle(e.target.value);
+          }}
+        />
+        <hr className="mt-6 mb-6 border-neutrals-gray-3" />
+        <h1 className="text-base font-bold">Field of Science</h1>
+        <p className="text-neutrals-gray-5 text-sm mb-6">
+          Start typing the field of science that best describes your research
+          node.
+        </p>
+        {isOpen && (
+          <FieldSelector
+            onChange={setResearchFields}
+            defaultValues={editManifest?.researchFields}
+            placeholder="Field of Science"
+          />
+        )}
+        <hr className="mt-6 mb-6 border-neutrals-gray-3" />
+        <h1 className="text-base font-bold">Choose License</h1>
+        <p className="text-neutrals-gray-5 text-sm">
+          Choose the applicable license for this Research Node. Components you
+          add to this Node will automatically inherit this license type, unless
+          you edit the Licensing at the component level.
+        </p>
+        <a
+          href="https://creativecommons.org/licenses/"
+          rel="noreferrer"
+          target="_blank"
+          className="text-tint-primary text-sm"
+        >
+          Learn More
+        </a>
+        <SelectList
+          label="License Type"
+          data={PDF_LICENSE_TYPES}
+          className="mt-2"
+          value={manifestLicense}
+          onSelect={(value: any) => setManifestLicense(value)}
+        />
+        <hr className="mt-6 mb-6 border-neutrals-gray-3" />
+      </div>
+      <div className="flex flex-row justify-end items-center bg-neutrals-gray-1 border-t border-t-tint-primary rounded-b-md px-4 py-3">
+        <PrimaryButton
+          disabled={
+            !(manifestTitle && researchFields.length > 0 && manifestLicense) ||
+            isLoading
+          }
+          onClick={() => {
+            if (editingNodeParams) return handleEdit();
+            /**
+             * Handle create new node
+             */
+            setTimeout(async () => {
+              setIsLoading(true);
+              try {
+                const payload = {
+                  title: manifestTitle || "",
+                  defaultLicense: manifestLicense?.name,
+                  researchFields,
+                  links: {
+                    pdf: [],
+                    metadata: [],
+                  },
+                };
+                const ros = await createResearchObjectStub(payload);
+
+                dispatch(setCurrentObjectId(""));
+                const ro = (ros as any).node.uuid;
+
+                dispatch(setCurrentObjectId(ro));
+                dispatch(
+                  setManifest({
+                    version: 1,
                     title: manifestTitle || "",
                     defaultLicense: manifestLicense?.name,
+                    components: [],
+                    contributors: [],
                     researchFields,
-                    links: {
-                      pdf: [],
-                      metadata: [],
-                    },
-                  };
-                  const ros = await createResearchObjectStub(payload);
+                  })
+                );
 
-                  dispatch(setCurrentObjectId(""));
-                  const ro = (ros as any).node.uuid;
+                dispatch(setComponentStack([]));
+                setIsAddingComponent(true);
+                setIsLoading(false);
 
-                  dispatch(setCurrentObjectId(ro));
-                  dispatch(
-                    setManifest({
-                      version: 1,
-                      title: manifestTitle || "",
-                      defaultLicense: manifestLicense?.name,
-                      components: [],
-                      contributors: [],
-                      researchFields,
-                    })
-                  );
+                onClose();
+                setIsLoading(false);
 
-                  dispatch(setComponentStack([]));
-                  setIsAddingComponent(true);
-                  setIsLoading(false);
+                // refresh node collection
+                dispatch(nodesApi.util.invalidateTags([{ type: tags.nodes }]));
+                navigate(
+                  `${site.app}${app.nodes}/${RESEARCH_OBJECT_NODES_PREFIX}${ro}`
+                );
 
-                  onClose();
-                  setIsLoading(false);
-
-                  // refresh node collection
-                  dispatch(
-                    nodesApi.util.invalidateTags([{ type: tags.nodes }])
-                  );
-                  navigate(
-                    `${site.app}${app.nodes}/${RESEARCH_OBJECT_NODES_PREFIX}${ro}`
-                  );
-
-                  return;
-                } catch (e) {
-                  console.log("Error", e);
-                } finally {
-                  setIsLoading(false);
-                }
-              });
-              dispatch(setCurrentObjectId(""));
-              dispatch(setPublicView(false));
-            }}
-            className="h-10 text-lg flex gap-2"
-          >
-            {isLoading ? "Saving" : "Save"}
-            {isLoading && <DefaultSpinner color="white" size={24} />}
-          </PrimaryButton>
-        </div>
+                return;
+              } catch (e) {
+                console.log("Error", e);
+              } finally {
+                setIsLoading(false);
+              }
+            });
+            dispatch(setCurrentObjectId(""));
+            dispatch(setPublicView(false));
+          }}
+          className="h-10 text-lg flex gap-2"
+        >
+          {isLoading ? "Saving" : "Save"}
+          {isLoading && <DefaultSpinner color="white" size={24} />}
+        </PrimaryButton>
       </div>
     </Modal>
   );

@@ -313,7 +313,12 @@ const CommitAdditionalInfoPopOver = (
   };
 
   return (
-    <Modal $maxWidth={550} onDismiss={close} isOpen={props.isOpen}>
+    <Modal
+      $maxWidth={550}
+      onDismiss={close}
+      isOpen={props.isOpen}
+      $scrollOverlay={true}
+    >
       <div className="px-6 py-5 text-white">
         <Modal.Header title="Additional Information" onDismiss={close} />
         <div className="py-8" style={{ width: 500 }}>
