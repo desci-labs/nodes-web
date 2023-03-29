@@ -46,10 +46,10 @@ const Section = (props: SectionProps) => {
       onClick={onClick}
     >
       {header ? (
-        <div className="border-neutral-300 dark:border-teal border-b">
-          {header({})}
-        </div>
-      ) : null}
+        // <div className="border-neutral-300 dark:border-teal border-b">
+        <>{header({})}</>
+      ) : // </div>
+      null}
       {children}
       {footer ? (
         <div className="border-tint-primary dark:border-teal border-t">

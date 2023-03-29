@@ -96,13 +96,6 @@ export const nodeReaderSlice = createSlice({
       state,
       { payload }: PayloadAction<{ componentId: string }>
     ) => {
-      console.log(
-        "delete",
-        payload.componentId,
-        state.manifest?.components.filter(
-          (component) => component.id !== payload.componentId
-        )
-      );
       if (state.manifest) {
         state.manifest.components = state.manifest.components.filter(
           (component) => component.id !== payload.componentId
