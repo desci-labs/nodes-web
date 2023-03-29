@@ -1,7 +1,6 @@
 import { DialogOverlay, DialogContent } from "@reach/dialog";
 import styled, { css } from "styled-components";
 import { animated, useTransition } from "react-spring";
-import PerfectScrollbar from "react-perfect-scrollbar";
 import { PropsWithChildren } from "react";
 import { IconX } from "@src/icons";
 
@@ -22,6 +21,8 @@ const StyledDialogOverlay = styled(AnimatedDialogOverlay)<{
     min-width: 100vw;
     height: 100vh;
     width: 100vw;
+
+    padding: 20px 0;
 
     display: flex;
     align-items: center;
@@ -114,9 +115,7 @@ export default function Modal({
                 $minHeight={$minHeight}
                 $scrollOverlay={$scrollOverlay}
               >
-                <PerfectScrollbar className="max-h-[100vh] h-fit overflow-hidden overflow-y-scroll">
-                  {children}
-                </PerfectScrollbar>
+                <div>{children}</div>
               </StyledDialogContent>
             </StyledDialogOverlay>
           )
@@ -157,10 +156,17 @@ const ModalFooter = ({
   border = true,
   padded = true,
   children,
-}: PropsWithChildren<{ border?: boolean; padded?: boolean }>) => {
+  collapse = false,
+}: PropsWithChildren<{
+  border?: boolean;
+  padded?: boolean;
+  collapse?: boolean;
+}>) => {
   return (
     <div
-      className={`flex flex-row justify-end gap-4 items-center h-16 w-full dark:bg-[#272727] ${
+      className={`flex flex-row justify-end gap-4 items-center ${
+        collapse ? "" : "h-16"
+      } w-full dark:bg-[#272727] ${
         border ? "border-t border-t-[#81C3C8]" : ""
       } rounded-b-lg ${padded ? "p-4" : ""}`}
     >
