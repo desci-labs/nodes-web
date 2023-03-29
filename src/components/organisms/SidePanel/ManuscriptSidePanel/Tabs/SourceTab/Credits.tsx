@@ -1,14 +1,14 @@
 import Identicon from "@components/atoms/Identicon";
 import TooltipIcon from "@components/atoms/TooltipIcon";
 import CollapsibleSection from "@components/organisms/CollapsibleSection";
-import { IconInfo } from "icons";
+import { IconDeleteForever, IconInfo, IconPen } from "icons";
 import Section from "../../Section";
 import SectionHeader from "../../Section/SectionHeader";
 import { ResearchObjectV1Author } from "@desci-labs/desci-models";
 import ClickableAddIcon from "@components/atoms/ClickableIcon/ClickableAddIcon";
 import toast from "react-hot-toast";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import { useState } from "react";
+import { PropsWithChildren, useState } from "react";
 
 interface CreditsProps {}
 
@@ -99,33 +99,77 @@ const Credits = (props: CreditsProps) => {
       <div className="flex flex-col gap-3 py-2 ">
         {manifestData &&
           mockAuthors.map((author: ResearchObjectV1Author, index: number) => (
-            <Section
-              key={index}
-              header={() => (
-                <SectionHeader
-                  title={() => (
-                    <div className="flex flex-col">
-                      <span className="text-sm font-bold">{author.name}</span>
-                      <span className="text-xs text-gray-400">Author</span>
-                    </div>
-                  )}
-                  action={() => <Identicon string={author.name} size={20} />}
-                  className="bg-zinc-100 dark:bg-muted-900"
-                  containerStyle={{ alignItems: "start" }}
-                />
-              )}
-            >
-              {/* <div className="flex flex-row px-4 py-2 justify-end gap-2 w-full">
+            <CreditsEditorWrapper id={index} key={index} expand={isEditable}>
+              <Section
+                key={index}
+                header={() => (
+                  <SectionHeader
+                    title={() => (
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold">{author.name}</span>
+                        <span className="text-xs text-gray-400">Author</span>
+                      </div>
+                    )}
+                    action={() => <Identicon string={author.name} size={20} />}
+                    className="w-full bg-zinc-100 dark:bg-muted-900"
+                    containerStyle={{ alignItems: "start" }}
+                  />
+                )}
+              >
+                {/* <div className="flex flex-row px-4 py-2 justify-end gap-2 w-full">
                 <OpenLinkPillButton
                   link={author.orcid || "https://orcid.com"}
                   leftIcon={() => <IconOrcid />}
                 />
               </div> */}
-            </Section>
+              </Section>
+            </CreditsEditorWrapper>
           ))}
       </div>
     </CollapsibleSection>
   );
 };
+
+interface CreditsEditorProps {
+  id: number;
+  expand: boolean;
+}
+
+function CreditsEditorWrapper({
+  children,
+  id,
+  expand = false,
+}: PropsWithChildren<CreditsEditorProps>) {
+  return (
+    <div className="flex transition-all">
+      {children}
+      <div
+        className={`relative flex justify-end items-center transition-all ease-out duration-200 overflow-hidden ${
+          expand ? "w-[31px]" : "w-0"
+        }`}
+        style={{ minWidth: expand ? 31 : 0 }}
+      >
+        <div className=" flex flex-col gap-2">
+          <button
+            onClick={() => {}}
+            className="flex items-center justify-center cursor-pointer w-6 h-6 rounded-full bg-gray-300 text-black dark:text-white dark:bg-neutrals-black"
+          >
+            <IconPen stroke="white" width={10} />
+          </button>
+          <button
+            onClick={() => {}}
+            className="flex items-center justify-center cursor-pointer w-6 h-6 rounded-full bg-gray-300 text-black dark:text-white dark:bg-neutrals-black"
+          >
+            <IconDeleteForever
+              stroke="rgb(188,107,103)"
+              strokeWidth={4}
+              width={12}
+            />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default Credits;

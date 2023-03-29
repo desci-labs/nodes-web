@@ -14,7 +14,8 @@ const Wrapper: StyledComponent<"div", any, any> = styled.div.attrs(
 )`
   border-style: solid;
   border-radius: 10px;
-  width: ${(props: any) => (props.selected ? "calc(100% - 0px)" : "calc(100% - 2px)")};
+  width: ${(props: any) =>
+    props.selected ? "calc(100% - 0px)" : "calc(100% - 2px)"};
   overflow: hidden;
 `;
 
@@ -45,11 +46,7 @@ const Section = (props: SectionProps) => {
       style={{ ...containerStyle }}
       onClick={onClick}
     >
-      {header ? (
-        // <div className="border-neutral-300 dark:border-teal border-b">
-        <>{header({})}</>
-      ) : // </div>
-      null}
+      {header && <>{header({})}</>}
       {children}
       {footer ? (
         <div className="border-tint-primary dark:border-teal border-t">
