@@ -49,7 +49,6 @@ import DriveTable, {
   oldComponentMetadata,
 } from "./Drive";
 import toast from "react-hot-toast";
-import { UploadQueuedItemType } from "./UploadPanel";
 import { BreadCrumb } from "../molecules/DriveBreadCrumbs";
 
 import { v4 as uuidv4 } from "uuid";
@@ -60,7 +59,7 @@ import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { setManifestCid, setManifestData } from "@src/state/nodes/viewer";
 import { useDrive } from "@src/state/drive/hooks";
-import { fetchTreeThunk } from "@src/state/drive/driveSlice";
+import { addFilesToDrive, fetchTreeThunk } from "@src/state/drive/driveSlice";
 
 export interface DatasetMetadataInfo {
   prepopulateFromName?: string;
@@ -263,8 +262,8 @@ const PaneDrive = () => {
       if (!nodeTree) return;
       const updateQueued = uploadQueue.some(
         (queuedItem) =>
-          queuedItem.uploadQueueType &&
-          queuedItem.uploadQueueType === UploadQueuedItemType.UPDATE_DATASET &&
+          // queuedItem.uploadQueueType &&
+          // queuedItem.uploadQueueType === UploadQueuedItemType.UPDATE_DATASET &&
           queuedItem.nodeUuid === currentObjectId!
       );
 
@@ -337,10 +336,9 @@ const PaneDrive = () => {
       const batchUid = Date.now().toString();
       const qItems = placeholders.map((ph) => {
         return {
-          driveObj: ph,
+          path: ph.path!,
           batchUid,
           nodeUuid: currentObjectId!,
-          uploadQueueType: UploadQueuedItemType.UPDATE_DATASET,
         };
       });
       setBatchUploadProgress({ ...batchUploadProgress, [batchUid]: 0 });
@@ -367,15 +365,6 @@ const PaneDrive = () => {
           updateProgress(batchUid, 100);
         }
 
-        // setDirectory((cwd) => {
-        //   if (cwd[0]?.parent?.path === VirtualDrivePaths.DRIVE_DATA_PATH) {
-        //     return dataDrive!.contains!;
-        //   }
-        //   return cwd;
-        // });
-
-        // debugger;
-        console.log("dsRootCid: ", oldDatasetRootCid);
         const dataDriveIdx = nodeTree?.contains?.findIndex(
           (d) => d.name === "Data"
         );
@@ -489,48 +478,29 @@ const PaneDrive = () => {
       });
     };
 
-    const freshDir = directoryRef.current!;
-    if (!droppedFileList && !droppedTransferItemList) {
-      return;
-    }
-
     try {
       let isUpdate = false;
       // debugger;
       const updateContext: UpdateDataContext = { path: "", rootCid: "" };
-      if ((droppedFileList || droppedTransferItemList) && !!freshDir[0]) {
-        //setup path context
-        if (freshDir.length && freshDir[0].parent) {
-          const rootCid = findRootComponentCid(
-            freshDir[0].parent as DriveObject
-          );
-          if (rootCid && manifestData) {
-            const isData = isDataComponent(manifestData!, rootCid);
-            if (isData) {
-              isUpdate = true;
-              const contextPath = freshDir[0].parent!.path!;
-              updateContext.path = contextPath;
-              updateContext.rootCid = rootCid;
-            }
+      if (droppedFileList || droppedTransferItemList) {
+        if (droppedFileList) {
+          if (droppedFileList instanceof FileList) {
+            //   if (isUpdate) {
+            //     handleUpdate(droppedFileList, updateContext, errorHandle);
+            //   } else {
+            //     handleUpload(droppedFileList, errorHandle);
+            //   }
+            dispatch(addFilesToDrive({ files: droppedFileList }));
           }
         }
-      }
 
-      if (droppedFileList) {
-        if (droppedFileList instanceof FileList) {
-          if (isUpdate) {
-            handleUpdate(droppedFileList, updateContext, errorHandle);
-          } else {
-            handleUpload(droppedFileList, errorHandle);
-          }
-        }
-      }
+        if (droppedTransferItemList) {
+          dispatch(addFilesToDrive({ files: droppedTransferItemList }));
 
-      if (droppedTransferItemList) {
-        if (isUpdate) {
-          handleUpdate(droppedTransferItemList, updateContext, errorHandle);
-        } else {
-          handleUpload(droppedTransferItemList, errorHandle);
+          // if (isUpdate) {
+          //   handleUpdate(droppedTransferItemList, updateContext, errorHandle);
+          // } else {
+          //   handleUpload(droppedTransferItemList, errorHandle);
         }
       }
     } catch (err: any) {

@@ -2,7 +2,6 @@ import RadialLoader from "@components/atoms/RadialLoader";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { IconDirectory, IconFolderStroke, IconGreenCheck, IconX } from "@icons";
 import React, { useEffect, useState } from "react";
-import { DriveObject } from "../Drive";
 import ReactTooltip from "react-tooltip";
 import {
   removeCidsFromPath,
@@ -11,17 +10,16 @@ import {
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { setComponentStack } from "@src/state/nodes/viewer";
-
-export enum UploadQueuedItemType {
-  UPDATE_DATASET = "Update Dataset",
-  UPLOAD_DATASET = "Upload Dataset",
-}
+import { useDrive } from "@src/state/drive/hooks";
+import {
+  cleanupUploadProgressMap,
+  navigateToDriveByPath,
+} from "@src/state/drive/driveSlice";
 
 export interface UploadQueueItem {
   nodeUuid: string;
-  driveObj: DriveObject;
+  path: string;
   batchUid: string;
-  uploadQueueType?: UploadQueuedItemType;
 }
 
 export interface UploadPanelProps {
@@ -30,15 +28,13 @@ export interface UploadPanelProps {
 
 const UploadPanel: React.FC<UploadPanelProps> = ({ show }) => {
   const { currentObjectId, componentStack } = useNodeReader();
+  const { batchUploadProgress, uploadQueue } = useDrive();
   const dispatch = useSetter();
 
-  const {
-    uploadQueue,
-    setShowUploadPanel,
-    batchUploadProgress,
-    setBatchUploadProgress,
-    setDriveJumpDir,
-  } = useManuscriptController(["uploadQueue", "batchUploadProgress"]);
+  const { setShowUploadPanel, setDriveJumpDir } = useManuscriptController([
+    "uploadQueue",
+    "batchUploadProgress",
+  ]);
   const [localQueue, setLocalQueue] = useState<UploadQueueItem[]>([]);
   const [uploadTransitioned, setUploadTransitioned] = useState<
     Record<string, boolean>
@@ -82,12 +78,7 @@ const UploadPanel: React.FC<UploadPanelProps> = ({ show }) => {
   }, [batchUploadProgress]);
 
   function close() {
-    //clean upload progress map
-    const incomplete = Object.entries(batchUploadProgress).filter(
-      (k, v) => v !== 100
-    );
-    setBatchUploadProgress(Object.fromEntries(incomplete));
-
+    dispatch(cleanupUploadProgressMap);
     setShowUploadPanel(false);
   }
 
@@ -129,7 +120,7 @@ const UploadPanel: React.FC<UploadPanelProps> = ({ show }) => {
                 <span>
                   <IconFolderStroke />
                 </span>
-                {qI.driveObj.name}
+                {qI.path.split("/").pop()}
               </div>
               <aside>
                 {batchUploadProgress[qI.batchUid] === -1 ? (
@@ -152,21 +143,21 @@ const UploadPanel: React.FC<UploadPanelProps> = ({ show }) => {
                     data-type="info"
                     data-background-color="black"
                     onClick={() => {
-                      if (qI.driveObj.parent) {
-                        setDriveJumpDir({
-                          targetUid: qI.driveObj.parent.uid!,
-                          targetPath: removeCidsFromPath(
-                            qI.driveObj.parent.path!
-                          ),
-                          itemUid: qI.driveObj.uid,
-                          itemPath: removeCidsFromPath(qI.driveObj.path!),
-                        });
-                        if (componentStack.length) {
-                          sessionStorage.removeItem(
-                            SessionStorageKeys.lastDirUid
-                          );
-                          dispatch(setComponentStack([]));
-                        }
+                      // if (qI.driveObj.parent) {
+                      //   setDriveJumpDir({
+                      //     targetUid: qI.driveObj.parent.uid!,
+                      //     targetPath: removeCidsFromPath(
+                      //       qI.driveObj.parent.path!
+                      //     ),
+                      //     itemUid: qI.driveObj.uid,
+                      //     itemPath: removeCidsFromPath(qI.driveObj.path!),
+                      //   });
+                      dispatch(navigateToDriveByPath({ path: qI.path }));
+                      if (componentStack.length) {
+                        sessionStorage.removeItem(
+                          SessionStorageKeys.lastDirUid
+                        );
+                        dispatch(setComponentStack([]));
                       }
                     }}
                   />

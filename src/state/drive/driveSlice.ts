@@ -31,12 +31,22 @@ import {
   extractComponentMetadata,
   generateCidCompMap,
 } from "./utils";
-import { NavigateToDriveByPathAction } from "./types";
+import {
+  AddFilesToDrivePayload,
+  AddItemsToUploadQueueAction,
+  NavigateToDriveByPathAction,
+  UpdateBatchUploadProgressAction,
+} from "./types";
+import { UploadQueueItem } from "@src/components/organisms/UploadPanel";
+import { reactRouterV6Instrumentation } from "@sentry/react";
 interface DriveState {
   nodeTree: DriveObject | null;
   status: RequestStatus;
   error: null | undefined | string;
   currentDrive: DriveObject | null;
+  uploadStatus: RequestStatus;
+  uploadQueue: UploadQueueItem[];
+  batchUploadProgress: Record<string, number>;
 }
 
 const initialState: DriveState = {
@@ -44,6 +54,9 @@ const initialState: DriveState = {
   status: "idle",
   error: null,
   currentDrive: null,
+  uploadStatus: "idle", //remove
+  uploadQueue: [],
+  batchUploadProgress: {},
 };
 
 export const driveSlice = createSlice({
@@ -71,6 +84,26 @@ export const driveSlice = createSlice({
         return;
       }
       state.currentDrive = driveFound;
+    },
+    addItemsToUploadQueue: (state, action: AddItemsToUploadQueueAction) => {
+      const { items } = action.payload;
+      state.uploadQueue = [...state.uploadQueue, ...items];
+      return;
+    },
+    updateBatchUploadProgress: (
+      state,
+      action: UpdateBatchUploadProgressAction
+    ) => {
+      const { batchUid, batchProgress } = action.payload;
+      state.batchUploadProgress[batchUid] = batchProgress;
+      return;
+    },
+    cleanupUploadProgressMap: (state) => {
+      const incomplete = Object.entries(state.batchUploadProgress).filter(
+        (k, v) => v !== 100
+      );
+      state.batchUploadProgress = Object.fromEntries(incomplete);
+      return;
     },
   },
   extraReducers: (builder) => {
@@ -138,11 +171,28 @@ export const driveSlice = createSlice({
       .addCase(fetchTreeThunk.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message || "Failed to fetch data";
+      })
+      .addCase(addFilesToDrive.pending, (state) => {
+        state.uploadStatus = "loading";
+      })
+      .addCase(addFilesToDrive.fulfilled, (state) => {
+        state.uploadStatus = "succeeded";
+        //reset cwd
+      })
+      .addCase(addFilesToDrive.rejected, (state) => {
+        state.uploadStatus = "failed";
+        //change placeholder to failed
       });
   },
 });
 
-export const { reset, navigateToDriveByPath } = driveSlice.actions;
+export const {
+  reset,
+  navigateToDriveByPath,
+  addItemsToUploadQueue,
+  updateBatchUploadProgress,
+  cleanupUploadProgressMap,
+} = driveSlice.actions;
 
 export interface FetchTreeThunkParams {
   manifest: ResearchObjectV1;
@@ -191,6 +241,19 @@ export const fetchTreeThunk = createAsyncThunk(
 
       return { tree: deleteAllParents(root), deprecated: true };
     }
+  }
+);
+
+export const addFilesToDrive = createAsyncThunk(
+  "drive/addFiles",
+  async (payload: AddFilesToDrivePayload, { getState, dispatch }) => {
+    const state = getState() as RootState;
+    const { manifest, currentObjectId, manifestCid } = state.nodes.nodeReader;
+    const { nodeTree } = state.drive;
+    const { files } = payload;
+    if (!nodeTree || !manifest) return;
+
+    const batchUid = Date.now().toString();
   }
 );
 
