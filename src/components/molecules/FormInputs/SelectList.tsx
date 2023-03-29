@@ -104,7 +104,7 @@ export default function SelectList(props: SelectListProps) {
         </ListboxButton>
         <ListboxPopover
           portal={true}
-          className="relative mt-4 max-h-96 min-h-[100px]"
+          className="relative mt-2 max-h-96 min-h-[100px]"
           onBlur={() => {
             setTouched(true);
           }}
