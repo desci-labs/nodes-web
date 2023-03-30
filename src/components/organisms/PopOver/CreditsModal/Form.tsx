@@ -13,7 +13,11 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
     formState: { errors },
   } = useFormContext<AuthorFormValues>();
 
-  const { onSubmit } = useCreditsform({ id: props.id, author: props.author });
+  const { onSubmit } = useCreditsform({
+    id: props.id,
+    author: props.author,
+    onDismiss: props.onDismiss,
+  });
 
   const OrcidInput = ({ name }: { name: OrcidPartsKeys }) => (
     <Controller

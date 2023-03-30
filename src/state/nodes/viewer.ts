@@ -363,25 +363,29 @@ export const saveManifestDraft = createAsyncThunk(
 
     if (!manifestData) return;
     // console.log("Save Manifest", manifestData);
-    const res = await updateDraft({
-      manifest: manifestData!,
-      uuid: args?.uuid ?? currentObjectId!,
-    });
+    try {
+      const res = await updateDraft({
+        manifest: manifestData!,
+        uuid: args?.uuid ?? currentObjectId!,
+      });
 
-    const manifestUrl = cleanupManifestUrl(res.uri || res.manifestUrl);
-    let response = res.manifestData;
+      const manifestUrl = cleanupManifestUrl(res.uri || res.manifestUrl);
+      let response = res.manifestData;
 
-    if (res.manifestData) {
-      dispatch(setManifest(res.manifestData));
-    } else {
-      const { data } = await axios.get(manifestUrl);
-      response = data;
-      dispatch(setManifest(data));
+      if (res.manifestData) {
+        dispatch(setManifest(res.manifestData));
+      } else {
+        const { data } = await axios.get(manifestUrl);
+        response = data;
+        dispatch(setManifest(data));
+      }
+      dispatch(setManifestCid(res.uri));
+      localStorage.setItem("manifest-url", manifestUrl);
+      args?.onSucess?.();
+      return response;
+    } catch (e) {
+      throw Error("Could not update manifest");
     }
-    dispatch(setManifestCid(res.uri));
-    localStorage.setItem("manifest-url", manifestUrl);
-    args?.onSucess?.();
-    return response;
   }
 );
 

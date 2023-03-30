@@ -26,7 +26,6 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
     resolver: yupResolver(authorsFormSchema),
   });
 
-  console.log("ISubmitting", methods.formState.isSubmitting);
   return (
     <Modal {...props} $maxWidth={650}>
       <div className="px-6 py-5 w-full lg:w-[650px] text-white">

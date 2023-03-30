@@ -12,9 +12,11 @@ import { AuthorFormValues } from "./schema";
 export default function useCreditsform({
   id,
   author,
+  onDismiss,
 }: {
   author?: ResearchObjectV1Author;
   id?: number;
+  onDismiss?: () => void;
 }) {
   const {
     watch,
@@ -37,17 +39,12 @@ export default function useCreditsform({
       dispatch(addNodeAuthor({ name, googleScholar, orcid }));
     }
 
-    await dispatch(
-      saveManifestDraft({
-        onSucess: () => {
-          // props?.onDismiss?.();
-        },
-        onError: () => {},
-      })
-    );
+    const res = await dispatch(saveManifestDraft({}));
+    if (!res.type.includes("rejected")) {
+      onDismiss?.();
+    }
   };
 
-  // const orcid = watch("orcid");
   const orcid1 = watch("orcid1");
   const orcid2 = watch("orcid2");
   const orcid3 = watch("orcid3");
