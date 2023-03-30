@@ -354,7 +354,6 @@ const PaneDrive = () => {
             currentObjectId!,
             files,
             manifestData!,
-            updateContext.rootCid,
             updateContext.path,
             (e) => {
               const perc = Math.ceil((e.loaded / e.total) * 100);

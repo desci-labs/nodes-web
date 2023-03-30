@@ -1,12 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 import { getDatasetTree, updateDatasetComponent } from "@src/api";
-import {
-  AccessStatus,
-  DriveNonComponentTypes,
-  DriveObject,
-  FileType,
-} from "@src/components/organisms/Drive";
+import { DriveObject, FileType } from "@src/components/organisms/Drive";
 import { RequestStatus, RootState } from "@src/store";
 import {
   ResearchObjectComponentType,
@@ -29,7 +24,7 @@ import {
   driveBfsByPath,
   DRIVE_EXTERNAL_LINKS_PATH,
   extractComponentMetadata,
-  generateCidCompMap,
+  generatePathCompMap,
 } from "./utils";
 import {
   AddFilesToDrivePayload,
@@ -39,7 +34,6 @@ import {
   UpdateBatchUploadProgressAction,
   UploadQueueItem,
 } from "./types";
-import { reactRouterV6Instrumentation } from "@sentry/react";
 import { __log } from "@src/components/utils";
 interface DriveState {
   nodeTree: DriveObject | null;
@@ -134,6 +128,7 @@ export const driveSlice = createSlice({
           state.currentDrive = tree as DriveObject;
           return;
         }
+        debugger;
         const manifest = action.payload.manifest!;
         //Process the IPFS tree into a DriveObject tree
         const root = createVirtualDrive({
@@ -144,15 +139,13 @@ export const driveSlice = createSlice({
         });
 
         //Generate a map of existing components
-        const cidToCompMap = generateCidCompMap(manifest);
+        const pathToCompMap = generatePathCompMap(manifest);
 
         //Convert IPFS tree to DriveObject tree
         const driveObjectTree = convertIpfsTreeToDriveObjectTree(
           tree as DriveObject[],
-          cidToCompMap
+          pathToCompMap
         );
-        //Reassign parent to top level
-        driveObjectTree.forEach((branch) => (branch.parent = root));
         root.contains = driveObjectTree;
 
         //Add links
@@ -178,6 +171,7 @@ export const driveSlice = createSlice({
           }
         });
         if (externalLinks.contains?.length) root.contains?.push(externalLinks);
+        state.nodeTree = root;
         state.currentDrive = root;
       })
       .addCase(fetchTreeThunk.rejected, (state, action) => {
@@ -221,16 +215,15 @@ export const fetchTreeThunk = createAsyncThunk(
     //determines if it's a old or new manifest
     const hasDataBucket =
       manifest?.components[0].type === ResearchObjectComponentType.DATA_BUCKET
-        ? true
+        ? manifest.components[0]
         : manifest?.components.find(
             (c) => c.type === ResearchObjectComponentType.DATA_BUCKET
           );
 
     if (hasDataBucket) {
-      //WIP
-      // const { data } = await getDatasetTree(rootCid, currentObjectId!);
-      // return data;
-      return { tree: {} as DriveObject[], manifest: manifest }; //remove
+      const rootCid = hasDataBucket.payload.cid;
+      const { tree } = await getDatasetTree(rootCid, currentObjectId!);
+      return { tree, manifest };
     } else {
       //fallback to construct deprecated tree
       const root = manifestToVirtualDrives(manifest!, manifestCid, {});
@@ -304,21 +297,25 @@ export const addFilesToDrive = createAsyncThunk(
     const contextPath = overwritePathContext || state.drive.currentDrive!.path;
     const snapshotNodeUuid = currentObjectId!;
     try {
-      const { manifest: updatedManifest, rootDataCid, manifestCid, tree, date } =
-        await updateDatasetComponent(
-          currentObjectId!,
-          files,
-          manifest
-          updateContext.rootCid,
-          contextPath,
-          (e) => {
-            const perc = Math.ceil((e.loaded / e.total) * 100);
-            const passedPerc = perc < 90 ? perc : 90;
-            dispatch(
-              updateBatchUploadProgress({ batchUid, progress: passedPerc })
-            );
-          }
-        );
+      const {
+        manifest: updatedManifest,
+        rootDataCid,
+        manifestCid,
+        tree,
+        date,
+      } = await updateDatasetComponent(
+        currentObjectId!,
+        files,
+        manifest,
+        contextPath!,
+        (e) => {
+          const perc = Math.ceil((e.loaded / e.total) * 100);
+          const passedPerc = perc < 90 ? perc : 90;
+          dispatch(
+            updateBatchUploadProgress({ batchUid, progress: passedPerc })
+          );
+        }
+      );
       dispatch(removeBatchFromUploadQueue({ batchUid }));
       if (rootDataCid) {
         // setPrivCidMap({ ...privCidMap, [rootDataCid]: true }); //later when privCidMap available
@@ -329,7 +326,7 @@ export const addFilesToDrive = createAsyncThunk(
       dispatch(updateBatchUploadProgress({ batchUid, progress: -1 }));
       __log("PaneDrive::handleUpdate", files, e);
     }
-    debugger;
+    // debugger;
   }
 );
 

@@ -17,7 +17,7 @@ import { v4 as uuidv4 } from "uuid";
 export type cidString = string;
 export type componentId = string;
 
-export function generateCidCompMap(
+export function generatePathCompMap(
   manifest: ResearchObjectV1
 ): Record<cidString, ResearchObjectV1Component> {
   const componentsMap: Record<cidString, ResearchObjectV1Component> = {};
@@ -25,10 +25,8 @@ export function generateCidCompMap(
     switch (c.type) {
       case ResearchObjectComponentType.CODE:
       case ResearchObjectComponentType.PDF:
-        componentsMap[c.payload.url] = c;
-        return;
       case ResearchObjectComponentType.DATA:
-        componentsMap[c.payload.cid] = c;
+        componentsMap[c.payload.path] = c;
         return;
       default:
         return;
@@ -63,20 +61,21 @@ export const DRIVE_EXTERNAL_LINKS_PATH = "externallinks";
 //Convert IPFS tree to DriveObject tree V2
 export function convertIpfsTreeToDriveObjectTree(
   tree: DriveObject[],
-  cidToCompMap: Record<cidString, ResearchObjectV1Component>
+  pathToCompMap: Record<cidString, ResearchObjectV1Component>
 ) {
   tree.forEach((branch) => {
-    const component = cidToCompMap[branch.cid];
-    branch.componentType = component.type || DriveNonComponentTypes.UNKNOWN;
-    branch.accessStatus = AccessStatus.PRIVATE; // FIXME, HARDCODED, PRIVCIDMAP
-    branch.metadata = extractComponentMetadata(component);
-    branch.starred = component.starred || false;
-    branch.uid = component.id || uuidv4(); //add cached uuids
     const pathSplit = branch.path?.split("/");
     if (pathSplit) {
       pathSplit[0] = DRIVE_NODE_ROOT_PATH;
       branch.path = pathSplit.join("/");
     }
+    const component = pathToCompMap[branch.path!];
+    debugger;
+    branch.componentType = component?.type || DriveNonComponentTypes.UNKNOWN;
+    branch.accessStatus = AccessStatus.PRIVATE; // FIXME, HARDCODED, PRIVCIDMAP
+    branch.metadata = extractComponentMetadata(component);
+    branch.starred = component?.starred || false;
+    branch.uid = component?.id || uuidv4(); //add cached uuids
     if (
       branch.contains &&
       branch.contains.length &&
@@ -84,7 +83,7 @@ export function convertIpfsTreeToDriveObjectTree(
     ) {
       branch.contains = convertIpfsTreeToDriveObjectTree(
         branch.contains,
-        cidToCompMap
+        pathToCompMap
       );
     }
   });
