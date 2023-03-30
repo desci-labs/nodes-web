@@ -15,19 +15,19 @@ interface CreditsProps {}
 const mockAuthors: ResearchObjectV1Author[] = [
   {
     name: "John Daily",
-    orcid: "John Daily",
+    orcid: "1234-1234-1234-1234",
   },
   {
     name: "Mary Maller",
-    orcid: "Mary Maller",
+    orcid: "1234-1234-1234-1234",
   },
   {
     name: "Nicolas Gailly",
-    orcid: "Nicolas Gailly",
+    orcid: "1234-1234-1234-1234",
   },
   {
     name: "Anca Nitulescu",
-    orcid: "Anca Nitulescu",
+    orcid: "1234-1234-1234-1234",
   },
 ];
 
@@ -116,14 +116,16 @@ const Credits = (props: CreditsProps) => {
             </CreditsEditorWrapper>
           ))}
       </div>
-      <CreditsModal
-        author={selectedAuthor}
-        isOpen={isOpen}
-        onDismiss={() => {
-          setIsOpen(false);
-          setSelectedAuthor(undefined);
-        }}
-      />
+      {isOpen && (
+        <CreditsModal
+          author={selectedAuthor}
+          isOpen={isOpen}
+          onDismiss={() => {
+            setIsOpen(false);
+            setSelectedAuthor(undefined);
+          }}
+        />
+      )}
     </CollapsibleSection>
   );
 };
