@@ -369,14 +369,12 @@ export const updateDatasetComponent = async (
   uuid: string,
   files: FileList | FileSystemEntry[],
   manifest: ResearchObjectV1,
-  rootCid: string,
   contextPath: string,
   onProgress?: (e: ProgressEvent) => void
 ) => {
   const formData = new FormData();
   formData.append("uuid", uuid);
   formData.append("manifest", JSON.stringify(manifest));
-  formData.append("rootCid", rootCid);
   formData.append("contextPath", contextPath);
   if (files.length) {
     if (files instanceof FileList) {
