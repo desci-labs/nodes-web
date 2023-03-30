@@ -35,9 +35,7 @@ const Credits = (props: CreditsProps) => {
   const { manifest: manifestData, mode } = useNodeReader();
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedAuthor, setSelectedAuthor] = useState<
-    ResearchObjectV1Author | undefined
-  >();
+  const [selectedIndex, setSelectedIndex] = useState<number>();
 
   if (
     mode !== "editor" &&
@@ -86,43 +84,50 @@ const Credits = (props: CreditsProps) => {
       className="mb-4"
     >
       <div className="flex flex-col gap-3 py-2 ">
-        {manifestData &&
-          mockAuthors.map((author: ResearchObjectV1Author, index: number) => (
-            <CreditsEditorWrapper
-              id={index}
-              key={index}
-              expand={isEditable}
-              onHandleEdit={() => {
-                setIsOpen(true);
-                setSelectedAuthor(author);
-              }}
-            >
-              <Section
+        {manifestData?.authors &&
+          manifestData?.authors.map(
+            (author: ResearchObjectV1Author, index: number) => (
+              <CreditsEditorWrapper
+                id={index}
                 key={index}
-                header={() => (
-                  <SectionHeader
-                    title={() => (
-                      <div className="flex flex-col">
-                        <span className="text-sm font-bold">{author.name}</span>
-                        <span className="text-xs text-gray-400">Author</span>
-                      </div>
-                    )}
-                    action={() => <Identicon string={author.name} size={20} />}
-                    className="w-full bg-zinc-100 dark:bg-muted-900"
-                    containerStyle={{ alignItems: "start" }}
-                  />
-                )}
-              ></Section>
-            </CreditsEditorWrapper>
-          ))}
+                expand={isEditable}
+                onHandleEdit={() => {
+                  setIsOpen(true);
+                  setSelectedIndex(index);
+                }}
+              >
+                <Section
+                  key={index}
+                  header={() => (
+                    <SectionHeader
+                      title={() => (
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold">
+                            {author.name}
+                          </span>
+                          <span className="text-xs text-gray-400">Author</span>
+                        </div>
+                      )}
+                      action={() => (
+                        <Identicon string={author.name} size={20} />
+                      )}
+                      className="w-full bg-zinc-100 dark:bg-muted-900"
+                      containerStyle={{ alignItems: "start" }}
+                    />
+                  )}
+                ></Section>
+              </CreditsEditorWrapper>
+            )
+          )}
       </div>
       {isOpen && (
         <CreditsModal
-          author={selectedAuthor}
+          author={manifestData?.authors?.[selectedIndex ?? -1]}
+          id={selectedIndex}
           isOpen={isOpen}
           onDismiss={() => {
             setIsOpen(false);
-            setSelectedAuthor(undefined);
+            setSelectedIndex(undefined);
           }}
         />
       )}

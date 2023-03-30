@@ -8,10 +8,6 @@ export type OrcidParts = Record<OrcidPartsKeys, string>;
 
 export type AuthorFormValues = ResearchObjectV1Author & OrcidParts;
 
-type SchemaShape<S> = {
-  [K in keyof S]: Yup.AnySchema;
-};
-
 const GOOGLE_SCHOLAR_URL_SCHEMA = Yup.string()
   .url()
   .optional()
@@ -53,8 +49,27 @@ const ORCID_SCHEMA = Yup.string()
   .test({
     name: "Orcid",
     message: "Invalid Orcid number",
+    test: (value = "", ctx) => {
+      if (value === "") return true;
+
+      let invalid = value
+        .split("-")
+        .map((data, index) => {
+          return /^\d+$/.test(data) && data.length === 4 ? data : "";
+        })
+        .filter(Boolean);
+
+      if (invalid.length !== 4) return false;
+      return true;
+    },
+  });
+
+const ORCID_PARTS_SCHEMA = Yup.string()
+  .optional()
+  .test({
+    name: "Orcid parts",
+    message: "Invalid Orcid number",
     test: (data = "", ctx) => {
-      // console.log("text context", data, ctx);
       if (data === "") return true;
       return (
         !Number.isNaN(parseInt(data)) &&
@@ -66,10 +81,10 @@ const ORCID_SCHEMA = Yup.string()
 
 export const authorsFormSchema = Yup.object({
   name: Yup.string().required(),
-  orcid: Yup.string().optional(),
+  orcid: ORCID_SCHEMA,
   googleScholar: GOOGLE_SCHOLAR_URL_SCHEMA.optional(),
-  orcid1: ORCID_SCHEMA.optional(),
-  orcid2: ORCID_SCHEMA.optional(),
-  orcid3: ORCID_SCHEMA.optional(),
-  orcid4: ORCID_SCHEMA.optional(),
+  orcid1: ORCID_PARTS_SCHEMA.optional(),
+  orcid2: ORCID_PARTS_SCHEMA.optional(),
+  orcid3: ORCID_PARTS_SCHEMA.optional(),
+  orcid4: ORCID_PARTS_SCHEMA.optional(),
 });

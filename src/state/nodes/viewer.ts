@@ -97,7 +97,25 @@ export const nodeReaderSlice = createSlice({
       state,
       { payload }: PayloadAction<ResearchObjectV1Author>
     ) => {
+      if (!state.manifest) return;
+
+      if (!state.manifest?.authors) {
+        state.manifest.authors = [];
+      }
+
       state.manifest?.authors?.push(payload);
+    },
+    updateNodeAuthor: (
+      state,
+      {
+        payload,
+      }: PayloadAction<{ update: ResearchObjectV1Author; index: number }>
+    ) => {
+      if (!state.manifest?.authors) return state;
+      state.manifest.authors = state.manifest.authors.map((author, idx) => {
+        if (idx === payload.index) return payload.update;
+        return author;
+      });
     },
     removeAuthor: (
       state,
@@ -381,6 +399,7 @@ export const {
   deleteComponent,
   updateComponent,
   setManifestData,
+  updateNodeAuthor,
   deleteAnnotation,
   toggleCommitPanel,
   setComponentStack,

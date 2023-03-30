@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSetter } from "@src/store/accessors";
 import { ResearchObjectV1Author } from "@desci-labs/desci-models";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
@@ -9,9 +9,15 @@ import InsetLabelSmallInput from "@src/components/molecules/FormInputs/InsetLabe
 import DividerSimple from "@src/components/atoms/DividerSimple";
 import { AuthorFormValues, authorsFormSchema, OrcidPartsKeys } from "./schema";
 import { yupResolver } from "@hookform/resolvers/yup";
+import {
+  addNodeAuthor,
+  saveManifestDraft,
+  updateNodeAuthor,
+} from "@src/state/nodes/viewer";
 
 interface CreditModalProps {
   author?: ResearchObjectV1Author;
+  id?: number;
 }
 
 export default function CreditsModal(props: ModalProps & CreditModalProps) {
@@ -21,10 +27,11 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
   const {
     watch,
     control,
+    setValue,
     setFocus,
-    handleSubmit,
     register,
-    formState: { errors, isValid, dirtyFields },
+    handleSubmit,
+    formState: { errors, isValid, isDirty, dirtyFields },
   } = useForm<AuthorFormValues>({
     mode: "onChange",
     defaultValues: {
@@ -44,43 +51,84 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
   console.log("onChange", watch("orcid1"), watch("orcid2"));
 
   const onSubmit = (data: ResearchObjectV1Author) => {
-    props?.onDismiss?.();
+    console.log("data", data);
+    const { name, googleScholar, orcid } = data;
+    if (props.author && props.id) {
+      dispatch(
+        updateNodeAuthor({
+          index: props.id,
+          update: { name, googleScholar, orcid },
+        })
+      );
+    } else {
+      dispatch(addNodeAuthor({ name, googleScholar, orcid }));
+    }
+    setIsLoading(true);
+    dispatch(
+      saveManifestDraft({
+        onSucess: () => {
+          setIsLoading(false);
+          props?.onDismiss?.();
+        },
+        onError: () => {
+          setIsLoading(false);
+        },
+      })
+    );
   };
 
   // const orcid = watch("orcid");
+  const orcid1 = watch("orcid1");
+  const orcid2 = watch("orcid2");
+  const orcid3 = watch("orcid3");
+  const orcid4 = watch("orcid4");
+
+  const updateOrcid = useCallback(() => {
+    const value = `${orcid1}-${orcid2}-${orcid3}-${orcid4}`;
+    let invalid = value.split("-").filter(Boolean).length === 0;
+    if (invalid) {
+      setValue("orcid", "");
+    } else {
+      setValue("orcid", value);
+    }
+  }, [orcid1, orcid2, orcid3, orcid4, setValue]);
 
   useEffect(() => {
     // console.log("ORCid1 Errors", errors.orcid1);
     if (errors.orcid1) {
       setFocus("orcid1");
     } else if (dirtyFields["orcid1"]) {
+      updateOrcid();
       setFocus("orcid2");
     }
-  }, [dirtyFields, errors.orcid1, setFocus]);
+  }, [dirtyFields, errors.orcid1, setFocus, updateOrcid]);
 
   useEffect(() => {
     if (errors.orcid2) {
       setFocus("orcid2");
     } else if (dirtyFields["orcid2"]) {
+      updateOrcid();
       setFocus("orcid3");
     }
-  }, [dirtyFields, errors.orcid2, setFocus]);
+  }, [dirtyFields, errors.orcid2, setFocus, updateOrcid]);
 
   useEffect(() => {
     if (errors.orcid3) {
       setFocus("orcid3");
     } else if (dirtyFields["orcid3"]) {
+      updateOrcid();
       setFocus("orcid4");
     }
-  }, [dirtyFields, errors.orcid3, setFocus]);
+  }, [dirtyFields, errors.orcid3, setFocus, updateOrcid]);
 
   useEffect(() => {
     if (errors.orcid4) {
       setFocus("orcid4");
     } else if (dirtyFields["orcid4"]) {
+      updateOrcid();
       setFocus("googleScholar");
     }
-  }, [dirtyFields, errors.orcid4, setFocus]);
+  }, [dirtyFields, errors.orcid4, setFocus, updateOrcid]);
 
   const OrcidInput = ({ name }: { name: OrcidPartsKeys }) => (
     <Controller
@@ -91,9 +139,6 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
       )}
     />
   );
-
-  const canSubmit = !errors["name"] && dirtyFields["name"];
-  console.log("Errors", canSubmit, isValid, dirtyFields, errors);
 
   return (
     <Modal {...props} $maxWidth={650}>
@@ -132,8 +177,11 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
             </span>
             <div className="flex gap-2 items-center justify-evenly max-w-[300px]">
               <OrcidInput name="orcid1" />
+              <span className="font-bold">-</span>
               <OrcidInput name="orcid2" />
+              <span>-</span>
               <OrcidInput name="orcid3" />
+              <span>-</span>
               <OrcidInput name="orcid4" />
             </div>
             <span className="text-red-400 text-xs">
@@ -162,7 +210,7 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
         <PrimaryButton
           type="submit"
           form="creditsModalForm"
-          disabled={!canSubmit || !isValid}
+          disabled={!isValid || !isDirty || isLoading}
         >
           {isLoading ? (
             <div className="flex flex-row gap-2 items-center w-full justify-center">
