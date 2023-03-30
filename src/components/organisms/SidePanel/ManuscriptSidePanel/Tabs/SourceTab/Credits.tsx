@@ -6,9 +6,9 @@ import Section from "../../Section";
 import SectionHeader from "../../Section/SectionHeader";
 import { ResearchObjectV1Author } from "@desci-labs/desci-models";
 import ClickableAddIcon from "@components/atoms/ClickableIcon/ClickableAddIcon";
-import toast from "react-hot-toast";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { PropsWithChildren, useState } from "react";
+import CreditsModal from "@src/components/organisms/PopOver/CreditsModal";
 
 interface CreditsProps {}
 
@@ -34,6 +34,10 @@ const mockAuthors: ResearchObjectV1Author[] = [
 const Credits = (props: CreditsProps) => {
   const { manifest: manifestData, mode } = useNodeReader();
   const [isEditable, setIsEditable] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedAuthor, setSelectedAuthor] = useState<
+    ResearchObjectV1Author | undefined
+  >();
 
   if (
     mode !== "editor" &&
@@ -47,6 +51,7 @@ const Credits = (props: CreditsProps) => {
   return (
     <CollapsibleSection
       startExpanded={true}
+      forceExpand={mode === "editor"}
       title={
         <div className="flex w-full justify-between">
           <div>
@@ -74,23 +79,7 @@ const Credits = (props: CreditsProps) => {
       collapseIconComponent={
         isEditing
           ? () => {
-              return (
-                <ClickableAddIcon
-                  onClick={(e: React.MouseEvent<HTMLElement>) => {
-                    e.stopPropagation();
-                    toast.error("Coming Soon", {
-                      duration: 2000,
-                      position: "top-center",
-                      style: {
-                        marginTop: 60,
-                        borderRadius: "10px",
-                        background: "#111",
-                        color: "#fff",
-                      },
-                    });
-                  }}
-                />
-              );
+              return <ClickableAddIcon onClick={() => setIsOpen(true)} />;
             }
           : undefined
       }
@@ -99,7 +88,15 @@ const Credits = (props: CreditsProps) => {
       <div className="flex flex-col gap-3 py-2 ">
         {manifestData &&
           mockAuthors.map((author: ResearchObjectV1Author, index: number) => (
-            <CreditsEditorWrapper id={index} key={index} expand={isEditable}>
+            <CreditsEditorWrapper
+              id={index}
+              key={index}
+              expand={isEditable}
+              onHandleEdit={() => {
+                setIsOpen(true);
+                setSelectedAuthor(author);
+              }}
+            >
               <Section
                 key={index}
                 header={() => (
@@ -115,17 +112,18 @@ const Credits = (props: CreditsProps) => {
                     containerStyle={{ alignItems: "start" }}
                   />
                 )}
-              >
-                {/* <div className="flex flex-row px-4 py-2 justify-end gap-2 w-full">
-                <OpenLinkPillButton
-                  link={author.orcid || "https://orcid.com"}
-                  leftIcon={() => <IconOrcid />}
-                />
-              </div> */}
-              </Section>
+              ></Section>
             </CreditsEditorWrapper>
           ))}
       </div>
+      <CreditsModal
+        author={selectedAuthor}
+        isOpen={isOpen}
+        onDismiss={() => {
+          setIsOpen(false);
+          setSelectedAuthor(undefined);
+        }}
+      />
     </CollapsibleSection>
   );
 };
@@ -133,12 +131,14 @@ const Credits = (props: CreditsProps) => {
 interface CreditsEditorProps {
   id: number;
   expand: boolean;
+  onHandleEdit: () => void;
 }
 
 function CreditsEditorWrapper({
   children,
   id,
   expand = false,
+  onHandleEdit,
 }: PropsWithChildren<CreditsEditorProps>) {
   return (
     <div className="flex transition-all">
@@ -151,7 +151,7 @@ function CreditsEditorWrapper({
       >
         <div className=" flex flex-col gap-2">
           <button
-            onClick={() => {}}
+            onClick={onHandleEdit}
             className="flex items-center justify-center cursor-pointer w-6 h-6 rounded-full bg-gray-300 text-black dark:text-white dark:bg-neutrals-black"
           >
             <IconPen stroke="white" width={10} />
