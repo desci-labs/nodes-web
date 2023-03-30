@@ -65,8 +65,7 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
     setAddress(account!);
   }, [account]);
 
-  console.log("Manifest CID", currentObjectId, manifestCid);
-  const createCommit = async () => {
+  const createCommit = useCallback(async () => {
     setLoading(true);
 
     try {
@@ -271,7 +270,7 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [manifestCid, manifestData, currentObjectId, address, setError]);
 
   const { wallets } = useManuscriptController(["wallets"]);
 
