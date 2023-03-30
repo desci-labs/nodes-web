@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSetter } from "@src/store/accessors";
 import { ResearchObjectV1Author } from "@desci-labs/desci-models";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
@@ -19,10 +19,12 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const {
-    control,
     watch,
+    control,
+    setFocus,
     handleSubmit,
-    formState: { errors },
+    register,
+    formState: { errors, isValid, dirtyFields },
   } = useForm<AuthorFormValues>({
     mode: "onChange",
     defaultValues: {
@@ -46,28 +48,53 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
   };
 
   // const orcid = watch("orcid");
-  console.log("Errors", errors);
 
   useEffect(() => {
-    console.log("ORCid1 Errors", errors.orcid1);
-  }, [watch("orcid1")]);
+    // console.log("ORCid1 Errors", errors.orcid1);
+    if (errors.orcid1) {
+      setFocus("orcid1");
+    } else if (dirtyFields["orcid1"]) {
+      setFocus("orcid2");
+    }
+  }, [dirtyFields, errors.orcid1, setFocus]);
+
+  useEffect(() => {
+    if (errors.orcid2) {
+      setFocus("orcid2");
+    } else if (dirtyFields["orcid2"]) {
+      setFocus("orcid3");
+    }
+  }, [dirtyFields, errors.orcid2, setFocus]);
+
+  useEffect(() => {
+    if (errors.orcid3) {
+      setFocus("orcid3");
+    } else if (dirtyFields["orcid3"]) {
+      setFocus("orcid4");
+    }
+  }, [dirtyFields, errors.orcid3, setFocus]);
+
+  useEffect(() => {
+    if (errors.orcid4) {
+      setFocus("orcid4");
+    } else if (dirtyFields["orcid4"]) {
+      setFocus("googleScholar");
+    }
+  }, [dirtyFields, errors.orcid4, setFocus]);
 
   const OrcidInput = ({ name }: { name: OrcidPartsKeys }) => (
     <Controller
       name={name}
       control={control}
       render={({ field }) => (
-        <InsetLabelSmallInput
-          label=""
-          // value={watch(name)}
-          // onChange={(e: ChangeEvent<HTMLInputElement>) => {
-          //   console.log("Changed", name, e.target.value);
-          // }}
-          field={field}
-        />
+        <InsetLabelSmallInput label="" field={field} ref={register(name).ref} />
       )}
     />
   );
+
+  const canSubmit = !errors["name"] && dirtyFields["name"];
+  console.log("Errors", canSubmit, isValid, dirtyFields, errors);
+
   return (
     <Modal {...props} $maxWidth={650}>
       <div className="px-6 py-5 w-full lg:w-[650px] text-white">
@@ -110,7 +137,7 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
               <OrcidInput name="orcid4" />
             </div>
             <span className="text-red-400 text-xs">
-              {errors.googleScholar?.message}
+              {errors.orcid?.message}
             </span>
           </div>
           <div className="mt-8">
@@ -121,7 +148,7 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
                 <InsetLabelSmallInput
                   label="Google Scholar Profile"
                   field={field}
-                  optional={true}
+                  ref={register("googleScholar").ref}
                 />
               )}
             />
@@ -132,7 +159,11 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
         </form>
       </div>
       <Modal.Footer>
-        <PrimaryButton type="submit" form="creditsModalForm">
+        <PrimaryButton
+          type="submit"
+          form="creditsModalForm"
+          disabled={!canSubmit || !isValid}
+        >
           {isLoading ? (
             <div className="flex flex-row gap-2 items-center w-full justify-center">
               saving <DefaultSpinner color="black" size={20} />

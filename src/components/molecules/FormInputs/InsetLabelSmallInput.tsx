@@ -15,8 +15,8 @@ const TextArea = forwardRef<
 });
 
 const Input = forwardRef<HTMLInputElement, HTMLProps<HTMLInputElement>>(
-  (props: HTMLProps<HTMLInputElement>) => {
-    return <input {...props} />;
+  (props: HTMLProps<HTMLInputElement>, ref) => {
+    return <input ref={ref} {...props} />;
   }
 );
 
@@ -37,7 +37,10 @@ interface InsetLabelSmallInputProps {
   disabled?: boolean;
 }
 
-export default function InsetLabelSmallInput(props: InsetLabelSmallInputProps) {
+const InsetLabelSmallInput = forwardRef<
+  HTMLFormElement,
+  InsetLabelSmallInputProps
+>((props: InsetLabelSmallInputProps, ref) => {
   const {
     label,
     value,
@@ -94,7 +97,10 @@ export default function InsetLabelSmallInput(props: InsetLabelSmallInputProps) {
         {...properties}
         onChange={onChange}
         {...field}
+        ref={ref}
       />
     </div>
   );
-}
+});
+
+export default InsetLabelSmallInput;
