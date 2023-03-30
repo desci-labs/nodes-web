@@ -6,6 +6,7 @@ import {
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 import {
+  cleanupManifestUrl,
   getNonDataComponentsFromManifest,
   triggerTooltips,
 } from "@src/components/utils";
@@ -23,6 +24,7 @@ import {
   setCurrentObjectId,
   setIsNew,
   setManifest,
+  setManifestCid,
   setResearchPanelTab,
   toggleMode,
 } from "@src/state/nodes/viewer";
@@ -70,6 +72,13 @@ export default function useManuscriptReader(publicView: boolean = false) {
       }
 
       dispatch(setManifest(parsedManuscript.manifest));
+      const manifestUrlCleaned = cleanupManifestUrl(
+        parsedManuscript.manifestUrl
+      );
+      const manifestCidOnly = manifestUrlCleaned.substring(
+        (process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE || "").length + 1
+      );
+      dispatch(setManifestCid(manifestCidOnly));
 
       const firstNonDataComponent = getNonDataComponentsFromManifest(
         parsedManuscript.manifest

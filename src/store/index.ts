@@ -9,6 +9,7 @@ import {
   persistStore,
   createMigrate,
   PersistedState,
+  createTransform,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
@@ -27,11 +28,23 @@ const migrations = {
   },
 };
 
+const nestedBlacklist = createTransform(
+  null,
+  (state: PersistedState, key) => {
+    const newState = { ...state };
+    (newState as any).nodes.loadState = {};
+
+    return newState;
+  },
+  {}
+);
+
 const persistConfig = {
   key: "root",
   version: 1,
   storage,
   migrate: createMigrate(migrations),
+  transforms: [nestedBlacklist],
   blacklist: [
     "user",
     "preferences",
