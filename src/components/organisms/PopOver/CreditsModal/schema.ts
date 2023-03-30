@@ -8,6 +8,12 @@ export type OrcidParts = Record<OrcidPartsKeys, string>;
 
 export type AuthorFormValues = ResearchObjectV1Author & OrcidParts;
 
+export interface CreditModalProps {
+  author?: ResearchObjectV1Author;
+  id?: number;
+}
+
+
 const GOOGLE_SCHOLAR_URL_SCHEMA = Yup.string()
   .url()
   .optional()
