@@ -50,7 +50,6 @@ export default function useManuscriptReader(publicView: boolean = false) {
     "scrollToPage$",
     "isAddingComponent",
     "isAddingSubcomponent",
-    "showUploadPanel",
   ]);
 
   const loadDraft = async (cid: string) => {

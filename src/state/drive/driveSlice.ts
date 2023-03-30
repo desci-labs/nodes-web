@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
-import { getDatasetTree } from "@src/api";
+import { getDatasetTree, updateDatasetComponent } from "@src/api";
 import {
   AccessStatus,
   DriveNonComponentTypes,
@@ -40,6 +40,7 @@ import {
   UploadQueueItem,
 } from "./types";
 import { reactRouterV6Instrumentation } from "@sentry/react";
+import { __log } from "@src/components/utils";
 interface DriveState {
   nodeTree: DriveObject | null;
   status: RequestStatus;
@@ -192,7 +193,6 @@ export const driveSlice = createSlice({
       })
       .addCase(addFilesToDrive.rejected, (state) => {
         state.uploadStatus = "failed";
-        //change placeholder to failed
       });
   },
 });
@@ -297,8 +297,38 @@ export const addFilesToDrive = createAsyncThunk(
       path: f.path,
       batchUid: batchUid,
     }));
+    dispatch(setShowUploadPanel(true));
     dispatch(addItemsToUploadQueue({ items: uploadQueueItems }));
     dispatch(updateBatchUploadProgress({ batchUid: batchUid, progress: 0 }));
+
+    const contextPath = overwritePathContext || state.drive.currentDrive!.path;
+    const snapshotNodeUuid = currentObjectId!;
+    try {
+      const { manifest: updatedManifest, rootDataCid, manifestCid, tree, date } =
+        await updateDatasetComponent(
+          currentObjectId!,
+          files,
+          manifest
+          updateContext.rootCid,
+          contextPath,
+          (e) => {
+            const perc = Math.ceil((e.loaded / e.total) * 100);
+            const passedPerc = perc < 90 ? perc : 90;
+            dispatch(
+              updateBatchUploadProgress({ batchUid, progress: passedPerc })
+            );
+          }
+        );
+      dispatch(removeBatchFromUploadQueue({ batchUid }));
+      if (rootDataCid) {
+        // setPrivCidMap({ ...privCidMap, [rootDataCid]: true }); //later when privCidMap available
+        dispatch(updateBatchUploadProgress({ batchUid, progress: 100 }));
+      }
+    } catch (e) {
+      dispatch(removeBatchFromUploadQueue({ batchUid }));
+      dispatch(updateBatchUploadProgress({ batchUid, progress: -1 }));
+      __log("PaneDrive::handleUpdate", files, e);
+    }
     debugger;
   }
 );
