@@ -1,4 +1,11 @@
-import React, { forwardRef, HTMLProps, KeyboardEvent } from "react";
+import React, {
+  ChangeEvent,
+  ChangeEventHandler,
+  FormEventHandler,
+  forwardRef,
+  HTMLProps,
+  KeyboardEvent,
+} from "react";
 
 const TextArea = forwardRef<
   HTMLTextAreaElement,
@@ -18,7 +25,7 @@ interface InsetLabelSmallInputProps {
   labelClassName?: string;
   textClassName?: string;
   value?: string;
-  onChange?: (e: KeyboardEvent) => void;
+  onChange?: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
   multiline?: boolean;
   properties?: {};
   field?: any;
@@ -43,7 +50,7 @@ export default function InsetLabelSmallInput(props: InsetLabelSmallInputProps) {
     fieldState,
     optional = false,
     disabled = false,
-    onChange
+    onChange,
   } = props;
 
   const InputComponent = multiline ? TextArea : Input;

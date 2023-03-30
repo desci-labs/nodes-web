@@ -8,7 +8,7 @@ import { ResearchObjectV1Author } from "@desci-labs/desci-models";
 import ClickableAddIcon from "@components/atoms/ClickableIcon/ClickableAddIcon";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { PropsWithChildren, useState } from "react";
-import CreditsModal from "@src/components/organisms/PopOver/CreditsModal";
+import CreditsModal from "@src/components/organisms/PopOver/CreditsModal/CreditsModal";
 
 interface CreditsProps {}
 

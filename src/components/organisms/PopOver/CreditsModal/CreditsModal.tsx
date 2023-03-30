@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useSetter } from "@src/store/accessors";
 import { ResearchObjectV1Author } from "@desci-labs/desci-models";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
@@ -7,14 +7,12 @@ import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 import { Controller, useForm } from "react-hook-form";
 import InsetLabelSmallInput from "@src/components/molecules/FormInputs/InsetLabelSmallInput";
 import DividerSimple from "@src/components/atoms/DividerSimple";
+import { AuthorFormValues, authorsFormSchema, OrcidPartsKeys } from "./schema";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 interface CreditModalProps {
   author?: ResearchObjectV1Author;
 }
-
-type OrcidPartsKeys = "orcid1" | "orcid2" | "orcid3" | "orcid4";
-
-type OrcidParts = Record<OrcidPartsKeys, string>;
 
 export default function CreditsModal(props: ModalProps & CreditModalProps) {
   const dispatch = useSetter();
@@ -25,7 +23,8 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
     watch,
     handleSubmit,
     formState: { errors },
-  } = useForm<ResearchObjectV1Author & OrcidParts>({
+  } = useForm<AuthorFormValues>({
+    mode: "onChange",
     defaultValues: {
       name: props?.author?.name,
       googleScholar: props?.author?.googleScholar ?? "",
@@ -35,17 +34,23 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
       orcid3: props?.author?.orcid?.split("-")[2] ?? "",
       orcid4: props?.author?.orcid?.split("-")[3] ?? "",
     },
-    reValidateMode: "onBlur",
+    reValidateMode: "onChange",
+    resolver: yupResolver(authorsFormSchema),
   });
 
-  const name = watch("name");
-  console.log(props.author, name, watch("orcid1"), watch("googleScholar"));
+  // const name = watch("name");
+  console.log("onChange", watch("orcid1"), watch("orcid2"));
 
   const onSubmit = (data: ResearchObjectV1Author) => {
     props?.onDismiss?.();
   };
 
-  const orcid = watch("orcid");
+  // const orcid = watch("orcid");
+  console.log("Errors", errors);
+
+  useEffect(() => {
+    console.log("ORCid1 Errors", errors.orcid1);
+  }, [watch("orcid1")]);
 
   const OrcidInput = ({ name }: { name: OrcidPartsKeys }) => (
     <Controller
@@ -54,15 +59,11 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
       render={({ field }) => (
         <InsetLabelSmallInput
           label=""
+          // value={watch(name)}
+          // onChange={(e: ChangeEvent<HTMLInputElement>) => {
+          //   console.log("Changed", name, e.target.value);
+          // }}
           field={field}
-          value={watch(name)}
-          onChange={(value) => {
-            console.log("update orcid", value);
-            if (!Number.isNaN(value) && typeof Number(value) === "number") {
-              // set part vallue
-              console.log("Set part", name, value);
-            }
-          }}
         />
       )}
     />

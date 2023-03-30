@@ -65,6 +65,7 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
     setAddress(account!);
   }, [account]);
 
+  console.log("Manifest CID", currentObjectId, manifestCid);
   const createCommit = async () => {
     setLoading(true);
 
@@ -97,6 +98,7 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
 
         let base64UuidToBase16 = convertUUIDToHex(currentObjectId!);
 
+        console.log("Publish CID", base64UuidToBase16, manifestCid);
         let exists = false;
         try {
           exists = (await contract.functions.exists(base64UuidToBase16))[0];
@@ -105,6 +107,7 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
         }
         let tx;
         let cid = getBytesFromCIDString(manifestCid!);
+        console.log("DPID CID", cid, manifestCid);
         // debugger;
         // check if token exists, if so update operation
         const DEFAULT_DPID_PREFIX_STRING = "beta";
