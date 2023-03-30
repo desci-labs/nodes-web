@@ -2,6 +2,7 @@ import {
   ResearchObjectComponentAnnotation,
   ResearchObjectComponentType,
   ResearchObjectV1,
+  ResearchObjectV1Author,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
@@ -91,6 +92,19 @@ export const nodeReaderSlice = createSlice({
     setManifest: (state, { payload }: PayloadAction<ResearchObjectV1>) => {
       state.manifestStatus = ManifestDataStatus.Idle;
       state.manifest = payload;
+    },
+    addNodeAuthor: (
+      state,
+      { payload }: PayloadAction<ResearchObjectV1Author>
+    ) => {
+      state.manifest?.authors?.push(payload);
+    },
+    removeAuthor: (
+      state,
+      { payload }: PayloadAction<{ authorIndex: number }>
+    ) => {
+      if (!state.manifest?.authors) return state;
+      state.manifest.authors.splice(payload.authorIndex, 1);
     },
     deleteComponent: (
       state,
@@ -207,7 +221,6 @@ export const nodeReaderSlice = createSlice({
         state.manifest.components = components;
       }
     },
-
     setManifestCid: (state, { payload }: PayloadAction<string>) => {
       state.manifestCid = payload;
     },
@@ -357,6 +370,8 @@ export const {
   setIsNew,
   toggleMode,
   setManifest,
+  removeAuthor,
+  addNodeAuthor,
   setPublicView,
   setEditNodeId,
   resetEditNode,
