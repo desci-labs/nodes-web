@@ -15,9 +15,9 @@ import {
   FileDir,
   FileType,
 } from "./organisms/Drive";
-import { UploadQueueItem } from "./organisms/UploadPanel";
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "./molecules/AnnotationEditor/components";
+import { UploadQueueItem } from "@src/state/drive/types";
 
 export const tempDate = "12/02/2022 7:00PM";
 

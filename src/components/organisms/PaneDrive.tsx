@@ -59,7 +59,14 @@ import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { setManifestCid, setManifestData } from "@src/state/nodes/viewer";
 import { useDrive } from "@src/state/drive/hooks";
-import { addFilesToDrive, fetchTreeThunk } from "@src/state/drive/driveSlice";
+import {
+  addFilesToDrive,
+  addItemsToUploadQueue,
+  fetchTreeThunk,
+  removeBatchFromUploadQueue,
+  setShowUploadPanel,
+  updateBatchUploadProgress,
+} from "@src/state/drive/driveSlice";
 
 export interface DatasetMetadataInfo {
   prepopulateFromName?: string;
@@ -98,19 +105,12 @@ const PaneDrive = () => {
     droppedTransferItemList,
     setDroppedFileList,
     setDroppedTransferItemList,
-    setUploadQueue,
-    uploadQueue,
-    setShowUploadPanel,
-    setBatchUploadProgress,
-    batchUploadProgress,
     privCidMap,
     setPrivCidMap,
   } = useManuscriptController([
     "privCidMap",
-    "uploadQueue",
     "droppedFileList",
     "droppedTransferItemList",
-    "batchUploadProgress",
   ]);
   const dispatch = useSetter();
   const {
@@ -120,7 +120,7 @@ const PaneDrive = () => {
     mode,
   } = useNodeReader();
 
-  const { nodeTree, status, currentDrive } = useDrive();
+  const { nodeTree, status, currentDrive, uploadQueue } = useDrive();
 
   // const [directory, setDirectory] = useState<Array<DriveObject>>([]);
   // const [renameComponentId, setRenameComponentId] = useState<string | null>(
@@ -136,10 +136,6 @@ const PaneDrive = () => {
   // const datasetMetadataInfoRef = useRef<DatasetMetadataInfo>(
   //   datasetMetadataInfoRefDefaults
   // );
-
-  function updateProgress(batch: string, progress: number) {
-    setBatchUploadProgress({ ...batchUploadProgress, [batch]: progress });
-  }
 
   useEffect(() => {
     if (loading) setLoading(false);
@@ -178,16 +174,20 @@ const PaneDrive = () => {
       const batchUid = Date.now().toString();
       if (dataDrive && placeHolder) {
         dataDrive.contains?.push(placeHolder);
-        setBatchUploadProgress({ ...batchUploadProgress, [batchUid]: 0 });
-        setUploadQueue([
-          ...uploadQueue,
-          {
-            nodeUuid: currentObjectId!,
-            driveObj: placeHolder,
-            batchUid,
-          },
-        ]);
-        setShowUploadPanel(true);
+        dispatch(updateBatchUploadProgress({ batchUid, progress: 0 }));
+
+        dispatch(
+          addItemsToUploadQueue({
+            items: [
+              {
+                nodeUuid: currentObjectId!,
+                path: placeHolder.path!,
+                batchUid,
+              },
+            ],
+          })
+        );
+        dispatch(setShowUploadPanel(true));
       }
       // if (dataDrive && placeHolder)
       //   setDirectory([...dataDrive.contains!, placeHolder]);
@@ -202,14 +202,16 @@ const PaneDrive = () => {
             (e) => {
               const perc = Math.ceil((e.loaded / e.total) * 100);
               const passedPerc = perc < 90 ? perc : 90;
-              updateProgress(batchUid, passedPerc);
+              dispatch(
+                updateBatchUploadProgress({ batchUid, progress: passedPerc })
+              );
             }
           );
         if (rootDataCid) {
           setPrivCidMap({ ...privCidMap, [rootDataCid]: true });
-          updateProgress(batchUid, 100);
+          dispatch(updateBatchUploadProgress({ batchUid, progress: 100 }));
         }
-        setUploadQueue(removeFromUploadQueue(uploadQueue, batchUid));
+        dispatch(removeBatchFromUploadQueue({ batchUid }));
         if (placeHolder) {
           placeHolder.cid = rootDataCid;
           placeHolder.path = `Data/${rootDataCid}`;
@@ -234,8 +236,9 @@ const PaneDrive = () => {
         resetAccessStatus(nodeTree!);
       } catch (e: any) {
         console.log(e);
-        updateProgress(batchUid, -1);
-        setUploadQueue(removeFromUploadQueue(uploadQueue, batchUid));
+        dispatch(updateBatchUploadProgress({ batchUid, progress: -1 }));
+        dispatch(removeBatchFromUploadQueue({ batchUid }));
+
         if (placeHolder) placeHolder.accessStatus = AccessStatus.FAILED;
 
         __log(
@@ -341,9 +344,9 @@ const PaneDrive = () => {
           nodeUuid: currentObjectId!,
         };
       });
-      setBatchUploadProgress({ ...batchUploadProgress, [batchUid]: 0 });
-      setUploadQueue([...uploadQueue, ...qItems]);
-      setShowUploadPanel(true);
+      dispatch(updateBatchUploadProgress({ batchUid, progress: 0 }));
+      dispatch(addItemsToUploadQueue({ items: qItems }));
+      dispatch(setShowUploadPanel(true));
       const snapshotNodeUuid = currentObjectId!;
       try {
         const { manifest, rootDataCid, manifestCid, tree, date } =
@@ -356,13 +359,15 @@ const PaneDrive = () => {
             (e) => {
               const perc = Math.ceil((e.loaded / e.total) * 100);
               const passedPerc = perc < 90 ? perc : 90;
-              updateProgress(batchUid, passedPerc);
+              dispatch(
+                updateBatchUploadProgress({ batchUid, progress: passedPerc })
+              );
             }
           );
-        setUploadQueue(removeFromUploadQueue(uploadQueue, batchUid));
+        dispatch(removeBatchFromUploadQueue({ batchUid }));
         if (rootDataCid) {
           setPrivCidMap({ ...privCidMap, [rootDataCid]: true });
-          updateProgress(batchUid, 100);
+          dispatch(updateBatchUploadProgress({ batchUid, progress: 100 }));
         }
 
         const dataDriveIdx = nodeTree?.contains?.findIndex(
@@ -436,8 +441,8 @@ const PaneDrive = () => {
         resetAccessStatus(nodeTree!);
       } catch (e: any) {
         console.log(e);
-        setUploadQueue(removeFromUploadQueue(uploadQueue, batchUid));
-        updateProgress(batchUid, -1);
+        dispatch(removeBatchFromUploadQueue({ batchUid }));
+        dispatch(updateBatchUploadProgress({ batchUid, progress: -1 }));
 
         placeholders.forEach((ph) => (ph.accessStatus = AccessStatus.FAILED));
 

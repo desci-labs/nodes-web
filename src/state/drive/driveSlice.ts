@@ -35,9 +35,10 @@ import {
   AddFilesToDrivePayload,
   AddItemsToUploadQueueAction,
   NavigateToDriveByPathAction,
+  removeBatchFromUploadQueueAction,
   UpdateBatchUploadProgressAction,
+  UploadQueueItem,
 } from "./types";
-import { UploadQueueItem } from "@src/components/organisms/UploadPanel";
 import { reactRouterV6Instrumentation } from "@sentry/react";
 interface DriveState {
   nodeTree: DriveObject | null;
@@ -47,6 +48,7 @@ interface DriveState {
   uploadStatus: RequestStatus;
   uploadQueue: UploadQueueItem[];
   batchUploadProgress: Record<string, number>;
+  showUploadPanel: boolean;
 }
 
 const initialState: DriveState = {
@@ -57,6 +59,7 @@ const initialState: DriveState = {
   uploadStatus: "idle", //remove
   uploadQueue: [],
   batchUploadProgress: {},
+  showUploadPanel: false,
 };
 
 export const driveSlice = createSlice({
@@ -85,25 +88,34 @@ export const driveSlice = createSlice({
       }
       state.currentDrive = driveFound;
     },
+    setShowUploadPanel: (state, action: { payload: boolean }) => {
+      state.showUploadPanel = action.payload;
+    },
     addItemsToUploadQueue: (state, action: AddItemsToUploadQueueAction) => {
       const { items } = action.payload;
       state.uploadQueue = [...state.uploadQueue, ...items];
-      return;
     },
     updateBatchUploadProgress: (
       state,
       action: UpdateBatchUploadProgressAction
     ) => {
-      const { batchUid, batchProgress } = action.payload;
-      state.batchUploadProgress[batchUid] = batchProgress;
-      return;
+      const { batchUid, progress } = action.payload;
+      state.batchUploadProgress[batchUid] = progress;
     },
     cleanupUploadProgressMap: (state) => {
       const incomplete = Object.entries(state.batchUploadProgress).filter(
         (k, v) => v !== 100
       );
       state.batchUploadProgress = Object.fromEntries(incomplete);
-      return;
+    },
+    removeBatchFromUploadQueue: (
+      state,
+      action: removeBatchFromUploadQueueAction
+    ) => {
+      const { batchUid } = action.payload;
+      state.uploadQueue = state.uploadQueue.filter(
+        (item) => item.batchUid !== batchUid
+      );
     },
   },
   extraReducers: (builder) => {
@@ -119,7 +131,6 @@ export const driveSlice = createSlice({
         if (action.payload.deprecated) {
           state.nodeTree = tree as DriveObject;
           state.currentDrive = tree as DriveObject;
-
           return;
         }
         const manifest = action.payload.manifest!;
@@ -192,6 +203,8 @@ export const {
   addItemsToUploadQueue,
   updateBatchUploadProgress,
   cleanupUploadProgressMap,
+  setShowUploadPanel,
+  removeBatchFromUploadQueue,
 } = driveSlice.actions;
 
 export interface FetchTreeThunkParams {
@@ -250,10 +263,43 @@ export const addFilesToDrive = createAsyncThunk(
     const state = getState() as RootState;
     const { manifest, currentObjectId, manifestCid } = state.nodes.nodeReader;
     const { nodeTree } = state.drive;
-    const { files } = payload;
+    const { files, overwritePathContext } = payload;
     if (!nodeTree || !manifest) return;
 
+    //Transform files to usable data for displaying state (upload panel items, optimistic drives)
+    const dirs: Record<string, string> = {};
+    const fileInfo = Array.prototype.filter
+      .call(files, (f) => {
+        const split = f.fullPath.split("/");
+        if (split.length === 2) return split;
+        if (split.length === 3) {
+          dirs[split[1]] = "/" + split[1];
+        }
+        return false;
+      })
+      .map((f) => {
+        const path = overwritePathContext
+          ? overwritePathContext + f.fullPath
+          : state.drive.currentDrive!.path + f.fullPath;
+        return {
+          isDirectory: f.isDirectory,
+          name: f.name,
+          path: path,
+        };
+      });
+    Object.keys(dirs).forEach((key) =>
+      fileInfo.push({ isDirectory: true, name: key, path: dirs[key] })
+    );
+
     const batchUid = Date.now().toString();
+    const uploadQueueItems = fileInfo.map((f) => ({
+      nodeUuid: currentObjectId!,
+      path: f.path,
+      batchUid: batchUid,
+    }));
+    dispatch(addItemsToUploadQueue({ items: uploadQueueItems }));
+    dispatch(updateBatchUploadProgress({ batchUid: batchUid, progress: 0 }));
+    debugger;
   }
 );
 

@@ -14,13 +14,9 @@ import { useDrive } from "@src/state/drive/hooks";
 import {
   cleanupUploadProgressMap,
   navigateToDriveByPath,
+  setShowUploadPanel,
 } from "@src/state/drive/driveSlice";
-
-export interface UploadQueueItem {
-  nodeUuid: string;
-  path: string;
-  batchUid: string;
-}
+import { UploadQueueItem } from "@src/state/drive/types";
 
 export interface UploadPanelProps {
   show: boolean;
@@ -31,10 +27,7 @@ const UploadPanel: React.FC<UploadPanelProps> = ({ show }) => {
   const { batchUploadProgress, uploadQueue } = useDrive();
   const dispatch = useSetter();
 
-  const { setShowUploadPanel, setDriveJumpDir } = useManuscriptController([
-    "uploadQueue",
-    "batchUploadProgress",
-  ]);
+  const { setDriveJumpDir } = useManuscriptController([]);
   const [localQueue, setLocalQueue] = useState<UploadQueueItem[]>([]);
   const [uploadTransitioned, setUploadTransitioned] = useState<
     Record<string, boolean>
@@ -79,7 +72,7 @@ const UploadPanel: React.FC<UploadPanelProps> = ({ show }) => {
 
   function close() {
     dispatch(cleanupUploadProgressMap);
-    setShowUploadPanel(false);
+    dispatch(setShowUploadPanel(false));
   }
 
   const globalQLength = uploadQueue.length;

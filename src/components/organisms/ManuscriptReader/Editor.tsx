@@ -19,6 +19,7 @@ import VSCodeViewer from "../VSCodeViewer";
 import ComponentStackView from "./ComponentStackView";
 import { useManuscriptController } from "./ManuscriptController";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import { useDrive } from "@src/state/drive/hooks";
 
 interface ReaderViewerProps {
   isLoading: boolean;
@@ -27,20 +28,18 @@ export default function Editor({ isLoading }: ReaderViewerProps) {
   const dispatch = useSetter();
   const { isDraggingFiles, componentStack } = useNodeReader();
   const { isToolbarVisible } = useGetter((state) => state.preferences);
+  const { showUploadPanel } = useDrive();
 
   const {
     isAddingComponent,
     isAddingSubcomponent,
     setIsAddingSubcomponent,
     setIsAddingComponent,
-    showUploadPanel,
   } = useManuscriptController([
     "scrollToPage$",
     "isAddingComponent",
     "isAddingSubcomponent",
-    "showUploadPanel",
   ]);
-
 
   return (
     <DragDropZone>

@@ -9,10 +9,9 @@ import {
 import { EditorHistory } from "@components/organisms/ManuscriptComponentsSection";
 import { PageMetadata } from "@components/organisms/Paper/usePageMetadata";
 import { HistoryEntryProps } from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/HistoryEntry";
-import { UploadQueueItem } from "@components/organisms/UploadPanel";
 import { DriveJumpingParams, DriveObject } from "@components/organisms/Drive";
 import { Wallet } from "@src/state/api/types";
-
+import { UploadQueueItem } from "@src/state/drive/types";
 
 /* ########################### Customizable options ################################ */
 
@@ -67,9 +66,6 @@ interface State {
   showCitationModal: boolean;
   selectedHistory: HistoryEntryProps | null;
   showPublicationDetails: boolean;
-  showUploadPanel: boolean;
-  uploadQueue: UploadQueueItem[];
-  batchUploadProgress: Record<string, number>;
   driveJumpDir: DriveJumpingParams | null;
   showProfileUpdater: boolean;
   componentToCite: DriveObject | null;
@@ -125,9 +121,6 @@ export const initialState: State = {
   showCitationModal: false,
   selectedHistory: null,
   showPublicationDetails: false,
-  showUploadPanel: false,
-  uploadQueue: [],
-  batchUploadProgress: {},
   driveJumpDir: null,
   showProfileUpdater: false,
   privCidMap: {},
