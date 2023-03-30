@@ -122,7 +122,10 @@ export const nodeReaderSlice = createSlice({
       { payload }: PayloadAction<{ authorIndex: number }>
     ) => {
       if (!state.manifest?.authors) return state;
-      state.manifest.authors.splice(payload.authorIndex, 1);
+      const authors = state.manifest.authors.filter(
+        (_, idx) => idx !== payload.authorIndex
+      );
+      state.manifest.authors = authors;
     },
     deleteComponent: (
       state,

@@ -47,11 +47,7 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
     resolver: yupResolver(authorsFormSchema),
   });
 
-  // const name = watch("name");
-  console.log("onChange", watch("orcid1"), watch("orcid2"));
-
   const onSubmit = (data: ResearchObjectV1Author) => {
-    console.log("data", data);
     const { name, googleScholar, orcid } = data;
     if (props.author && props.id) {
       dispatch(

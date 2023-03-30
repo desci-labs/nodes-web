@@ -9,29 +9,14 @@ import ClickableAddIcon from "@components/atoms/ClickableIcon/ClickableAddIcon";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { PropsWithChildren, useState } from "react";
 import CreditsModal from "@src/components/organisms/PopOver/CreditsModal/CreditsModal";
+import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
+import { useSetter } from "@src/store/accessors";
+import { removeAuthor, saveManifestDraft } from "@src/state/nodes/viewer";
 
 interface CreditsProps {}
 
-const mockAuthors: ResearchObjectV1Author[] = [
-  {
-    name: "John Daily",
-    orcid: "1234-1234-1234-1234",
-  },
-  {
-    name: "Mary Maller",
-    orcid: "1234-1234-1234-1234",
-  },
-  {
-    name: "Nicolas Gailly",
-    orcid: "1234-1234-1234-1234",
-  },
-  {
-    name: "Anca Nitulescu",
-    orcid: "1234-1234-1234-1234",
-  },
-];
-
 const Credits = (props: CreditsProps) => {
+  const dispatch = useSetter();
   const { manifest: manifestData, mode } = useNodeReader();
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -45,6 +30,12 @@ const Credits = (props: CreditsProps) => {
   }
 
   const isEditing = mode === "editor";
+
+  const handleDelete = (authorIndex: number) => {
+    console.log("Delete", authorIndex, manifestData?.authors?.[authorIndex]);
+    dispatch(removeAuthor({ authorIndex }));
+    dispatch(saveManifestDraft({}));
+  };
 
   return (
     <CollapsibleSection
@@ -95,6 +86,9 @@ const Credits = (props: CreditsProps) => {
                   setIsOpen(true);
                   setSelectedIndex(index);
                 }}
+                onHandleDelete={() => {
+                  handleDelete(index);
+                }}
               >
                 <Section
                   key={index}
@@ -139,6 +133,7 @@ interface CreditsEditorProps {
   id: number;
   expand: boolean;
   onHandleEdit: () => void;
+  onHandleDelete: () => void;
 }
 
 function CreditsEditorWrapper({
@@ -146,7 +141,43 @@ function CreditsEditorWrapper({
   id,
   expand = false,
   onHandleEdit,
+  onHandleDelete,
 }: PropsWithChildren<CreditsEditorProps>) {
+  const { dialogs, setDialogs } = useManuscriptController(["dialogs"]);
+
+  const doDelete = () => {
+    setDialogs([
+      ...dialogs,
+      {
+        title: "Are you sure?",
+        message: "",
+        actions: ({ close }) => {
+          return (
+            <div className="flex gap-2 pt-4">
+              <button
+                className="text-md cursor-pointer rounded-md shadow-sm text-white bg-black px-3 py-1 hover:bg-neutrals-gray-2"
+                onClick={() => {
+                  close();
+                }}
+              >
+                Cancel
+              </button>
+
+              <button
+                className="text-md cursor-pointer rounded-md shadow-sm text-white bg-red-700 px-3 py-1 hover:bg-neutrals-gray-3"
+                onClick={() => {
+                  onHandleDelete();
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          );
+        },
+      },
+    ]);
+  };
+
   return (
     <div className="flex transition-all">
       {children}
@@ -164,7 +195,7 @@ function CreditsEditorWrapper({
             <IconPen stroke="white" width={10} />
           </button>
           <button
-            onClick={() => {}}
+            onClick={doDelete}
             className="flex items-center justify-center cursor-pointer w-6 h-6 rounded-full bg-gray-300 text-black dark:text-white dark:bg-neutrals-black"
           >
             <IconDeleteForever
