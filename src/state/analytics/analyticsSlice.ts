@@ -78,7 +78,7 @@ export const adminAnalyticsSlice = createSlice({
          * https://redux-toolkit.js.org/usage/immer-reducers#immutability-and-redux
          */
         state.status = "succeeded";
-        state.newUsersToday = action.payload.newUsersToday;
+        state.newUsersToday = action.payload.newUsersToday || 0;
         state.newUsersInLast7Days = action.payload.newUsersInLast7Days || 0;
         state.newUsersInLast30Days = action.payload.newUsersInLast30Days || 0;
         state.newNodesToday = action.payload.newNodesToday || 0;
