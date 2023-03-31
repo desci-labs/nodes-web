@@ -323,10 +323,10 @@ const CitationPopover = (props: ModalProps) => {
 
   return (
     <Modal
-      {...props}
       isOpen={showCitationModal}
       onDismiss={close}
       $maxWidth={650}
+      $scrollOverlay={true}
     >
       <div className="px-6 py-5 text-white">
         <Modal.Header

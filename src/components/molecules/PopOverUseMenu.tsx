@@ -24,6 +24,7 @@ const PopOverUseMenu = () => {
         close();
       }}
       $maxWidth={600}
+      $scrollOverlay={true}
     >
       <div className="px-6 py-5 text-white relative">
         <Modal.Header

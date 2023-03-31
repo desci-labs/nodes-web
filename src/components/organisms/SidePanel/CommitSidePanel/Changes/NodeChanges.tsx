@@ -95,9 +95,10 @@ const NodeChanges = (props: ChangesComponentProps) => {
         </div>
       </CollapsibleSection>
       <Modal
-        onDismiss={() => setViewDiff(false)}
+        $minHeight={20}
+        $scrollOverlay={true}
         isOpen={viewDiff}
-        $minHeight={40}
+        onDismiss={() => setViewDiff(false)}
       >
         <Modal.Header onDismiss={() => setViewDiff(false)} />
         <div className="text-[10px] leading-3">
