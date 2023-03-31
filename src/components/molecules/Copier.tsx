@@ -1,5 +1,6 @@
-import { CheckIcon, LinkIcon } from "@heroicons/react/solid";
-import { useState } from "react";
+import { CheckIcon } from "@heroicons/react/solid";
+import { ButtonHTMLAttributes, FC, useState } from "react";
+import { BsClipboard } from "react-icons/bs";
 
 export function useCopier() {
   const [copied, setCopied] = useState(false);
@@ -16,18 +17,52 @@ export function useCopier() {
   return { handleCopy, copied };
 }
 
-export default function Copier(props: { text: string; classes?: string }) {
+export default function Copier(props: {
+  text: string;
+  classes?: string;
+  icon?: FC<any>;
+}) {
   const { handleCopy, copied } = useCopier();
+
   return (
-    <div className="flex items-center justify-center text-center border-none bg-black w-8 p-2 text-sm rounded-xl">
+    <>
       {copied ? (
-        <CheckIcon className={props.classes ?? "w-12"} />
+        <CheckIcon className={`w-8 ${props.classes ?? ""}`} />
       ) : (
-        <LinkIcon
-          className={`cursor-pointer w-8 ${props.classes ?? ""}`}
-          onClick={() => handleCopy(props.text)}
-        />
+        <>
+          {props?.icon ? (
+            <>{props?.icon({ onClick: () => handleCopy(props.text) })}</>
+          ) : (
+            <BsClipboard
+              className={`cursor-pointer w-8 ${props.classes ?? ""}`}
+              onClick={() => handleCopy(props.text)}
+            />
+          )}
+        </>
       )}
-    </div>
+    </>
+  );
+}
+
+export function CopyButton(
+  props: ButtonHTMLAttributes<HTMLButtonElement> & {
+    text: string;
+    label: string;
+  }
+) {
+  const { handleCopy, copied } = useCopier();
+
+  return (
+    <button
+      {...props}
+      className={`text-sm font-bold text-tint-primary hover:text-tint-primary-hover disabled:text-neutrals-gray-4 ${props.className}`}
+      onClick={() => handleCopy(props.text)}
+    >
+      {copied ? (
+        <CheckIcon className="w-5 h-5" />
+      ) : (
+        <BsClipboard className="w-5 h-5" />
+      )}
+    </button>
   );
 }

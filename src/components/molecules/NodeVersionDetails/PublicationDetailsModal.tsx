@@ -8,6 +8,7 @@ import useVersionDetails from "./useVersionDetails";
 import { CHAINS } from "@connectors/../chains";
 import { DEFAULT_CHAIN } from "../ConnectWithSelect";
 import { useHistoryReader, useNodeReader } from "@src/state/nodes/hooks";
+import { LinkIcon } from "@heroicons/react/solid";
 
 const ACTIVE_CHAIN = CHAINS[DEFAULT_CHAIN] as any;
 const BLOCK_EXPLORER_URL = ACTIVE_CHAIN && ACTIVE_CHAIN.blockExplorerUrls[0];
@@ -152,7 +153,16 @@ function Details(props: {
               {props.detail}
             </div>
           )}
-          {props.copy && <Copier text={props.copy} />}
+          {props.copy && (
+            <div className="flex items-center justify-center text-center border-none w-8 bg-black p-2 text-sm rounded-xl">
+              <Copier
+                text={props.copy}
+                icon={(props) => (
+                  <LinkIcon className="w-8 cursor-pointer" {...props} />
+                )}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
