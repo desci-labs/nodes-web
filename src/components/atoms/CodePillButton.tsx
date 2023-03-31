@@ -51,9 +51,20 @@ const CodePillButton = ({
                   // !!!HARDCODED
 
                   if (href) {
-                    const [blank, name, path, sha] = href
+                    const [query, name, path, sha] = href
                       .split("?")[1]
                       .split(/&?[nusp]=/);
+                    const queryParams = query.split("&");
+                    const queryObj = queryParams.reduce(
+                      (acc: any, curr: string) => {
+                        const [key, value] = curr.split("=");
+                        acc[key] = value;
+                        return acc;
+                      },
+                      {}
+                    );
+                    debugger;
+
                     setRequestedCodeFile({
                       name,
                       path,

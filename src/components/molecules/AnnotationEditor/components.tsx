@@ -328,6 +328,9 @@ export const DirectoryLinkComponent = (props: DirectoryLinkComponentProps) => {
   const { href, fileName, children, readOnly, attributes } = props;
   const [showCopiedText, setShowCopiedText] = useState<boolean>(false);
 
+  const [showEditSyntaxModal, setShowEditSyntaxModal] =
+    useState<boolean>(false);
+
   const selected = useSelected();
   const focused = useFocused();
 
@@ -385,20 +388,21 @@ export const DirectoryLinkComponent = (props: DirectoryLinkComponentProps) => {
                   />
                   <div>Copy Link</div>
                 </div>
-                {/* <div className='font-thin'>|</div>
-                  <div
-                    className='flex flex-row items-center m-1 gap-1 cursor-pointer'
-                  >
-                    <IconPen
-                      fill="white"
-                      width={12}
-                      height={12}
-                      strokeWidth={2}
-                    />
-                    <div>
-                      Edit Syntax
-                    </div>
-                  </div> */}
+                <div className="font-thin">|</div>
+                <div
+                  className="flex flex-row items-center m-1 gap-1 cursor-pointer"
+                  onClick={() => {
+                    setShowEditSyntaxModal(true);
+                  }}
+                >
+                  <IconPen
+                    fill="white"
+                    width={12}
+                    height={12}
+                    strokeWidth={2}
+                  />
+                  <div>Edit Syntax</div>
+                </div>
               </div>
             )}
           </div>
