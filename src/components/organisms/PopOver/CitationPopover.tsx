@@ -10,7 +10,7 @@ import {
   useState,
 } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useCopier } from "@components/molecules/Copier";
+import { CopyButton, useCopier } from "@components/molecules/Copier";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import { getPublishedVersions } from "@src/api";
 import { AccessStatus, DriveObject, FileDir, FileType } from "../Drive";
@@ -281,28 +281,7 @@ const CitationComponent = () => {
   );
 };
 
-function CopyButton(
-  props: ButtonHTMLAttributes<HTMLButtonElement> & {
-    text: string;
-    label: string;
-  }
-) {
-  const { handleCopy, copied } = useCopier();
 
-  return (
-    <button
-      {...props}
-      className={`text-sm font-bold text-tint-primary hover:text-tint-primary-hover disabled:text-neutrals-gray-4 ${props.className}`}
-      onClick={() => handleCopy(props.text)}
-    >
-      {copied ? (
-        <CheckIcon className="w-5 h-5" />
-      ) : (
-        <BsClipboard className="w-5 h-5" />
-      )}
-    </button>
-  );
-}
 
 function Box(props: PropsWithChildren<{}>) {
   return (
@@ -323,10 +302,10 @@ const CitationPopover = (props: ModalProps) => {
 
   return (
     <Modal
-      {...props}
       isOpen={showCitationModal}
       onDismiss={close}
       $maxWidth={650}
+      $scrollOverlay={true}
     >
       <div className="px-6 py-5 text-white">
         <Modal.Header

@@ -105,6 +105,7 @@ export const ReferAFriendModal = ({
       <Modal
         $maxWidth={isSendComplete ? 400 : 600}
         isOpen={showReferralModal}
+        $scrollOverlay={true}
         onDismiss={() => {
           onClose?.();
         }}

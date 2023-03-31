@@ -41,6 +41,7 @@ export function ProfileInfoWrapper(props: ProfilePopOverProps) {
         setShowProfileUpdater(false);
       }}
       isOpen={showProfileUpdater}
+      $scrollOverlay={true}
       $maxWidth={700}
     >
       <div className="py-4 px-6 text-neutrals-gray-5 lg:w-[700px]">

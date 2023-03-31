@@ -17,6 +17,7 @@ import { lockScroll, restoreScroll } from "@src/components/utils";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { toggleCommitPanel } from "@src/state/nodes/viewer";
+import { animated, useTransition } from "react-spring";
 
 // @ts-ignore
 const Wrapper: StyledComponent<"div", any, any, any> = styled(SidePanel).attrs({
@@ -53,6 +54,14 @@ const CommitSidePanel = (props: CommitSidePanelProps) => {
 
   const { isValid } = useNodeValidator();
   const { isError: fail } = useNodeDiff();
+
+  // Panel overlay transition
+  const fadeTransition = useTransition(isCommitPanelOpen, {
+    config: { duration: 200 },
+    from: { opacity: 0 },
+    enter: { opacity: 1 },
+    leave: { opacity: 0 },
+  });
 
   // const [fail, setFail] = useState(true);
   const panelOrientation = "left";
@@ -91,71 +100,85 @@ const CommitSidePanel = (props: CommitSidePanelProps) => {
   }
 
   return (
-    <div
-      id="commit-sidepanel-overlay"
-      className="fixed w-screen h-screen top-0 left-0 z-10"
-      style={{ background: "rgba(0, 0, 0, 0.86)" }}
-      onClick={() => dispatch(toggleCommitPanel(false))}
-    >
-      <Wrapper
-        orientation={panelOrientation}
-        isOpen={isCommitPanelOpen}
-        width={320}
-      >
-        <div className="relative h-full" onClick={(e) => e.stopPropagation()}>
-          <PanelCloseButton
-            panelOrientation={panelOrientation}
-            visible={isCommitPanelOpen}
-            onClick={() => dispatch(toggleCommitPanel(false))}
-          />
-          <ContentWrapper>
-            <div className="p-4">
-              <Title>Commit Changes</Title>
-              <Subtitle>
-                Review your changes and complete the items below before
-                publishing
-              </Subtitle>
-            </div>
-            <PerfectScrollbar>
-              <div className="py-4">
-                <NodeChanges />
-                <NodeMetadata />
-                <General />
-              </div>
-            </PerfectScrollbar>
-            <Footer>
-              <FlexRowSpaceBetween>
-                <FooterUpdatesText numUpdates={5} />
-                <PrimaryButton
-                  onClick={() => setShowAdditionalInfoPopover(true)}
-                  disabled={!isValid || fail}
+    <>
+      {fadeTransition(
+        ({ opacity }, item) =>
+          item && (
+            <animated.div
+              id="commit-sidepanel-overlay"
+              className="fixed w-screen h-screen top-0 left-0 z-10"
+              style={{
+                background: "rgba(0, 0, 0, 0.86)",
+                opacity: opacity.to({ range: [0.0, 1.0], output: [0, 1] }),
+                // opacity: opacity.to({ range: [0.0, 1.0], output: [0, 1] }),
+              }}
+              onClick={() => dispatch(toggleCommitPanel(false))}
+            >
+              <Wrapper
+                orientation={panelOrientation}
+                isOpen={isCommitPanelOpen}
+                width={320}
+              >
+                <div
+                  className="relative h-full"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  Continue
-                </PrimaryButton>
-              </FlexRowSpaceBetween>
-            </Footer>
-          </ContentWrapper>
-        </div>
-        <CommitAdditionalInfoPopOver
-          isOpen={showAdditionalInfoPopover}
-          onDismiss={() => {
-            setShowAdditionalInfoPopover(false);
-          }}
-          onSuccess={() => {
-            setShowCommitStatusPopover(true);
-          }}
-        />
-        <CommitStatusPopover
-          isOpen={showCommitStatusPopover}
-          onDismiss={() => {
-            setShowCommitStatusPopover(false);
-          }}
-          onSuccess={() => {
-            dispatch(toggleCommitPanel(false));
-          }}
-        />
-      </Wrapper>
-    </div>
+                  <PanelCloseButton
+                    panelOrientation={panelOrientation}
+                    visible={isCommitPanelOpen}
+                    onClick={() => dispatch(toggleCommitPanel(false))}
+                  />
+                  <ContentWrapper>
+                    <div className="p-4">
+                      <Title>Commit Changes</Title>
+                      <Subtitle>
+                        Review your changes and complete the items below before
+                        publishing
+                      </Subtitle>
+                    </div>
+                    <PerfectScrollbar>
+                      <div className="py-4">
+                        <NodeChanges />
+                        <NodeMetadata />
+                        <General />
+                      </div>
+                    </PerfectScrollbar>
+                    <Footer>
+                      <FlexRowSpaceBetween>
+                        <FooterUpdatesText numUpdates={5} />
+                        <PrimaryButton
+                          onClick={() => setShowAdditionalInfoPopover(true)}
+                          disabled={!isValid || fail}
+                        >
+                          Continue
+                        </PrimaryButton>
+                      </FlexRowSpaceBetween>
+                    </Footer>
+                  </ContentWrapper>
+                </div>
+                <CommitAdditionalInfoPopOver
+                  isOpen={showAdditionalInfoPopover}
+                  onDismiss={() => {
+                    setShowAdditionalInfoPopover(false);
+                  }}
+                  onSuccess={() => {
+                    setShowCommitStatusPopover(true);
+                  }}
+                />
+                <CommitStatusPopover
+                  isOpen={showCommitStatusPopover}
+                  onDismiss={() => {
+                    setShowCommitStatusPopover(false);
+                  }}
+                  onSuccess={() => {
+                    dispatch(toggleCommitPanel(false));
+                  }}
+                />
+              </Wrapper>
+            </animated.div>
+          )
+      )}
+    </>
   );
 };
 

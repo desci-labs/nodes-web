@@ -9,6 +9,7 @@ const StyledDialogOverlay = styled(AnimatedDialogOverlay)<{
   $scrollOverlay?: boolean;
 }>`
   &[data-reach-dialog-overlay] {
+    padding 20px;
     backdrop-filter: blur(3px);
     background-color: transparent;
     overflow: hidden;
@@ -21,8 +22,6 @@ const StyledDialogOverlay = styled(AnimatedDialogOverlay)<{
     min-width: 100vw;
     height: 100vh;
     width: 100vw;
-
-    padding: 20px 0;
 
     display: flex;
     align-items: center;
@@ -45,9 +44,10 @@ const StyledDialogContent = styled(AnimatedDialogContent)<StyledDialogProps>`
   &[data-reach-dialog-content] {
     margin: auto;
     background-color: #191b1c;
-    padding: 0px;
+    padding: 0;
     overflow-y: auto;
     overflow-x: hidden;
+    position: relative;
     max-width: ${({ $maxWidth }) =>
       $maxWidth ? `${$maxWidth}px` : "max-content"};
     ${({ $maxHeight }) =>
@@ -62,6 +62,7 @@ const StyledDialogContent = styled(AnimatedDialogContent)<StyledDialogProps>`
       `}
     display: ${({ $scrollOverlay }) =>
       $scrollOverlay ? "inline-table" : "flex"};
+    flex-direction: ${({ $scrollOverlay }) => ($scrollOverlay ? "" : "column")};
     border-radius: 5px;
   }
 `;
@@ -115,7 +116,7 @@ export default function Modal({
                 $minHeight={$minHeight}
                 $scrollOverlay={$scrollOverlay}
               >
-                <div>{children}</div>
+                {children}
               </StyledDialogContent>
             </StyledDialogOverlay>
           )
@@ -156,17 +157,10 @@ const ModalFooter = ({
   border = true,
   padded = true,
   children,
-  collapse = false,
-}: PropsWithChildren<{
-  border?: boolean;
-  padded?: boolean;
-  collapse?: boolean;
-}>) => {
+}: PropsWithChildren<{ border?: boolean; padded?: boolean }>) => {
   return (
     <div
-      className={`flex flex-row justify-end gap-4 items-center ${
-        collapse ? "" : "h-16"
-      } w-full dark:bg-[#272727] ${
+      className={`flex flex-row justify-end gap-4 items-center w-full dark:bg-[#272727] ${
         border ? "border-t border-t-[#81C3C8]" : ""
       } rounded-b-lg ${padded ? "p-4" : ""}`}
     >

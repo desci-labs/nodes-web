@@ -12,6 +12,7 @@ import { api } from "@src/state/api";
 import { tags } from "@src/state/api/tags";
 import { useSetter } from "@src/store/accessors";
 import { Wallet } from "@src/state/api/types";
+import Copier from "../molecules/Copier";
 
 const SignatureRequestButton = ({
   className,
@@ -193,7 +194,10 @@ const AccountCard = ({
             <div className="-mb-1">
               <Jazzicon diameter={20} seed={jsNumberForAddress(account)} />
             </div>
-            {shortAccount(account)}
+            <div className="flex gap-2 items-center ">
+              {shortAccount(account)}
+              <Copier text={account} classes="text-tint-primary w-3" />
+            </div>
             <span className="text-tint-primary">
               ({serverWallet?.nickname})
             </span>

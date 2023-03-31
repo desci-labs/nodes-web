@@ -78,21 +78,23 @@ export const adminAnalyticsSlice = createSlice({
          * https://redux-toolkit.js.org/usage/immer-reducers#immutability-and-redux
          */
         state.status = "succeeded";
-        state.newUsersToday = action.payload.newUsersToday;
-        state.newUsersInLast7Days = action.payload.newUsersInLast7Days;
-        state.newUsersInLast30Days = action.payload.newUsersInLast30Days;
-        state.newNodesToday = action.payload.newNodesToday;
-        state.newNodesInLast7Days = action.payload.newNodesInLast7Days;
-        state.newNodesInLast30Days = action.payload.newNodesInLast30Days;
-        state.activeUsersToday = action.payload.activeUsersToday;
-        state.activeUsersInLast7Days = action.payload.activeUsersInLast7Days;
-        state.activeUsersInLast30Days = action.payload.activeUsersInLast30Days;
-        state.nodeViewsToday = action.payload.nodeViewsToday;
-        state.nodeViewsInLast7Days = action.payload.nodeViewsInLast7Days;
-        state.nodeViewsInLast30Days = action.payload.nodeViewsInLast30Days;
-        state.bytesToday = action.payload.bytesToday;
-        state.bytesInLast7Days = action.payload.bytesInLast7Days;
-        state.bytesInLast30Days = action.payload.bytesInLast30Days;
+        state.newUsersToday = action.payload.newUsersToday || 0;
+        state.newUsersInLast7Days = action.payload.newUsersInLast7Days || 0;
+        state.newUsersInLast30Days = action.payload.newUsersInLast30Days || 0;
+        state.newNodesToday = action.payload.newNodesToday || 0;
+        state.newNodesInLast7Days = action.payload.newNodesInLast7Days || 0;
+        state.newNodesInLast30Days = action.payload.newNodesInLast30Days || 0;
+        state.activeUsersToday = action.payload.activeUsersToday || 0;
+        state.activeUsersInLast7Days =
+          action.payload.activeUsersInLast7Days || 0;
+        state.activeUsersInLast30Days =
+          action.payload.activeUsersInLast30Days || 0;
+        state.nodeViewsToday = action.payload.nodeViewsToday || 0;
+        state.nodeViewsInLast7Days = action.payload.nodeViewsInLast7Days || 0;
+        state.nodeViewsInLast30Days = action.payload.nodeViewsInLast30Days || 0;
+        state.bytesToday = action.payload.bytesToday || 0;
+        state.bytesInLast7Days = action.payload.bytesInLast7Days || 0;
+        state.bytesInLast30Days = action.payload.bytesInLast30Days || 0;
       })
       .addCase(fetchAdminAnalytics.rejected, (state, action) => {
         state.status = "failed";

@@ -352,7 +352,6 @@ const ComponentMetadataPopover = (
 
   return (
     <Modal
-      {...props}
       isOpen={props.isVisible}
       onDismiss={() => props?.onClose()}
       $scrollOverlay={true}
