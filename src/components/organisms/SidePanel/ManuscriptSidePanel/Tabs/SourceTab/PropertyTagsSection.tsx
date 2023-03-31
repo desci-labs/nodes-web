@@ -46,6 +46,9 @@ const PropertyTagsSection = (props: PropertyTagsSectionProps) => {
       className="mb-4"
     >
       <ContentWrapper className="py-2">
+        {componentKeywords?.length === 0 && (
+          <span className="text-xs block text-center w-full">No Keywords</span>
+        )}
         {componentKeywords?.map((tag: any, index: number) => (
           <div
             key={index}

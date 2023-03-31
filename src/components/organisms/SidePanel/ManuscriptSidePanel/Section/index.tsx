@@ -8,13 +8,14 @@ const Wrapper: StyledComponent<"div", any, any> = styled.div.attrs(
     className: `bg-white dark:bg-dark-gray shadow-md relative ${
       selected
         ? "border-black dark:border-[white] border-[2px] top-[0px] mb-[-1px]"
-        : "dark:hover:border-zinc-500 dark:border-muted-900 border-[1px] ml-[1px] mt-[1px]" // special stuff to make selection not move box at all even with thicker border
+        : "dark:hover:border-zinc-500 dark:border-muted-900 border-[1px] mt-[1px]" // special stuff to make selection not move box at all even with thicker border
     } ${className}`,
   })
 )`
   border-style: solid;
   border-radius: 10px;
-  width: ${(props: any) => (props.selected ? "calc(100% - 0px)" : "calc(100% - 2px)")};
+  width: ${(props: any) =>
+    props.selected ? "calc(100% - 0px)" : "calc(100%)"};
   overflow: hidden;
 `;
 
@@ -45,11 +46,7 @@ const Section = (props: SectionProps) => {
       style={{ ...containerStyle }}
       onClick={onClick}
     >
-      {header ? (
-        <div className="border-neutral-300 dark:border-teal border-b">
-          {header({})}
-        </div>
-      ) : null}
+      {header && <>{header({})}</>}
       {children}
       {footer ? (
         <div className="border-tint-primary dark:border-teal border-t">
