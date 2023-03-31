@@ -285,7 +285,7 @@ const PopOverShareMenu = () => {
       $scrollOverlay={true}
     >
       <div className="px-6 py-5 text-white relative min-w-[600px]">
-        <Modal.Header title="Share Node" />
+        <Modal.Header title="Share Node" onDismiss={close} />
         {body}
       </div>
     </Modal>
