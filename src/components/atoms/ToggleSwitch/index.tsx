@@ -11,7 +11,7 @@ interface SwitchProps {
   IconOff?: React.FC;
   IconOn?: React.FC;
   isEnabled: () => boolean;
-  toggle: () => void;
+  toggle: (e: any) => void;
   enabledBkgColorClass?: string; //tailwind e.g. 'bg-gray-700'
 }
 const ToggleSwitch = ({

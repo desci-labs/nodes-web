@@ -20,6 +20,16 @@ import ReactModal from "react-modal";
 import { FormatHyperlink, IconPen } from "@icons";
 import ReactTooltip from "react-tooltip";
 import { DriveObject } from "@components/organisms/Drive";
+import PopOver from "@src/components/organisms/PopOver";
+import PopOverBasic from "@src/components/atoms/PopOverBasic";
+import Modal from "../Modal/Modal";
+import InsetLabelInput from "../FormInputs/InsetLabelInput";
+import PrimaryButton from "@src/components/atoms/PrimaryButton";
+import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
+import { Switch } from "@headlessui/react";
+import ToggleSwitch from "@src/components/atoms/ToggleSwitch";
+import ToggleSwitchWithLabel from "@src/components/atoms/ToggleSwitchWithLabel";
+import ModalEditAnnotationLink from "../ModalEditAnnotationLink";
 
 interface BaseProps {
   className: string;
@@ -349,6 +359,8 @@ export const DirectoryLinkComponent = (props: DirectoryLinkComponentProps) => {
     }
   }, [showCopiedText]);
 
+  const [isExecutable, setIsExecutable] = useState<boolean>(false);
+
   return (
     <>
       <ReactTooltip
@@ -427,6 +439,13 @@ export const DirectoryLinkComponent = (props: DirectoryLinkComponentProps) => {
         {children}
         <CodePillButton href={href}>{fileName}</CodePillButton>
       </span>
+      <ModalEditAnnotationLink
+        fileName={fileName || ""}
+        isExecutable={isExecutable}
+        setIsExecutable={setIsExecutable}
+        setShowModal={setShowEditSyntaxModal}
+        showModal={showEditSyntaxModal}
+      />
     </>
   );
 };
