@@ -35,6 +35,9 @@ interface InsetLabelSmallInputProps {
   className?: string;
   optional?: boolean;
   disabled?: boolean;
+  maxLength?: number;
+  pattern?: string;
+  onFocus?: FormEventHandler;
 }
 
 const InsetLabelSmallInput = forwardRef<
@@ -53,6 +56,9 @@ const InsetLabelSmallInput = forwardRef<
     fieldState,
     optional = false,
     disabled = false,
+    maxLength,
+    onFocus,
+    pattern,
     onChange,
   } = props;
 
@@ -94,7 +100,10 @@ const InsetLabelSmallInput = forwardRef<
             (e.currentTarget as HTMLInputElement).select();
           }
         }}
+        onFocus={onFocus}
+        maxLength={maxLength}
         {...properties}
+        pattern={pattern}
         onChange={onChange}
         {...field}
         ref={ref}

@@ -13,13 +13,12 @@ export interface CreditModalProps {
   id?: number;
 }
 
-
 const GOOGLE_SCHOLAR_URL_SCHEMA = Yup.string()
   .url()
   .optional()
   .test({
     name: "Google scholar url",
-    message: "URL is not a valid google scholar profile",
+    message: "URL is not a valid Google Scholar profile",
     test: (value = "", ctx) => {
       if (value === "") return true;
       /**
@@ -54,7 +53,7 @@ const ORCID_SCHEMA = Yup.string()
   .optional()
   .test({
     name: "Orcid",
-    message: "Invalid Orcid number",
+    message: "Invalid ORCiD",
     test: (value = "", ctx) => {
       if (value === "") return true;
 
@@ -74,7 +73,7 @@ const ORCID_PARTS_SCHEMA = Yup.string()
   .optional()
   .test({
     name: "Orcid parts",
-    message: "Invalid Orcid number",
+    message: "Invalid ORCiD",
     test: (data = "", ctx) => {
       if (data === "") return true;
       return (

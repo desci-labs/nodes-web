@@ -7,9 +7,9 @@ import {
 import { useSetter } from "@src/store/accessors";
 import { useCallback, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
-import { AuthorFormValues } from "./schema";
+import { AuthorFormValues, OrcidPartsKeys } from "./schema";
 
-export default function useCreditsform({
+export default function useCreditsForm({
   id,
   author,
   onDismiss,
@@ -60,41 +60,36 @@ export default function useCreditsform({
     }
   }, [orcid1, orcid2, orcid3, orcid4, setValue]);
 
-  useEffect(() => {
-    // console.log("ORCid1 Errors", errors.orcid1);
-    if (errors.orcid1) {
-      setFocus("orcid1");
-    } else if (dirtyFields["orcid1"]) {
-      updateOrcid();
-      setFocus("orcid2");
+  const handleFieldChange = (
+    value: string,
+    fieldName: keyof AuthorFormValues,
+    nextFieldName: keyof AuthorFormValues
+  ) => {
+    if (errors[fieldName]) {
+      setFocus(fieldName);
+    } else if (dirtyFields[fieldName]) {
+      if (fieldName.substring(0, 5) === "orcid" && value.length === 4) {
+        delete dirtyFields[fieldName];
+        updateOrcid();
+        setFocus(nextFieldName);
+      }
     }
+  };
+
+  useEffect(() => {
+    handleFieldChange(orcid1, "orcid1", "orcid2");
   }, [dirtyFields, errors.orcid1, setFocus, updateOrcid]);
 
   useEffect(() => {
-    if (errors.orcid2) {
-      setFocus("orcid2");
-    } else if (dirtyFields["orcid2"]) {
-      updateOrcid();
-      setFocus("orcid3");
-    }
+    handleFieldChange(orcid2, "orcid2", "orcid3");
   }, [dirtyFields, errors.orcid2, setFocus, updateOrcid]);
 
   useEffect(() => {
-    if (errors.orcid3) {
-      setFocus("orcid3");
-    } else if (dirtyFields["orcid3"]) {
-      updateOrcid();
-      setFocus("orcid4");
-    }
+    handleFieldChange(orcid3, "orcid3", "orcid4");
   }, [dirtyFields, errors.orcid3, setFocus, updateOrcid]);
 
   useEffect(() => {
-    if (errors.orcid4) {
-      setFocus("orcid4");
-    } else if (dirtyFields["orcid4"]) {
-      updateOrcid();
-      setFocus("googleScholar");
-    }
+    handleFieldChange(orcid4, "orcid4", "googleScholar");
   }, [dirtyFields, errors.orcid4, setFocus, updateOrcid]);
 
   return { onSubmit };

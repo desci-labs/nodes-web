@@ -3,7 +3,8 @@ import { Controller, useFormContext } from "react-hook-form";
 import InsetLabelSmallInput from "@src/components/molecules/FormInputs/InsetLabelSmallInput";
 import DividerSimple from "@src/components/atoms/DividerSimple";
 import { AuthorFormValues, CreditModalProps, OrcidPartsKeys } from "./schema";
-import useCreditsform from "./useCreditsform";
+import useCreditsForm from "./useCreditsForm";
+import { FormEvent } from "react";
 
 export default function CreditsForm(props: ModalProps & CreditModalProps) {
   const {
@@ -13,7 +14,7 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
     formState: { errors },
   } = useFormContext<AuthorFormValues>();
 
-  const { onSubmit } = useCreditsform({
+  const { onSubmit } = useCreditsForm({
     id: props.id,
     author: props.author,
     onDismiss: props.onDismiss,
@@ -24,7 +25,17 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
       name={name}
       control={control}
       render={({ field }) => (
-        <InsetLabelSmallInput label="" field={field} ref={register(name).ref} />
+        <InsetLabelSmallInput
+          label=""
+          field={field}
+          ref={register(name).ref}
+          maxLength={4}
+          onFocus={(e: FormEvent<HTMLInputElement>) => {
+            if (e.currentTarget.value.length === 4) {
+              e.currentTarget.select();
+            }
+          }}
+        />
       )}
     />
   );
@@ -54,8 +65,8 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
         Scientific Identity
       </span>
       <div className="mt-5">
-        <span className="text-lg capitalize mb-1 inline-block">
-          ORCID <span className="text-sm text-neutrals-gray-4">(optional)</span>
+        <span className="text-lg mb-1 inline-block">
+          ORCiD <span className="text-sm text-neutrals-gray-4">(optional)</span>
         </span>
         <div className="flex gap-2 items-center justify-evenly max-w-[300px]">
           <OrcidInput name="orcid1" />
@@ -77,6 +88,7 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
               label="Google Scholar Profile"
               field={field}
               ref={register("googleScholar").ref}
+              optional={true}
             />
           )}
         />

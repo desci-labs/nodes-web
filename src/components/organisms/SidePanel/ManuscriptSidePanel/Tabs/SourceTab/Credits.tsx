@@ -1,7 +1,7 @@
 import Identicon from "@components/atoms/Identicon";
 import TooltipIcon from "@components/atoms/TooltipIcon";
 import CollapsibleSection from "@components/organisms/CollapsibleSection";
-import { IconDeleteForever, IconInfo, IconPen } from "icons";
+import { IconCirclePlus, IconDeleteForever, IconInfo, IconPen } from "icons";
 import Section from "../../Section";
 import SectionHeader from "../../Section/SectionHeader";
 import { ResearchObjectV1Author } from "@desci-labs/desci-models";
@@ -12,12 +12,13 @@ import CreditsModal from "@src/components/organisms/PopOver/CreditsModal/Credits
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { useSetter } from "@src/store/accessors";
 import { removeAuthor, saveManifestDraft } from "@src/state/nodes/viewer";
+import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
 
 interface CreditsProps {}
 
 const Credits = (props: CreditsProps) => {
   const dispatch = useSetter();
-  const { manifest: manifestData, mode } = useNodeReader();
+  const { manifest: manifestData, mode, publicView } = useNodeReader();
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number>();
@@ -44,8 +45,8 @@ const Credits = (props: CreditsProps) => {
       title={
         <div className="flex w-full justify-between">
           <div>
-            <span>Credits</span>
-            {isEditing ? (
+            <span>Credit</span>
+            {isEditing && manifestData?.authors?.length ? (
               <span
                 className="text-xs text-tint-primary hover:text-tint-primary-hover cursor-pointer ml-1 mb-0.5 font-bold"
                 onClick={(e: React.MouseEvent<HTMLSpanElement>) => {
@@ -57,7 +58,12 @@ const Credits = (props: CreditsProps) => {
               </span>
             ) : (
               <TooltipIcon
-                icon={<IconInfo className="fill-black dark:fill-[white]" />}
+                icon={
+                  <IconInfo
+                    className="fill-black dark:fill-[white] top-0.5 relative"
+                    height={16}
+                  />
+                }
                 id="contributor-authors"
                 tooltip="Linked Authors"
               />
@@ -75,6 +81,15 @@ const Credits = (props: CreditsProps) => {
       className="mb-4"
     >
       <div className="flex flex-col gap-3 py-2 ">
+        {isEditing ? (
+          <ButtonSecondary
+            onClick={() => setIsOpen(true)}
+            className="group mx-[1px]"
+          >
+            <IconCirclePlus className="group-hover:fill-black fill-white transition-colors" />
+            Credit Contributor
+          </ButtonSecondary>
+        ) : null}
         {manifestData?.authors &&
           manifestData?.authors.map(
             (author: ResearchObjectV1Author, index: number) => (
