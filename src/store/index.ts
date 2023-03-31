@@ -2,6 +2,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import adminAnalyticsReducer from "@src/state/analytics/analyticsSlice";
 import { api } from "@src/state/api";
 import driveReducer from "@src/state/drive/driveSlice";
+import { nodeReaderMiddleware } from "@src/state/nodes/middleware";
 import { nodesReducer } from "@src/state/nodes/root";
 import preferenceSlice from "@src/state/preferences/preferencesSlice";
 import userSlice from "@src/state/user/userSlice";
@@ -18,7 +19,9 @@ const rootReducer = combineReducers({
 export const store = configureStore({
   reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat([api.middleware]),
+    getDefaultMiddleware()
+      .prepend(nodeReaderMiddleware.middleware)
+      .concat([api.middleware]),
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

@@ -70,7 +70,7 @@ export function convertIpfsTreeToDriveObjectTree(
       branch.path = pathSplit.join("/");
     }
     const component = pathToCompMap[branch.path!];
-    debugger;
+    // debugger;
     branch.componentType = component?.type || DriveNonComponentTypes.UNKNOWN;
     branch.accessStatus = AccessStatus.PRIVATE; // FIXME, HARDCODED, PRIVCIDMAP
     branch.metadata = extractComponentMetadata(component);

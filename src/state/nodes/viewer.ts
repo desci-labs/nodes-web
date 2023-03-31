@@ -263,6 +263,10 @@ export const nodeReaderSlice = createSlice({
   },
 });
 
+export const selectNodeUuid = (state: {
+  nodes: { nodeReader: NodeReaderPref };
+}) => state.nodes.nodeReader.currentObjectId;
+
 export default nodeReaderSlice.reducer;
 
 export const {
