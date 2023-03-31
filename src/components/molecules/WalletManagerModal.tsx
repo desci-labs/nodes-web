@@ -27,7 +27,7 @@ const WalletManagerModal = (props: ModalProps) => {
   };
 
   return (
-    <Modal onDismiss={close} isOpen={props.isOpen}>
+    <Modal onDismiss={close} isOpen={props.isOpen} $scrollOverlay={true}>
       <div className="px-6 py-5 min-w-full lg:min-w-[700px]">
         <Modal.Header
           onDismiss={close}
@@ -40,7 +40,6 @@ const WalletManagerModal = (props: ModalProps) => {
           </div>
         </div>
       </div>
-      <Modal.Footer padded={false} />
     </Modal>
   );
 };

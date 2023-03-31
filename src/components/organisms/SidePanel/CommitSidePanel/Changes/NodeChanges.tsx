@@ -95,7 +95,7 @@ const NodeChanges = (props: ChangesComponentProps) => {
         </div>
       </CollapsibleSection>
       <Modal
-        $minHeight={40}
+        $minHeight={20}
         $scrollOverlay={true}
         isOpen={viewDiff}
         onDismiss={() => setViewDiff(false)}
