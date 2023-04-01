@@ -35,6 +35,8 @@ import {
   UploadQueueItem,
 } from "./types";
 import { __log } from "@src/components/utils";
+import { setManifest, setManifestCid } from "../nodes/viewer";
+import { dispatch } from "react-hot-toast/dist/core/store";
 interface DriveState {
   nodeTree: DriveObject | null;
   status: RequestStatus;
@@ -128,7 +130,7 @@ export const driveSlice = createSlice({
           state.currentDrive = tree as DriveObject;
           return;
         }
-        debugger;
+
         const manifest = action.payload.manifest!;
         //Process the IPFS tree into a DriveObject tree
         const root = createVirtualDrive({
@@ -172,7 +174,17 @@ export const driveSlice = createSlice({
         });
         if (externalLinks.contains?.length) root.contains?.push(externalLinks);
         state.nodeTree = root;
-        state.currentDrive = root;
+
+        const driveFound = driveBfsByPath(
+          state.nodeTree!,
+          state.currentDrive?.path!
+        );
+        if (driveFound) {
+          state.currentDrive = driveFound;
+        }
+        if (!state.currentDrive) {
+          state.currentDrive = root;
+        }
       })
       .addCase(fetchTreeThunk.rejected, (state, action) => {
         state.status = "failed";
@@ -317,9 +329,12 @@ export const addFilesToDrive = createAsyncThunk(
         }
       );
       dispatch(removeBatchFromUploadQueue({ batchUid }));
-      if (rootDataCid) {
+      if (rootDataCid && updatedManifest && manifestCid) {
         // setPrivCidMap({ ...privCidMap, [rootDataCid]: true }); //later when privCidMap available
         dispatch(updateBatchUploadProgress({ batchUid, progress: 100 }));
+        dispatch(setManifest(updatedManifest));
+        dispatch(setManifestCid(manifestCid));
+        dispatch(fetchTreeThunk());
       }
     } catch (e) {
       dispatch(removeBatchFromUploadQueue({ batchUid }));
