@@ -19,17 +19,13 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
       googleScholar: props?.author?.googleScholar ?? "",
       role: props?.author?.role || ResearchObjectV1AuthorRole.AUTHOR,
       orcid: props?.author?.orcid ?? "",
-      orcid1: props?.author?.orcid?.split("-")[0] ?? "",
-      orcid2: props?.author?.orcid?.split("-")[1] ?? "",
-      orcid3: props?.author?.orcid?.split("-")[2] ?? "",
-      orcid4: props?.author?.orcid?.split("-")[3] ?? "",
     },
     reValidateMode: "onChange",
     resolver: yupResolver(authorsFormSchema),
   });
 
   return (
-    <Modal {...props} $maxWidth={650}>
+    <Modal {...props} $maxWidth={650} $scrollOverlay={true}>
       <div className="px-6 py-5 w-full lg:w-[650px] text-white">
         <Modal.Header
           title="Collaborator Details"

@@ -9,7 +9,7 @@ import {
 export type OrcidPartsKeys = "orcid1" | "orcid2" | "orcid3" | "orcid4";
 export type OrcidParts = Record<OrcidPartsKeys, string>;
 
-export type AuthorFormValues = ResearchObjectV1Author & OrcidParts;
+export type AuthorFormValues = ResearchObjectV1Author;
 
 export interface CreditModalProps {
   author?: ResearchObjectV1Author;
@@ -72,21 +72,6 @@ const ORCID_SCHEMA = Yup.string()
     },
   });
 
-const ORCID_PARTS_SCHEMA = Yup.string()
-  .optional()
-  .test({
-    name: "Orcid parts",
-    message: "Invalid ORCiD",
-    test: (data = "", ctx) => {
-      if (data === "") return true;
-      return (
-        !Number.isNaN(parseInt(data)) &&
-        typeof Number(data) === "number" &&
-        data.length === 4
-      );
-    },
-  });
-
 export const authorRoles = Object.values(ResearchObjectV1AuthorRole);
 
 const AUTHOR_ROLES_SCHEMA = Yup.string()
@@ -104,9 +89,6 @@ export const authorsFormSchema = Yup.object({
   orcid: ORCID_SCHEMA,
   name: Yup.string().required(),
   role: AUTHOR_ROLES_SCHEMA,
-  orcid1: ORCID_PARTS_SCHEMA.optional(),
-  orcid2: ORCID_PARTS_SCHEMA.optional(),
-  orcid3: ORCID_PARTS_SCHEMA.optional(),
-  orcid4: ORCID_PARTS_SCHEMA.optional(),
   googleScholar: GOOGLE_SCHOLAR_URL_SCHEMA.optional(),
 });
+

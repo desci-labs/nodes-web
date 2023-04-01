@@ -2,11 +2,11 @@ import { ModalProps } from "@src/components/molecules/Modal/Modal";
 import { Controller, useFormContext } from "react-hook-form";
 import InsetLabelSmallInput from "@src/components/molecules/FormInputs/InsetLabelSmallInput";
 import DividerSimple from "@src/components/atoms/DividerSimple";
-import { AuthorFormValues, CreditModalProps, OrcidPartsKeys } from "./schema";
+import { AuthorFormValues, CreditModalProps } from "./schema";
 import useCreditsForm from "./useCreditsForm";
-import { FormEvent } from "react";
 import SelectList from "@src/components/molecules/FormInputs/SelectList";
 import { ResearchObjectV1AuthorRole } from "@desci-labs/desci-models";
+import { PatternFormat } from "react-number-format";
 
 const authorRoles = Object.values(ResearchObjectV1AuthorRole).map(
   (role, idx) => ({
@@ -31,27 +31,8 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
     onDismiss: props.onDismiss,
   });
 
-  const OrcidInput = ({ name }: { name: OrcidPartsKeys }) => (
-    <Controller
-      name={name}
-      control={control}
-      render={({ field }) => (
-        <InsetLabelSmallInput
-          label=""
-          field={field}
-          ref={register(name).ref}
-          maxLength={4}
-          onFocus={(e: FormEvent<HTMLInputElement>) => {
-            if (e.currentTarget.value.length === 4) {
-              e.currentTarget.select();
-            }
-          }}
-        />
-      )}
-    />
-  );
-
   const selectedRole = watch("role");
+  const orcid = watch("orcid");
 
   return (
     <form
@@ -96,15 +77,19 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
         <span className="text-lg mb-1 inline-block">
           ORCiD <span className="text-sm text-neutrals-gray-4">(optional)</span>
         </span>
-        <div className="flex gap-2 items-center justify-evenly max-w-[300px]">
-          <OrcidInput name="orcid1" />
-          <span className="font-bold">-</span>
-          <OrcidInput name="orcid2" />
-          <span>-</span>
-          <OrcidInput name="orcid3" />
-          <span>-</span>
-          <OrcidInput name="orcid4" />
-        </div>
+        <Controller
+          name="orcid"
+          control={control}
+          render={({ field }: any) => (
+            <PatternFormat
+              value={orcid}
+              placeholder="0000-0000-0000-0000"
+              format="####-####-####-####"
+              className="bg-transparent relative block w-full mt-2 my-5 font-medium text-gray-900 dark:text-white focus:ring-0 outline-none focus:outline-none border border-transparent border-b border-b-[#969696] focus:border-0 focus:border-b-tint-primary-hover focus:border-b focus-within:border-b-tint-primary-hover px-3 py-2 shadow-sm bg-white dark:bg-[#272727]"
+              {...field}
+            />
+          )}
+        />
         <span className="text-red-400 text-xs">{errors.orcid?.message}</span>
       </div>
       <div className="mt-8">
@@ -127,3 +112,4 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
     </form>
   );
 }
+
