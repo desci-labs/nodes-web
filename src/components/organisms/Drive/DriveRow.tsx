@@ -245,7 +245,11 @@ export default function DriveRow({
       )}
       <li className={`${DRIVE_ROW_STYLES[6]}`}>
         <BlackGenericButton
-          disabled={file.accessStatus !== AccessStatus.PUBLIC}
+          disabled={
+            ![AccessStatus.PUBLIC, AccessStatus.PARTIAL].includes(
+              file.accessStatus
+            )
+          }
           onClick={() => {
             setComponentToCite(file);
             setShowCitationModal(true);
