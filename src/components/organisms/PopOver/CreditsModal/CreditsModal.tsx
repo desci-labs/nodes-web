@@ -9,6 +9,7 @@ import {
 } from "./schema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import CreditsForm from "./Form";
+import { ResearchObjectV1AuthorRole } from "@desci-labs/desci-models";
 
 export default function CreditsModal(props: ModalProps & CreditModalProps) {
   const methods = useForm<AuthorFormValues>({
@@ -16,6 +17,7 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
     defaultValues: {
       name: props?.author?.name,
       googleScholar: props?.author?.googleScholar ?? "",
+      role: props?.author?.role || ResearchObjectV1AuthorRole.AUTHOR,
       orcid: props?.author?.orcid ?? "",
       orcid1: props?.author?.orcid?.split("-")[0] ?? "",
       orcid2: props?.author?.orcid?.split("-")[1] ?? "",

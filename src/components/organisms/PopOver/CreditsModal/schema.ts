@@ -1,7 +1,10 @@
 import * as Yup from "yup";
 import validUrl from "valid-url";
 
-import { ResearchObjectV1Author } from "@desci-labs/desci-models";
+import {
+  ResearchObjectV1Author,
+  ResearchObjectV1AuthorRole,
+} from "@desci-labs/desci-models";
 
 export type OrcidPartsKeys = "orcid1" | "orcid2" | "orcid3" | "orcid4";
 export type OrcidParts = Record<OrcidPartsKeys, string>;
@@ -84,12 +87,26 @@ const ORCID_PARTS_SCHEMA = Yup.string()
     },
   });
 
+export const authorRoles = Object.values(ResearchObjectV1AuthorRole);
+
+const AUTHOR_ROLES_SCHEMA = Yup.string()
+  .required()
+  .test({
+    name: "Role",
+    message: "Invalid Author Role",
+    test: (data, _) => {
+      if (data === "") return false;
+      return authorRoles.includes(data as ResearchObjectV1AuthorRole);
+    },
+  });
+
 export const authorsFormSchema = Yup.object({
-  name: Yup.string().required(),
   orcid: ORCID_SCHEMA,
-  googleScholar: GOOGLE_SCHOLAR_URL_SCHEMA.optional(),
+  name: Yup.string().required(),
+  role: AUTHOR_ROLES_SCHEMA,
   orcid1: ORCID_PARTS_SCHEMA.optional(),
   orcid2: ORCID_PARTS_SCHEMA.optional(),
   orcid3: ORCID_PARTS_SCHEMA.optional(),
   orcid4: ORCID_PARTS_SCHEMA.optional(),
+  googleScholar: GOOGLE_SCHOLAR_URL_SCHEMA.optional(),
 });

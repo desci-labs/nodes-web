@@ -68,7 +68,6 @@ export default function SelectList(props: SelectListProps) {
   return (
     <div>
       <StyledListBoxInput
-        // value={value}
         defaultValue={value}
         onChange={onHandleChange}
         aria-labelledby={labelId}

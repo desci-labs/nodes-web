@@ -5,12 +5,23 @@ import DividerSimple from "@src/components/atoms/DividerSimple";
 import { AuthorFormValues, CreditModalProps, OrcidPartsKeys } from "./schema";
 import useCreditsForm from "./useCreditsForm";
 import { FormEvent } from "react";
+import SelectList from "@src/components/molecules/FormInputs/SelectList";
+import { ResearchObjectV1AuthorRole } from "@desci-labs/desci-models";
+
+const authorRoles = Object.values(ResearchObjectV1AuthorRole).map(
+  (role, idx) => ({
+    id: idx,
+    name: role,
+  })
+);
 
 export default function CreditsForm(props: ModalProps & CreditModalProps) {
   const {
-    handleSubmit,
+    watch,
     control,
     register,
+    setValue,
+    handleSubmit,
     formState: { errors },
   } = useFormContext<AuthorFormValues>();
 
@@ -40,6 +51,8 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
     />
   );
 
+  const selectedRole = watch("role");
+
   return (
     <form
       name="creditsModalForm"
@@ -59,6 +72,21 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
           />
         )}
       />
+
+      <SelectList
+        label="Role"
+        mandatory={true}
+        data={authorRoles}
+        value={authorRoles.find((role) => role.name === selectedRole)}
+        onSelect={(val) =>
+          setValue("role", val.name, {
+            shouldDirty: true,
+            shouldValidate: true,
+          })
+        }
+        {...register("role")}
+      />
+      <span className="text-red-400 text-xs">{errors.role?.message}</span>
       <DividerSimple />
 
       <span className="text-xl font-bold mt-6 inline-block capitalize">

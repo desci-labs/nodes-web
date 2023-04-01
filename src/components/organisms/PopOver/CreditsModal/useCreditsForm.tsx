@@ -7,7 +7,7 @@ import {
 import { useSetter } from "@src/store/accessors";
 import { useCallback, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
-import { AuthorFormValues, OrcidPartsKeys } from "./schema";
+import { AuthorFormValues } from "./schema";
 
 export default function useCreditsForm({
   id,
@@ -27,16 +27,18 @@ export default function useCreditsForm({
   const dispatch = useSetter();
 
   const onSubmit = async (data: ResearchObjectV1Author) => {
-    const { name, googleScholar, orcid } = data;
+    const { name, googleScholar, orcid, role } = data;
     if (author && id !== undefined) {
       dispatch(
         updateNodeAuthor({
           index: id,
-          update: { name, googleScholar, orcid },
+          update: { name: name.trim(), role, googleScholar, orcid },
         })
       );
     } else {
-      dispatch(addNodeAuthor({ name, googleScholar, orcid }));
+      dispatch(
+        addNodeAuthor({ name: name.trim(), role, googleScholar, orcid })
+      );
     }
 
     const res = await dispatch(saveManifestDraft({}));
@@ -60,37 +62,68 @@ export default function useCreditsForm({
     }
   }, [orcid1, orcid2, orcid3, orcid4, setValue]);
 
-  const handleFieldChange = (
-    value: string,
-    fieldName: keyof AuthorFormValues,
-    nextFieldName: keyof AuthorFormValues
-  ) => {
-    if (errors[fieldName]) {
-      setFocus(fieldName);
-    } else if (dirtyFields[fieldName]) {
-      if (fieldName.substring(0, 5) === "orcid" && value.length === 4) {
-        delete dirtyFields[fieldName];
-        updateOrcid();
-        setFocus(nextFieldName);
+  const handleFieldChange = useCallback(
+    (
+      value: string,
+      fieldName: keyof AuthorFormValues,
+      nextFieldName: keyof AuthorFormValues
+    ) => {
+      if (errors[fieldName]) {
+        setFocus(fieldName);
+      } else if (dirtyFields[fieldName]) {
+        if (fieldName.substring(0, 5) === "orcid" && value.length === 4) {
+          delete dirtyFields[fieldName];
+          updateOrcid();
+          setFocus(nextFieldName);
+        }
       }
-    }
-  };
+    },
+    [dirtyFields, errors, setFocus, updateOrcid]
+  );
 
   useEffect(() => {
     handleFieldChange(orcid1, "orcid1", "orcid2");
-  }, [dirtyFields, errors.orcid1, setFocus, updateOrcid]);
+  }, [
+    dirtyFields,
+    errors.orcid1,
+    handleFieldChange,
+    orcid1,
+    setFocus,
+    updateOrcid,
+  ]);
 
   useEffect(() => {
     handleFieldChange(orcid2, "orcid2", "orcid3");
-  }, [dirtyFields, errors.orcid2, setFocus, updateOrcid]);
+  }, [
+    dirtyFields,
+    errors.orcid2,
+    handleFieldChange,
+    orcid2,
+    setFocus,
+    updateOrcid,
+  ]);
 
   useEffect(() => {
     handleFieldChange(orcid3, "orcid3", "orcid4");
-  }, [dirtyFields, errors.orcid3, setFocus, updateOrcid]);
+  }, [
+    dirtyFields,
+    errors.orcid3,
+    handleFieldChange,
+    orcid3,
+    setFocus,
+    updateOrcid,
+  ]);
 
   useEffect(() => {
     handleFieldChange(orcid4, "orcid4", "googleScholar");
-  }, [dirtyFields, errors.orcid4, setFocus, updateOrcid]);
+  }, [
+    dirtyFields,
+    errors.orcid4,
+    handleFieldChange,
+    orcid4,
+    setFocus,
+    updateOrcid,
+  ]);
 
   return { onSubmit };
 }
