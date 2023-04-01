@@ -177,6 +177,7 @@ DriveRowProps) {
     //   }}
     // >
     <>
+      <li className={`${everyRow}`}>{renderComponentIcon(file)}</li>
       <li
         ref={handleRef}
         className={`${everyRow} !justify-start gap-2`}
@@ -200,7 +201,6 @@ DriveRowProps) {
         <span className="truncate max-w-sm">{file.name}</span>
       </li>
       <li className={`${everyRow}`}>{file.lastModified}</li>
-      <li className={`${everyRow}`}>{renderComponentIcon(file)}</li>
       <li className={`${everyRow}`}>{file.accessStatus}</li>
       <li
         onClick={() =>
@@ -215,26 +215,6 @@ DriveRowProps) {
         {BytesToHumanFileSize(file.size)}
         {/* <button className="" onClick={() => setRenameComponentId(file.cid)}>rn</button> */}
       </li>
-      {publicView ? (
-        <></>
-      ) : (
-        <>
-          <li className={`${everyRow}`}>
-            <StatusButton
-              status={ButtonState.SUCCESS}
-              disabled={!canEditMetadata}
-              className={`lg:w-[125px] justify-center ${
-                true ? "pointer-events-none" : "gap-2.5"
-              }`}
-              // onClick={handleEditMetadata}
-            >
-              <>
-                <span className="hidden lg:block">"Metadata Status"</span>
-              </>
-            </StatusButton>
-          </li>
-        </>
-      )}
       <li className={`${everyRow}`}>
         <BlackGenericButton
           onClick={() => {

@@ -320,15 +320,14 @@ const DriveTable: React.FC<DriveTableProps> = ({
           className={`bg-neutrals-gray-2  grid list-none font-medium text-sm text-white  border-b border-[#555659]  select-none items-center`}
           // className="bg-black rounded-t-xl h-[56px] grid list-none font-bold text-sm text-white content-center justify-items-center gap-10 px-5 border-b border-[#555659] items-center"
           style={{
-            gridTemplateColumns:
-              "2fr repeat(4, minmax(auto, 1fr)) minmax(125px, auto) repeat(2, 40px)",
+            gridTemplateColumns: `${DriveColumnWidths.STARRED} ${DriveColumnWidths.FILE_NAME} ${DriveColumnWidths.LAST_MODIFIED} ${DriveColumnWidths.STATUS} ${DriveColumnWidths.FILE_SIZE} ${DriveColumnWidths.CITE} ${DriveColumnWidths.USE}`,
           }}
         >
+          <li className={`${everyRow} ${headerRow}`}>⭐</li>
           <li className={`${everyRow} ${headerRow} !justify-start`}>
             File Name
           </li>
           <li className={`${everyRow} ${headerRow}`}>Last Modified</li>
-          <li className={`${everyRow} ${headerRow}`}>Type</li>
 
           <li
             data-tip={""}
@@ -339,9 +338,6 @@ const DriveTable: React.FC<DriveTableProps> = ({
           </li>
 
           <li className={`${everyRow} ${headerRow}`}>File Size</li>
-          {!publicView ? (
-            <li className={`${everyRow} ${headerRow}`}>Metadata</li>
-          ) : null}
           <li className={`${everyRow} ${headerRow}`}>Cite</li>
           <li className={`${everyRow} ${headerRow}`}>Use</li>
           {currentDrive?.contains?.length ? (
@@ -389,3 +385,12 @@ export * from "./types";
 
 export const everyRow = "flex items-center justify-center w-full px-3";
 const headerRow = "h-14 border bg-black";
+export enum DriveColumnWidths {
+  STARRED = "40px",
+  FILE_NAME = "2fr",
+  LAST_MODIFIED = "minmax(auto, 1fr)",
+  STATUS = "minmax(auto, 1fr)",
+  FILE_SIZE = "minmax(auto, 1fr)",
+  CITE = "40px",
+  USE = "40px",
+}
