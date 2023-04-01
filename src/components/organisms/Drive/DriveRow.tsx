@@ -31,6 +31,7 @@ import { useDriveContext } from "./ContextMenu/Index";
 import { useInteractionHandler } from "./ContextMenu/useActionHandler";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { everyRow } from ".";
+import "./styles.scss";
 
 export const DRIVE_ROW_STYLES = [
   "justify-self-start w-44 2xl:w-full min-w-44 flex-grow-3", // file
@@ -176,7 +177,11 @@ DriveRowProps) {
     //     }
     //   }}
     // >
-    <>
+    <div
+      className={`singleRow contents !bg-neutrals-gray-2 ${
+        selected ? "singleRowSelected" : null
+      }`}
+    >
       <li className={`${everyRow}`}>{renderComponentIcon(file)}</li>
       <li
         ref={handleRef}
@@ -236,6 +241,6 @@ DriveRowProps) {
           <IconCPU className={`p-0 `} />
         </BlackGenericButton>
       </li>
-    </>
+    </div>
   );
 }

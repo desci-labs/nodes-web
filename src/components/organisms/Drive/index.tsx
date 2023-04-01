@@ -39,6 +39,7 @@ import {
   navigateToDriveByPath,
 } from "@src/state/drive/driveSlice";
 import { useSetter } from "@src/store/accessors";
+import "./styles.scss";
 
 const Empty = () => {
   return <div className="p-5 text-xs">No files</div>;
@@ -317,10 +318,10 @@ const DriveTable: React.FC<DriveTableProps> = ({
         ref={containerRef}
       >
         <ul
-          className={`bg-neutrals-gray-2  grid list-none font-medium text-sm text-white  border-b border-[#555659]  select-none items-center`}
+          className={`bg-neutrals-gray-1 grid list-none font-medium text-sm text-white select-none items-center rounded-t-xl rounded-b-xl h-full`}
           // className="bg-black rounded-t-xl h-[56px] grid list-none font-bold text-sm text-white content-center justify-items-center gap-10 px-5 border-b border-[#555659] items-center"
           style={{
-            gridTemplateColumns: `${DriveColumnWidths.STARRED} ${DriveColumnWidths.FILE_NAME} ${DriveColumnWidths.LAST_MODIFIED} ${DriveColumnWidths.STATUS} ${DriveColumnWidths.FILE_SIZE} ${DriveColumnWidths.CITE} ${DriveColumnWidths.USE}`,
+            gridTemplateColumns: `${ColWidths.STARRED} ${ColWidths.FILE_NAME} ${ColWidths.LAST_MODIFIED} ${ColWidths.STATUS} ${ColWidths.FILE_SIZE} ${ColWidths.CITE} ${ColWidths.USE}`,
           }}
         >
           <li className={`${everyRow} ${headerRow}`}>⭐</li>
@@ -383,9 +384,10 @@ export default DriveTable;
 
 export * from "./types";
 
-export const everyRow = "flex items-center justify-center w-full px-3";
-const headerRow = "h-14 border bg-black";
-export enum DriveColumnWidths {
+export const everyRow =
+  "flex items-center justify-center w-full px-3 border-b border-[#555659] h-12 driveRow";
+const headerRow = "!h-14 border bg-black driveRowHeader";
+enum ColWidths {
   STARRED = "40px",
   FILE_NAME = "2fr",
   LAST_MODIFIED = "minmax(auto, 1fr)",

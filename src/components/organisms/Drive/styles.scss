@@ -1,0 +1,33 @@
+$columns: 7;
+
+.driveRowHeader {
+    --borderRadius: 8px;
+    &:first-of-type {
+        border-top-left-radius: var(--borderRadius);
+    }
+    &:nth-of-type(#{$columns}) {
+        border-top-right-radius: var(--borderRadius);
+
+    }
+}
+
+
+.singleRow {
+    &:last-of-type {
+        border-bottom-right-radius: var(--borderRadius);
+        border-bottom-left-radius: var(--borderRadius);
+        &>li {
+            border-bottom: none
+        }
+    }
+    &:hover > li {
+        background: #333
+    } 
+}
+
+.singleRowSelected {
+    background: rgba(40, 169, 195, 0.5); //tint-primary
+    &:hover > li {
+        background: rgba(40, 169, 195, 0.75); //tint-primary
+    }
+}
