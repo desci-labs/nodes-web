@@ -14,7 +14,7 @@ nodeReaderMiddleware.startListening({
     const prevNodeUuid = selectNodeUuid(prevState);
     const newNodeUuid = selectNodeUuid(state);
 
-    if (prevNodeUuid !== newNodeUuid) {
+    if (prevNodeUuid !== newNodeUuid && prevNodeUuid !== "") {
       await listenerApi.delay(500); //Appears neccessary so the manifest can update before the tree is fetched
       listenerApi.dispatch(reset());
       listenerApi.dispatch(fetchTreeThunk());
