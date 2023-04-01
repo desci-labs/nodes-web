@@ -30,6 +30,7 @@ import {
 import { useDriveContext } from "./ContextMenu/Index";
 import { useInteractionHandler } from "./ContextMenu/useActionHandler";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import { everyRow } from ".";
 
 export const DRIVE_ROW_STYLES = [
   "justify-self-start w-44 2xl:w-full min-w-44 flex-grow-3", // file
@@ -73,7 +74,7 @@ export default function DriveRow({
   canUse,
 }: // setOldComponentMetadata,
 DriveRowProps) {
-  const contextRef = useRef<HTMLUListElement>();
+  const contextRef = useRef<HTMLLIElement>();
   const { init } = useDriveContext(file);
   const { handleDbClick } = useInteractionHandler();
   const { setUseMenuCids, setShowCitationModal, setComponentToCite } =
@@ -140,7 +141,7 @@ DriveRowProps) {
 
   // const isNodeRoot = isNodeRootDrive(file);
   const handleRef = useCallback(
-    (node: HTMLUListElement) => {
+    (node: HTMLLIElement) => {
       if (
         file.type === FileType.Dir &&
         file.parent?.path?.toLowerCase().includes("noderoot")
@@ -155,28 +156,30 @@ DriveRowProps) {
   );
 
   return (
-    <ul
-      ref={handleRef}
-      className={`h-[48px] grid list-none font-medium text-sm text-white content-center justify-items-center items-center gap-10 border-b border-[#555659] last-of-type:border-none px-5 last-of-type:rounded-b-xl select-none
-       ${
-         selected
-           ? "bg-tint-primary bg-opacity-50 hover:bg-tint-primary hover:bg-opacity-75"
-           : "hover:bg-neutrals-gray-2"
-       }`}
-      style={{
-        gridTemplateColumns:
-          "2fr repeat(4, minmax(auto, 1fr)) minmax(125px, auto) repeat(2, 40px)",
-      }}
-      onDoubleClick={(e) => handleDbClick(e, file)}
-      onClick={(e) => {
-        if (e.ctrlKey) {
-          e.stopPropagation();
-          toggleSelected(index, file.componentType);
-        }
-      }}
-    >
+    // <ul
+    //   ref={handleRef}
+    //   className={`h-[48px] grid list-none font-medium text-sm text-white content-center justify-items-center items-center gap-10 border-b border-[#555659] last-of-type:border-none px-5 last-of-type:rounded-b-xl select-none
+    //    ${
+    //      selected
+    //        ? "bg-tint-primary bg-opacity-50 hover:bg-tint-primary hover:bg-opacity-75"
+    //        : "hover:bg-neutrals-gray-2"
+    //    }`}
+    //   style={{
+    //     gridTemplateColumns:
+    //       "2fr repeat(4, minmax(auto, 1fr)) minmax(125px, auto) repeat(2, 40px)",
+    //   }}
+    //   onDoubleClick={(e) => handleDbClick(e, file)}
+    //   onClick={(e) => {
+    //     if (e.ctrlKey) {
+    //       e.stopPropagation();
+    //       toggleSelected(index, file.componentType);
+    //     }
+    //   }}
+    // >
+    <>
       <li
-        className={`justify-self-start flex gap-2 h-[48px] items-center cursor-pointer overflow-hidden ${DRIVE_ROW_STYLES[0]}`}
+        ref={handleRef}
+        className={`${everyRow} !justify-start gap-2`}
         onClick={(e) => {
           if (e.ctrlKey) return;
           if (
@@ -196,9 +199,9 @@ DriveRowProps) {
         </span>
         <span className="truncate max-w-sm">{file.name}</span>
       </li>
-      <li className={`${DRIVE_ROW_STYLES[1]}`}>{file.lastModified}</li>
-      <li className={`${DRIVE_ROW_STYLES[2]}`}>{renderComponentIcon(file)}</li>
-      <li className={`${DRIVE_ROW_STYLES[3]}`}>{file.accessStatus}</li>
+      <li className={`${everyRow}`}>{file.lastModified}</li>
+      <li className={`${everyRow}`}>{renderComponentIcon(file)}</li>
+      <li className={`${everyRow}`}>{file.accessStatus}</li>
       <li
         onClick={() =>
           console.log(
@@ -207,7 +210,7 @@ DriveRowProps) {
             }: ${JSON.stringify(file.metadata)}`
           )
         }
-        className={`${DRIVE_ROW_STYLES[4]}`}
+        className={`${everyRow}`}
       >
         {BytesToHumanFileSize(file.size)}
         {/* <button className="" onClick={() => setRenameComponentId(file.cid)}>rn</button> */}
@@ -216,7 +219,7 @@ DriveRowProps) {
         <></>
       ) : (
         <>
-          <li className={`${DRIVE_ROW_STYLES[5]}`}>
+          <li className={`${everyRow}`}>
             <StatusButton
               status={ButtonState.SUCCESS}
               disabled={!canEditMetadata}
@@ -232,7 +235,7 @@ DriveRowProps) {
           </li>
         </>
       )}
-      <li className={`${DRIVE_ROW_STYLES[6]}`}>
+      <li className={`${everyRow}`}>
         <BlackGenericButton
           onClick={() => {
             setComponentToCite(file);
@@ -242,7 +245,7 @@ DriveRowProps) {
           Cite
         </BlackGenericButton>
       </li>
-      <li className={`${DRIVE_ROW_STYLES[7]}`}>
+      <li className={`${everyRow}`}>
         <BlackGenericButton
           disabled={!canUse}
           onClick={() => {
@@ -253,6 +256,6 @@ DriveRowProps) {
           <IconCPU className={`p-0 `} />
         </BlackGenericButton>
       </li>
-    </ul>
+    </>
   );
 }

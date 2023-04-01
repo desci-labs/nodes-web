@@ -317,57 +317,59 @@ const DriveTable: React.FC<DriveTableProps> = ({
         ref={containerRef}
       >
         <ul
-          id="HeaderRow"
-          className="bg-black rounded-t-xl h-[56px] grid list-none font-bold text-sm text-white content-center justify-items-center gap-10 px-5 border-b border-[#555659] items-center"
+          className={`bg-neutrals-gray-2  grid list-none font-medium text-sm text-white  border-b border-[#555659]  select-none items-center`}
+          // className="bg-black rounded-t-xl h-[56px] grid list-none font-bold text-sm text-white content-center justify-items-center gap-10 px-5 border-b border-[#555659] items-center"
           style={{
             gridTemplateColumns:
               "2fr repeat(4, minmax(auto, 1fr)) minmax(125px, auto) repeat(2, 40px)",
           }}
         >
-          <li className={`${DRIVE_ROW_STYLES[0]}`}>File Name</li>
-          <li className={`${DRIVE_ROW_STYLES[1]}`}>Last Modified</li>
-          <li className={`${DRIVE_ROW_STYLES[2]}`}>Type</li>
+          <li className={`${everyRow} ${headerRow} !justify-start`}>
+            File Name
+          </li>
+          <li className={`${everyRow} ${headerRow}`}>Last Modified</li>
+          <li className={`${everyRow} ${headerRow}`}>Type</li>
 
           <li
             data-tip={""}
             data-for="status"
-            className={`${DRIVE_ROW_STYLES[3]}`}
+            className={`${everyRow} ${headerRow}`}
           >
             Status
           </li>
 
-          <li className={`${DRIVE_ROW_STYLES[4]}`}>File Size</li>
+          <li className={`${everyRow} ${headerRow}`}>File Size</li>
           {!publicView ? (
-            <li className={`${DRIVE_ROW_STYLES[5]}`}>Metadata</li>
+            <li className={`${everyRow} ${headerRow}`}>Metadata</li>
           ) : null}
-          <li className={`${DRIVE_ROW_STYLES[6]}`}>Cite</li>
-          <li className={`${DRIVE_ROW_STYLES[7]}`}>Use</li>
+          <li className={`${everyRow} ${headerRow}`}>Cite</li>
+          <li className={`${everyRow} ${headerRow}`}>Use</li>
+          {currentDrive?.contains?.length ? (
+            currentDrive.contains.map((f: DriveObject, idx: number) => {
+              return (
+                <DriveRow
+                  key={`drive_row_${f.path + f.cid + idx || idx}`}
+                  file={f}
+                  exploreDirectory={exploreDirectory}
+                  index={idx}
+                  selected={!!selected[idx]}
+                  toggleSelected={toggleSelected}
+                  isMultiselecting={!!Object.keys(selected).length}
+                  // setMetaStaging={setMetaStaging}
+                  // setShowEditMetadata={setShowEditMetadata}
+                  // datasetMetadataInfoRef={datasetMetadataInfoRef}
+                  selectedFiles={selected}
+                  canEditMetadata={canEditMetadata}
+                  canUse={canUse}
+                  // setOldComponentMetadata={setOldComponentMetadata}
+                />
+              );
+            })
+          ) : (
+            <Empty />
+          )}
         </ul>
         <StatusInfo />
-        {currentDrive?.contains?.length ? (
-          currentDrive.contains.map((f: DriveObject, idx: number) => {
-            return (
-              <DriveRow
-                key={`drive_row_${f.path + f.cid + idx || idx}`}
-                file={f}
-                exploreDirectory={exploreDirectory}
-                index={idx}
-                selected={!!selected[idx]}
-                toggleSelected={toggleSelected}
-                isMultiselecting={!!Object.keys(selected).length}
-                // setMetaStaging={setMetaStaging}
-                // setShowEditMetadata={setShowEditMetadata}
-                // datasetMetadataInfoRef={datasetMetadataInfoRef}
-                selectedFiles={selected}
-                canEditMetadata={canEditMetadata}
-                canUse={canUse}
-                // setOldComponentMetadata={setOldComponentMetadata}
-              />
-            );
-          })
-        ) : (
-          <Empty />
-        )}
       </div>
       <PopOverUseMenu />
       {/* {renameComponentId && (
@@ -384,3 +386,6 @@ const DriveTable: React.FC<DriveTableProps> = ({
 export default DriveTable;
 
 export * from "./types";
+
+export const everyRow = "flex items-center justify-center w-full px-3";
+const headerRow = "h-14 border bg-black";
