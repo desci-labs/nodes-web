@@ -121,7 +121,7 @@ interface FormatterProps {
 const defaultFormatter = (props: FormatterProps): FormatterResult => {
   const authorNames = formatNames(
     [props.author]
-      .concat(props.manifest?.contributors.map((c) => c.author?.name) ?? [])
+      .concat(props.manifest?.authors?.map((c) => c.name) ?? [])
       .filter(Boolean)
   );
   const year = props?.year
@@ -143,7 +143,7 @@ const defaultFormatter = (props: FormatterProps): FormatterResult => {
 const apaFormatter = (props: FormatterProps): FormatterResult => {
   let authorNames = formatNames(
     [props.author]
-      .concat(props.manifest?.contributors.map((c) => c.author?.name) ?? [])
+      .concat(props.manifest?.authors?.map((c) => c.name) ?? [])
       .filter(Boolean)
   );
 
@@ -201,9 +201,7 @@ const getBibtexEntryKey = (
 
 const bibTexFormatter = (props: FormatterProps): FormatterResult => {
   const authors = formatBibTexAuthor(
-    [props.author]
-      .concat(props.manifest?.contributors.map((c) => c.author?.name) ?? [])
-      .filter(Boolean)
+    (props.manifest?.authors ?? [])?.map((c) => c.name).filter(Boolean)
   );
 
   // test cases

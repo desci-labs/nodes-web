@@ -159,7 +159,6 @@ export default function DriveRow({
     [file.parent?.path, file.type, init]
   );
 
-  console.log("file", file);
   return (
     <ul
       ref={handleRef}
