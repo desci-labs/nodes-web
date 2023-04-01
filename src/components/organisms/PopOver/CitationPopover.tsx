@@ -2,7 +2,6 @@ import PrimaryButton from "@components/atoms/PrimaryButton";
 import { useManuscriptController } from "@components/organisms/ManuscriptReader/ManuscriptController";
 import { IconWarning } from "@icons";
 import {
-  ButtonHTMLAttributes,
   PropsWithChildren,
   useCallback,
   useEffect,
@@ -10,8 +9,11 @@ import {
   useState,
 } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { CopyButton, useCopier } from "@components/molecules/Copier";
-import { ResearchObjectComponentType } from "@desci-labs/desci-models";
+import { CopyButton } from "@components/molecules/Copier";
+import {
+  ResearchObjectComponentType,
+  ResearchObjectV1Component,
+} from "@desci-labs/desci-models";
 import { getPublishedVersions } from "@src/api";
 import { AccessStatus, DriveObject, FileDir, FileType } from "../Drive";
 import {
@@ -19,17 +21,11 @@ import {
   DEFAULT_RESULT,
   getFormatter,
 } from "@src/helper/citation";
-import { BsClipboard } from "react-icons/bs";
-import { CheckIcon } from "@heroicons/react/solid";
 import { useUser } from "@src/state/user/hooks";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 import SelectList from "@src/components/molecules/FormInputs/SelectList";
 
-// Todo: implement a useNodeDetails hook to get the details of a the currentObjectId like (owner etc)
-// Todo: use the owner details to determine if the current user is the owner
-// Todo: if the current userId == ownerId, add extra features like profile
-// Todo: completion shortcut if user has not completed their  profile
 
 const CitationComponent = () => {
   const userProfile = useUser();
@@ -113,7 +109,8 @@ const CitationComponent = () => {
     }
 
     const index = manifestData?.components.findIndex(
-      (c) => c.id === component.cid || c.id === componentParent.cid
+      (c: ResearchObjectV1Component) =>
+        c.id === component.cid || c.id === componentParent.cid
     );
     const versionString =
       index === undefined || index < 0 ? version : `${version}/${index}`;
