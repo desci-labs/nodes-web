@@ -26,7 +26,6 @@ import { useNodeReader } from "@src/state/nodes/hooks";
 import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 import SelectList from "@src/components/molecules/FormInputs/SelectList";
 
-
 const CitationComponent = () => {
   const userProfile = useUser();
   const { componentToCite, setShowProfileUpdater } = useManuscriptController([
@@ -95,7 +94,9 @@ const CitationComponent = () => {
 
     const component =
       componentToCite.type === FileType.Dir
-        ? componentToCite?.contains?.[0] ?? null
+        ? componentToCite?.contains?.find(
+            (file) => file.accessStatus === AccessStatus.PUBLIC
+          ) ?? null
         : componentToCite;
     if (!component) return dpidLink;
 
@@ -277,8 +278,6 @@ const CitationComponent = () => {
     </div>
   );
 };
-
-
 
 function Box(props: PropsWithChildren<{}>) {
   return (
