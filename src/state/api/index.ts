@@ -9,12 +9,6 @@ const baseQueryWithRetry = retry(
     baseUrl: `${API_URL}/v1`,
     mode: "cors",
     prepareHeaders(headers, { getState, endpoint }) {
-      console.log(
-        "Prepare headers",
-        headers,
-        endpoint,
-        `Bearer ${localStorage.getItem("auth")}`
-      );
       headers.set("Authorization", `Bearer ${localStorage.getItem("auth")}`);
     },
   }),
@@ -27,7 +21,7 @@ const baseQueryWithRetry = retry(
 export const api = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithRetry,
-  tagTypes: [tags.user, tags.nodes, tags.collection],
+  tagTypes: [tags.user, tags.nodes, tags.collection, tags.nodeVersions],
   endpoints: () => ({}),
 });
 

@@ -33,26 +33,32 @@ const labels: Record<Steps, { title: string; caption: string }> = {
   },
 };
 
-const Footer = ({step, goBack, nextStep, isLoading}: any) => <PopoverFooter>
-{[
-  Steps.VerifyCode,
-  Steps.WaitList,
-  Steps.MagicLinkExpired,
-].includes(step) && (
-  <PrimaryButton
-    className="bg-transparent hover:bg-transparent text-white hover:text-neutrals-gray-5"
-    onClick={goBack}
-    type="button"
-  >
-    Back
-  </PrimaryButton>
-)}
-{[Steps.ConfirmEmail, Steps.VerifyCode].includes(step) && (
-  <PrimaryButton disabled={isLoading} type="submit" onClick={nextStep}>
-    {step === Steps.ConfirmEmail ? "Login" : "Continue"}
-  </PrimaryButton>
-)}
-</PopoverFooter>
+const Footer = ({ step, goBack, nextStep, isLoading }: any) => (
+  <PopoverFooter>
+    {[Steps.VerifyCode, Steps.WaitList, Steps.MagicLinkExpired].includes(
+      step
+    ) && (
+      <PrimaryButton
+        className="bg-transparent hover:bg-transparent text-white hover:text-neutrals-gray-5"
+        onClick={goBack}
+        type="button"
+      >
+        Back
+      </PrimaryButton>
+    )}
+    {[Steps.ConfirmEmail, Steps.VerifyCode].includes(step) && (
+      <PrimaryButton
+        disabled={isLoading}
+        type="submit"
+        onClick={nextStep}
+        className="flex gap-2 items-center"
+      >
+        {step === Steps.ConfirmEmail ? "Login" : "Continue"}{" "}
+        {isLoading && <DefaultSpinner color="black" size={20} />}
+      </PrimaryButton>
+    )}
+  </PopoverFooter>
+);
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -72,7 +78,6 @@ export default function Login() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("valid", inputRef.current?.checkValidity());
     if (inputRef.current?.checkValidity()) {
       if (step === Steps.ConfirmEmail) {
         onSubmitEmail(email);
@@ -103,7 +108,18 @@ export default function Login() {
         }}
         containerClassName="flex items-center justify-center min-h-screen bg-neutrals-gray-3"
         className="rounded-lg bg-zinc-100 dark:bg-zinc-900"
-        footer={useCallback(() => <Footer step={step} goBack={goBack} isLoading={isLoading} nextStep={handleSubmit} />, [step, goBack, isLoading])}
+        footer={useCallback(
+          () => (
+            <Footer
+              step={step}
+              goBack={goBack}
+              isLoading={isLoading}
+              nextStep={handleSubmit}
+            />
+          ),
+          // eslint-disable-next-line react-hooks/exhaustive-deps
+          [step, goBack, isLoading]
+        )}
       >
         <form onSubmit={handleSubmit}>
           <div className="px-6 py-5">

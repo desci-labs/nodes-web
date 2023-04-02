@@ -61,8 +61,8 @@ const usePageMetadata = (
 
           let documentOffset = 0;
           if (i !== 0) {
-            const prevPageOffset = pageDimensions[i - 1].documentOffset;
-            const prevPageHeight = pageDimensions[i - 1].height;
+            const prevPageOffset = pageDimensions[i - 1]?.documentOffset ?? 0;
+            const prevPageHeight = pageDimensions[i - 1]?.height ?? height;
             documentOffset = prevPageOffset + prevPageHeight + PDF_PAGE_SPACING;
           }
 
@@ -147,7 +147,8 @@ const usePageMetadata = (
             pageMetadata[firstInViewIndex]
           ) === 0
         ) {
-          const pageScrollTop = pageMetadata[firstInViewIndex].documentOffset;
+          const pageScrollTop =
+            pageMetadata[firstInViewIndex]?.documentOffset ?? 0;
           const pageHeight = pageMetadata[firstInViewIndex].height;
 
           // limit searchRange depending on which direction the viewport is

@@ -16,6 +16,7 @@ const initialState: AppPreferences = {
   checkingCode: false,
   activeToolbar: TOOLBAR_ENTRY.collection,
   isToolbarVisible: false,
+  showReferralModal: false,
 };
 
 const slice = createSlice({
@@ -33,6 +34,9 @@ const slice = createSlice({
     },
     setTorusKey: (state, { payload }: PayloadAction<any>) => {
       state.torusKey = payload;
+    },
+    setShowReferralModal: (state, { payload }: PayloadAction<boolean>) => {
+      state.showReferralModal = payload;
     },
     setHeaderHidden: (state, { payload }: PayloadAction<boolean>) => {
       state.hideHeader = payload;
@@ -73,4 +77,5 @@ export const {
   toggleToolbar,
   setActiveToolbar,
   setPreferences,
+  setShowReferralModal,
 } = slice.actions;

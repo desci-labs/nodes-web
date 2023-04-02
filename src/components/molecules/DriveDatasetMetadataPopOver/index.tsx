@@ -1,7 +1,6 @@
 import DefaultSpinner from "@components/atoms/DefaultSpinner";
 import PrimaryButton from "@components/atoms/PrimaryButton";
 import { EMPTY_FUNC } from "@components/utils";
-import { IconX } from "@icons";
 import React, {
   useCallback,
   useEffect,
@@ -10,24 +9,23 @@ import React, {
   useState,
 } from "react";
 
-import PopoverFooter from "@components/molecules/Footer";
 import { DataComponent, ResearchObjectV1 } from "@desci-labs/desci-models";
-
-import PopOver from "@components/organisms/PopOver";
 
 import {
   DatasetMetadataInfo,
   MetaStaging,
 } from "@components/organisms/PaneDrive";
-import useSaveManifest from "@src/hooks/useSaveManifest";
-import { ComponentMetadataForm } from "./DatasetMetadataForm";
-import OverwriteMetadataDialog from "./OverwriteMetadataDialog";
+import { DatasetMetadataForm } from "./DatasetMetadataForm";
+import { OverwriteMetadataForm } from "./OverwriteMetadataDialog";
 import {
   findAndInheritSubMetadata,
   rootComponentPaths,
 } from "@src/components/driveUtils";
 import { FileType } from "@src/components/organisms/Drive";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import { saveManifestDraft, updateComponent } from "@src/state/nodes/viewer";
+import { useSetter } from "@src/store/accessors";
+import Modal from "../Modal/Modal";
 
 export const DATASET_METADATA_FORM_DEFAULTS = {
   title: "",
@@ -55,8 +53,10 @@ const defaultProps = {
 const DriveDatasetMetadataPopOver = (
   props: DriveDatasetMetadataPopoverProps & typeof defaultProps
 ) => {
+  const dispatch = useSetter();
   const { publicView } = useNodeReader();
-  const { saveManifest, isSaving } = useSaveManifest();
+  // const { saveManifest, isSaving } = useSaveManifest();
+  const [isSaving, setIsSaving] = useState(false);
   const formRef = useRef<HTMLFormElement | null>(null);
   const [componentIndexes, setComponentIndexes] = useState<
     number[] | undefined
@@ -108,7 +108,7 @@ const DriveDatasetMetadataPopOver = (
 
   const onSubmit = useCallback(
     async (data: DataComponent["payload"]) => {
-      // console.log("[DRIVE METADATA] ON SUBMIT HIT");
+      console.log("[DRIVE METADATA] ON SUBMIT HIT");
       // debugger;
       if (manifestData && componentIndexes?.length) {
         if (props.metaStaging.length !== 1) delete data.title;
@@ -117,6 +117,8 @@ const DriveDatasetMetadataPopOver = (
         //handle overwriting, both normal metadata and submetadata
         if (overWrite) {
           componentIndexes.forEach((idx) => {
+            const payload = { ...manifestDataClone.components[idx].payload };
+            const meta: any = {};
             props.metaStaging.forEach((file) => {
               const subMeta =
                 manifestDataClone.components[idx].payload.subMetadata;
@@ -126,11 +128,26 @@ const DriveDatasetMetadataPopOver = (
                 splitPath.splice(0, 1);
               const neutralPath = splitPath.join("/");
 
-              const removeMetaKeys = Object.keys(subMeta).filter((k) =>
-                k.includes(neutralPath)
-              );
-              removeMetaKeys.forEach((k) => delete subMeta[k]);
+              // const removeMetaKeys = Object.keys(subMeta).filter((k) =>
+              //   k.includes(neutralPath)
+              // );
+
+              Object.keys(subMeta).forEach((k) => {
+                if (!k.includes(neutralPath)) {
+                  meta[k] = subMeta[k];
+                }
+              });
+              // removeMetaKeys.forEach((k) => delete subMeta[k]);
             });
+            dispatch(
+              updateComponent({
+                index: idx,
+                update: {
+                  ...manifestDataClone.components[idx],
+                  payload: { ...payload, subMetadata: meta },
+                },
+              })
+            );
           });
         }
 
@@ -141,48 +158,78 @@ const DriveDatasetMetadataPopOver = (
               ...manifestData?.components[cI].payload,
               ...data,
             };
-            manifestDataClone.components[cI].payload = newPayload;
+            // console.log("components", manifestDataClone.components[cI]);
+            // manifestDataClone.components[cI].payload = newPayload;
+            dispatch(
+              updateComponent({
+                index: cI,
+                update: {
+                  ...manifestDataClone.components[cI],
+                  payload: newPayload,
+                },
+              })
+            );
           });
         }
 
         //subMetadata
         if (rootCid) {
           const idx = componentIndexes[0];
+          let payload = { ...manifestDataClone.components[idx].payload };
           props.metaStaging.forEach((file) => {
             if (file.file.path) {
               const newSubMetadata = {
-                ...manifestData?.components[idx].payload.subMetadata[
-                  file.file.path
-                ],
+                ...payload.subMetadata[file.file.path],
                 ...data,
               };
 
-              manifestDataClone.components[idx].payload.subMetadata[
-                file.file.path
-              ] = newSubMetadata;
+              payload = {
+                ...payload,
+                subMetadata: {
+                  ...payload.subMetadata,
+                  [file.file.path]: newSubMetadata,
+                },
+              };
             }
           });
+          dispatch(
+            updateComponent({
+              index: idx,
+              update: { ...manifestData.components[idx], payload },
+            })
+          );
         }
 
         try {
-          await saveManifest(manifestDataClone);
+          // await saveManifest(manifestDataClone);
+          setIsSaving(true);
+          dispatch(
+            saveManifestDraft({
+              onError: () => {
+                setIsSaving(false);
+              },
+              onSucess: () => {
+                setIsSaving(false);
+                if (hasDirs) {
+                  props.metaStaging.forEach((f) => {
+                    if (f.file.type === FileType.Dir)
+                      findAndInheritSubMetadata(manifestData, f.file);
+                  });
+                }
 
-          if (hasDirs) {
-            props.metaStaging.forEach((f) => {
-              if (f.file.type === FileType.Dir)
-                findAndInheritSubMetadata(manifestData, f.file);
-            });
-          }
+                props.metaStaging.forEach((f) => {
+                  f.file.metadata = data;
+                });
 
-          props.metaStaging.forEach((f) => {
-            f.file.metadata = data;
-          });
-
-          setOverWrite(false);
-          setShowOverwriteDialog(false);
-          props.onClose();
+                setOverWrite(false);
+                setShowOverwriteDialog(false);
+                props.onClose();
+              },
+            })
+          );
         } catch (e: any) {
           alert(e.message);
+          setIsSaving(false);
         }
       }
     },
@@ -206,21 +253,55 @@ const DriveDatasetMetadataPopOver = (
     return <div></div>;
     // return <div className="text-xs bg-red-500">component problem</div>;
   }
-  // console.log("[MD]non virtual");
 
   return (
     <div>
-      <PopOver
+      <Modal
         {...props}
-        style={{
-          width: 700,
-          marginLeft: 0,
-          marginRight: 0,
-        }}
-        footer={() => (
-          <PopoverFooter>
+        isOpen={props.isVisible}
+        onDismiss={() => props?.onClose()}
+        $scrollOverlay={true}
+        $maxWidth={700}
+      >
+        <div
+          className={`rounded-lg bg-zinc-100 dark:bg-zinc-900 ${
+            showOverwriteDialog ? "hidden" : "animate-fadeIn"
+          }`}
+        >
+          <div className="py-4 px-6 text-neutrals-gray-5">
+            <Modal.Header
+              onDismiss={props.onClose}
+              title="Enter Metadatas"
+              subTitle=" Please fill in the metadata for open access data."
+            />
+            <div className="px-1">
+              {/**Have to force a re-render with props.isVisible */}
+              {/* <PerfectScrollbar className="max-h-[calc(100vh-300px)] h-[calc(100vh-300px)] overflow-y-scroll"> */}
+              {props.isVisible && mode === "editor" ? (
+                <DatasetMetadataForm
+                  ref={formRef}
+                  prepopulate={
+                    props.datasetMetadataInfoRef.current.prepopulateMetadata
+                  }
+                  prepopulatingFrom={
+                    props.datasetMetadataInfoRef.current.prepopulateFromName
+                  }
+                  currentObjectId={currentObjectId!}
+                  onSubmit={onSubmit}
+                  // setNewMetadata={setNewMetadata}
+                  loading={isSaving}
+                  metaStaging={props.metaStaging}
+                  defaultLicense={props.manifestData.defaultLicense || ""}
+                />
+              ) : // <ReadOnlyComponent component={component} />
+              null}
+              {/* </PerfectScrollbar> */}
+            </div>
+          </div>
+          <div className="flex flex-row justify-end gap-4 items-center h-16 w-full dark:bg-[#272727] border-t border-t-[#81C3C8] rounded-b-lg p-4">
             <PrimaryButton
               onClick={() => {
+                console.log("submit");
                 // debugger;
                 if (publicView) {
                   props.onClose();
@@ -247,71 +328,18 @@ const DriveDatasetMetadataPopOver = (
                 "Done"
               )}
             </PrimaryButton>
-          </PopoverFooter>
-        )}
-        containerStyle={{
-          backgroundColor: "#3A3A3ABF",
-        }}
-        onClose={() => {
-          // formRef?.current?.reset();
-          props.onClose();
-        }}
-        className={`rounded-lg bg-zinc-100 dark:bg-zinc-900 ${
-          showOverwriteDialog ? "hidden" : null
-        }`}
-      >
-        <div className="py-4 px-6 text-neutrals-gray-5">
-          <div className="flex flex-row justify-end items-center">
-            <IconX
-              fill="white"
-              width={20}
-              height={20}
-              className="cursor-pointer"
-              onClick={() => {
-                props.onClose();
-              }}
-            />
-          </div>
-
-          <div className="px-1">
-            <h1 className="text-xl font-bold text-white">Enter Metadata</h1>
-            <div className="text-sm ">
-              Please fill in the metadata for open access data.
-            </div>
-
-            {/**Have to force a re-render with props.isVisible */}
-            {/* <PerfectScrollbar className="max-h-[calc(100vh-300px)] h-[calc(100vh-300px)] overflow-y-scroll"> */}
-            {props.isVisible && mode === "editor" ? (
-              <ComponentMetadataForm
-                ref={formRef}
-                prepopulate={
-                  props.datasetMetadataInfoRef.current.prepopulateMetadata
-                }
-                prepopulatingFrom={
-                  props.datasetMetadataInfoRef.current.prepopulateFromName
-                }
-                currentObjectId={currentObjectId!}
-                onSubmit={onSubmit}
-                // setNewMetadata={setNewMetadata}
-                loading={isSaving}
-                metaStaging={props.metaStaging}
-                defaultLicense={props.manifestData.defaultLicense || ""}
-              />
-            ) : // <ReadOnlyComponent component={component} />
-            null}
-            {/* </PerfectScrollbar> */}
           </div>
         </div>
-      </PopOver>
-      {showOverwriteDialog && (
-        <OverwriteMetadataDialog
-          setShowOverwriteDialog={setShowOverwriteDialog}
-          setOverWrite={setOverWrite}
-          loading={isSaving}
-          formRef={formRef}
-          overWrite={overWrite}
-        />
-      )}
+        {showOverwriteDialog && (
+          <OverwriteMetadataForm
+            setShowOverwriteDialog={setShowOverwriteDialog}
+            setOverWrite={setOverWrite}
+            loading={isSaving}
+            formRef={formRef}
+            overWrite={overWrite}
+          />
+        )}
+      </Modal>
     </div>
   );
 };

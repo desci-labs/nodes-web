@@ -512,6 +512,7 @@ const PaneDrive = () => {
     }
     setDroppedFileList(null);
     setDroppedTransferItemList(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     droppedFileList,
     setDroppedFileList,

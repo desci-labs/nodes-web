@@ -1,5 +1,5 @@
 /* This example requires Tailwind CSS v2.0+ */
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { CheckIcon } from "@heroicons/react/solid";
 import {
   Combobox,
@@ -23,6 +23,7 @@ function classNames(...classes: any[]) {
 interface Props {
   placeholder?: string;
   onChange: (value: string[]) => void;
+  defaultValues?: string[];
 }
 
 export default function FieldSelector(props: Props) {
@@ -33,16 +34,28 @@ export default function FieldSelector(props: Props) {
   const [debouncedInput] = useDebouncer(input, 300);
   const { isFetching, data } = useSearchField(debouncedInput);
   const [customCategories, addCategory] = useState<ResearchFields[]>([]);
+  const inputChangedRef = useRef(false);
 
   const onHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value.trim());
   };
+
+  useEffect(() => {
+    // don't prefill default values if an edit has been made
+    if (inputChangedRef.current === true) return;
+
+    if (values.length === 0 && props?.defaultValues) {
+      setValues(props.defaultValues);
+      onChange(props.defaultValues);
+    }
+  }, [values, props.defaultValues, onChange]);
 
   const onValueChanged = (value: string) => {
     if (values.includes(value)) return;
     setInput("");
     setValues((values) => values.concat(value));
     onChange(values.concat(value));
+    inputChangedRef.current = true;
   };
 
   const categories = useMemo(
@@ -58,6 +71,7 @@ export default function FieldSelector(props: Props) {
     update.splice(index, 1);
     setValues((_) => update);
     onChange(update);
+    inputChangedRef.current = true;
   };
 
   return (
@@ -86,20 +100,27 @@ export default function FieldSelector(props: Props) {
         </div>
         <ComboboxInput
           type="text"
-          placeholder="Enter category..."
+          placeholder="Search category..."
           selectOnClick
           onChange={onHandleChange}
+          value={input}
           className="block grow text-sm w-full bg-transparent ring-0 focus:ring-0 border-none focus:border-none"
         />
       </div>
 
       {(data || isFetching) && (
-        <ComboboxPopover portal={false}>
+        <ComboboxPopover
+          portal={true}
+          style={{
+            minHeight: "200px",
+            zIndex: 1046,
+          }}
+        >
           <ComboboxList
             onBlur={() => {
               setTouched(true);
             }}
-            className="absolute z-10 mt-1 w-full bg-white dark:bg-[#272727] shadow-lg max-h-52 rounded-md py-1 text-base overflow-y-scroll focus:outline-none sm:text-sm list-none"
+            className="absolute z-10 mt-1 w-full bg-white dark:bg-[#272727] shadow-lg max-h-52  rounded-md py-1 text-base overflow-y-scroll focus:outline-none sm:text-sm list-none"
           >
             {isFetching && (
               <div className="w-full flex justify-center">
@@ -143,21 +164,27 @@ export default function FieldSelector(props: Props) {
               </ComboboxOption>
             ))}
           </ComboboxList>
-          {categories.length === 0 && !isFetching ? (
+          {categories.length === 0 &&
+          !isFetching &&
+          debouncedInput === input ? (
             <div
-              className={`flex flex-col justify-center items-center absolute z-10 mt-1 p-2 w-full gap-2 bg-white dark:bg-[#272727] shadow-lg max-h-96 rounded-md py-2 text-base ${
+              className={`flex flex-col justify-center items-center absolute z-10 mt-1 p-2 w-full gap-2 bg-white dark:bg-[#272727] shadow-lg max-h-96rounded-md py-2 text-base ${
                 isFetching && "hidden"
               }`}
             >
-              <span>{input}</span>
-              <span className="block text-gray-400 text-sm">No results found</span>
+              <span className="text-white font-bold">{input}</span>
+              <span className="block text-gray-400 text-sm">
+                No results found
+              </span>
               <PrimaryButton
                 className="block mt-1 cursor-pointer disabled:cursor-not-allowed"
-                onClick={() =>
+                onClick={() => {
                   addCategory((prev) =>
                     prev.concat([{ name: input, id: random(500, 600) }])
-                  )
-                }
+                  );
+                  onValueChanged(input);
+                  inputChangedRef.current = true;
+                }}
               >
                 Add New Field of Science
               </PrimaryButton>

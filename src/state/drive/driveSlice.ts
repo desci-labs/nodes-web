@@ -38,21 +38,23 @@ import { __log } from "@src/components/utils";
 import { setManifest, setManifestCid } from "../nodes/viewer";
 import { dispatch } from "react-hot-toast/dist/core/store";
 interface DriveState {
-  nodeTree: DriveObject | null;
   status: RequestStatus;
   error: null | undefined | string;
+  nodeTree: DriveObject | null;
   currentDrive: DriveObject | null;
   uploadStatus: RequestStatus;
   uploadQueue: UploadQueueItem[];
   batchUploadProgress: Record<string, number>;
   showUploadPanel: boolean;
+  deprecated: boolean | undefined;
 }
 
 const initialState: DriveState = {
-  nodeTree: null,
   status: "idle",
   error: null,
+  nodeTree: null,
   currentDrive: null,
+  deprecated: undefined,
   uploadStatus: "idle", //remove
   uploadQueue: [],
   batchUploadProgress: {},
@@ -126,10 +128,15 @@ export const driveSlice = createSlice({
         const { tree } = action.payload;
         // debugger;
         if (action.payload.deprecated) {
+          console.log(
+            "[DRIVE]Deprecated node detected. Using old drive format."
+          );
+          state.deprecated = true;
           state.nodeTree = tree as DriveObject;
           state.currentDrive = tree as DriveObject;
           return;
         }
+        state.deprecated = false;
 
         const manifest = action.payload.manifest!;
         //Process the IPFS tree into a DriveObject tree
@@ -232,13 +239,14 @@ export const fetchTreeThunk = createAsyncThunk(
             (c) => c.type === ResearchObjectComponentType.DATA_BUCKET
           );
 
+    debugger;
     if (hasDataBucket) {
       const rootCid = hasDataBucket.payload.cid;
       const { tree } = await getDatasetTree(rootCid, currentObjectId!);
       return { tree, manifest };
     } else {
       //fallback to construct deprecated tree
-      const root = manifestToVirtualDrives(manifest!, manifestCid, {});
+      const rootDrive = manifestToVirtualDrives(manifest!, manifestCid, {});
 
       const lastPathUidMap = JSON.parse(
         sessionStorage.getItem(SessionStorageKeys.pathUidMap)!
@@ -252,12 +260,11 @@ export const fetchTreeThunk = createAsyncThunk(
           : undefined;
 
       //options also takes in a public view boolean
-      await getAllTrees(root, currentObjectId!, manifest!, {
+      await getAllTrees(rootDrive, currentObjectId!, manifest!, {
         pathUidMap: provideMap,
         public: false, //FIXME, HARDCODED
       });
-
-      return { tree: deleteAllParents(root), deprecated: true };
+      return { tree: deleteAllParents(rootDrive), deprecated: true };
     }
   }
 );

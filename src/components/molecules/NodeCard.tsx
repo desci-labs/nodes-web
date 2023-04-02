@@ -2,22 +2,19 @@ import { useManuscriptController } from "@src/components/organisms/ManuscriptRea
 import { RESEARCH_OBJECT_NODES_PREFIX } from "@desci-labs/desci-models";
 import { ResearchNode } from "@src/state/api/types";
 import { IconKebab, IconNodeNoMetadata, IconPen } from "@icons";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { app, site } from "@src/constants/routes";
 import ContextMenu from "../organisms/ContextMenu";
-import { EditNodeInfo } from "../organisms/PaneNodeCollection";
 import { useSetter } from "@src/store/accessors";
-import { setPublicView } from "@src/state/nodes/viewer";
+import { setEditNodeId, setPublicView } from "@src/state/nodes/viewer";
 
 export interface NodeProps {
   id?: number;
   disabled?: boolean;
   isCurrent?: boolean;
   onClick?: () => void;
-  setEditModalInfo: React.Dispatch<
-    React.SetStateAction<EditNodeInfo | undefined>
-  >;
+  onHandleEdit?: () => void;
 }
 
 const NodeCard = ({
@@ -29,7 +26,7 @@ const NodeCard = ({
   isPublished,
   isCurrent,
   onClick,
-  setEditModalInfo,
+  onHandleEdit,
 }: ResearchNode & NodeProps) => {
   const dispatch = useSetter();
   const { setShowAddNewNode } = useManuscriptController([]);
@@ -86,12 +83,14 @@ const NodeCard = ({
                         icon: <IconPen fill="white" />,
                         label: <span>Edit</span>,
                         onClick: () => {
-                          setEditModalInfo({
-                            title: title,
-                            uuid: uuid!,
-                            licenseType: undefined,
-                          });
-                          // setCurrentObjectId(uuid!);
+                          dispatch(
+                            setEditNodeId({
+                              uuid: uuid!,
+                              title,
+                              licenseType: null,
+                            })
+                          );
+                          onHandleEdit?.();
                           setShowAddNewNode(true);
                         },
                       },

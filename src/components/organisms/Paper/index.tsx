@@ -4,7 +4,7 @@ import { Document } from "react-pdf/dist/esm/entry.webpack5";
 import "react-pdf/dist/umd/Page/AnnotationLayer.css";
 import "./style.scss";
 
-import { APPROXIMATED_HEADER_HEIGHT, __log } from "@components/utils";
+import { APPROXIMATED_HEADER_HEIGHT } from "@components/utils";
 import { ResearchObjectComponentAnnotation } from "@desci-labs/desci-models";
 import { useScrolling, useUpdateEffect } from "react-use";
 import { PageComponentHOC } from "./Page";
@@ -379,7 +379,7 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
     setHighlightPrompt(null);
   };
 
-  __log("Paper::beforeRender, currentPdf", currentPdf);
+  // __log("Paper::beforeRender, currentPdf", currentPdf);
 
   //listen for centered zoom calls and execute them
   useEffect(() => {
@@ -388,7 +388,7 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
         centeredZoom.zoomMagnitude,
         centeredZoom.centerCoords && centeredZoom.centerCoords
       );
-      console.log("exected centered zoom: ", centeredZoom.zoomMagnitude);
+      // console.log("exected centered zoom: ", centeredZoom.zoomMagnitude);
       dispatch(resetCenteredZoom());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

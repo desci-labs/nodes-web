@@ -2,22 +2,21 @@ import { useEffect, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 
 import cx from "classnames";
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { IconCircleCheck, IconWallet } from "@icons";
 import { shortAccount } from "@components/utils";
 import { useUser } from "@src/state/user/hooks";
 import { useGetter } from "@src/store/accessors";
+import WalletManagerModal from "../WalletManagerModal";
 
 const DigitalSignature = () => {
   const { account } = useWeb3React();
   const userProfile = useUser();
+  const [openWalet, setOpenWallet] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const {
     torusKey,
     orcid: { orcidData },
   } = useGetter((state) => state.preferences);
-
-  const { setShowWalletManager } = useManuscriptController();
 
   useEffect(() => {
     if (
@@ -39,7 +38,7 @@ const DigitalSignature = () => {
           : `hover:bg-gray-800 cursor-default`
       }`}
       onClick={async () => {
-        setShowWalletManager(true);
+        setOpenWallet(true);
         return false;
       }}
     >
@@ -77,6 +76,10 @@ const DigitalSignature = () => {
           </div>
         </button>
       </div>
+      <WalletManagerModal
+        isOpen={openWalet}
+        onDismiss={() => setOpenWallet(false)}
+      />
     </div>
   );
 };

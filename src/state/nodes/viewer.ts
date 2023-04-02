@@ -2,9 +2,14 @@ import {
   ResearchObjectComponentAnnotation,
   ResearchObjectComponentType,
   ResearchObjectV1,
+  ResearchObjectV1Author,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { updateDraft } from "@src/api";
+import { cleanupManifestUrl } from "@src/components/utils";
+import { RootState } from "@src/store";
+import axios from "axios";
 
 type ReaderMode = "reader" | "editor";
 
@@ -14,11 +19,25 @@ export enum ResearchTabs {
   source = "source",
 }
 
+export interface EditNodeParams {
+  uuid: string;
+  title: string;
+  licenseType: any;
+  // researchFields: string[];
+}
+
+export enum ManifestDataStatus {
+  Idle = "Idle",
+  Pending = "Pending",
+  Fulfilled = "Fulfilled",
+  Rejected = "Rejected",
+}
 interface NodeReaderPref {
   isNew: boolean;
   mode: ReaderMode;
   manifestCid: string;
   publicView: boolean;
+  editingNodeParams?: EditNodeParams | null;
   currentObjectId?: string;
   isDraggingFiles: boolean;
   isCommitPanelOpen: boolean;
@@ -26,31 +45,41 @@ interface NodeReaderPref {
   researchPanelTab: ResearchTabs;
   isResearchPanelOpen: boolean;
   lastScrollTop: Record<string, number>;
-  componentStack: ResearchObjectV1Component[];
   startedNewAnnotationViaButton: boolean;
+  componentStack: ResearchObjectV1Component[];
+  manifestStatus: ManifestDataStatus;
 }
 
 const initialState: NodeReaderPref = {
   isNew: false,
   mode: "reader",
-  currentObjectId: "",
   manifestCid: "",
+  editingNodeParams: null,
+  currentObjectId: "",
   lastScrollTop: {},
   publicView: false,
   componentStack: [],
   isDraggingFiles: false,
   isCommitPanelOpen: false,
   isResearchPanelOpen: true,
-  researchPanelTab: ResearchTabs.current,
+  researchPanelTab: ResearchTabs.history,
   startedNewAnnotationViaButton: false,
+  manifestStatus: ManifestDataStatus.Idle,
 };
 
 export const nodeReaderSlice = createSlice({
   initialState,
-  name: "nodeViewerSlice",
+  name: "nodeViewer",
   reducers: {
+    resetNodeViewer: (state) => initialState,
     toggleMode: (state) => {
       state.mode = state.mode === "reader" ? "editor" : "reader";
+    },
+    resetEditNode: (state) => {
+      state.editingNodeParams = null;
+    },
+    setEditNodeId: (state, { payload }: PayloadAction<EditNodeParams>) => {
+      state.editingNodeParams = payload;
     },
     setManifestData: (
       state,
@@ -58,9 +87,55 @@ export const nodeReaderSlice = createSlice({
     ) => {
       state.manifest = payload.manifest;
       state.manifestCid = payload.cid;
+      state.manifestStatus = ManifestDataStatus.Idle;
     },
     setManifest: (state, { payload }: PayloadAction<ResearchObjectV1>) => {
+      state.manifestStatus = ManifestDataStatus.Idle;
       state.manifest = payload;
+    },
+    addNodeAuthor: (
+      state,
+      { payload }: PayloadAction<ResearchObjectV1Author>
+    ) => {
+      if (!state.manifest) return;
+
+      if (!state.manifest?.authors) {
+        state.manifest.authors = [];
+      }
+
+      state.manifest?.authors?.push(payload);
+    },
+    updateNodeAuthor: (
+      state,
+      {
+        payload,
+      }: PayloadAction<{ update: ResearchObjectV1Author; index: number }>
+    ) => {
+      if (!state.manifest?.authors) return state;
+      state.manifest.authors = state.manifest.authors.map((author, idx) => {
+        if (idx === payload.index) return payload.update;
+        return author;
+      });
+    },
+    removeAuthor: (
+      state,
+      { payload }: PayloadAction<{ authorIndex: number }>
+    ) => {
+      if (!state.manifest?.authors) return state;
+      const authors = state.manifest.authors.filter(
+        (_, idx) => idx !== payload.authorIndex
+      );
+      state.manifest.authors = authors;
+    },
+    deleteComponent: (
+      state,
+      { payload }: PayloadAction<{ componentId: string }>
+    ) => {
+      if (state.manifest) {
+        state.manifest.components = state.manifest.components.filter(
+          (component) => component.id !== payload.componentId
+        );
+      }
     },
     updateComponent: (
       state,
@@ -167,7 +242,6 @@ export const nodeReaderSlice = createSlice({
         state.manifest.components = components;
       }
     },
-
     setManifestCid: (state, { payload }: PayloadAction<string>) => {
       state.manifestCid = payload;
     },
@@ -261,7 +335,59 @@ export const nodeReaderSlice = createSlice({
       return state;
     },
   },
+  extraReducers(builder) {
+    builder
+      .addCase(saveManifestDraft.pending, (state) => {
+        state.manifestStatus = ManifestDataStatus.Pending;
+      })
+      .addCase(saveManifestDraft.fulfilled, (state, action) => {
+        state.manifestStatus = ManifestDataStatus.Fulfilled;
+      })
+      .addCase(saveManifestDraft.rejected, (state, action) => {
+        state.manifestStatus = ManifestDataStatus.Rejected;
+      });
+  },
 });
+
+type SaveManifestProps = {
+  uuid?: string;
+  onSucess?: () => void;
+  onError?: (error?: any) => void;
+};
+
+export const saveManifestDraft = createAsyncThunk(
+  `${nodeReaderSlice.name}/saveManifestDraft`,
+  async (args: SaveManifestProps, { dispatch, getState }) => {
+    const state = getState() as RootState;
+    const { manifest: manifestData, currentObjectId } = state.nodes.nodeReader;
+
+    if (!manifestData) return;
+    // console.log("Save Manifest", manifestData);
+    try {
+      const res = await updateDraft({
+        manifest: manifestData!,
+        uuid: args?.uuid ?? currentObjectId!,
+      });
+
+      const manifestUrl = cleanupManifestUrl(res.uri || res.manifestUrl);
+      let response = res.manifestData;
+
+      if (res.manifestData) {
+        dispatch(setManifest(res.manifestData));
+      } else {
+        const { data } = await axios.get(manifestUrl);
+        response = data;
+        dispatch(setManifest(data));
+      }
+      dispatch(setManifestCid(res.uri));
+      localStorage.setItem("manifest-url", manifestUrl);
+      args?.onSucess?.();
+      return response;
+    } catch (e) {
+      throw Error("Could not update manifest");
+    }
+  }
+);
 
 export const selectNodeUuid = (state: {
   nodes: { nodeReader: NodeReaderPref };
@@ -273,11 +399,18 @@ export const {
   setIsNew,
   toggleMode,
   setManifest,
+  removeAuthor,
+  addNodeAuthor,
   setPublicView,
+  setEditNodeId,
+  resetEditNode,
   setManifestCid,
   saveAnnotation,
+  resetNodeViewer,
+  deleteComponent,
   updateComponent,
   setManifestData,
+  updateNodeAuthor,
   deleteAnnotation,
   toggleCommitPanel,
   setComponentStack,

@@ -4,7 +4,6 @@ import { PropsWithChildren } from "react";
 import useScroll from "@src/hooks/useScroll";
 import useCheckOrcid from "@src/hooks/useCheckOrcid";
 import Toolbar from "@src/components/organisms/Toolbar";
-import PopOverWalletManager from "@src/components/molecules/PopOverWalletManager";
 import { useUser } from "@src/state/user/hooks";
 import ProfilePopOver from "@src/components/screens/Profile";
 import { useGetter } from "@src/store/accessors";
@@ -12,7 +11,7 @@ import { useGetter } from "@src/store/accessors";
 export default function AppWrapper(props: PropsWithChildren<{}>) {
   const userProfile = useUser();
   const { hideFooter, checkingCode } = useGetter((state) => state.preferences);
-  console.log("profile", checkingCode, userProfile);
+
   // page scroll behaviour init hook
   useScroll();
 
@@ -55,7 +54,6 @@ export default function AppWrapper(props: PropsWithChildren<{}>) {
 export function Popovers() {
   return (
     <>
-      <PopOverWalletManager />
       <ProfilePopOver onClose={() => {}} />
     </>
   );

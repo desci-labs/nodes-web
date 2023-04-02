@@ -6,6 +6,14 @@ import { nodeReaderMiddleware } from "@src/state/nodes/middleware";
 import { nodesReducer } from "@src/state/nodes/root";
 import preferenceSlice from "@src/state/preferences/preferencesSlice";
 import userSlice from "@src/state/user/userSlice";
+import {
+  persistReducer,
+  persistStore,
+  createMigrate,
+  PersistedState,
+  createTransform,
+} from "redux-persist";
+import storage from "redux-persist/lib/storage";
 
 const rootReducer = combineReducers({
   user: userSlice,
@@ -16,13 +24,51 @@ const rootReducer = combineReducers({
   drive: driveReducer,
 });
 
+const migrations = {
+  1: (state: PersistedState) => {
+    console.log("migrate, ", state);
+    return {} as PersistedState; // reset all state, except version
+  },
+};
+
+const nestedBlacklist = createTransform(
+  null,
+  (state: PersistedState, key) => {
+    const newState = { ...state };
+    (newState as any).nodes.loadState = {};
+
+    return newState;
+  },
+  {}
+);
+
+const persistConfig = {
+  key: "root",
+  version: 1,
+  storage,
+  migrate: createMigrate(migrations),
+  transforms: [nestedBlacklist],
+  blacklist: [
+    "user",
+    "preferences",
+    "pdfViewer",
+    "nodeViewer",
+    "adminAnalytics",
+    api.reducerPath,
+  ],
+};
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
 export const store = configureStore({
-  reducer: rootReducer,
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
       .prepend(nodeReaderMiddleware.middleware)
       .concat([api.middleware]),
 });
+
+export const persistor = persistStore(store);
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;

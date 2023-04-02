@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { FlexColumn, FlexRow, FlexRowSpaceBetween } from "@components/styled";
 import SidePanel from "@components/organisms/SidePanel";
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import HistoryTab from "./Tabs/HistoryTab";
 import SourceTab from "./Tabs/SourceTab";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -25,7 +24,11 @@ import { useEffectOnce } from "react-use";
 import NodeDrive from "@components/molecules/NodeDrive";
 import useSaveManifest from "@src/hooks/useSaveManifest";
 import { useUser } from "@src/state/user/hooks";
-import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
+import {
+  useNodeReader,
+  useNodeVersions,
+  usePdfReader,
+} from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import {
   popFromComponentStack,
@@ -87,8 +90,8 @@ interface ManuscriptSidePanelProps {
 let playTime = 0;
 const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
   const { onClose } = props;
+  const dispatch = useSetter();
   const { selectedAnnotationId } = usePdfReader();
-  const { publishMap } = useManuscriptController(["publishMap"]);
   const {
     manifest: manifestData,
     publicView,
@@ -99,7 +102,7 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
     componentStack,
     researchPanelTab,
   } = useNodeReader();
-  const dispatch = useSetter();
+  const nodeVersions = useNodeVersions(currentObjectId);
 
   const onSetResearchPanelTab = (tab: ResearchTabs) =>
     dispatch(setResearchPanelTab(tab));
@@ -131,14 +134,14 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
   const refVideo = useRef(null);
 
   useEffect(() => {
-    const didPush = !!publishMap[currentObjectId!];
+    const didPush = !!nodeVersions;
 
     setShouldBeBlue(didPush);
 
     if (refVideo.current) {
       (refVideo.current! as HTMLVideoElement).currentTime = playTime + 0.25;
     }
-  }, [manifestData, isCommitPanelOpen, currentObjectId, mode, publishMap]);
+  }, [manifestData, isCommitPanelOpen, currentObjectId, mode, nodeVersions]);
 
   useEffect(() => {
     if (!refVideo.current) {

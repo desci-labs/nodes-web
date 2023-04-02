@@ -9,13 +9,13 @@ import NodeCardLoader from "../molecules/NodeCardLoader";
 import { useGetter, useSetter } from "@src/store/accessors";
 import { useGetNodesQuery } from "@src/state/api/nodes";
 import { toggleToolbar } from "@src/state/preferences/preferencesSlice";
-import AddResearchNode from "@src/components/organisms/Modals/AddResearchNode/AddResearchNode";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import {
   setCurrentObjectId,
   setPublicView,
   toggleResearchPanel,
 } from "@src/state/nodes/viewer";
+import CreateNodeModal from "./CreateNodeModal/CreateNodeModal";
 
 export interface EditNodeInfo {
   uuid: string;
@@ -24,14 +24,9 @@ export interface EditNodeInfo {
 }
 
 export default function PaneNodeCollection() {
-  const {
-    publishMap,
-    setPublishMap,
-    setIsAddingComponent,
-    setIsAddingSubcomponent,
-    showAddNewNode,
-    setShowAddNewNode,
-  } = useManuscriptController(["publishMap", "showAddNewNode"]);
+  const { setIsAddingComponent, setIsAddingSubcomponent, setShowAddNewNode } =
+    useManuscriptController(["showAddNewNode"]);
+  const [isOpen, setOpen] = useState(false);
 
   const dispatch = useSetter();
   const { isNew, currentObjectId } = useNodeReader();
@@ -40,10 +35,6 @@ export default function PaneNodeCollection() {
   const [, setMounted] = useState(false);
 
   const { data: nodes, isLoading } = useGetNodesQuery();
-  const [, setShowModal] = useState<boolean>(false);
-  const [editModalInfo, setEditModalInfo] = useState<
-    EditNodeInfo | undefined
-  >();
 
   const onClose = (dontHideToolbar?: boolean) => {
     if (!dontHideToolbar) {
@@ -58,29 +49,18 @@ export default function PaneNodeCollection() {
   /**
    * Refresh node list when we view this screen
    */
-  useEffect(() => {}, [dispatch, isToolbarVisible]);
+  useEffect(() => {
+    // dispatch(nodesApi.util.invalidateTags([{ type: tags.nodes }]));
+  }, [dispatch, isToolbarVisible]);
 
   useEffect(() => {
     if (nodes && nodes.length > 0) {
       if (!currentObjectId) {
         dispatch(setCurrentObjectId(nodes[0]?.uuid));
       }
-      /**
-       * Update which nodes we know are published based on graph index
-       */
-      const publishedNodes = nodes
-        .filter((n: any) => n.isPublished)
-        .map((n: any) => ({ uuid: n.uuid, index: n.index }));
-      if (publishedNodes.length) {
-        const newPublishMap = { ...publishMap };
-        publishedNodes.forEach((n: any) => {
-          newPublishMap[n.uuid] = n.index;
-        });
-        setPublishMap(newPublishMap);
-      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isNew, nodes, setPublishMap]);
+  }, [isNew, nodes]);
 
   const NodeCollectionView = () => (
     <div className="max-w-2xl w-full self-center flex flex-col gap-6 pb-10">
@@ -90,6 +70,7 @@ export default function PaneNodeCollection() {
             {...node}
             key={`node-card-sidepanel-${node.uuid}`}
             isCurrent={node.uuid === currentObjectId}
+            onHandleEdit={() => setOpen(true)}
             onClick={() => {
               setTimeout(() => {
                 setIsAddingComponent(false);
@@ -98,7 +79,6 @@ export default function PaneNodeCollection() {
               });
               onClose();
             }}
-            setEditModalInfo={setEditModalInfo}
           />
         ))}
     </div>
@@ -136,6 +116,7 @@ export default function PaneNodeCollection() {
             onClick={() => {
               dispatch(setPublicView(false));
               setShowAddNewNode(true);
+              setOpen(true);
             }}
             className="h-10 text-lg"
           >
@@ -143,16 +124,7 @@ export default function PaneNodeCollection() {
           </PrimaryButton>
         </div>
         {isLoading ? <NodeCollectionLoader /> : <LoadedNodesCollection />}
-        <AddResearchNode
-          setEditModalInfo={setEditModalInfo}
-          editModalInfo={editModalInfo}
-          onRequestClose={() => {
-            setShowModal(false);
-            setShowAddNewNode(false);
-          }}
-          isVisible={showAddNewNode}
-          toggleModal={setShowAddNewNode}
-        />
+        <CreateNodeModal isOpen={isOpen} onDismiss={() => setOpen(false)} />
       </div>
     </div>
   );

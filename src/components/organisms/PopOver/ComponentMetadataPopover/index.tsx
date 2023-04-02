@@ -1,11 +1,8 @@
 import DefaultSpinner from "@components/atoms/DefaultSpinner";
 import PrimaryButton from "@components/atoms/PrimaryButton";
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { EMPTY_FUNC } from "@components/utils";
 import { IconViewLink, IconX } from "@icons";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
-
-import PopoverFooter from "@components/molecules/Footer";
 import CreateableSelect from "@components/molecules/FormInputs/CreateableSelect";
 import {
   CommonComponentPayload,
@@ -14,17 +11,18 @@ import {
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 import { Controller, useForm } from "react-hook-form";
-import PopOver from "..";
 import InsetLabelInput from "../../../molecules/FormInputs/InsetLabelInput";
-import SelectMenu from "../../../molecules/FormInputs/SelectMenu";
 import ReadOnlyComponent from "./ReadOnlyComponent";
 import axios from "axios";
-import useSaveManifest from "@src/hooks/useSaveManifest";
-import { useNodeReader } from "@src/state/nodes/hooks";
+import { useManifestStatus, useNodeReader } from "@src/state/nodes/hooks";
+import { useSetter } from "@src/store/accessors";
+import { updateComponent, saveManifestDraft } from "@src/state/nodes/viewer";
+import SelectList from "@src/components/molecules/FormInputs/SelectList";
+import Modal from "@src/components/molecules/Modal/Modal";
 
 export const PDF_LICENSE_TYPES = [
-  { id: 1, name: "CC BY" },
   { id: 0, name: "CC0" },
+  { id: 1, name: "CC BY" },
   { id: 2, name: "CC BY-SA" },
   { id: 3, name: "CC BY-NC" },
   { id: 4, name: "CC BY-NC-SA" },
@@ -239,11 +237,13 @@ const ComponentMetadataForm = React.forwardRef(
             control={control}
             defaultValue={defaultLicense}
             render={({ field }: any) => (
-              <SelectMenu
-                label="Choose license"
-                data={getLicenseTypes()}
-                field={{ ...field, value: field.value || defaultLicense }}
+              <SelectList
+                label="License Type"
+                className="mt-2"
                 mandatory={true}
+                data={PDF_LICENSE_TYPES}
+                defaultValue={defaultLicense}
+                field={{ ...field, value: field.value || defaultLicense }}
               />
             )}
           />
@@ -292,8 +292,9 @@ const defaultProps = {
 const ComponentMetadataPopover = (
   props: ComponentMetadataPopoverProps & typeof defaultProps
 ) => {
+  const dispatch = useSetter();
   const formRef = useRef<HTMLFormElement | null>(null);
-  const { saveManifest, isSaving } = useSaveManifest();
+  const { isLoading: isSaving } = useManifestStatus();
   const [component, setComponent] = useState<
     ResearchObjectV1Component | undefined
   >();
@@ -323,20 +324,24 @@ const ComponentMetadataPopover = (
 
   const onSubmit = async (data: CommonComponentPayload) => {
     if (manifestData && componentIndex !== undefined) {
-      // const { keywords, description, licenseType } = data;
       const manifestDataClone = { ...manifestData };
 
       const componentPayload = {
         ...manifestData?.components[componentIndex].payload,
         ...data,
       };
-      manifestDataClone.components[componentIndex].payload = componentPayload;
-      try {
-        await saveManifest(manifestDataClone);
-        props.onClose();
-      } catch (e: any) {
-        alert(e.message);
-      }
+
+      dispatch(
+        updateComponent({
+          index: componentIndex,
+          update: {
+            ...manifestDataClone.components[componentIndex],
+            payload: componentPayload,
+          },
+        })
+      );
+
+      dispatch(saveManifestDraft({ onSucess: () => props.onClose() }));
     }
   };
 
@@ -346,43 +351,11 @@ const ComponentMetadataPopover = (
   }
 
   return (
-    <PopOver
-      {...props}
-      style={{
-        width: 720,
-        marginLeft: 0,
-        marginRight: 0,
-      }}
-      containerStyle={{
-        backgroundColor: "#3A3A3ABF",
-      }}
-      onClose={() => {
-        // formRef?.current?.reset();
-        props.onClose();
-      }}
-      className="rounded-lg bg-zinc-100 dark:bg-zinc-900"
-      footer={() => (
-        <PopoverFooter>
-          <PrimaryButton
-            onClick={() => {
-              if (publicView) {
-                props.onClose();
-              } else {
-                formRef.current!.submit();
-              }
-            }}
-            disabled={isSaving && !publicView}
-          >
-            {isSaving ? (
-              <DefaultSpinner color="black" size={24} />
-            ) : mode === "editor" ? (
-              "Save Changes"
-            ) : (
-              "Done"
-            )}
-          </PrimaryButton>
-        </PopoverFooter>
-      )}
+    <Modal
+      isOpen={props.isVisible}
+      onDismiss={() => props?.onClose()}
+      $scrollOverlay={true}
+      $maxWidth={720}
     >
       <div className="py-4 px-6 text-neutrals-gray-5">
         <div className="flex flex-row justify-end items-center">
@@ -439,7 +412,27 @@ const ComponentMetadataPopover = (
           )}
         </div>
       </div>
-    </PopOver>
+      <div className="flex flex-row justify-end gap-4 items-center h-16 w-full dark:bg-[#272727] border-t border-t-[#81C3C8] rounded-b-lg p-4">
+        <PrimaryButton
+          onClick={() => {
+            if (publicView) {
+              props.onClose();
+            } else {
+              formRef.current!.submit();
+            }
+          }}
+          disabled={isSaving && !publicView}
+        >
+          {isSaving ? (
+            <DefaultSpinner color="black" size={24} />
+          ) : mode === "editor" ? (
+            "Save Changes"
+          ) : (
+            "Done"
+          )}
+        </PrimaryButton>
+      </div>
+    </Modal>
   );
 };
 

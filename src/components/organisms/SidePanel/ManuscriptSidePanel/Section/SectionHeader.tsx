@@ -2,9 +2,7 @@ import React from "react";
 import { FlexRowSpaceBetween } from "@components/styled";
 import styled from "styled-components";
 
-const Wrapper = styled(FlexRowSpaceBetween).attrs(({ className }: any) => ({
-  className: className,
-}))`
+const Wrapper = styled(FlexRowSpaceBetween).attrs(({ className }: any) => ({}))`
   padding: 0.75rem 1rem;
 `;
 const Title = styled.p.attrs({

@@ -19,8 +19,12 @@ import AnnotationHidden from "@components/atoms/AnnotationHidden";
 import AnnotationExpanded from "@components/atoms/AnnotationExpanded";
 import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
-import { saveAnnotation, deleteAnnotation } from "@src/state/nodes/viewer";
-import { saveManifestDraft } from "@src/state/nodes/saveManifestDraft";
+import {
+  saveAnnotation,
+  deleteAnnotation,
+  saveManifestDraft,
+} from "@src/state/nodes/viewer";
+// import { saveManifestDraft } from "@src/state/nodes/saveManifestDraft";
 import {
   setIsEditingAnnotation,
   setKeepAnnotating,
@@ -60,7 +64,12 @@ const AnnotationComponent = (props: AnnotationProps) => {
   } = props;
   const ref = useRef<HTMLDivElement | null>(null);
   const dispatch = useSetter();
-  const { isEditingAnnotation, keepAnnotating } = usePdfReader();
+  const {
+    isEditingAnnotation,
+    keepAnnotating,
+    selectedAnnotationId,
+    hoveredAnnotationId,
+  } = usePdfReader();
   const { mode, componentStack, manifest: manifestData } = useNodeReader();
 
   useClickAway(ref, (e: Event) => {
@@ -84,12 +93,20 @@ const AnnotationComponent = (props: AnnotationProps) => {
       } else {
         if (selected && allowClickAway) {
           if (!isEditingAnnotation) {
-            dispatch(
-              updatePdfPreferences({
-                hoveredAnnotationId: "",
-                selectedAnnotationId: "",
-              })
-            );
+            if (selectedAnnotationId === annotation.id) {
+              dispatch(
+                updatePdfPreferences({
+                  selectedAnnotationId: "",
+                })
+              );
+            }
+            if (hoveredAnnotationId === annotation.id) {
+              dispatch(
+                updatePdfPreferences({
+                  hoveredAnnotationId: "",
+                })
+              );
+            }
           }
           onClose();
         }
@@ -278,10 +295,10 @@ const AnnotationComponent = (props: AnnotationProps) => {
    * selected in code view
    * editing in code view
    */
-  const isFixedPosition = isEditingAnnotation || (isCode && selected);
+  const isFixedPosition = selected && (isEditingAnnotation || isCode);
   const isVisible = hovered || selected;
 
-  const isExpanded = !isFixedPosition && isVisible && selected;
+  const isExpanded = !isFixedPosition && isVisible;
 
   const isAnnotationVisible = !isFixedPosition && isVisible && !selected;
   const isAnnotationHidden = !isFixedPosition && !isVisible && !selected;
@@ -296,6 +313,7 @@ const AnnotationComponent = (props: AnnotationProps) => {
       style={{
         display: "flex",
         maxHeight: `calc(100vh - ${APPROXIMATED_HEADER_HEIGHT}px)`,
+        border: 0,
       }}
     >
       {isFixedPosition ? (
@@ -325,21 +343,20 @@ const AnnotationComponent = (props: AnnotationProps) => {
           annotationTitle={annotationTitle}
           mode={mode}
         />
-      ) : null}
-      {isAnnotationVisible ? (
-        <AnnotationVisible
-          DURATION_BASE_MS={DURATION_BASE_MS}
-          annotationText={annotationText}
-          annotationTitle={annotationTitle}
-        />
-      ) : null}
-      {isAnnotationHidden ? (
+      ) : !!selectedAnnotationId ? null : (
         <AnnotationHidden
           DURATION_BASE_MS={DURATION_BASE_MS}
           isEditingAnnotation={isEditingAnnotation}
           annotationTitle={annotationTitle}
         />
-      ) : null}
+      )}
+      {/* {isAnnotationVisible ? (
+        <AnnotationVisible
+          DURATION_BASE_MS={DURATION_BASE_MS}
+          annotationText={annotationText}
+          annotationTitle={annotationTitle}
+        />
+      ) : null} */}
     </div>
   );
 };

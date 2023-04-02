@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import Paper from "@components/organisms/Paper";
 import { useManuscriptController } from "./ManuscriptController";
-import CodeViewer from "@components/organisms/CodeViewer";
+// import CodeViewer from "@components/organisms/CodeViewer";
 
 import Youtube from "@components/atoms/Youtube";
 import {
@@ -46,7 +46,7 @@ const ComponentStackView = (props: ComponentStackViewProps) => {
   // console.log("componentStack", JSON.stringify(componentStack));
 
   const renderComponent = (component: ResearchObjectV1Component) => {
-    __log("ComponentStackView::renderComponent", JSON.stringify(component));
+    __log("ComponentStackView::renderComponent", component);
     switch (component.type) {
       case ResearchObjectComponentType.PDF:
         return <Paper {...component} />;
@@ -73,11 +73,11 @@ const ComponentStackView = (props: ComponentStackViewProps) => {
   //   `ComponentStackView::render componentStack=`,
   //   JSON.stringify(componentStack)
   // );
-  console.log("component stack", componentStack);
+  // console.log("component stack", componentStack);
 
   useEffect(() => {
     if (forceRefreshDrive) setTimeout(() => setForceRefreshDrive(false));
-  }, [forceRefreshDrive]);
+  }, [forceRefreshDrive, setForceRefreshDrive]);
 
   return (
     <ViewWrapper>

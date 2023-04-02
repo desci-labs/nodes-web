@@ -7,6 +7,7 @@ import {
 } from "@src/state/analytics/analyticsSlice";
 import { useEffect } from "react";
 import AdminStats from "../atoms/AdminStat";
+import prettyBytes from "pretty-bytes";
 
 const AdminAnalyticsScreen = () => {
   const adminAnalytics = useGetter(selectAdminAnalytics);
@@ -44,6 +45,11 @@ const AdminAnalyticsScreen = () => {
                 name: "Active Users",
                 stat: `${adminAnalytics.activeUsersToday}`,
               },
+              { name: "Node Views", stat: `${adminAnalytics.nodeViewsToday}` },
+              {
+                name: "Uploaded",
+                stat: `${prettyBytes(adminAnalytics.bytesToday)}`,
+              },
             ]}
           />
 
@@ -62,6 +68,14 @@ const AdminAnalyticsScreen = () => {
                 name: "Active Users",
                 stat: `${adminAnalytics.activeUsersInLast7Days}`,
               },
+              {
+                name: "Node Views",
+                stat: `${adminAnalytics.nodeViewsInLast7Days}`,
+              },
+              {
+                name: "Uploaded",
+                stat: `${prettyBytes(adminAnalytics.bytesInLast7Days)}`,
+              },
             ]}
           />
 
@@ -79,6 +93,14 @@ const AdminAnalyticsScreen = () => {
               {
                 name: "Active Users",
                 stat: `${adminAnalytics.activeUsersInLast30Days}`,
+              },
+              {
+                name: "Node Views",
+                stat: `${adminAnalytics.nodeViewsInLast30Days}`,
+              },
+              {
+                name: "Uploaded",
+                stat: `${prettyBytes(adminAnalytics.bytesInLast30Days)}`,
               },
             ]}
           />

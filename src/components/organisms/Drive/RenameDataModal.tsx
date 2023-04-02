@@ -3,13 +3,11 @@ import {
   ResearchObjectV1,
 } from "@desci-labs/desci-models";
 import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
-import PopOverBasic from "@src/components/atoms/PopOverBasic";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
-import PopoverFooter from "@src/components/molecules/Footer";
 import InsetLabelInput from "@src/components/molecules/FormInputs/InsetLabelInput";
+import Modal from "@src/components/molecules/Modal/Modal";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import { saveManifestDraft } from "@src/state/nodes/saveManifestDraft";
-import { updateComponent } from "@src/state/nodes/viewer";
+import { updateComponent, saveManifestDraft } from "@src/state/nodes/viewer";
 import { useSetter } from "@src/store/accessors";
 import React, { useEffect, useState } from "react";
 import { DriveObject } from "./types";
@@ -77,7 +75,7 @@ const RenameDataModal: React.FC<RenameDataModalProps> = ({
     try {
       dispatch(
         saveManifestDraft({
-          onSaveCallback: () => {
+          onSucess: () => {
             setLoading(false);
             setDirectory((oldDir) => {
               let compCid = renameComponentId;
@@ -105,31 +103,26 @@ const RenameDataModal: React.FC<RenameDataModalProps> = ({
 
   const componentString = getComponentString(compType);
 
+  const close = () => setRenameComponentId(null);
   return (
-    <div>
-      <PopOverBasic
-        bodyClassNames="!min-h-[70px]"
-        onClose={() => {
-          setRenameComponentId(null);
-        }}
-        title={`Rename ${componentString}`}
-        isVisible={true}
-        footer={() => (
-          <PopoverFooter>
-            <PrimaryButton onClick={handleSubmit}>
-              {loading ? <DefaultSpinner color="black" size={24} /> : "Save"}
-            </PrimaryButton>
-          </PopoverFooter>
-        )}
-      >
-        <InsetLabelInput
-          label={`${componentString} Name`}
-          value={newName}
-          onChange={(e: any) => setNewName(e.target.value)}
-          mandatory={true}
-        />
-      </PopOverBasic>
-    </div>
+    <Modal onDismiss={close} isOpen>
+      <div className="py-3 px-6 !min-h-[70px] min-w-[400px]">
+        <Modal.Header onDismiss={close} title={`Rename ${componentString}`} />
+        <div className="my-2">
+          <InsetLabelInput
+            label={`${componentString} Name`}
+            value={newName}
+            onChange={(e: any) => setNewName(e.target.value)}
+            mandatory={true}
+          />
+        </div>
+      </div>
+      <Modal.Footer>
+        <PrimaryButton onClick={handleSubmit}>
+          {loading ? <DefaultSpinner color="black" size={24} /> : "Save"}
+        </PrimaryButton>
+      </Modal.Footer>
+    </Modal>
   );
 };
 
