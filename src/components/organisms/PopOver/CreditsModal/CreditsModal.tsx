@@ -27,10 +27,7 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
   return (
     <Modal {...props} $maxWidth={650} $scrollOverlay={true}>
       <div className="px-6 py-5 w-full lg:w-[650px] text-white">
-        <Modal.Header
-          title="Collaborator Details"
-          onDismiss={props.onDismiss}
-        />
+        <Modal.Header title="Contributor Details" onDismiss={props.onDismiss} />
         <FormProvider {...methods}>
           <CreditsForm {...props} />
         </FormProvider>
