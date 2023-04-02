@@ -1,4 +1,11 @@
-import React, { forwardRef, HTMLProps, KeyboardEvent } from "react";
+import React, {
+  ChangeEvent,
+  ChangeEventHandler,
+  FormEventHandler,
+  forwardRef,
+  HTMLProps,
+  KeyboardEvent,
+} from "react";
 
 const TextArea = forwardRef<
   HTMLTextAreaElement,
@@ -8,8 +15,8 @@ const TextArea = forwardRef<
 });
 
 const Input = forwardRef<HTMLInputElement, HTMLProps<HTMLInputElement>>(
-  (props: HTMLProps<HTMLInputElement>) => {
-    return <input {...props} />;
+  (props: HTMLProps<HTMLInputElement>, ref) => {
+    return <input ref={ref} {...props} />;
   }
 );
 
@@ -18,7 +25,7 @@ interface InsetLabelSmallInputProps {
   labelClassName?: string;
   textClassName?: string;
   value?: string;
-  onChange?: (e: KeyboardEvent) => void;
+  onChange?: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
   multiline?: boolean;
   properties?: {};
   field?: any;
@@ -28,9 +35,15 @@ interface InsetLabelSmallInputProps {
   className?: string;
   optional?: boolean;
   disabled?: boolean;
+  maxLength?: number;
+  pattern?: string;
+  onFocus?: FormEventHandler;
 }
 
-export default function InsetLabelSmallInput(props: InsetLabelSmallInputProps) {
+const InsetLabelSmallInput = forwardRef<
+  HTMLFormElement,
+  InsetLabelSmallInputProps
+>((props: InsetLabelSmallInputProps, ref) => {
   const {
     label,
     value,
@@ -43,7 +56,10 @@ export default function InsetLabelSmallInput(props: InsetLabelSmallInputProps) {
     fieldState,
     optional = false,
     disabled = false,
-    onChange
+    maxLength,
+    onFocus,
+    pattern,
+    onChange,
   } = props;
 
   const InputComponent = multiline ? TextArea : Input;
@@ -84,10 +100,16 @@ export default function InsetLabelSmallInput(props: InsetLabelSmallInputProps) {
             (e.currentTarget as HTMLInputElement).select();
           }
         }}
+        onFocus={onFocus}
+        maxLength={maxLength}
         {...properties}
+        pattern={pattern}
         onChange={onChange}
         {...field}
+        ref={ref}
       />
     </div>
   );
-}
+});
+
+export default InsetLabelSmallInput;

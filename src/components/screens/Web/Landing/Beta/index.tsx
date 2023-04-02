@@ -1,7 +1,7 @@
 import { ArrowNarrowDownIcon } from "@heroicons/react/outline";
 import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
-import { site, web } from "@src/constants/routes";
+import { app, site, web } from "@src/constants/routes";
 import {
   IconBlock,
   IconDigitalKey,
@@ -9,6 +9,7 @@ import {
   IconRepo,
   SvgIconProps,
 } from "@src/icons";
+import { useUser } from "@src/state/user/hooks";
 import { PropsWithChildren, ReactElement } from "react";
 import { NavLink } from "react-router-dom";
 import "../style.scss";
@@ -135,33 +136,43 @@ const IntroCards = () => (
   </>
 );
 
-export const Banner = () => (
-  <section className="container mx-auto max-w-5xl flex flex-col gap-10 md:gap-0 md:flex-row items-center justify-between mt-24 md:mt-36 relative">
-    <div className="flex flex-col items-start justify-start text-white gap-5">
-      <h1 className="text-6xl md:text-6xl max-w-3xl !leading-tight">
-        Next-generation scientific publishing
-      </h1>
-      <span className="text-2xl mb-2">
-        Publish composable research objects stored open state
-      </span>
-      <NavLink to={`${site.web}${web.login}`}>
-        <PrimaryButton className="px-8 py-4">
-          <span className="text-[18px]">Test the Beta</span>
-        </PrimaryButton>
-      </NavLink>
-    </div>
-    <ArrowNarrowDownIcon
-      color="#fff"
-      width="100"
-      strokeWidth={1}
-      onClick={() => {
-        const el = document.getElementById("intro-cards");
-        el?.scrollIntoView({ behavior: "smooth" });
-      }}
-      className="md:absolute top-50 right-[-50px] will-change-transform animate-float cursor-pointer"
-    />
-  </section>
-);
+export const Banner = () => {
+  const userData = useUser();
+
+  const isLoggedIn = userData?.userId > 0;
+
+  return (
+    <section className="container mx-auto max-w-5xl flex flex-col gap-10 md:gap-0 md:flex-row items-center justify-between mt-24 md:mt-36 relative">
+      <div className="flex flex-col items-start justify-start text-white gap-5">
+        <h1 className="text-6xl md:text-6xl max-w-3xl !leading-tight">
+          Next-generation scientific publishing
+        </h1>
+        <span className="text-2xl mb-2">
+          Publish composable research objects stored open state
+        </span>
+        <NavLink
+          to={
+            isLoggedIn ? `${site.app}${app.nodes}` : `${site.web}${web.login}`
+          }
+        >
+          <PrimaryButton className="px-8 py-4">
+            <span className="text-[18px]">Test the Beta</span>
+          </PrimaryButton>
+        </NavLink>
+      </div>
+      <ArrowNarrowDownIcon
+        color="#fff"
+        width="100"
+        strokeWidth={1}
+        onClick={() => {
+          const el = document.getElementById("intro-cards");
+          el?.scrollIntoView({ behavior: "smooth" });
+        }}
+        className="md:absolute top-50 right-[-50px] will-change-transform animate-float cursor-pointer"
+      />
+    </section>
+  );
+};
 
 function IntroCard(props: {
   title: string;

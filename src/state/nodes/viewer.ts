@@ -2,6 +2,7 @@ import {
   ResearchObjectComponentAnnotation,
   ResearchObjectComponentType,
   ResearchObjectV1,
+  ResearchObjectV1Author,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
@@ -92,17 +93,44 @@ export const nodeReaderSlice = createSlice({
       state.manifestStatus = ManifestDataStatus.Idle;
       state.manifest = payload;
     },
+    addNodeAuthor: (
+      state,
+      { payload }: PayloadAction<ResearchObjectV1Author>
+    ) => {
+      if (!state.manifest) return;
+
+      if (!state.manifest?.authors) {
+        state.manifest.authors = [];
+      }
+
+      state.manifest?.authors?.push(payload);
+    },
+    updateNodeAuthor: (
+      state,
+      {
+        payload,
+      }: PayloadAction<{ update: ResearchObjectV1Author; index: number }>
+    ) => {
+      if (!state.manifest?.authors) return state;
+      state.manifest.authors = state.manifest.authors.map((author, idx) => {
+        if (idx === payload.index) return payload.update;
+        return author;
+      });
+    },
+    removeAuthor: (
+      state,
+      { payload }: PayloadAction<{ authorIndex: number }>
+    ) => {
+      if (!state.manifest?.authors) return state;
+      const authors = state.manifest.authors.filter(
+        (_, idx) => idx !== payload.authorIndex
+      );
+      state.manifest.authors = authors;
+    },
     deleteComponent: (
       state,
       { payload }: PayloadAction<{ componentId: string }>
     ) => {
-      console.log(
-        "delete",
-        payload.componentId,
-        state.manifest?.components.filter(
-          (component) => component.id !== payload.componentId
-        )
-      );
       if (state.manifest) {
         state.manifest.components = state.manifest.components.filter(
           (component) => component.id !== payload.componentId
@@ -214,7 +242,6 @@ export const nodeReaderSlice = createSlice({
         state.manifest.components = components;
       }
     },
-
     setManifestCid: (state, { payload }: PayloadAction<string>) => {
       state.manifestCid = payload;
     },
@@ -336,25 +363,29 @@ export const saveManifestDraft = createAsyncThunk(
 
     if (!manifestData) return;
     // console.log("Save Manifest", manifestData);
-    const res = await updateDraft({
-      manifest: manifestData!,
-      uuid: args?.uuid ?? currentObjectId!,
-    });
+    try {
+      const res = await updateDraft({
+        manifest: manifestData!,
+        uuid: args?.uuid ?? currentObjectId!,
+      });
 
-    const manifestUrl = cleanupManifestUrl(res.uri || res.manifestUrl);
-    let response = res.manifestData;
+      const manifestUrl = cleanupManifestUrl(res.uri || res.manifestUrl);
+      let response = res.manifestData;
 
-    if (res.manifestData) {
-      dispatch(setManifest(res.manifestData));
-    } else {
-      const { data } = await axios.get(manifestUrl);
-      response = data;
-      dispatch(setManifest(data));
+      if (res.manifestData) {
+        dispatch(setManifest(res.manifestData));
+      } else {
+        const { data } = await axios.get(manifestUrl);
+        response = data;
+        dispatch(setManifest(data));
+      }
+      dispatch(setManifestCid(res.uri));
+      localStorage.setItem("manifest-url", manifestUrl);
+      args?.onSucess?.();
+      return response;
+    } catch (e) {
+      throw Error("Could not update manifest");
     }
-    dispatch(setManifestCid(res.uri));
-    localStorage.setItem("manifest-url", manifestUrl);
-    args?.onSucess?.();
-    return response;
   }
 );
 
@@ -364,6 +395,8 @@ export const {
   setIsNew,
   toggleMode,
   setManifest,
+  removeAuthor,
+  addNodeAuthor,
   setPublicView,
   setEditNodeId,
   resetEditNode,
@@ -373,6 +406,7 @@ export const {
   deleteComponent,
   updateComponent,
   setManifestData,
+  updateNodeAuthor,
   deleteAnnotation,
   toggleCommitPanel,
   setComponentStack,

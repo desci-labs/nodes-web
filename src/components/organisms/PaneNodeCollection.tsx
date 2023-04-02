@@ -9,13 +9,13 @@ import NodeCardLoader from "../molecules/NodeCardLoader";
 import { useGetter, useSetter } from "@src/store/accessors";
 import { useGetNodesQuery } from "@src/state/api/nodes";
 import { toggleToolbar } from "@src/state/preferences/preferencesSlice";
-import AddResearchNode from "@src/components/organisms/Modals/AddResearchNode/AddResearchNode";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import {
   setCurrentObjectId,
   setPublicView,
   toggleResearchPanel,
 } from "@src/state/nodes/viewer";
+import CreateNodeModal from "./CreateNodeModal/CreateNodeModal";
 
 export interface EditNodeInfo {
   uuid: string;
@@ -24,12 +24,9 @@ export interface EditNodeInfo {
 }
 
 export default function PaneNodeCollection() {
-  const {
-    setIsAddingComponent,
-    setIsAddingSubcomponent,
-    showAddNewNode,
-    setShowAddNewNode,
-  } = useManuscriptController(["showAddNewNode"]);
+  const { setIsAddingComponent, setIsAddingSubcomponent, setShowAddNewNode } =
+    useManuscriptController(["showAddNewNode"]);
+  const [isOpen, setOpen] = useState(false);
 
   const dispatch = useSetter();
   const { isNew, currentObjectId } = useNodeReader();
@@ -38,7 +35,6 @@ export default function PaneNodeCollection() {
   const [, setMounted] = useState(false);
 
   const { data: nodes, isLoading } = useGetNodesQuery();
-  const [, setShowModal] = useState<boolean>(false);
 
   const onClose = (dontHideToolbar?: boolean) => {
     if (!dontHideToolbar) {
@@ -74,6 +70,7 @@ export default function PaneNodeCollection() {
             {...node}
             key={`node-card-sidepanel-${node.uuid}`}
             isCurrent={node.uuid === currentObjectId}
+            onHandleEdit={() => setOpen(true)}
             onClick={() => {
               setTimeout(() => {
                 setIsAddingComponent(false);
@@ -119,6 +116,7 @@ export default function PaneNodeCollection() {
             onClick={() => {
               dispatch(setPublicView(false));
               setShowAddNewNode(true);
+              setOpen(true);
             }}
             className="h-10 text-lg"
           >
@@ -126,14 +124,7 @@ export default function PaneNodeCollection() {
           </PrimaryButton>
         </div>
         {isLoading ? <NodeCollectionLoader /> : <LoadedNodesCollection />}
-        <AddResearchNode
-          onRequestClose={() => {
-            setShowModal(false);
-            setShowAddNewNode(false);
-          }}
-          isVisible={showAddNewNode}
-          toggleModal={setShowAddNewNode}
-        />
+        <CreateNodeModal isOpen={isOpen} onDismiss={() => setOpen(false)} />
       </div>
     </div>
   );

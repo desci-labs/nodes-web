@@ -39,10 +39,6 @@ export const appRouter = createBrowserRouter(
     <>
       <Route
         path={`${site.app}/*`}
-        loader={(args) => {
-          console.log("Load App Data", args);
-          return { args };
-        }}
         element={
           <Suspense fallback={<Placeholder isLoading={true} fullHeight />}>
             <AppWrapper>

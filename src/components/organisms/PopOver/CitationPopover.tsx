@@ -1,8 +1,6 @@
 import PrimaryButton from "@components/atoms/PrimaryButton";
 import { useManuscriptController } from "@components/organisms/ManuscriptReader/ManuscriptController";
-import { IconWarning, IconX } from "@icons";
-import PopOver, { PopOverProps } from ".";
-import PopoverFooter from "@components/molecules/Footer";
+import { IconWarning } from "@icons";
 import {
   ButtonHTMLAttributes,
   PropsWithChildren,
@@ -12,9 +10,7 @@ import {
   useState,
 } from "react";
 import { Controller, useForm } from "react-hook-form";
-import SelectMenu from "@src/components/molecules/FormInputs/SelectMenu";
-// import { useDesciProvider } from "@contexts/DesciContext";
-import { useCopier } from "@components/molecules/Copier";
+import { CopyButton, useCopier } from "@components/molecules/Copier";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import { getPublishedVersions } from "@src/api";
 import { AccessStatus, DriveObject, FileDir, FileType } from "../Drive";
@@ -27,6 +23,8 @@ import { BsClipboard } from "react-icons/bs";
 import { CheckIcon } from "@heroicons/react/solid";
 import { useUser } from "@src/state/user/hooks";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
+import SelectList from "@src/components/molecules/FormInputs/SelectList";
 
 // Todo: implement a useNodeDetails hook to get the details of a the currentObjectId like (owner etc)
 // Todo: use the owner details to determine if the current user is the owner
@@ -34,15 +32,17 @@ import { useNodeReader } from "@src/state/nodes/hooks";
 // Todo: completion shortcut if user has not completed their  profile
 
 const CitationComponent = () => {
-  // const { userProfile } = useDesciProvider();
   const userProfile = useUser();
   const { componentToCite, setShowProfileUpdater } = useManuscriptController([
     "componentToCite",
     "showProfileUpdater",
   ]);
-  const { manifest: manifestData, currentObjectId } = useNodeReader();
+  const {
+    manifest: manifestData,
+    currentObjectId,
+    publicView,
+  } = useNodeReader();
 
-  // console.log(manifestData?.components, componentToCite);
   const { control, watch } = useForm({
     defaultValues: {
       format: CITATION_FORMATS[0],
@@ -113,7 +113,7 @@ const CitationComponent = () => {
     }
 
     const index = manifestData?.components.findIndex(
-      (c) => c.id === component.cid || c.id == componentParent.cid
+      (c) => c.id === component.cid || c.id === componentParent.cid
     );
     const versionString =
       index === undefined || index < 0 ? version : `${version}/${index}`;
@@ -130,11 +130,11 @@ const CitationComponent = () => {
         ResearchObjectComponentType.DATA &&
       componentParent
     ) {
-      const splitPath = component.path?.split("/").filter((a) => a != "Data");
+      const splitPath = component.path?.split("/").filter((a) => a !== "Data");
       if (splitPath && splitPath.length > 1) {
         let newPath = splitPath.slice(1);
         newPath.unshift(componentParent.name);
-        if (componentToCite.type == FileType.Dir) {
+        if (componentToCite.type === FileType.Dir) {
           newPath = [componentParent.name];
         }
         fqiDataSuffix = newPath.join("/");
@@ -167,7 +167,7 @@ const CitationComponent = () => {
     version,
   ]);
 
-  const canCite = userProfile?.profile.name && manifestData;
+  const canCite = (publicView || userProfile?.profile.name) && manifestData;
   const formatter = useMemo(() => getFormatter(format.name), [format.name]);
   const { citation } = useMemo(
     () =>
@@ -200,7 +200,7 @@ const CitationComponent = () => {
           name="format"
           control={control}
           render={({ field }: any) => (
-            <SelectMenu
+            <SelectList
               title="Choose citation format"
               label="Choose citation format"
               data={CITATION_FORMATS}
@@ -227,7 +227,7 @@ const CitationComponent = () => {
             />
           </div>
         </Box>
-        {!userProfile?.profile.name && (
+        {!publicView && !userProfile?.profile.name && (
           <div>
             <div className="text-neutrals-gray-7 text-sm border-yellow-300 gap-2 bg-neutrals-gray-3 p-2 rounded-md flex flex-row items-center">
               <IconWarning height={16} /> Complete your profile to cite this
@@ -281,28 +281,7 @@ const CitationComponent = () => {
   );
 };
 
-function CopyButton(
-  props: ButtonHTMLAttributes<HTMLButtonElement> & {
-    text: string;
-    label: string;
-  }
-) {
-  const { handleCopy, copied } = useCopier();
 
-  return (
-    <button
-      {...props}
-      className={`text-sm font-bold text-tint-primary hover:text-tint-primary-hover disabled:text-neutrals-gray-4 ${props.className}`}
-      onClick={() => handleCopy(props.text)}
-    >
-      {copied ? (
-        <CheckIcon className="w-5 h-5" />
-      ) : (
-        <BsClipboard className="w-5 h-5" />
-      )}
-    </button>
-  );
-}
 
 function Box(props: PropsWithChildren<{}>) {
   return (
@@ -312,64 +291,39 @@ function Box(props: PropsWithChildren<{}>) {
   );
 }
 
-const CitationPopover = (props: PopOverProps) => {
+const CitationPopover = (props: ModalProps) => {
   const { showCitationModal, setShowCitationModal } = useManuscriptController([
     "showCitationModal",
   ]);
   const close = () => {
-    props?.onClose?.();
+    props?.onDismiss?.();
     setShowCitationModal(false);
   };
 
   return (
-    <PopOver
-      {...props}
-      isVisible={showCitationModal}
-      style={{
-        width: 650,
-        padding: 0,
-        marginLeft: 0,
-        marginRight: 0,
-        position: "fixed",
-      }}
-      containerStyle={{
-        backgroundColor: "#3A3A3ABF",
-      }}
-      footer={() => (
-        <PopoverFooter>
-          <PrimaryButton
-            className="w-[63px] justify-center flex"
-            onClick={close}
-          >
-            Done
-          </PrimaryButton>
-        </PopoverFooter>
-      )}
-      displayCloseIcon={false}
-      className="rounded-lg bg-zinc-100 dark:bg-zinc-900"
+    <Modal
+      isOpen={showCitationModal}
+      onDismiss={close}
+      $maxWidth={650}
+      $scrollOverlay={true}
     >
       <div className="px-6 py-5 text-white">
-        <div className="flex flex-row justify-between items-center">
-          <div className="">
-            <p className="text-xl font-bold">Cite</p>
-            <p className="text-neutrals-gray-5 text-sm">
-              Choose your citation format then click copy citation, or copy
-              dPID.
-            </p>
-          </div>
-          <IconX
-            fill="white"
-            width={20}
-            height={20}
-            className="cursor-pointer"
-            onClick={close}
-          />
-        </div>
+        <Modal.Header
+          onDismiss={close}
+          title="Cite"
+          subTitle="Choose your citation format then click copy citation, or copy
+              dPID."
+        />
         <div className="py-2">
           <CitationComponent />
         </div>
       </div>
-    </PopOver>
+      <Modal.Footer>
+        <PrimaryButton className="w-[63px] justify-center flex" onClick={close}>
+          Done
+        </PrimaryButton>
+      </Modal.Footer>
+    </Modal>
   );
 };
 

@@ -1,10 +1,10 @@
 import { getPublishedVersions, resolvePublishedManifest } from "@api/index";
 import PaneInfo from "@components/atoms/PaneInfo";
-import PopOverBasic from "@components/atoms/PopOverBasic";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import {
   ResearchObjectComponentType,
   ResearchObjectV1,
+  ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 import {
   IconCode,
@@ -21,14 +21,13 @@ import {
   useState,
 } from "react";
 import { SpinnerCircular } from "spinners-react";
-import PerfectScrollbar from "react-perfect-scrollbar";
 import toast from "react-hot-toast";
-// import InputInsetLabelIcon from "@components/atoms/InputInsetLabelIcon";
 import { useParams } from "react-router-dom";
 import { useCopier } from "./Copier";
 import { CheckIcon } from "@heroicons/react/outline";
 import { useGetNodesQuery } from "@src/state/api/nodes";
 import { useNodeReader, useNodeVersions } from "@src/state/nodes/hooks";
+import Modal from "@src/components/molecules/Modal/Modal";
 
 function CopyButton(
   props: ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -171,7 +170,7 @@ const PopOverShareMenu = () => {
     if (lastManifest && currentObjectId && (publicView || versions)) {
       const versionCount = numVersions;
       body = (
-        <PerfectScrollbar className="flex items-center w-full h-full flex-grow flex-col justify-evenly">
+        <div>
           {/* <div className="">Your Node is public</div> */}
           <div className="my-4 w-full">
             <LinkCopier
@@ -189,74 +188,80 @@ const PopOverShareMenu = () => {
           </div>
           {versionCount ? (
             <div className="pb-4 w-full">
-              {manifestData?.components.map((c, index: number) => {
-                const fqi = isDpidSupported
-                  ? `${lastManifest?.dpid?.id}/${versionForLink}/${index}`
-                  : `${currentObjectId.replaceAll(
-                      ".",
-                      ""
-                    )}/${versionForLink}/${index}`;
+              {manifestData?.components.map(
+                (c: ResearchObjectV1Component, index: number) => {
+                  const fqi = isDpidSupported
+                    ? `${lastManifest?.dpid?.id}/${versionForLink}/${index}`
+                    : `${currentObjectId.replaceAll(
+                        ".",
+                        ""
+                      )}/${versionForLink}/${index}`;
 
-                const link = isDpidSupported
-                  ? `${dpidLink}/${index}`
-                  : `${window.location.protocol}//${window.location.host}/${fqi}`;
+                  const link = isDpidSupported
+                    ? `${dpidLink}/${index}`
+                    : `${window.location.protocol}//${window.location.host}/${fqi}`;
 
-                switch (c.type) {
-                  case ResearchObjectComponentType.CODE:
-                    return (
-                      <div className="my-2" key={`component-share-${c.id}`}>
-                        <LinkCopier
-                          icon={
-                            <IconCodeBracket
-                              height={12}
-                              fill={"white"}
-                              width={12}
-                            />
-                          }
-                          label={`${c.name} Share Link`}
-                          value={`${window.location.protocol}//${window.location.host}/${fqi}`}
-                        />
-                        <div className="mt-2 w-[90%] -right-[10%] relative">
+                  switch (c.type) {
+                    case ResearchObjectComponentType.CODE:
+                      return (
+                        <div className="my-2" key={`component-share-${c.id}`}>
                           <LinkCopier
                             icon={
-                              <IconCode height={12} fill={"white"} width={12} />
-                            }
-                            label={`Import ${c.name} via desci-fetch`}
-                            value={`with desci.fetch([('${c.name}.py', '${c.name}')], "${fqi}"):`}
-                          />
-                        </div>
-                        <div className="mt-2 w-[90%] -right-[10%] relative">
-                          <LinkCopier
-                            icon={
-                              <IconDocument
+                              <IconCodeBracket
                                 height={12}
                                 fill={"white"}
                                 width={12}
                               />
                             }
-                            label={`Browse ${c.name} via HTTP`}
-                            value={`${process.env.REACT_APP_NODES_API}/${fqi}/master/README.md?g=${process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE}`}
+                            label={`${c.name} Share Link`}
+                            value={`${window.location.protocol}//${window.location.host}/${fqi}`}
+                          />
+                          <div className="mt-2 w-[90%] -right-[10%] relative">
+                            <LinkCopier
+                              icon={
+                                <IconCode
+                                  height={12}
+                                  fill={"white"}
+                                  width={12}
+                                />
+                              }
+                              label={`Import ${c.name} via desci-fetch`}
+                              value={`with desci.fetch([('${c.name}.py', '${c.name}')], "${fqi}"):`}
+                            />
+                          </div>
+                          <div className="mt-2 w-[90%] -right-[10%] relative">
+                            <LinkCopier
+                              icon={
+                                <IconDocument
+                                  height={12}
+                                  fill={"white"}
+                                  width={12}
+                                />
+                              }
+                              label={`Browse ${c.name} via HTTP`}
+                              value={`${process.env.REACT_APP_NODES_API}/${fqi}/master/README.md?g=${process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE}`}
+                            />
+                          </div>
+                        </div>
+                      );
+                    default:
+                      return (
+                        <div className="my-2" key={`component-share-${c.id}`}>
+                          <LinkCopier
+                            icon={
+                              <IconFile height={12} fill={"white"} width={12} />
+                            }
+                            label={`${c.name} Share Link`}
+                            value={link}
                           />
                         </div>
-                      </div>
-                    );
-                  default:
-                    return (
-                      <div className="my-2" key={`component-share-${c.id}`}>
-                        <LinkCopier
-                          icon={
-                            <IconFile height={12} fill={"white"} width={12} />
-                          }
-                          label={`${c.name} Share Link`}
-                          value={link}
-                        />
-                      </div>
-                    );
+                      );
+                  }
                 }
-              })}
+              )}
             </div>
           ) : null}
-        </PerfectScrollbar>
+        </div>
       );
     } else {
       body = (
@@ -268,16 +273,22 @@ const PopOverShareMenu = () => {
     }
   }
 
+  const close = () => {
+    setShowShareMenu(false);
+  };
+
   return (
-    <PopOverBasic
-      isVisible={showShareMenu}
-      title="Share Node"
-      onClose={() => {
-        setShowShareMenu(false);
-      }}
+    <Modal
+      isOpen={showShareMenu}
+      onDismiss={close}
+      $maxWidth={600}
+      $scrollOverlay={true}
     >
-      {body}
-    </PopOverBasic>
+      <div className="px-6 py-5 text-white relative min-w-[600px]">
+        <Modal.Header title="Share Node" onDismiss={close} />
+        {body}
+      </div>
+    </Modal>
   );
 };
 

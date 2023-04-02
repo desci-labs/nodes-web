@@ -1,9 +1,7 @@
 import { FlexRowSpaceBetween } from "@components/styled";
 import styled from "styled-components";
 import { useState } from "react";
-import PopOver from "@components/organisms/PopOver";
 import PrimaryButton from "@components/atoms/PrimaryButton";
-import { IconX } from "@icons";
 import ReactDiffViewer from "react-diff-viewer";
 import { SpinnerCircular } from "spinners-react";
 import DiffWindow from "../DiffWindow";
@@ -11,6 +9,7 @@ import CollapsibleSection from "@components/organisms/CollapsibleSection";
 import { SearchIcon } from "@heroicons/react/solid";
 import useNodeDiff from "./useNodeDiff";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import Modal from "@src/components/molecules/Modal/Modal";
 
 const ChangeNameTitle = styled.p.attrs({
   className: `text-xs`,
@@ -95,28 +94,14 @@ const NodeChanges = (props: ChangesComponentProps) => {
           )}
         </div>
       </CollapsibleSection>
-      <PopOver
-        className="transition-all rounded-lg bg-zinc-100 dark:bg-zinc-900 "
-        containerStyle={{
-          backgroundColor: "#3A3A3ABF",
-        }}
-        footer={() => <></>}
-        onClose={() => setViewDiff(false)}
-        isVisible={viewDiff}
-        style={{ marginLeft: 0, marginRight: 0, width: 720 }}
+      <Modal
+        $minHeight={20}
+        $scrollOverlay={true}
+        isOpen={viewDiff}
+        onDismiss={() => setViewDiff(false)}
       >
+        <Modal.Header onDismiss={() => setViewDiff(false)} />
         <div className="text-[10px] leading-3">
-          <div className="flex flex-row justify-end items-center">
-            <IconX
-              fill="white"
-              width={20}
-              height={20}
-              className="cursor-pointer"
-              onClick={() => {
-                setViewDiff(false);
-              }}
-            />
-          </div>
           <ReactDiffViewer
             useDarkTheme={true}
             oldValue={JSON.stringify(diffRoot, null, 2)}
@@ -124,46 +109,28 @@ const NodeChanges = (props: ChangesComponentProps) => {
             splitView={true}
           />
         </div>
-      </PopOver>
-      {selectedDiff > -1 && diff ? (
-        <PopOver
-          isVisible={true}
-          containerStyle={{
-            backgroundColor: "#3A3A3ABF",
-          }}
-          footer={() => (
-            <div
-              className={`mt-10 flex flex-row justify-end items-center h-16 w-full dark:bg-[#272727] border-t border-t-[#81C3C8] rounded-b-lg p-4`}
-            >
-              <PrimaryButton
-                disabled={false}
-                className={`w-[140px] flex justify-center`}
-                onClick={() => setSelectedDiff(-1)}
-              >
-                Done
-              </PrimaryButton>
-            </div>
-          )}
-          className="transition-all rounded-lg bg-zinc-100 dark:bg-zinc-900"
-          style={{ marginLeft: 0, marginRight: 0, width: 720 }}
-        >
-          <div className="p-4">
-            <div className="flex flex-row justify-end items-center">
-              <IconX
-                fill="white"
-                width={20}
-                height={20}
-                className="cursor-pointer"
-                onClick={() => {
-                  setSelectedDiff(-1);
-                }}
-              />
-            </div>
-            <h1 className="text-lg font-bold mb-10 -mt-5">Diff Viewer</h1>
-            <DiffWindow diff={diff[selectedDiff]} />
-          </div>
-        </PopOver>
-      ) : null}
+      </Modal>
+      <Modal
+        isOpen={selectedDiff > -1 && !!diff}
+        onDismiss={() => setSelectedDiff(-1)}
+      >
+        <div className="p-4 text-white">
+          <Modal.Header
+            title="Diff Viewer"
+            onDismiss={() => setSelectedDiff(-1)}
+          />
+          <DiffWindow diff={diff && diff[selectedDiff]} />
+        </div>
+        <Modal.Footer>
+          <PrimaryButton
+            disabled={false}
+            className={`w-[140px] flex justify-center`}
+            onClick={() => setSelectedDiff(-1)}
+          >
+            Done
+          </PrimaryButton>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

@@ -7,24 +7,17 @@ import {
   getResearchObjectStub,
   updateDraft,
 } from "@src/api";
-import PrimaryButton from "@src/components/atoms/PrimaryButton";
-import FieldSelector from "@src/components/organisms/Modals/AddResearchNode/FieldSelector";
-import PlaceholderInput from "@src/components/molecules/FormInputs/PlaceholderInput";
-import SelectMenu from "@src/components/molecules/FormInputs/SelectMenu";
-import { app, site } from "@src/constants/routes";
-import { IconX } from "@src/icons";
-import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useManuscriptController } from "../../ManuscriptReader/ManuscriptController";
-import { PDF_LICENSE_TYPES } from "../../PopOver/ComponentMetadataPopover";
 import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
+import PrimaryButton from "@src/components/atoms/PrimaryButton";
+import PlaceholderInput from "@src/components/molecules/FormInputs/PlaceholderInput";
+import SelectList from "@src/components/molecules/FormInputs/SelectList";
+import Modal from "@src/components/molecules/Modal/Modal";
 import { cleanupManifestUrl } from "@src/components/utils";
-import axios from "axios";
-import PopOver, { PopOverProps } from "@components/organisms/PopOver";
-import { useSetter } from "@src/store/accessors";
+import { app, site } from "@src/constants/routes";
 import { api } from "@src/state/api";
+import { nodesApi } from "@src/state/api/nodes";
 import { tags } from "@src/state/api/tags";
-import { toggleToolbar } from "@src/state/preferences/preferencesSlice";
+import { useNodeReader } from "@src/state/nodes/hooks";
 import {
   resetEditNode,
   setComponentStack,
@@ -32,15 +25,24 @@ import {
   setManifest,
   setPublicView,
 } from "@src/state/nodes/viewer";
-import { useNodeReader } from "@src/state/nodes/hooks";
-import { nodesApi } from "@src/state/api/nodes";
+import { toggleToolbar } from "@src/state/preferences/preferencesSlice";
+import { useSetter } from "@src/store/accessors";
+import axios from "axios";
+import { memo, useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useManuscriptController } from "../ManuscriptReader/ManuscriptController";
+import FieldSelector from "./FieldSelector";
+import { PDF_LICENSE_TYPES } from "../PopOver/ComponentMetadataPopover";
+interface CreateNodeModalProps {
+  isOpen: boolean;
+  onDismiss: () => void;
+}
 
-export type ModalProps = PopOverProps & {
-  toggleModal: (status: boolean) => void;
-  onRequestClose?: any;
-};
-
-export default function AddResearchNode(props: ModalProps) {
+export default memo(function CreateNodeModal({
+  isOpen,
+  onDismiss,
+}: CreateNodeModalProps) {
+  const navigate = useNavigate();
   const dispatch = useSetter();
   const { editingNodeParams } = useNodeReader();
 
@@ -97,6 +99,13 @@ export default function AddResearchNode(props: ModalProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, editingNodeParams]);
 
+  useEffect(() => {
+    if (isOpen === true) {
+      navigate(`${site.app}/start`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
   const onClose = (dontHideToolbar?: boolean) => {
     if (!dontHideToolbar) {
       dispatch(toggleToolbar(false));
@@ -106,16 +115,15 @@ export default function AddResearchNode(props: ModalProps) {
     setEditManifest(null);
     setResearchFields([]);
     dispatch(resetEditNode());
-    props.toggleModal(false);
+    onDismiss?.();
   };
-  const navigate = useNavigate();
 
   useEffect(() => {
-    if (props.isVisible === true) {
+    if (isOpen === true) {
       navigate(`${site.app}/nodes/start`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.isVisible]);
+  }, [isOpen]);
 
   const handleEdit = useCallback(async () => {
     // debugger;
@@ -139,8 +147,8 @@ export default function AddResearchNode(props: ModalProps) {
       console.log(`[EDIT NODE]Failed fetching manifest err: ${e}`);
     } finally {
       setIsLoading(false);
-      onClose();
-      if (props.onRequestClose) props.onRequestClose({} as any);
+      onDismiss();
+      // if (props.onRequestClose) props.onRequestClose({} as any);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -152,110 +160,22 @@ export default function AddResearchNode(props: ModalProps) {
   ]);
 
   return (
-    <PopOver
-      displayCloseIcon={false}
-      isVisible={props.isVisible}
-      style={{
-        width: 700,
-        minWidth: 300,
-        padding: 0,
-        marginLeft: 0,
-        marginRight: 0,
-      }}
-      containerStyle={{
-        backgroundColor: "rgba(0,0,0,0.8)",
-        position: "fixed",
-        top: 0,
-        left: 0,
-      }}
-      containerClassName="flex items-center justify-center"
-      className="rounded-lg bg-[#191B1C] dark:bg-[#191B1C] text-white"
-      footer={() => (
-        <div className="flex flex-row justify-end items-center bg-neutrals-gray-1 border-t border-t-tint-primary rounded-b-md px-4 py-3">
-          <PrimaryButton
-            disabled={
-              !(
-                manifestTitle &&
-                researchFields.length > 0 &&
-                manifestLicense
-              ) || isLoading
-            }
-            onClick={() => {
-              if (editingNodeParams) return handleEdit();
-              /**
-               * Handle create new node
-               */
-              setTimeout(async () => {
-                setIsLoading(true);
-                try {
-                  const payload = {
-                    title: manifestTitle || "",
-                    defaultLicense: manifestLicense?.name,
-                    researchFields,
-                    links: {
-                      pdf: [],
-                      metadata: [],
-                    },
-                  };
-                  const ros = await createResearchObjectStub(payload);
-
-                  dispatch(setCurrentObjectId(""));
-                  const ro = (ros as any).node.uuid;
-
-                  dispatch(setCurrentObjectId(ro));
-                  dispatch(
-                    setManifest({
-                      version: 1,
-                      title: manifestTitle || "",
-                      defaultLicense: manifestLicense?.name,
-                      components: [],
-                      contributors: [],
-                      researchFields,
-                    })
-                  );
-
-                  dispatch(setComponentStack([]));
-                  setIsAddingComponent(true);
-                  setIsLoading(false);
-
-                  onClose();
-                  setIsLoading(false);
-
-                  // refresh node collection
-                  dispatch(
-                    nodesApi.util.invalidateTags([{ type: tags.nodes }])
-                  );
-                  navigate(
-                    `${site.app}${app.nodes}/${RESEARCH_OBJECT_NODES_PREFIX}${ro}`
-                  );
-
-                  return;
-                } catch (e) {
-                  console.log("Error", e);
-                } finally {
-                  setIsLoading(false);
-                }
-              });
-              dispatch(setCurrentObjectId(""));
-              dispatch(setPublicView(false));
-            }}
-            className="h-10 text-lg flex gap-2"
-          >
-            {isLoading ? "Saving" : "Save"}
-            {isLoading && <DefaultSpinner color="white" size={24} />}
-          </PrimaryButton>
-        </div>
-      )}
+    <Modal
+      isOpen={isOpen}
+      onDismiss={onClose}
+      $scrollOverlay={true}
+      $maxWidth={700}
     >
-      <div className="px-6 pt-5 pb-2">
+      <Modal.Header onDismiss={onClose} />
+      <div className="px-6 pt-5 pb-2 text-white">
         <div className="flex flex-row justify-between items-center">
           <h1 className="text-lg font-bold">Name the Research Node</h1>
-          <IconX className="cursor-pointer" onClick={() => onClose(true)} />
         </div>
         <p className="text-neutrals-gray-5 text-sm mb-6">
           Enter the name of your research node. Ideally it would be the title of
           your research report.
         </p>
+
         <PlaceholderInput
           placeholder={"Research Node Name"}
           value={manifestTitle}
@@ -269,7 +189,7 @@ export default function AddResearchNode(props: ModalProps) {
           Start typing the field of science that best describes your research
           node.
         </p>
-        {props.isVisible && (
+        {isOpen && (
           <FieldSelector
             onChange={setResearchFields}
             defaultValues={editManifest?.researchFields}
@@ -291,15 +211,84 @@ export default function AddResearchNode(props: ModalProps) {
         >
           Learn More
         </a>
-        <SelectMenu
+        <SelectList
           label="License Type"
           data={PDF_LICENSE_TYPES}
-          className="mt-6"
+          className="mt-2"
           value={manifestLicense}
           onSelect={(value: any) => setManifestLicense(value)}
         />
         <hr className="mt-6 mb-6 border-neutrals-gray-3" />
       </div>
-    </PopOver>
+      <div className="flex flex-row justify-end items-center bg-neutrals-gray-1 border-t border-t-tint-primary rounded-b-md px-4 py-3">
+        <PrimaryButton
+          disabled={
+            !(manifestTitle && researchFields.length > 0 && manifestLicense) ||
+            isLoading
+          }
+          onClick={() => {
+            if (editingNodeParams) return handleEdit();
+            /**
+             * Handle create new node
+             */
+            setTimeout(async () => {
+              setIsLoading(true);
+              try {
+                const payload = {
+                  title: manifestTitle || "",
+                  defaultLicense: manifestLicense?.name,
+                  researchFields,
+                  links: {
+                    pdf: [],
+                    metadata: [],
+                  },
+                };
+                const ros = await createResearchObjectStub(payload);
+
+                dispatch(setCurrentObjectId(""));
+                const ro = (ros as any).node.uuid;
+
+                dispatch(setCurrentObjectId(ro));
+                dispatch(
+                  setManifest({
+                    version: 1,
+                    title: manifestTitle || "",
+                    defaultLicense: manifestLicense?.name,
+                    components: [],
+                    contributors: [],
+                    researchFields,
+                  })
+                );
+
+                dispatch(setComponentStack([]));
+                setIsAddingComponent(true);
+                setIsLoading(false);
+
+                onClose();
+                setIsLoading(false);
+
+                // refresh node collection
+                dispatch(nodesApi.util.invalidateTags([{ type: tags.nodes }]));
+                navigate(
+                  `${site.app}${app.nodes}/${RESEARCH_OBJECT_NODES_PREFIX}${ro}`
+                );
+
+                return;
+              } catch (e) {
+                console.log("Error", e);
+              } finally {
+                setIsLoading(false);
+              }
+            });
+            dispatch(setCurrentObjectId(""));
+            dispatch(setPublicView(false));
+          }}
+          className="h-10 text-lg flex gap-2"
+        >
+          {isLoading ? "Saving" : "Save"}
+          {isLoading && <DefaultSpinner color="white" size={24} />}
+        </PrimaryButton>
+      </div>
+    </Modal>
   );
-}
+});
