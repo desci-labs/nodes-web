@@ -15,6 +15,7 @@ const authorRoles = Object.values(ResearchObjectV1AuthorRole).map(
   })
 );
 
+const ORCID_SITE = "https://orcid.org/";
 export default function CreditsForm(props: ModalProps & CreditModalProps) {
   const {
     watch,
@@ -85,12 +86,23 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
               value={orcid}
               placeholder="0000-0000-0000-0000"
               format="####-####-####-####"
-              className="bg-transparent relative block w-full mt-2 my-5 font-medium text-gray-900 dark:text-white focus:ring-0 outline-none focus:outline-none border border-transparent border-b border-b-[#969696] focus:border-0 focus:border-b-tint-primary-hover focus:border-b focus-within:border-b-tint-primary-hover px-3 py-2 shadow-sm bg-white dark:bg-[#272727]"
+              className="bg-transparent relative block w-full my-2 font-medium text-gray-900 dark:text-white focus:ring-0 outline-none focus:outline-none border border-transparent border-b border-b-[#969696] focus:border-0 focus:border-b-tint-primary-hover focus:border-b focus-within:border-b-tint-primary-hover px-3 py-2 shadow-sm bg-white dark:bg-[#272727]"
               {...field}
             />
           )}
         />
         <span className="text-red-400 text-xs">{errors.orcid?.message}</span>
+        {orcid && (
+          <a
+            className="block text-md font-extrabold text-tint-primary hover:text-tint-primary-hover tracking-tight disabled:text-neutrals-gray-4"
+            href={`${errors?.orcid ? "" : `${ORCID_SITE}${orcid}`}`}
+            target="_blank"
+            rel="noreferrer"
+            aria-disabled={!!errors?.orcid}
+          >
+            Find ORCID PID
+          </a>
+        )}
       </div>
       <div className="mt-8">
         <Controller
