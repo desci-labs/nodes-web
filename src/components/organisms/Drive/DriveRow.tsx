@@ -16,8 +16,11 @@ import {
   IconData,
   IconDirectory,
   IconIpfs,
+  IconPlayRounded,
+  IconQuotes,
   IconResearchNode,
   IconResearchReport,
+  IconStar,
 } from "@icons";
 import { useCallback, useMemo, useRef } from "react";
 import {
@@ -182,10 +185,20 @@ DriveRowProps) {
         selected ? "singleRowSelected" : null
       }`}
     >
-      <li className={`${everyRow}`}>{renderComponentIcon(file)}</li>
+      <li className={`${everyRow}`}>
+        <IconStar
+          className={`cursor-pointer ${
+            file.starred
+              ? "fill-tint-primary stroke-tint-primary hover:fill-transparent hover:stroke-neutrals-gray-5"
+              : "stroke-neutrals-gray-5 hover:fill-tint-primary hover:stroke-tint-primary"
+          }`}
+          width={18}
+          height={18}
+        />
+      </li>
       <li
         ref={handleRef}
-        className={`${everyRow} !justify-start gap-2`}
+        className={`${everyRow} !justify-start gap-1 cursor-pointer`}
         onClick={(e) => {
           if (e.ctrlKey) return;
           if (
@@ -197,10 +210,18 @@ DriveRowProps) {
         }}
       >
         <span>
-          {file.type === "dir" ? (
-            <IconDirectory />
+          {file.type === FileType.Dir ? (
+            <IconDirectory
+              fill="#28AAC4"
+              className={`w-[34px] ${
+                file.componentType !== DriveNonComponentTypes.UNKNOWN
+                  ? "fill-tint-primary"
+                  : "fill-neutrals-gray-5"
+              }`}
+            />
           ) : (
-            <IconIpfs height={20} width={17.3} />
+            // <IconIpfs height={20} width={17.3} />
+            renderComponentIcon(file)
           )}
         </span>
         <span className="truncate max-w-sm">{file.name}</span>
@@ -222,23 +243,25 @@ DriveRowProps) {
       </li>
       <li className={`${everyRow}`}>
         <BlackGenericButton
+          className="w-7 h-7"
           onClick={() => {
             setComponentToCite(file);
             setShowCitationModal(true);
           }}
         >
-          Cite
+          <IconQuotes />
         </BlackGenericButton>
       </li>
       <li className={`${everyRow}`}>
         <BlackGenericButton
           disabled={!canUse}
+          className="p-0 min-w-[28px] h-7"
           onClick={() => {
             const cid = file.cid ? file.cid : manifestCid ? manifestCid : "";
             setUseMenuCids([cid]);
           }}
         >
-          <IconCPU className={`p-0 `} />
+          <IconPlayRounded className="p-0" />
         </BlackGenericButton>
       </li>
     </div>

@@ -130,6 +130,9 @@ import { ReactComponent as IconGitbook } from "@images/gitbook.svg";
 import { ReactComponent as IconDesciNodes } from "@images/icons/a-desci-nodes-logo.svg";
 import { ReactComponent as IconHelp } from "@images/icons/icon-help.svg";
 import { ReactComponent as IconKebab } from "@images/icons/kebab.svg";
+import { ReactComponent as IconStar } from "@images/icons/star.svg";
+import { ReactComponent as IconQuotes } from "@images/icons/quotes.svg";
+import { ReactComponent as IconPlayRounded } from "@images/icons/play.svg";
 
 export type SvgIconProps = FC<
   React.SVGProps<SVGSVGElement> & {
@@ -138,6 +141,9 @@ export type SvgIconProps = FC<
 >;
 
 export {
+  IconPlayRounded,
+  IconQuotes,
+  IconStar,
   IconKebab,
   IconHelp,
   IconDesciNodes,

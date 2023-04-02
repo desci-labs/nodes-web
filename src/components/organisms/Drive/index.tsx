@@ -29,7 +29,7 @@ import {
 } from "./types";
 import DriveRow, { DRIVE_ROW_STYLES } from "./DriveRow";
 import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
-import { IconCirclePlus } from "@src/icons";
+import { IconCirclePlus, IconStar } from "@src/icons";
 import RenameDataModal from "./RenameDataModal";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useDrive } from "@src/state/drive/hooks";
@@ -324,7 +324,13 @@ const DriveTable: React.FC<DriveTableProps> = ({
             gridTemplateColumns: `${ColWidths.STARRED} ${ColWidths.FILE_NAME} ${ColWidths.LAST_MODIFIED} ${ColWidths.STATUS} ${ColWidths.FILE_SIZE} ${ColWidths.CITE} ${ColWidths.USE}`,
           }}
         >
-          <li className={`${everyRow} ${headerRow}`}>⭐</li>
+          <li className={`${everyRow} ${headerRow}`}>
+            <IconStar
+              className="fill-tint-primary stroke-tint-primary"
+              width={18}
+              height={18}
+            />
+          </li>
           <li className={`${everyRow} ${headerRow} !justify-start`}>
             File Name
           </li>
@@ -388,7 +394,7 @@ export const everyRow =
   "flex items-center justify-center w-full px-3 border-b border-[#555659] h-12 driveRow";
 const headerRow = "!h-14 border bg-black driveRowHeader";
 enum ColWidths {
-  STARRED = "40px",
+  STARRED = "50px",
   FILE_NAME = "2fr",
   LAST_MODIFIED = "minmax(auto, 1fr)",
   STATUS = "minmax(auto, 1fr)",
