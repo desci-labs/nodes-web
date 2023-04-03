@@ -27,19 +27,22 @@ import { SessionStorageKeys } from "../driveUtils";
 import { useSetter } from "@src/store/accessors";
 import { setComponentStack } from "@src/state/nodes/viewer";
 import { updatePdfPreferences } from "@src/state/nodes/pdf";
+import { useNodeReader } from "@src/state/nodes/hooks";
 
 const CardWrapper: StyledComponent<
   "div",
   any,
-  { isSelected?: boolean; isHalfSelected?: boolean },
+  { isSelected?: boolean; isHalfSelected?: boolean; isRecentlyAdded?: boolean },
   never
-> = styled.div.attrs(({ isSelected, isHalfSelected }: any) => ({
-  className: `cursor-pointer shadow-md ${
-    isSelected || isHalfSelected
-      ? "border-2 border-black dark:border-white"
-      : "border-[1px] border-muted-300 dark:border-muted-500 hover:border-black hover:dark:border-gray-500"
-  }`,
-}))`
+> = styled.div.attrs(
+  ({ isSelected, isHalfSelected, isRecentlyAdded }: any) => ({
+    className: `cursor-pointer shadow-md ${
+      isSelected || isHalfSelected
+        ? "border-2 border-black dark:border-white"
+        : "border-[1px] border-muted-300 dark:border-muted-500 hover:border-black hover:dark:border-gray-500"
+    } ${isRecentlyAdded ? "animate-pulsatingGlow" : null}`,
+  })
+)`
   width: 100%;
   margin: ${(props: { isSelected?: boolean; isHalfSelected?: boolean }) =>
     props.isSelected || props.isHalfSelected
@@ -121,6 +124,7 @@ const ComponentCard = (props: ComponentCardProps) => {
   const [showComponentMetadata, setShowComponentMetadata] =
     useState<boolean>(false);
   const { setDriveJumpDir } = useManuscriptController([]);
+  const { recentlyAddedComponents } = useNodeReader();
   /***
    * Use local click tracking for fast click response
    * */
@@ -201,6 +205,7 @@ const ComponentCard = (props: ComponentCardProps) => {
     <CardWrapper
       isSelected={isSelected}
       isHalfSelected={clicked}
+      isRecentlyAdded={recentlyAddedComponents[component.payload.path] ?? false}
       onClick={handleComponentClick}
     >
       <FlexColumn>

@@ -48,6 +48,7 @@ import {
 import { __log } from "@src/components/utils";
 import {
   addComponent,
+  addRecentlyAddedComponent,
   saveManifestDraft,
   setManifest,
   setManifestCid,
@@ -396,6 +397,7 @@ export const starComponentThunk = createAsyncThunk(
     if (!manifest || deprecated) return;
 
     dispatch(starComponent({ path: item.path! }));
+    dispatch(addRecentlyAddedComponent(item.path!));
 
     const starCompIdx = manifest.components.findIndex(
       (c: ResearchObjectV1Component) => c.payload.path === item.path

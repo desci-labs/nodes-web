@@ -36,3 +36,5 @@ export interface UpdateBatchUploadProgressAction {
 export interface StarComponentThunkPayload {
   item: DriveObject;
 }
+
+export type DrivePath = string;

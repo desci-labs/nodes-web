@@ -10,6 +10,8 @@ import { updateDraft } from "@src/api";
 import { cleanupManifestUrl } from "@src/components/utils";
 import { RootState } from "@src/store";
 import axios from "axios";
+import { Path } from "react-router";
+import { DrivePath } from "../drive/types";
 
 type ReaderMode = "reader" | "editor";
 
@@ -48,6 +50,7 @@ interface NodeReaderPref {
   startedNewAnnotationViaButton: boolean;
   componentStack: ResearchObjectV1Component[];
   manifestStatus: ManifestDataStatus;
+  recentlyAddedComponents: Record<DrivePath, boolean>;
 }
 
 const initialState: NodeReaderPref = {
@@ -65,6 +68,7 @@ const initialState: NodeReaderPref = {
   researchPanelTab: ResearchTabs.history,
   startedNewAnnotationViaButton: false,
   manifestStatus: ManifestDataStatus.Idle,
+  recentlyAddedComponents: {},
 };
 
 export const nodeReaderSlice = createSlice({
@@ -340,6 +344,18 @@ export const nodeReaderSlice = createSlice({
       }
       return state;
     },
+    addRecentlyAddedComponent: (
+      state,
+      { payload }: PayloadAction<DrivePath>
+    ) => {
+      state.recentlyAddedComponents[payload] = true;
+    },
+    removeRecentlyAddedComponent: (
+      state,
+      { payload }: PayloadAction<DrivePath>
+    ) => {
+      delete state.recentlyAddedComponents[payload];
+    },
   },
   extraReducers(builder) {
     builder
@@ -430,4 +446,6 @@ export const {
   updatePendingAnnotations,
   setStartedNewAnnotationViaButton,
   addComponent,
+  addRecentlyAddedComponent,
+  removeRecentlyAddedComponent,
 } = nodeReaderSlice.actions;

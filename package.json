@@ -138,7 +138,7 @@
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "models:compile": "cd ../nodes/desci-models && yarn && yarn build && cd ../../nodes-web && rm node_modules/.yarn-integrity && yarn",
     "contracts:compile": "cd ../nodes/desci-contracts && yarn && npx hardhat compile --network ganache && cd ../../nodes-web && rm node_modules/.yarn-integrity && yarn",
-    "start": "yarn models:compile && yarn contracts:compile && REACT_APP_VERSION=$npm_package_version craco start",
+    "start": "yarn models:compile && yarn contracts:compile && REACT_APP_VERSION=$npm_package_version TAILWIND_MODE=watch craco start",
     "build": "yarn stub && yarn models:compile && yarn contracts:compile && REACT_APP_VERSION=$npm_package_version GENERATE_SOURCEMAP=false craco build && yarn terser",
     "stub": "./stubContract.sh",
     "test": "craco test",

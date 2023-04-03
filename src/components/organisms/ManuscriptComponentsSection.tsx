@@ -50,7 +50,9 @@ const EditableHOC = (props: any) => {
     }
 
     if (manifestData) {
-      const index = manifestData.components.findIndex((c) => c.id === id);
+      const index = manifestData.components.findIndex(
+        (c: ResearchObjectV1Component) => c.id === id
+      );
       if (index > -1) {
         dispatch(deleteComponent({ componentId: id }));
         dispatch(saveManifestDraft({}));
