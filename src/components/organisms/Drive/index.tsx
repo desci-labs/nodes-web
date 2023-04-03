@@ -227,6 +227,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
 
         return nodeDrived;
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodeDrived, manifestData]);
 
   function toggleSelected(
@@ -417,6 +418,10 @@ const DriveTable: React.FC<DriveTableProps> = ({
           componentToUse={componentToUse}
           index={selectedIndex}
           selectedFiles={selected}
+          onDismiss={() => {
+            setSelectedIndex(0);
+            setComponentToUse(null);
+          }}
         />
       )}
       {renameComponentId && (

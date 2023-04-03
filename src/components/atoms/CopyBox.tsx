@@ -38,4 +38,35 @@ const CopyBox = ({
   );
 };
 
+interface CodeBoxProps {
+  title: string;
+  label: string;
+  children: JSX.Element | string;
+  className?: string;
+  onHandleClick: () => void;
+}
+
+export const CodeBox = ({
+  title,
+  label,
+  children,
+  className,
+  onHandleClick,
+}: CodeBoxProps) => {
+  return (
+    <div
+      className={`bg-neutrals-gray-1 p-2 border-b-2 border-neutrals-gray-3 ${className}`}
+    >
+      <h1 className="font-bold select-none">{title}</h1>
+      <div className="my-1">{children}</div>
+      <button
+        className="text-tint-primary font-bold hover:text-tint-primary-hover"
+        onClick={onHandleClick}
+      >
+        {label}
+      </button>
+    </div>
+  );
+};
+
 export default CopyBox;

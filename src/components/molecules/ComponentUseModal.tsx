@@ -1,4 +1,4 @@
-import CopyBox from "@components/atoms/CopyBox";
+import CopyBox, { CodeBox } from "@components/atoms/CopyBox";
 import PrimaryButton from "@components/atoms/PrimaryButton";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { IconWarning } from "@src/icons";
@@ -22,7 +22,6 @@ import useActionHandler from "@src/components/organisms/Drive/ContextMenu/useAct
 import { useRef } from "react";
 import {
   findRootComponentCid,
-  // isNodeRootDrive,
   isRootComponentDrive,
 } from "@src/components/driveUtils";
 import {
@@ -119,8 +118,6 @@ const ComponentUseModal = ({
     }
   };
 
-  // const isNodeRoot = isNodeRootDrive(file);
-
   function close() {
     setComponentToUse(null);
     restProps?.onDismiss?.();
@@ -139,7 +136,6 @@ const ComponentUseModal = ({
       ResearchObjectComponentType.PDF,
     ].includes(componentToUse.componentType as ResearchObjectComponentType);
 
-  console.log(file);
   return (
     <Modal
       {...restProps}
@@ -159,7 +155,18 @@ const ComponentUseModal = ({
             <VideoAnimation />{" "}
           </section>
           <section id="cid-use" className="max-w-[600px]">
-            <div>
+            <div className="lg:hidden">
+              <CodeBox
+                title="License Type"
+                label="Edit Metadata"
+                className="my-6 w-full overflow-hidden pr-2"
+                onHandleClick={handleEditMetadata}
+              >
+                <>{file.metadata.licenseType ?? ""}</>
+              </CodeBox>
+              <DividerSimple />
+            </div>
+            <div className="mt-6">
               <h1 className="font-bold">Use Edge Compute</h1>
               <span className="text-neutrals-gray-4">
                 Copy the dPID to run compute jobs without moving the data using
@@ -176,7 +183,7 @@ const ComponentUseModal = ({
               <CopyBox
                 title="dPid"
                 copyButtonText="Copy dPID"
-                className="my-8 w-full overflow-hidden pr-2"
+                className="my-6 w-full overflow-hidden pr-2"
                 copyText={dpid}
               >
                 <>{dpid}</>
@@ -200,7 +207,7 @@ const ComponentUseModal = ({
               <CopyBox
                 title="Python syntax"
                 copyButtonText="Copy Syntax"
-                className="my-8 w-full overflow-hidden pr-2"
+                className="my-6 w-full overflow-hidden pr-2"
                 copyText={pythonImport}
               >
                 <>{pythonImport}</>
@@ -252,9 +259,10 @@ const ComponentUseModal = ({
                 state. Uncommitted files are not included.
               </span>
             </div>
-            <span className="text-sm flex gap-2">
+            <span className="text-sm gap-2 hidden lg:flex">
               <span className="inline-block">
-                License Type: <b>{file.metadata.licenseType ?? ""}</b>{" "}
+                License Type:{" "}
+                <b>{file.metadata.licenseType ?? "Not Specified"}</b>{" "}
               </span>
               <button
                 className="text-tint-primary hover:text-tint-primary-hover"
