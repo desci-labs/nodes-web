@@ -137,22 +137,28 @@ export const nodeReaderSlice = createSlice({
         );
       }
     },
+    addComponent: (
+      state,
+      { payload }: PayloadAction<{ component: ResearchObjectV1Component }>
+    ) => {
+      if (state.manifest) {
+        state.manifest.components.push(payload.component);
+      }
+    },
     updateComponent: (
       state,
       {
         payload,
-      }: PayloadAction<{ index: number; update: ResearchObjectV1Component }>
+      }: PayloadAction<{
+        index: number;
+        update: Partial<ResearchObjectV1Component>;
+      }>
     ) => {
-      if (state.manifest) {
-        state.manifest.components = state.manifest.components.map(
-          (component, idx) => {
-            if (idx === payload.index) {
-              return payload.update;
-            }
-            return component;
-          }
-        );
-      }
+      if (!state.manifest) return;
+      state.manifest.components[payload.index] = {
+        ...state.manifest.components[payload.index],
+        ...payload.update,
+      };
     },
     updatePendingAnnotations: (
       state,
@@ -422,4 +428,5 @@ export const {
   popFromComponentStack,
   updatePendingAnnotations,
   setStartedNewAnnotationViaButton,
+  addComponent,
 } = nodeReaderSlice.actions;
