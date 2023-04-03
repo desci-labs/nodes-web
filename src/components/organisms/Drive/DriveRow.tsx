@@ -35,6 +35,8 @@ import { useInteractionHandler } from "./ContextMenu/useActionHandler";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { everyRow } from ".";
 import "./styles.scss";
+import { starComponent, starComponentThunk } from "@src/state/drive/driveSlice";
+import { useSetter } from "@src/store/accessors";
 
 export const DRIVE_ROW_STYLES = [
   "justify-self-start w-44 2xl:w-full min-w-44 flex-grow-3", // file
@@ -84,6 +86,8 @@ DriveRowProps) {
   const { setUseMenuCids, setShowCitationModal, setComponentToCite } =
     useManuscriptController(["componentToCite"]);
   const { manifestCid, manifest: manifestData, publicView } = useNodeReader();
+
+  const dispatch = useSetter();
 
   // const handleEditMetadata = () => {
   //   // debugger;
@@ -194,6 +198,7 @@ DriveRowProps) {
           }`}
           width={18}
           height={18}
+          onClick={() => dispatch(starComponentThunk({ item: file }))}
         />
       </li>
       <li

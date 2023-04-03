@@ -1,3 +1,5 @@
+import { DriveObject } from "@src/components/organisms/Drive";
+
 export interface NavigateToDriveByPathAction {
   payload: {
     path: string;
@@ -29,4 +31,8 @@ export interface UpdateBatchUploadProgressAction {
     batchUid: string;
     progress: number;
   };
+}
+
+export interface StarComponentThunkPayload {
+  item: DriveObject;
 }

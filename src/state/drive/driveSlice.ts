@@ -1,11 +1,21 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import {
+  ActionCreatorWithPayload,
+  PayloadAction,
+  createAsyncThunk,
+  createSlice,
+} from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 import { getDatasetTree, updateDatasetComponent } from "@src/api";
-import { DriveObject, FileType } from "@src/components/organisms/Drive";
+import {
+  DriveNonComponentTypes,
+  DriveObject,
+  FileType,
+} from "@src/components/organisms/Drive";
 import { RequestStatus, RootState } from "@src/store";
 import {
   ResearchObjectComponentType,
   ResearchObjectV1,
+  ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 import {
   createVirtualDrive,
@@ -31,11 +41,18 @@ import {
   AddItemsToUploadQueueAction,
   NavigateToDriveByPathAction,
   removeBatchFromUploadQueueAction,
+  StarComponentThunkPayload,
   UpdateBatchUploadProgressAction,
   UploadQueueItem,
 } from "./types";
 import { __log } from "@src/components/utils";
-import { setManifest, setManifestCid } from "../nodes/viewer";
+import {
+  addComponent,
+  saveManifestDraft,
+  setManifest,
+  setManifestCid,
+  updateComponent,
+} from "../nodes/viewer";
 import { dispatch } from "react-hot-toast/dist/core/store";
 interface DriveState {
   status: RequestStatus;
@@ -116,6 +133,14 @@ export const driveSlice = createSlice({
         (item) => item.batchUid !== batchUid
       );
     },
+    starComponent: (state, { payload }: PayloadAction<{ path: string }>) => {
+      if (!state.currentDrive) return;
+      const drive = state.currentDrive.contains!.find(
+        (fd: DriveObject) => fd.path === payload.path
+      );
+      if (!drive) return;
+      drive.starred = !drive.starred;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -164,7 +189,7 @@ export const driveSlice = createSlice({
           path: DRIVE_NODE_ROOT_PATH + "/" + DRIVE_EXTERNAL_LINKS_PATH,
           contains: [],
         });
-        manifest.components.forEach((c) => {
+        manifest.components.forEach((c: ResearchObjectV1Component) => {
           if (c.type === ResearchObjectComponentType.LINK) {
             externalLinks.contains!.push(
               createVirtualDrive({
@@ -218,6 +243,7 @@ export const {
   cleanupUploadProgressMap,
   setShowUploadPanel,
   removeBatchFromUploadQueue,
+  starComponent,
 } = driveSlice.actions;
 
 export interface FetchTreeThunkParams {
@@ -237,7 +263,8 @@ export const fetchTreeThunk = createAsyncThunk(
       manifest?.components[0].type === ResearchObjectComponentType.DATA_BUCKET
         ? manifest.components[0]
         : manifest?.components.find(
-            (c) => c.type === ResearchObjectComponentType.DATA_BUCKET
+            (c: ResearchObjectV1Component) =>
+              c.type === ResearchObjectComponentType.DATA_BUCKET
           );
 
     if (hasDataBucket) {
@@ -354,6 +381,48 @@ export const addFilesToDrive = createAsyncThunk(
       __log("PaneDrive::handleUpdate", files, e);
     }
     // debugger;
+  }
+);
+
+export const starComponentThunk = createAsyncThunk(
+  `drive/starComponent`,
+  async (payload: StarComponentThunkPayload, { getState, dispatch }) => {
+    const state = getState() as RootState;
+    const { manifest } = state.nodes.nodeReader;
+    const { deprecated } = state.drive;
+    const { item } = payload;
+
+    //Deprecated starring unhandled, temporarily disabled to prevent errors
+    if (!manifest || deprecated) return;
+
+    dispatch(starComponent({ path: item.path! }));
+
+    const starCompIdx = manifest.components.findIndex(
+      (c: ResearchObjectV1Component) => c.payload.path === item.path
+    );
+
+    // debugger;
+    if (starCompIdx !== -1) {
+      dispatch(
+        updateComponent({
+          index: starCompIdx,
+          update: { starred: !item.starred },
+        })
+      );
+    } else {
+      const newComponent: ResearchObjectV1Component = {
+        id: uuidv4(),
+        name: item.name,
+        type: ResearchObjectComponentType.UNKNOWN,
+        payload: {
+          path: item.path,
+          cid: item.cid,
+        },
+        starred: true,
+      };
+      dispatch(addComponent({ component: newComponent }));
+    }
+    dispatch(saveManifestDraft({ onSucess: () => dispatch(fetchTreeThunk()) }));
   }
 );
 

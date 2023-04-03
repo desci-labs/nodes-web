@@ -33,7 +33,6 @@ import { IconCirclePlus, IconStar } from "@src/icons";
 import RenameDataModal from "./RenameDataModal";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useDrive } from "@src/state/drive/hooks";
-import { dispatch } from "react-hot-toast/dist/core/store";
 import {
   fetchTreeThunk,
   navigateToDriveByPath,

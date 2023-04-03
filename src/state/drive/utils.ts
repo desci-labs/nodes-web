@@ -26,6 +26,7 @@ export function generatePathCompMap(
       case ResearchObjectComponentType.CODE:
       case ResearchObjectComponentType.PDF:
       case ResearchObjectComponentType.DATA:
+      case ResearchObjectComponentType.UNKNOWN:
         componentsMap[c.payload.path] = c;
         return;
       default:
