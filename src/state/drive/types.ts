@@ -1,3 +1,4 @@
+import { ResearchObjectComponentType } from "@src/../../nodes/desci-models/dist";
 import { DriveObject } from "@src/components/organisms/Drive";
 
 export interface NavigateToDriveByPathAction {
@@ -35,6 +36,10 @@ export interface UpdateBatchUploadProgressAction {
 
 export interface StarComponentThunkPayload {
   item: DriveObject;
+}
+export interface AssignTypeThunkPayload {
+  item: DriveObject;
+  type: ResearchObjectComponentType;
 }
 
 export type DrivePath = string;

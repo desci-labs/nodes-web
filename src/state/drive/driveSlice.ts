@@ -13,6 +13,7 @@ import {
 } from "@src/components/organisms/Drive";
 import { RequestStatus, RootState } from "@src/store";
 import {
+  CommonComponentPayload,
   ResearchObjectComponentType,
   ResearchObjectV1,
   ResearchObjectV1Component,
@@ -35,10 +36,13 @@ import {
   DRIVE_EXTERNAL_LINKS_PATH,
   extractComponentMetadata,
   generatePathCompMap,
+  urlOrCid,
 } from "./utils";
 import {
   AddFilesToDrivePayload,
   AddItemsToUploadQueueAction,
+  AssignTypeThunkPayload,
+  DrivePath,
   NavigateToDriveByPathAction,
   removeBatchFromUploadQueueAction,
   StarComponentThunkPayload,
@@ -134,13 +138,26 @@ export const driveSlice = createSlice({
         (item) => item.batchUid !== batchUid
       );
     },
-    starComponent: (state, { payload }: PayloadAction<{ path: string }>) => {
+    starComponent: (state, { payload }: PayloadAction<{ path: DrivePath }>) => {
       if (!state.currentDrive) return;
       const drive = state.currentDrive.contains!.find(
         (fd: DriveObject) => fd.path === payload.path
       );
       if (!drive) return;
       drive.starred = !drive.starred;
+    },
+    assignComponentType: (
+      state,
+      {
+        payload,
+      }: PayloadAction<{ path: DrivePath; type: ResearchObjectComponentType }>
+    ) => {
+      if (!state.currentDrive) return;
+      const drive = state.currentDrive.contains!.find(
+        (fd: DriveObject) => fd.path === payload.path
+      );
+      if (!drive) return;
+      drive.componentType = payload.type;
     },
   },
   extraReducers: (builder) => {
@@ -245,6 +262,7 @@ export const {
   setShowUploadPanel,
   removeBatchFromUploadQueue,
   starComponent,
+  assignComponentType,
 } = driveSlice.actions;
 
 export interface FetchTreeThunkParams {
@@ -421,6 +439,48 @@ export const starComponentThunk = createAsyncThunk(
           cid: item.cid,
         },
         starred: true,
+      };
+      dispatch(addComponent({ component: newComponent }));
+    }
+    dispatch(saveManifestDraft({ onSucess: () => dispatch(fetchTreeThunk()) }));
+  }
+);
+
+export const assignTypeThunk = createAsyncThunk(
+  `drive/assignType`,
+  async (payload: AssignTypeThunkPayload, { getState, dispatch }) => {
+    const state = getState() as RootState;
+    const { manifest } = state.nodes.nodeReader;
+    const { deprecated } = state.drive;
+    const { item, type } = payload;
+
+    //Deprecated type assignment unhandled, temporarily disabled to prevent errors
+    if (!manifest || deprecated) return;
+
+    dispatch(assignComponentType({ path: item.path!, type: type }));
+
+    const existingCompIdx = manifest.components.findIndex(
+      (c: ResearchObjectV1Component) => c.payload.path === item.path!
+    );
+
+    const urlOrCidProps = urlOrCid(item.cid, type);
+    if (existingCompIdx !== -1) {
+      dispatch(
+        updateComponent({
+          index: existingCompIdx,
+          update: { type, payload: { ...urlOrCidProps } },
+        })
+      );
+    } else {
+      const newComponent: ResearchObjectV1Component = {
+        id: uuidv4(),
+        name: item.name,
+        type: type,
+        payload: {
+          path: item.path,
+          ...urlOrCidProps,
+        },
+        starred: false,
       };
       dispatch(addComponent({ component: newComponent }));
     }
