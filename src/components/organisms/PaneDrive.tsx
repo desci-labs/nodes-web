@@ -59,6 +59,7 @@ import LoaderDrive from "../molecules/LoaderDrive";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { setManifestCid, setManifestData } from "@src/state/nodes/viewer";
+import ComponentUseModal from "@src/components/molecules/ComponentUseModal";
 
 export interface DatasetMetadataInfo {
   prepopulateFromName?: string;
@@ -104,12 +105,14 @@ const PaneDrive = () => {
     batchUploadProgress,
     privCidMap,
     setPrivCidMap,
+    componentToUse,
   } = useManuscriptController([
     "privCidMap",
     "uploadQueue",
     "droppedFileList",
     "droppedTransferItemList",
     "batchUploadProgress",
+    "componentToUse",
   ]);
   const dispatch = useSetter();
   const {

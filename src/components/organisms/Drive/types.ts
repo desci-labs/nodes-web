@@ -76,6 +76,7 @@ export interface DriveRowProps {
   setOldComponentMetadata: (
     value: React.SetStateAction<oldComponentMetadata | null>
   ) => void;
+  onHandleUse: () => void;
 }
 
 export interface DriveJumpingParams {

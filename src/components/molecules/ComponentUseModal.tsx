@@ -7,25 +7,123 @@ import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 import WarningSign from "@src/components/atoms/warning-sign";
 import DividerSimple from "@src/components/atoms/DividerSimple";
 import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
-import { DriveObject, FileType } from "../organisms/Drive";
-import useComponentDpid from "../organisms/Drive/hooks/useComponentDpid";
-import { ResearchObjectComponentType } from "@desci-labs/desci-models";
+import {
+  DriveNonComponentTypes,
+  DriveObject,
+  FileType,
+  oldComponentMetadata,
+} from "@src/components/organisms/Drive";
+import useComponentDpid from "@src/components/organisms/Drive/hooks/useComponentDpid";
+import {
+  ResearchObjectComponentType,
+  ResearchObjectV1Component,
+} from "@desci-labs/desci-models";
 import useActionHandler from "@src/components/organisms/Drive/ContextMenu/useActionHandler";
 import { useRef } from "react";
+import {
+  findRootComponentCid,
+  // isNodeRootDrive,
+  isRootComponentDrive,
+} from "@src/components/driveUtils";
+import {
+  DatasetMetadataInfo,
+  MetaStaging,
+} from "@components/organisms/PaneDrive";
+interface UseModalProps {
+  datasetMetadataInfoRef: React.MutableRefObject<DatasetMetadataInfo>;
+  setOldComponentMetadata: (
+    value: React.SetStateAction<oldComponentMetadata | null>
+  ) => void;
+  setMetaStaging: React.Dispatch<React.SetStateAction<MetaStaging[]>>;
+  isMultiselecting: boolean;
+  setShowEditMetadata: React.Dispatch<React.SetStateAction<boolean>>;
+  componentToUse: DriveObject;
+  index: number;
+  selectedFiles: Record<
+    number,
+    ResearchObjectComponentType | DriveNonComponentTypes
+  >;
+}
 
-const ComponentUseModal = (
-  props: ModalProps & { componentToUse: DriveObject }
-) => {
-  const { componentToUse, setComponentToUse } = useManuscriptController([
-    "componentToUse",
-  ]);
+const ComponentUseModal = ({
+  index,
+  setOldComponentMetadata,
+  isMultiselecting,
+  datasetMetadataInfoRef,
+  setMetaStaging,
+  setShowEditMetadata,
+  componentToUse,
+  selectedFiles,
+  ...restProps
+}: ModalProps & UseModalProps) => {
+  const { setComponentToUse } = useManuscriptController(["componentToUse"]);
   const { manifest: manifestData } = useNodeReader();
   const { dpid, fqi } = useComponentDpid(componentToUse!);
   console.log(componentToUse);
   const handler = useActionHandler();
 
+  const file = componentToUse;
+
+  const handleEditMetadata = () => {
+    // debugger;
+    if (!file) return;
+
+    if (file.componentType !== ResearchObjectComponentType.DATA) {
+      const component = manifestData?.components.find(
+        (c: ResearchObjectV1Component) => c.id === file.cid
+      );
+      if (!component) return;
+      setOldComponentMetadata({
+        componentId: component.id,
+        cb: () => {
+          const { keywords, description, licenseType } = component.payload;
+
+          const newMetadata = { keywords, description, licenseType };
+          file.metadata = newMetadata;
+        },
+      });
+    }
+
+    if (file.componentType === ResearchObjectComponentType.DATA) {
+      // debugger;
+      if (!isMultiselecting)
+        setMetaStaging([
+          {
+            file: file,
+            index: index,
+          },
+        ]);
+
+      if (isMultiselecting) {
+        datasetMetadataInfoRef.current.prepopulateFromName = file.name;
+        const staging = Object.keys(selectedFiles).map((fileIndex: string) => {
+          const parentDriveObj = file.parent;
+          const selectedFile = parentDriveObj?.contains![
+            parseInt(fileIndex)
+          ] as DriveObject;
+          return {
+            file: selectedFile!,
+          };
+        });
+        setMetaStaging(staging);
+      }
+
+      //dag file/dir (submetadata)
+      if (!isRootComponentDrive(file)) {
+        const rootCid = findRootComponentCid(file);
+        if (rootCid) datasetMetadataInfoRef.current.rootCid = rootCid;
+      }
+      datasetMetadataInfoRef.current.prepopulateMetadata = file.metadata;
+
+      if (setShowEditMetadata) setShowEditMetadata(true);
+    }
+  };
+
+  // const isNodeRoot = isNodeRootDrive(file);
+
   function close() {
     setComponentToUse(null);
+    restProps?.onDismiss?.();
   }
 
   const isDpidSupported = !!manifestData?.dpid;
@@ -40,9 +138,11 @@ const ComponentUseModal = (
       ResearchObjectComponentType.CODE,
       ResearchObjectComponentType.PDF,
     ].includes(componentToUse.componentType as ResearchObjectComponentType);
+
+  console.log(file);
   return (
     <Modal
-      {...props}
+      {...restProps}
       onDismiss={() => {
         close();
       }}
@@ -112,22 +212,24 @@ const ComponentUseModal = (
               <span className="text-neutrals-gray-4">
                 View data and run compute directly in Nodes IDE.
               </span>
-              <ButtonSecondary
-                disabled={!canPreview}
-                className="mt-4 w-full"
-                onClick={() => {
-                  const c =
-                    componentToUse?.type === FileType.File
-                      ? componentToUse
-                      : componentToUse?.contains?.find(
-                          (c) => c.type === FileType.File
-                        );
-                  handler["PREVIEW"]?.(c!);
-                  close();
-                }}
-              >
-                Preview in Nodes IDE
-              </ButtonSecondary>
+              <div className="w-full flex items-center justify-center lg:justify-start">
+                <ButtonSecondary
+                  disabled={!canPreview}
+                  className="mt-4 lg:w-full text-center"
+                  onClick={() => {
+                    const c =
+                      componentToUse?.type === FileType.File
+                        ? componentToUse
+                        : componentToUse?.contains?.find(
+                            (c) => c.type === FileType.File
+                          );
+                    handler["PREVIEW"]?.(c!);
+                    close();
+                  }}
+                >
+                  Preview in Nodes IDE
+                </ButtonSecondary>
+              </div>
             </div>
             {!isDpidSupported && (
               <div className="text-neutrals-gray-7 text-sm border-yellow-300 gap-4 bg-neutrals-gray-3 p-4 rounded-md flex flex-row items-center">
@@ -151,8 +253,15 @@ const ComponentUseModal = (
               </span>
             </div>
             <span className="text-sm flex gap-2">
-              <span className="inline-block">License Type: CCO </span>
-              <button className="text-tint-primary">Edit Metadata</button>
+              <span className="inline-block">
+                License Type: <b>{file.metadata.licenseType ?? ""}</b>{" "}
+              </span>
+              <button
+                className="text-tint-primary hover:text-tint-primary-hover"
+                onClick={handleEditMetadata}
+              >
+                Edit Metadata
+              </button>
             </span>
           </div>
           <PrimaryButton onClick={close}>Done</PrimaryButton>

@@ -14,7 +14,6 @@ import {
 import DriveBreadCrumbs, {
   BreadCrumb,
 } from "@components/molecules/DriveBreadCrumbs";
-import ComponentUseModal from "@src/components/molecules/ComponentUseModal";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -32,6 +31,7 @@ import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
 import { IconCirclePlus } from "@src/icons";
 import RenameDataModal from "./RenameDataModal";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import ComponentUseModal from "@src/components/molecules/ComponentUseModal";
 
 const Empty = () => {
   return <div className="p-5 text-xs">No files</div>;
@@ -73,11 +73,12 @@ const DriveTable: React.FC<DriveTableProps> = ({
   setRenameComponentId,
 }) => {
   const {
-    componentToUse,
     setIsAddingComponent,
     driveJumpDir,
     setDriveJumpDir,
     privCidMap,
+    componentToUse,
+    setComponentToUse,
   } = useManuscriptController(["driveJumpDir", "privCidMap", "componentToUse"]);
 
   const {
@@ -89,6 +90,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
   const [selected, setSelected] = useState<
     Record<number, ResearchObjectComponentType | DriveNonComponentTypes>
   >({});
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -392,6 +394,10 @@ const DriveTable: React.FC<DriveTableProps> = ({
                 selectedFiles={selected}
                 canEditMetadata={canEditMetadata}
                 canUse={canUse}
+                onHandleUse={() => {
+                  setComponentToUse(f);
+                  setSelectedIndex(idx);
+                }}
                 setOldComponentMetadata={setOldComponentMetadata}
               />
             );
@@ -401,7 +407,17 @@ const DriveTable: React.FC<DriveTableProps> = ({
         )}
       </div>
       {componentToUse && (
-        <ComponentUseModal isOpen={true} componentToUse={componentToUse} />
+        <ComponentUseModal
+          isOpen={true}
+          isMultiselecting={!!Object.keys(selected).length}
+          setMetaStaging={setMetaStaging}
+          setShowEditMetadata={setShowEditMetadata}
+          datasetMetadataInfoRef={datasetMetadataInfoRef}
+          setOldComponentMetadata={setOldComponentMetadata}
+          componentToUse={componentToUse}
+          index={selectedIndex}
+          selectedFiles={selected}
+        />
       )}
       {renameComponentId && (
         <RenameDataModal

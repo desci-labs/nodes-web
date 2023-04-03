@@ -74,13 +74,16 @@ export default function DriveRow({
   selectedFiles,
   canEditMetadata,
   canUse,
+  onHandleUse,
   setOldComponentMetadata,
 }: DriveRowProps) {
   const contextRef = useRef<HTMLUListElement>();
   const { init } = useDriveContext(file);
   const { handleDbClick } = useInteractionHandler();
-  const { setComponentToUse, setShowCitationModal, setComponentToCite } =
-    useManuscriptController(["componentToCite", "componentToUse"]);
+  const { setShowCitationModal, setComponentToCite } = useManuscriptController([
+    "componentToCite",
+    "componentToUse",
+  ]);
   const { manifest: manifestData, publicView } = useNodeReader();
 
   const handleEditMetadata = () => {
@@ -253,13 +256,7 @@ export default function DriveRow({
         </BlackGenericButton>
       </li>
       <li className={`${DRIVE_ROW_STYLES[7]}`}>
-        <BlackGenericButton
-          disabled={!canUse}
-          onClick={() => {
-            // const cid = file.cid ? file.cid : manifestCid ? manifestCid : "";
-            setComponentToUse(file);
-          }}
-        >
+        <BlackGenericButton disabled={!canUse} onClick={onHandleUse}>
           <IconCPU className={`p-0 `} />
         </BlackGenericButton>
       </li>
