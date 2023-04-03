@@ -4,6 +4,7 @@ import { useManuscriptController } from "@src/components/organisms/ManuscriptRea
 import { IconWarning } from "@src/icons";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import Modal from "@src/components/molecules/Modal/Modal";
+import WarningSign from "../atoms/warning-sign";
 
 const PopOverUseMenu = () => {
   const { useMenuCids, setUseMenuCids } = useManuscriptController([
@@ -23,15 +24,13 @@ const PopOverUseMenu = () => {
       onDismiss={() => {
         close();
       }}
-      $maxWidth={600}
       $scrollOverlay={true}
+      // $maxWidth={90}
     >
-      <div className="px-6 py-5 text-white relative">
+      <div className="px-6 py-5 text-white relative max-w-[90vw]">
         <Modal.Header
-          title="Content Identifier"
-          subTitle="Copy the CID (Content Identifier) link, which represents this file
-              on the IPFS network. Use the CID for compute over data (COD)
-              functionalities"
+          title="Interact with Node using dPID"
+          subTitle="You can use the granular dPID of the file you have selected interact with the associated data."
           onDismiss={close}
         />
         <section id="cid-use">
@@ -96,6 +95,19 @@ const PopOverUseMenu = () => {
         </section>
       </div>
       <Modal.Footer>
+        <div className="flex flex-col text-white">
+          <div className="flex gap-2 items-center">
+            <WarningSign width={30} />{" "}
+            <span className="text-xs">
+              These content identifiers refer to the latest committed node
+              state. Uncommitted files are not included.
+            </span>
+          </div>
+          <span className="text-sm flex gap-2">
+            <span className="inline-block">License Type: CCO </span>
+            <button className="text-tint-primary">Edit Metadata</button>
+          </span>
+        </div>
         <PrimaryButton onClick={close}>Done</PrimaryButton>
       </Modal.Footer>
     </Modal>
