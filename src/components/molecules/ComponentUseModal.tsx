@@ -17,13 +17,17 @@ const ComponentUseModal = (
     "componentToUse",
   ]);
   const { manifest: manifestData } = useNodeReader();
-  const dpid = useComponentDpid(componentToUse!);
+  const { dpid, fqi } = useComponentDpid(componentToUse!);
 
   function close() {
     setComponentToUse(null);
   }
 
   const isDpidSupported = !!manifestData?.dpid;
+
+  const pythonImport = componentToUse
+    ? `with desci.fetch([('${componentToUse.name}.py', '${componentToUse.name}')], "${fqi}"):`
+    : "";
 
   return (
     <Modal
@@ -84,9 +88,9 @@ const ComponentUseModal = (
                 title="Python syntax"
                 copyButtonText="Copy Syntax"
                 className="my-8 w-full overflow-hidden pr-2"
-                copyText={``}
+                copyText={pythonImport}
               >
-                <>{dpid}</>
+                <>{pythonImport}</>
               </CopyBox>
               <DividerSimple />
             </div>

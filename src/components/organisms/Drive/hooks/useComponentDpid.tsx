@@ -32,14 +32,17 @@ export default function useComponentDpid(componentToUse: DriveObject) {
     ]
   );
 
-  const resolveDpid = useCallback((): string => {
-    if (!componentToUse) return "";
+  const resolveDpid = useCallback((): {
+    dpid: string;
+    fqi: string;
+  } => {
+    if (!componentToUse) return { dpid: "", fqi: "" };
 
     const component =
       componentToUse.type === FileType.Dir
         ? componentToUse?.contains?.[0] ?? null
         : componentToUse;
-    if (!component) return dpidLink;
+    if (!component) return { dpid: dpidLink, fqi: "" };
 
     let componentParent: DriveObject | FileDir = component;
     while (
@@ -93,9 +96,12 @@ export default function useComponentDpid(componentToUse: DriveObject) {
 
     let codeLink = `${window.location.protocol}//${window.location.host}/${fqi}`;
 
-    return component.componentType === ResearchObjectComponentType.CODE
-      ? codeLink
-      : link;
+    const dpid =
+      component.componentType === ResearchObjectComponentType.CODE
+        ? codeLink
+        : link;
+
+    return { dpid, fqi };
   }, [
     componentToUse,
     currentObjectId,
