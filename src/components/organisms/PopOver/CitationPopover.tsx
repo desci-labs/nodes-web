@@ -11,7 +11,10 @@ import {
 } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { CopyButton, useCopier } from "@components/molecules/Copier";
-import { ResearchObjectComponentType } from "@desci-labs/desci-models";
+import {
+  ResearchObjectComponentType,
+  ResearchObjectV1Component,
+} from "@desci-labs/desci-models";
 import { getPublishedVersions } from "@src/api";
 import { AccessStatus, DriveObject, FileDir, FileType } from "../Drive";
 import {
@@ -113,7 +116,8 @@ const CitationComponent = () => {
     }
 
     const index = manifestData?.components.findIndex(
-      (c) => c.id === component.cid || c.id === componentParent.cid
+      (c: ResearchObjectV1Component) =>
+        c.id === component.cid || c.id === componentParent.cid
     );
     const versionString =
       index === undefined || index < 0 ? version : `${version}/${index}`;

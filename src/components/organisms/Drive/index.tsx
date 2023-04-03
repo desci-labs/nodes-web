@@ -14,7 +14,7 @@ import {
 import DriveBreadCrumbs, {
   BreadCrumb,
 } from "@components/molecules/DriveBreadCrumbs";
-import PopOverUseMenu from "@components/molecules/PopOverUseMenu";
+import ComponentUseModal from "@src/components/molecules/ComponentUseModal";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -72,8 +72,13 @@ const DriveTable: React.FC<DriveTableProps> = ({
   renameComponentId,
   setRenameComponentId,
 }) => {
-  const { setIsAddingComponent, driveJumpDir, setDriveJumpDir, privCidMap } =
-    useManuscriptController(["driveJumpDir", "privCidMap"]);
+  const {
+    componentToUse,
+    setIsAddingComponent,
+    driveJumpDir,
+    setDriveJumpDir,
+    privCidMap,
+  } = useManuscriptController(["driveJumpDir", "privCidMap", "componentToUse"]);
 
   const {
     manifest: manifestData,
@@ -395,7 +400,9 @@ const DriveTable: React.FC<DriveTableProps> = ({
           <Empty />
         )}
       </div>
-      <PopOverUseMenu />
+      {componentToUse && (
+        <ComponentUseModal isOpen={true} componentToUse={componentToUse} />
+      )}
       {renameComponentId && (
         <RenameDataModal
           renameComponentId={renameComponentId}

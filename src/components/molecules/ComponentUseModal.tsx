@@ -3,26 +3,31 @@ import PrimaryButton from "@components/atoms/PrimaryButton";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { IconWarning } from "@src/icons";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import Modal from "@src/components/molecules/Modal/Modal";
+import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 import WarningSign from "@src/components/atoms/warning-sign";
 import DividerSimple from "@src/components/atoms/DividerSimple";
-import ButtonSecondary from "../atoms/ButtonSecondary";
+import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
+import { DriveObject } from "../organisms/Drive";
+import useComponentDpid from "../organisms/Drive/hooks/useComponentDpid";
 
-const PopOverUseMenu = () => {
-  const { useMenuCids, setUseMenuCids } = useManuscriptController([
-    "useMenuCids",
+const ComponentUseModal = (
+  props: ModalProps & { componentToUse: DriveObject }
+) => {
+  const { componentToUse, setComponentToUse } = useManuscriptController([
+    "componentToUse",
   ]);
   const { manifest: manifestData } = useNodeReader();
+  const dpid = useComponentDpid(componentToUse!);
 
   function close() {
-    setUseMenuCids([]);
+    setComponentToUse(null);
   }
 
   const isDpidSupported = !!manifestData?.dpid;
 
   return (
     <Modal
-      isOpen={!!useMenuCids.length}
+      {...props}
       onDismiss={() => {
         close();
       }}
@@ -55,9 +60,9 @@ const PopOverUseMenu = () => {
                 title="dPid"
                 copyButtonText="Copy dPID"
                 className="my-8 w-full overflow-hidden pr-2"
-                copyText={`https://ipfs.desci.com/ipfs/${useMenuCids[0]}`}
+                copyText={dpid}
               >
-                <>{useMenuCids[0]}</>
+                <>{dpid}</>
               </CopyBox>
               <DividerSimple />
             </div>
@@ -79,9 +84,9 @@ const PopOverUseMenu = () => {
                 title="Python syntax"
                 copyButtonText="Copy Syntax"
                 className="my-8 w-full overflow-hidden pr-2"
-                copyText={`https://ipfs.desci.com/ipfs/${useMenuCids[0]}`}
+                copyText={``}
               >
-                <>{useMenuCids[0]}</>
+                <>{dpid}</>
               </CopyBox>
               <DividerSimple />
             </div>
@@ -127,4 +132,4 @@ const PopOverUseMenu = () => {
   );
 };
 
-export default PopOverUseMenu;
+export default ComponentUseModal;
