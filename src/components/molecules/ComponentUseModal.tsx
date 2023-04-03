@@ -7,8 +7,11 @@ import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 import WarningSign from "@src/components/atoms/warning-sign";
 import DividerSimple from "@src/components/atoms/DividerSimple";
 import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
-import { DriveObject } from "../organisms/Drive";
+import { DriveObject, FileType } from "../organisms/Drive";
 import useComponentDpid from "../organisms/Drive/hooks/useComponentDpid";
+import { ResearchObjectComponentType } from "@desci-labs/desci-models";
+import useActionHandler from "@src/components/organisms/Drive/ContextMenu/useActionHandler";
+import { useRef } from "react";
 
 const ComponentUseModal = (
   props: ModalProps & { componentToUse: DriveObject }
@@ -18,6 +21,8 @@ const ComponentUseModal = (
   ]);
   const { manifest: manifestData } = useNodeReader();
   const { dpid, fqi } = useComponentDpid(componentToUse!);
+  console.log(componentToUse);
+  const handler = useActionHandler();
 
   function close() {
     setComponentToUse(null);
@@ -29,6 +34,12 @@ const ComponentUseModal = (
     ? `with desci.fetch([('${componentToUse.name}.py', '${componentToUse.name}')], "${fqi}"):`
     : "";
 
+  const canPreview =
+    componentToUse &&
+    [
+      ResearchObjectComponentType.CODE,
+      ResearchObjectComponentType.PDF,
+    ].includes(componentToUse.componentType as ResearchObjectComponentType);
   return (
     <Modal
       {...props}
@@ -44,7 +55,9 @@ const ComponentUseModal = (
           onDismiss={close}
         />
         <div className="w-full grid grid-cols-1 lg:grid-cols-2 place-content-center lg:justify-items-start justify-items-center mt-8 overflow-hidden overflow-x-scroll">
-          <section className="hidden lg:block"> video section</section>
+          <section className="hidden lg:block w-full">
+            <VideoAnimation />{" "}
+          </section>
           <section id="cid-use" className="max-w-[600px]">
             <div>
               <h1 className="font-bold">Use Edge Compute</h1>
@@ -95,11 +108,24 @@ const ComponentUseModal = (
               <DividerSimple />
             </div>
             <div className="my-6">
-              <h2>Preview in Nodes IDE</h2>
+              <h2>Preview in+ Nodes IDE</h2>
               <span className="text-neutrals-gray-4">
                 View data and run compute directly in Nodes IDE.
               </span>
-              <ButtonSecondary className="mt-4 w-full">
+              <ButtonSecondary
+                disabled={!canPreview}
+                className="mt-4 w-full"
+                onClick={() => {
+                  const c =
+                    componentToUse?.type === FileType.File
+                      ? componentToUse
+                      : componentToUse?.contains?.find(
+                          (c) => c.type === FileType.File
+                        );
+                  handler["PREVIEW"]?.(c!);
+                  close();
+                }}
+              >
                 Preview in Nodes IDE
               </ButtonSecondary>
             </div>
@@ -136,4 +162,37 @@ const ComponentUseModal = (
   );
 };
 
+const VideoAnimation = () => {
+  const refVideo = useRef(null);
+  return (
+    <div
+      className={`overflow-hidden relative min-w-[300px] h-full`}
+      // style={{
+      //   filter: "sepia(1.0) saturate(0)",
+      // }}
+    >
+      <video
+        loop
+        ref={refVideo}
+        playsInline
+        autoPlay
+        key={`cube-panel`}
+        muted
+        // onTimeUpdate={() => {
+        //   if (refVideo.current) {
+        //     playTime = (refVideo.current! as HTMLVideoElement)
+        //       .currentTime;
+        //   }
+        // }}
+        src={`https://d3ibh1pfr1vlpk.cloudfront.net/two.mp4`}
+        className="w-full h-full"
+        style={{
+          // left: "-50px",
+          // height: 260,
+          top: -35,
+        }}
+      ></video>
+    </div>
+  );
+};
 export default ComponentUseModal;
