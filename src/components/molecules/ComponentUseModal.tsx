@@ -54,7 +54,7 @@ const ComponentUseModal = (
           subTitle="You can use the granular dPID of the file you have selected interact with the associated data."
           onDismiss={close}
         />
-        <div className="w-full grid grid-cols-1 lg:grid-cols-2 place-content-center lg:justify-items-start justify-items-center mt-8 overflow-hidden overflow-x-scroll">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-2 place-content-center lg:justify-items-center gap-4 justify-items-center mt-8 overflow-hidden overflow-x-scroll">
           <section className="hidden lg:block w-full">
             <VideoAnimation />{" "}
           </section>
@@ -166,32 +166,45 @@ const VideoAnimation = () => {
   const refVideo = useRef(null);
   return (
     <div
-      className={`overflow-hidden relative min-w-[300px] h-full`}
-      // style={{
-      //   filter: "sepia(1.0) saturate(0)",
-      // }}
+      className={`overflow-hidden relative min-w-[300px] h-full flex items-center justify-center`}
     >
-      <video
-        loop
-        ref={refVideo}
-        playsInline
-        autoPlay
-        key={`cube-panel`}
-        muted
-        // onTimeUpdate={() => {
-        //   if (refVideo.current) {
-        //     playTime = (refVideo.current! as HTMLVideoElement)
-        //       .currentTime;
-        //   }
-        // }}
-        src={`https://d3ibh1pfr1vlpk.cloudfront.net/two.mp4`}
-        className="w-full h-full"
+      <div
+        className="w-full h-full p-8 relative"
         style={{
-          // left: "-50px",
-          // height: 260,
-          top: -35,
+          borderRadius: "72%",
+          width: "400px",
+          overflow: "hidden",
+          border: "none",
+          boxShadow: "0em 0em 3em 15px rgba(0, 0, 0, .5)",
+          maxHeight: "91%",
         }}
-      ></video>
+      >
+        <div
+          className="absolute top-0 left-0 bg-transparent z-50"
+          style={{
+            borderRadius: "72%",
+            width: "100%",
+            height: "100%",
+            boxShadow: "inset 0em 0em 40px 35px rgba(0, 0, 0, .3)",
+          }}
+        ></div>
+        <video
+          loop
+          ref={refVideo}
+          playsInline
+          autoPlay
+          key={`cube-panel`}
+          muted
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            borderRadius: "72%",
+            transform: "scale(1.5)",
+          }}
+          src={`https://desci-labs-public.s3.amazonaws.com/node-front.mp4`}
+        ></video>
+      </div>
     </div>
   );
 };
