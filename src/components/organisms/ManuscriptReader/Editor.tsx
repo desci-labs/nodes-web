@@ -20,6 +20,7 @@ import ComponentStackView from "./ComponentStackView";
 import { useManuscriptController } from "./ManuscriptController";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useDrive } from "@src/state/drive/hooks";
+import AssignTypePane from "../AssignTypePane";
 
 interface ReaderViewerProps {
   isLoading: boolean;
@@ -27,6 +28,7 @@ interface ReaderViewerProps {
 export default function Editor({ isLoading }: ReaderViewerProps) {
   const dispatch = useSetter();
   const { isDraggingFiles, componentStack } = useNodeReader();
+  const { componentTypeBeingAssignedTo } = useDrive();
   const { isToolbarVisible } = useGetter((state) => state.preferences);
   const { showUploadPanel } = useDrive();
 
@@ -78,6 +80,7 @@ export default function Editor({ isLoading }: ReaderViewerProps) {
         <PublicationDetailsModal />
 
         {(isAddingComponent || isAddingSubcomponent) && <ComponentAdd />}
+        {componentTypeBeingAssignedTo && <AssignTypePane />}
 
         <SavingIndicator />
       </>
