@@ -2,7 +2,12 @@ import DefaultSpinner from "@components/atoms/DefaultSpinner";
 import PrimaryButton from "@components/atoms/PrimaryButton";
 import { EMPTY_FUNC } from "@components/utils";
 import { IconViewLink, IconX } from "@icons";
-import React, { useEffect, useImperativeHandle, useRef } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from "react";
 import CreateableSelect from "@components/molecules/FormInputs/CreateableSelect";
 import {
   CommonComponentPayload,
@@ -316,6 +321,11 @@ const ComponentMetadataPopover = (
     },
   });
 
+  const close = useCallback(() => {
+    methods.formState.isDirty ? onHandleDismiss() : props?.onClose();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [methods.formState.isDirty, props]);
+
   const onSubmit = async (data: CommonComponentPayload) => {
     if (manifestData && componentIndex !== undefined) {
       const manifestDataClone = { ...manifestData };
@@ -339,12 +349,7 @@ const ComponentMetadataPopover = (
     }
   };
 
-  const isVirtualComponent = !component || componentIndex === undefined;
-  if (isVirtualComponent) {
-    return <div>{/* className="text-xs bg-red-500">component problem */}</div>;
-  }
-
-  const onHandleDismiss = () => {
+  const onHandleDismiss = useCallback(() => {
     setDialogs([
       ...dialogs,
       {
@@ -373,14 +378,17 @@ const ComponentMetadataPopover = (
         },
       },
     ]);
-  };
+  }, [dialogs, props?.onClose, setDialogs]);
+
+  const isVirtualComponent = !component || componentIndex === undefined;
+  if (isVirtualComponent) {
+    return <div>{/* className="text-xs bg-red-500">component problem */}</div>;
+  }
 
   return (
     <Modal
       isOpen={props.isVisible}
-      onDismiss={() =>
-        methods.formState.isDirty ? onHandleDismiss() : props?.onClose()
-      }
+      onDismiss={close}
       $scrollOverlay={true}
       $maxWidth={720}
     >
@@ -392,9 +400,7 @@ const ComponentMetadataPopover = (
               width={20}
               height={20}
               className="cursor-pointer"
-              onClick={() =>
-                methods.formState.isDirty ? onHandleDismiss() : props?.onClose()
-              }
+              onClick={close}
             />
           </div>
           <div className="px-20 h-full">
