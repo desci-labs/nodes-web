@@ -281,7 +281,7 @@ const DriveDatasetMetadataPopOver = (
       ...dialogs,
       {
         title: "Are you sure?",
-        message: "",
+        message: "You have some unsaved changes",
         actions: ({ close }) => {
           return (
             <div className="flex gap-2 pt-4">
