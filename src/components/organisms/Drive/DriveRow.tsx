@@ -193,8 +193,8 @@ DriveRowProps) {
         <IconStar
           className={`cursor-pointer ${
             file.starred
-              ? "fill-tint-primary stroke-tint-primary hover:fill-transparent hover:stroke-neutrals-gray-5"
-              : "stroke-neutrals-gray-5 hover:fill-tint-primary hover:stroke-tint-primary"
+              ? "fill-tint-primary stroke-tint-primary hover:fill-tint-primary hover:stroke-neutrals-gray-5 hover:opacity-20"
+              : "stroke-neutrals-gray-5 hover:fill-tint-primary hover:stroke-tint-primary hover:opacity-70"
           }`}
           width={18}
           height={18}
