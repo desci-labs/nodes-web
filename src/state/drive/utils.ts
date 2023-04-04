@@ -112,6 +112,19 @@ export function driveBfsByPath(rootDrive: DriveObject, targetPath: string) {
   }
 }
 
+//Preferred over driveBfsByPath, but may not function if working with deprecated tree
+export function findDriveByPath(rootDrive: DriveObject, targetPath: string) {
+  const queue = targetPath.split("/");
+  queue.shift();
+  let currentDrive: DriveObject | undefined = rootDrive;
+  while (queue.length) {
+    if (!currentDrive) return null;
+    if (currentDrive.path === targetPath) return currentDrive;
+    const nextPath = queue.shift();
+    currentDrive = currentDrive.contains?.find((d) => d.name === nextPath);
+  }
+}
+
 /* 
 Inconsistent use of URL and CID within the manifest payloads, PDFs and Code Repos use .url,
  others generally use .cid, this helper function fetches the appropriate property
