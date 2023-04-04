@@ -133,18 +133,19 @@ const EXTERNAL_COMPONENTS: UiComponentDefinition[] = [
   },
 ];
 
-const Title = () => {
+export const Title: React.FC<{ text: string; description: string }> = ({
+  text,
+  description,
+}) => {
   return (
     <div className="text-center mb-5">
-      <h1 className="text-[28px] font-bold">Add Component</h1>
-      <h3 className="text-neutrals-gray-5 text-base">
-        Choose the component you would like to add to your research node
-      </h3>
+      <h1 className="text-[28px] font-bold">{text}</h1>
+      <h3 className="text-neutrals-gray-5 text-base">{description}</h3>
     </div>
   );
 };
 
-const SectionHeading = ({ icon, title, subtitle }: any) => {
+export const SectionHeading = ({ icon, title, subtitle }: any) => {
   return (
     <div className="flex flex-col my-6 gap-6">
       <div className="flex flex-row gap-4">
@@ -194,7 +195,10 @@ const ComponentButton = ({
 const ComponentLibrary = () => {
   return (
     <div className="flex flex-col max-w-2xl mx-auto pb-10">
-      <Title />
+      <Title
+        text="Add Component"
+        description="Choose the component you would like to add to your research node"
+      />
       <SectionHeading
         icon={<IconIpfs width={40} height={46} />}
         title="Component Library"

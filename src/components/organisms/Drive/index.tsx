@@ -44,6 +44,20 @@ const Empty = () => {
   return <div className="p-5 text-xs">No files</div>;
 };
 
+export const everyRow =
+  "flex items-center justify-center w-full px-3 border-b border-[#555659] h-12 driveRow";
+const headerRow = "!h-14 bg-black driveRowHeader";
+
+enum ColWidths {
+  STARRED = "50px",
+  FILE_NAME = "2fr",
+  LAST_MODIFIED = "minmax(auto, 1fr)",
+  STATUS = "minmax(auto, 1fr)",
+  FILE_SIZE = "minmax(auto, 1fr)",
+  CITE = "50px",
+  USE = "50px",
+}
+
 interface DriveTableProps {
   // directory: DriveObject[];
   // setDirectory: React.Dispatch<React.SetStateAction<DriveObject[]>>;
@@ -318,7 +332,6 @@ const DriveTable: React.FC<DriveTableProps> = ({
       >
         <ul
           className={`bg-neutrals-gray-1 grid list-none font-medium text-sm text-white select-none items-center rounded-t-xl rounded-b-xl h-full`}
-          // className="bg-black rounded-t-xl h-[56px] grid list-none font-bold text-sm text-white content-center justify-items-center gap-10 px-5 border-b border-[#555659] items-center"
           style={{
             gridTemplateColumns: `${ColWidths.STARRED} ${ColWidths.FILE_NAME} ${ColWidths.LAST_MODIFIED} ${ColWidths.STATUS} ${ColWidths.FILE_SIZE} ${ColWidths.CITE} ${ColWidths.USE}`,
           }}
@@ -388,16 +401,3 @@ const DriveTable: React.FC<DriveTableProps> = ({
 export default DriveTable;
 
 export * from "./types";
-
-export const everyRow =
-  "flex items-center justify-center w-full px-3 border-b border-[#555659] h-12 driveRow";
-const headerRow = "!h-14 border bg-black driveRowHeader";
-enum ColWidths {
-  STARRED = "50px",
-  FILE_NAME = "2fr",
-  LAST_MODIFIED = "minmax(auto, 1fr)",
-  STATUS = "minmax(auto, 1fr)",
-  FILE_SIZE = "minmax(auto, 1fr)",
-  CITE = "40px",
-  USE = "40px",
-}
