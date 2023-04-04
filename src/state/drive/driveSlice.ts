@@ -37,6 +37,7 @@ import {
   extractComponentMetadata,
   generatePathCompMap,
   urlOrCid,
+  findDriveByPath,
 } from "./utils";
 import {
   AddFilesToDrivePayload,
@@ -69,6 +70,7 @@ interface DriveState {
   batchUploadProgress: Record<string, number>;
   showUploadPanel: boolean;
   deprecated: boolean | undefined;
+  componentTypeBeingAssignedTo: DrivePath | null;
 }
 
 const initialState: DriveState = {
@@ -81,6 +83,7 @@ const initialState: DriveState = {
   uploadQueue: [],
   batchUploadProgress: {},
   showUploadPanel: false,
+  componentTypeBeingAssignedTo: null,
 };
 
 export const driveSlice = createSlice({
@@ -94,7 +97,10 @@ export const driveSlice = createSlice({
       if (state.status !== "succeeded" || !state.nodeTree) return;
       const { path } = action.payload;
 
-      let driveFound = driveBfsByPath(state.nodeTree!, path);
+      const optimizedSearch = findDriveByPath(state.nodeTree, path);
+      let driveFound = optimizedSearch
+        ? optimizedSearch
+        : driveBfsByPath(state.nodeTree!, path);
       if (driveFound && driveFound.type === FileType.File) {
         const pathSplit = path.split("/");
         pathSplit.pop();
@@ -158,6 +164,12 @@ export const driveSlice = createSlice({
       );
       if (!drive) return;
       drive.componentType = payload.type;
+    },
+    setComponentTypeBeingAssignedTo: (
+      state,
+      { payload }: PayloadAction<DrivePath | null>
+    ) => {
+      state.componentTypeBeingAssignedTo = payload;
     },
   },
   extraReducers: (builder) => {
@@ -263,6 +275,7 @@ export const {
   removeBatchFromUploadQueue,
   starComponent,
   assignComponentType,
+  setComponentTypeBeingAssignedTo,
 } = driveSlice.actions;
 
 export interface FetchTreeThunkParams {
@@ -389,10 +402,9 @@ export const addFilesToDrive = createAsyncThunk(
       dispatch(removeBatchFromUploadQueue({ batchUid }));
       if (rootDataCid && updatedManifest && manifestCid) {
         // setPrivCidMap({ ...privCidMap, [rootDataCid]: true }); //later when privCidMap available
-        dispatch(updateBatchUploadProgress({ batchUid, progress: 100 }));
         const latestState = getState() as RootState;
-
         if (snapshotNodeUuid === latestState.nodes.nodeReader.currentObjectId) {
+          dispatch(updateBatchUploadProgress({ batchUid, progress: 100 }));
           dispatch(setManifest(updatedManifest));
           dispatch(setManifestCid(manifestCid));
           dispatch(fetchTreeThunk());
@@ -453,6 +465,7 @@ export const starComponentThunk = createAsyncThunk(
 export const assignTypeThunk = createAsyncThunk(
   `drive/assignType`,
   async (payload: AssignTypeThunkPayload, { getState, dispatch }) => {
+    dispatch(setComponentTypeBeingAssignedTo(null));
     const state = getState() as RootState;
     const { manifest } = state.nodes.nodeReader;
     const { deprecated } = state.drive;
