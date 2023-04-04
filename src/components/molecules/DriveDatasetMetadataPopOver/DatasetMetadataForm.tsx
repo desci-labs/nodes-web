@@ -4,13 +4,14 @@ import React, { useImperativeHandle } from "react";
 import CreateableSelect from "@components/molecules/FormInputs/CreateableSelect";
 import {} from "@src/components/organisms/ManuscriptReader";
 import { DataComponent, DataComponentMetadata } from "@desci-labs/desci-models";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useFormContext } from "react-hook-form";
 import { PDF_LICENSE_TYPES } from "@components/organisms/PopOver/ComponentMetadataPopover";
 import InsetLabelSmallInput from "../FormInputs/InsetLabelSmallInput";
 import SpacerHorizontal from "@components/atoms/SpacerHorizontal";
 import { MetaStaging } from "@components/organisms/PaneDrive";
 import { DATASET_METADATA_FORM_DEFAULTS } from ".";
 import SelectList from "@src/components/molecules/FormInputs/SelectList";
+import { DriveMetadata } from "@src/components/organisms/Drive";
 
 interface DatasetMetadataFormProps {
   onSubmit: (data: DataComponent["payload"]) => void;
@@ -28,37 +29,39 @@ interface DatasetMetadataFormProps {
 export const DatasetMetadataForm = React.forwardRef(
   (props: DatasetMetadataFormProps, ref: any) => {
     // const payload = props.component.payload as DataComponent["payload"];
-    const licenseType = PDF_LICENSE_TYPES.find(
-      (l) => l.name === props.prepopulate?.licenseType
-    );
+    // const licenseType = PDF_LICENSE_TYPES.find(
+    //   (l) => l.name === props.prepopulate?.licenseType
+    // );
+
     const defaultLicense = PDF_LICENSE_TYPES.find(
       (l) => l.name === props.defaultLicense
     );
 
-    const data = {
-      title: props.prepopulate?.title || "",
-      ontologyPurl: props.prepopulate?.ontologyPurl || "",
-      controlledVocabTerms: props.prepopulate?.controlledVocabTerms || [],
-      keywords: props.prepopulate?.keywords || [],
-      description: props.prepopulate?.description,
-      licenseType: licenseType,
-    };
+    const { control, handleSubmit, watch } = useFormContext<DriveMetadata>();
+    // const data = {
+    //   title: props.prepopulate?.title || "",
+    //   ontologyPurl: props.prepopulate?.ontologyPurl || "",
+    //   controlledVocabTerms: props.prepopulate?.controlledVocabTerms || [],
+    //   keywords: props.prepopulate?.keywords || [],
+    //   description: props.prepopulate?.description,
+    //   licenseType: licenseType,
+    // };
 
-    const { control, handleSubmit, watch } = useForm({
-      defaultValues: {
-        title: data.title || DATASET_METADATA_FORM_DEFAULTS.title,
-        ontologyPurl:
-          data.ontologyPurl || DATASET_METADATA_FORM_DEFAULTS.ontologyPurl,
-        controlledVocabTerms:
-          data.controlledVocabTerms ||
-          DATASET_METADATA_FORM_DEFAULTS.controlledVocabTerms,
-        keywords: data.keywords || DATASET_METADATA_FORM_DEFAULTS.keywords,
-        description:
-          data.description || DATASET_METADATA_FORM_DEFAULTS.description,
-        licenseType:
-          data.licenseType || DATASET_METADATA_FORM_DEFAULTS.licenseType,
-      },
-    });
+    // const { control, handleSubmit, watch } = useForm({
+    //   defaultValues: {
+    //     title: data.title || DATASET_METADATA_FORM_DEFAULTS.title,
+    //     ontologyPurl:
+    //       data.ontologyPurl || DATASET_METADATA_FORM_DEFAULTS.ontologyPurl,
+    //     controlledVocabTerms:
+    //       data.controlledVocabTerms ||
+    //       DATASET_METADATA_FORM_DEFAULTS.controlledVocabTerms,
+    //     keywords: data.keywords || DATASET_METADATA_FORM_DEFAULTS.keywords,
+    //     description:
+    //       data.description || DATASET_METADATA_FORM_DEFAULTS.description,
+    //     licenseType:
+    //       data.licenseType || DATASET_METADATA_FORM_DEFAULTS.licenseType,
+    //   },
+    // });
 
     watch("description");
 
@@ -256,15 +259,21 @@ export const DatasetMetadataForm = React.forwardRef(
           <Controller
             name="licenseType"
             control={control}
-            defaultValue={defaultLicense}
-            render={({ field }: any) => (
-              <SelectList
-                label="Choose license"
-                data={PDF_LICENSE_TYPES}
-                field={{ ...field, value: field.value || defaultLicense }}
-                mandatory={true}
-              />
-            )}
+            defaultValue={defaultLicense?.name}
+            render={({ field }: any) => {
+              const val = PDF_LICENSE_TYPES.find((l) => l.name === field.value);
+              return (
+                <SelectList
+                  label="Choose license"
+                  mandatory={true}
+                  data={PDF_LICENSE_TYPES}
+                  field={{
+                    ...field,
+                    value: val || field.value || defaultLicense,
+                  }}
+                />
+              );
+            }}
           />
           <div className="text-xs mt-2">
             Your Node's default license type is{" "}

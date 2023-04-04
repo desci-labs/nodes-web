@@ -691,21 +691,23 @@ const PaneDrive = () => {
             </div>
           </PerfectScrollbar>
 
-          <DriveDatasetMetadataPopOver
-            currentObjectId={currentObjectId!}
-            manifestData={manifestData!}
-            mode={mode}
-            datasetMetadataInfoRef={datasetMetadataInfoRef}
-            metaStaging={metaStaging}
-            // componentId={component.id}
-            isVisible={showEditMetadata}
-            onClose={() => {
-              delete datasetMetadataInfoRef.current.rootCid;
-              delete datasetMetadataInfoRef.current.prepopulateFromName;
-              datasetMetadataInfoRef.current = datasetMetadataInfoRefDefaults;
-              setShowEditMetadata(false);
-            }}
-          />
+          {showEditMetadata && (
+            <DriveDatasetMetadataPopOver
+              currentObjectId={currentObjectId!}
+              manifestData={manifestData!}
+              mode={mode}
+              datasetMetadataInfoRef={datasetMetadataInfoRef}
+              metaStaging={metaStaging}
+              // componentId={component.id}
+              isVisible={true}
+              onClose={() => {
+                delete datasetMetadataInfoRef.current.rootCid;
+                delete datasetMetadataInfoRef.current.prepopulateFromName;
+                datasetMetadataInfoRef.current = datasetMetadataInfoRefDefaults;
+                setShowEditMetadata(false);
+              }}
+            />
+          )}
           {!!OldComponentMetadata && (
             <ComponentMetadataPopover
               currentObjectId={currentObjectId!}

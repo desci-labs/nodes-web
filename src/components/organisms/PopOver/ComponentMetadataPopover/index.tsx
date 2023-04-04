@@ -129,7 +129,7 @@ const ComponentMetadataForm = React.forwardRef(
     );
 
     const { control, handleSubmit, watch, setValue } =
-      useFormContext<ComponentPayloadValues>();
+      useFormContext<CommonComponentPayload>();
 
     watch("description");
 
@@ -223,7 +223,6 @@ const ComponentMetadataForm = React.forwardRef(
             limits.
           </div>
         </div>
-
         <div className="py-3 my-3">
           <Controller
             name="licenseType"
@@ -288,11 +287,6 @@ const defaultProps = {
   onClose: EMPTY_FUNC,
 };
 
-interface ComponentPayloadValues {
-  keywords: string[];
-  description: string;
-  licenseType: string;
-}
 const ComponentMetadataPopover = (
   props: ComponentMetadataPopoverProps & typeof defaultProps
 ) => {
@@ -314,7 +308,7 @@ const ComponentMetadataPopover = (
     (c) => c.id === props.componentId
   );
 
-  const methods = useForm<ComponentPayloadValues>({
+  const methods = useForm<CommonComponentPayload>({
     defaultValues: {
       keywords: component?.payload.keywords || FORM_DEFAULTS.keywords,
       description: component?.payload.description || FORM_DEFAULTS.description,
