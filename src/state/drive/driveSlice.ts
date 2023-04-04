@@ -390,9 +390,13 @@ export const addFilesToDrive = createAsyncThunk(
       if (rootDataCid && updatedManifest && manifestCid) {
         // setPrivCidMap({ ...privCidMap, [rootDataCid]: true }); //later when privCidMap available
         dispatch(updateBatchUploadProgress({ batchUid, progress: 100 }));
-        dispatch(setManifest(updatedManifest));
-        dispatch(setManifestCid(manifestCid));
-        dispatch(fetchTreeThunk());
+        const latestState = getState() as RootState;
+
+        if (snapshotNodeUuid === latestState.nodes.nodeReader.currentObjectId) {
+          dispatch(setManifest(updatedManifest));
+          dispatch(setManifestCid(manifestCid));
+          dispatch(fetchTreeThunk());
+        }
       }
     } catch (e) {
       dispatch(removeBatchFromUploadQueue({ batchUid }));
