@@ -102,7 +102,7 @@ const AssignTypePane = () => {
                   gridTemplateColumns: "repeat(auto-fill, 120px)",
                 }}
               >
-                {COMPONENT_LIBRARY.map((c) => (
+                {COMPONENT_LIBRARY.filter((c) => !c.doNotRender).map((c) => (
                   <ComponentButton
                     key={c.title}
                     icon={c.icon}

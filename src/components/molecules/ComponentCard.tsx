@@ -28,6 +28,7 @@ import { useSetter } from "@src/store/accessors";
 import { setComponentStack } from "@src/state/nodes/viewer";
 import { updatePdfPreferences } from "@src/state/nodes/pdf";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import { setComponentTypeBeingAssignedTo } from "@src/state/drive/driveSlice";
 
 const CardWrapper: StyledComponent<
   "div",
@@ -189,6 +190,9 @@ const ComponentCard = (props: ComponentCardProps) => {
             dispatch(setComponentStack([component]));
           }
         }
+        if (component.type === ResearchObjectComponentType.UNKNOWN) {
+          dispatch(setComponentTypeBeingAssignedTo(component.payload.path));
+        }
       }
     }, 50);
   };
@@ -215,7 +219,7 @@ const ComponentCard = (props: ComponentCardProps) => {
           <span className="text-xs font-bold">{component.name}</span>
           {/* {headerRight} */}
           <span className="flex flex-col items-center">
-            <div className="border-white border-[1px] p-1 rounded-full scale-75 block -my-1">
+            <div className="border-tint-primary border-[2px] p-1 rounded-full scale-75 block -my-1">
               <span
                 className={`
                 cursor-pointer

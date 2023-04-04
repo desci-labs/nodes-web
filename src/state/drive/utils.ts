@@ -114,15 +114,17 @@ export function driveBfsByPath(rootDrive: DriveObject, targetPath: string) {
 
 //Preferred over driveBfsByPath, but may not function if working with deprecated tree
 export function findDriveByPath(rootDrive: DriveObject, targetPath: string) {
+  if (!targetPath || !rootDrive) return null;
   const queue = targetPath.split("/");
   queue.shift();
   let currentDrive: DriveObject | undefined = rootDrive;
   while (queue.length) {
     if (!currentDrive) return null;
-    if (currentDrive.path === targetPath) return currentDrive;
     const nextPath = queue.shift();
     currentDrive = currentDrive.contains?.find((d) => d.name === nextPath);
   }
+  if (currentDrive?.path === targetPath) return currentDrive;
+  return null;
 }
 
 /* 

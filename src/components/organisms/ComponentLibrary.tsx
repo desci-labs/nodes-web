@@ -13,6 +13,7 @@ import {
   IconComponentPresentation,
   IconComponentRestrictedData,
   IconComponentSupplementaryInformation,
+  IconComponentUnknown,
   IconExternalComponents,
   IconIpfs,
   IconPlay,
@@ -30,6 +31,7 @@ export interface UiComponentDefinition {
   title: string;
   componentType: ResearchObjectComponentType;
   componentSubType?: ResearchObjectComponentSubtypes | undefined;
+  doNotRender?: boolean;
 }
 
 const IconWrapper = ({ Icon, className }: any) => (
@@ -96,6 +98,12 @@ export const COMPONENT_LIBRARY: UiComponentDefinition[] = [
     icon: <IconWrapper Icon={IconComponentOpenData} className="p-[2px]" />,
     title: "Open Access Data",
     componentType: ResearchObjectComponentType.DATA,
+  },
+  {
+    icon: <IconWrapper Icon={IconComponentUnknown} />,
+    title: "Unknown",
+    componentType: ResearchObjectComponentType.UNKNOWN,
+    doNotRender: true,
   },
 ];
 const EXTERNAL_COMPONENTS: UiComponentDefinition[] = [
@@ -210,7 +218,7 @@ const ComponentLibrary = () => {
           gridTemplateColumns: "repeat(auto-fill, 120px)",
         }}
       >
-        {COMPONENT_LIBRARY.map((c) => (
+        {COMPONENT_LIBRARY.filter((c) => !c.doNotRender).map((c) => (
           <ComponentButton
             key={c.title}
             icon={c.icon}

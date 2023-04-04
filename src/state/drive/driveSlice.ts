@@ -105,8 +105,8 @@ export const driveSlice = createSlice({
         pathSplit.pop();
         const parentPath = pathSplit.join("/");
         let driveFound = state.deprecated
-          ? driveBfsByPath(state.nodeTree!, path)
-          : findDriveByPath(state.nodeTree!, path);
+          ? driveBfsByPath(state.nodeTree!, parentPath)
+          : findDriveByPath(state.nodeTree!, parentPath);
       }
       if (!driveFound) {
         console.error(
@@ -244,6 +244,7 @@ export const driveSlice = createSlice({
         if (driveFound) {
           state.currentDrive = driveFound;
         }
+        debugger;
         if (!state.currentDrive) {
           state.currentDrive = root;
         }
