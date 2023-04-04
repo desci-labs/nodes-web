@@ -26,7 +26,7 @@ module.exports = {
         gradient: "gradients 3s ease infinite",
         wiggle: "wiggle 0.3s ease-in-out infinite",
         float: "float 3s ease-in-out infinite",
-        pulsatingGlow: "pulsatingGlow 1s ease-in-out 7",
+        pulsatingGlow: "pulsatingGlow 2.5s ease-in-out",
       },
       keyframes: {
         pulsatingGlow: {
