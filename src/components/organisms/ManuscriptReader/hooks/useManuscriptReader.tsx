@@ -60,6 +60,7 @@ export default function useManuscriptReader(publicView: boolean = false) {
       dispatch(setCurrentObjectId(parsedManuscript.cid));
       dispatch(setResearchPanelTab(ResearchTabs.current));
 
+      // TODO: remove line to support reader mode in private share
       if (mode !== "editor") {
         dispatch(toggleMode());
       }
