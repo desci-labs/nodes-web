@@ -28,6 +28,7 @@ import { useSetter } from "@src/store/accessors";
 import Modal from "../Modal/Modal";
 import { FormProvider, useForm } from "react-hook-form";
 import { DriveMetadata } from "@src/components/organisms/Drive/types";
+import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 
 export const DATASET_METADATA_FORM_DEFAULTS = {
   title: "",
@@ -66,6 +67,7 @@ const DriveDatasetMetadataPopOver = (
   const [showOverwriteDialog, setShowOverwriteDialog] =
     useState<boolean>(false);
   const [overWrite, setOverWrite] = useState<boolean>(false);
+  const { dialogs, setDialogs } = useManuscriptController(["dialogs"]);
 
   const manifestData = props.manifestData;
   const currentObjectId = props.currentObjectId;
@@ -274,12 +276,45 @@ const DriveDatasetMetadataPopOver = (
     // return <div className="text-xs bg-red-500">component problem</div>;
   }
 
+  const onHandleDismiss = () => {
+    setDialogs([
+      ...dialogs,
+      {
+        title: "Are you sure?",
+        message: "",
+        actions: ({ close }) => {
+          return (
+            <div className="flex gap-2 pt-4">
+              <button
+                className="text-md cursor-pointer rounded-md shadow-sm text-white bg-black px-3 py-1 hover:bg-neutrals-gray-2"
+                onClick={() => {
+                  close();
+                }}
+              >
+                No
+              </button>
+
+              <button
+                className="text-md cursor-pointer rounded-md shadow-sm text-white bg-red-700 px-3 py-1 hover:bg-neutrals-gray-3"
+                onClick={props?.onClose}
+              >
+                Yes
+              </button>
+            </div>
+          );
+        },
+      },
+    ]);
+  };
+
   return (
     <div>
       <Modal
         {...props}
         isOpen={props.isVisible}
-        onDismiss={() => props?.onClose()}
+        onDismiss={() =>
+          methods.formState.isDirty ? onHandleDismiss() : props?.onClose()
+        }
         $scrollOverlay={true}
         $maxWidth={700}
       >
@@ -291,7 +326,9 @@ const DriveDatasetMetadataPopOver = (
           >
             <div className="py-4 px-6 text-neutrals-gray-5">
               <Modal.Header
-                onDismiss={props.onClose}
+                onDismiss={
+                  methods.formState.isDirty ? onHandleDismiss : props?.onClose
+                }
                 title="Enter Metadatas"
                 subTitle=" Please fill in the metadata for open access data."
               />
