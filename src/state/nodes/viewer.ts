@@ -50,7 +50,7 @@ interface NodeReaderPref {
   startedNewAnnotationViaButton: boolean;
   componentStack: ResearchObjectV1Component[];
   manifestStatus: ManifestDataStatus;
-  recentlyAddedComponents: Record<DrivePath, boolean>;
+  recentlyAddedComponent: DrivePath;
 }
 
 const initialState: NodeReaderPref = {
@@ -68,7 +68,7 @@ const initialState: NodeReaderPref = {
   researchPanelTab: ResearchTabs.history,
   startedNewAnnotationViaButton: false,
   manifestStatus: ManifestDataStatus.Idle,
-  recentlyAddedComponents: {},
+  recentlyAddedComponent: "",
 };
 
 export const nodeReaderSlice = createSlice({
@@ -348,13 +348,13 @@ export const nodeReaderSlice = createSlice({
       state,
       { payload }: PayloadAction<DrivePath>
     ) => {
-      state.recentlyAddedComponents[payload] = true;
+      state.recentlyAddedComponent = payload;
     },
     removeRecentlyAddedComponent: (
       state,
       { payload }: PayloadAction<DrivePath>
     ) => {
-      delete state.recentlyAddedComponents[payload];
+      state.recentlyAddedComponent = "";
     },
   },
   extraReducers(builder) {

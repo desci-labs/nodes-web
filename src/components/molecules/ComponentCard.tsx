@@ -124,7 +124,7 @@ const ComponentCard = (props: ComponentCardProps) => {
   const [showComponentMetadata, setShowComponentMetadata] =
     useState<boolean>(false);
   const { setDriveJumpDir } = useManuscriptController([]);
-  const { recentlyAddedComponents } = useNodeReader();
+  const { recentlyAddedComponent } = useNodeReader();
   /***
    * Use local click tracking for fast click response
    * */
@@ -205,7 +205,9 @@ const ComponentCard = (props: ComponentCardProps) => {
     <CardWrapper
       isSelected={isSelected}
       isHalfSelected={clicked}
-      isRecentlyAdded={recentlyAddedComponents[component.payload.path] ?? false}
+      isRecentlyAdded={
+        recentlyAddedComponent === component.payload?.path ?? false
+      }
       onClick={handleComponentClick}
     >
       <FlexColumn>
