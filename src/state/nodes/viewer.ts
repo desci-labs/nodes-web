@@ -385,7 +385,6 @@ export const saveManifestDraft = createAsyncThunk(
 
     if (!manifestData) return;
     // console.log("Save Manifest", manifestData);
-    debugger;
     try {
       const res = await updateDraft({
         manifest: manifestData!,

@@ -47,3 +47,5 @@ export interface AssignTypeThunkPayload {
 }
 
 export type DrivePath = string;
+export type CidString = string;
+export type ComponentId = string;

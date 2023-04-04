@@ -29,12 +29,10 @@ import {
   SessionStorageKeys,
 } from "@src/components/driveUtils";
 import {
-  cidString,
   convertIpfsTreeToDriveObjectTree,
   deleteAllParents,
   driveBfsByPath,
   DRIVE_EXTERNAL_LINKS_PATH,
-  extractComponentMetadata,
   generatePathCompMap,
   urlOrCid,
   findDriveByPath,
@@ -59,7 +57,6 @@ import {
   setManifestCid,
   updateComponent,
 } from "../nodes/viewer";
-import { dispatch } from "react-hot-toast/dist/core/store";
 interface DriveState {
   status: RequestStatus;
   error: null | undefined | string;
@@ -244,7 +241,6 @@ export const driveSlice = createSlice({
         if (driveFound) {
           state.currentDrive = driveFound;
         }
-        debugger;
         if (!state.currentDrive) {
           state.currentDrive = root;
         }
@@ -328,7 +324,6 @@ export const fetchTreeThunk = createAsyncThunk(
         pathUidMap: provideMap,
         public: publicView,
       });
-      debugger;
       return { tree: deleteAllParents(rootDrive), deprecated: true };
     }
   }

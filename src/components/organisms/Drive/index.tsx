@@ -1,14 +1,7 @@
 import {
   constructBreadCrumbs,
-  createVirtualDrive,
   driveBfsByPath,
   driveBfsByUid,
-  DRIVE_DATA_PATH,
-  fillOuterSizes,
-  getAllTrees,
-  gracefullyAssignTreeUids,
-  manifestToVirtualDrives,
-  resetAccessStatus,
   SessionStorageKeys,
 } from "@components/driveUtils";
 import DriveBreadCrumbs, {
@@ -27,16 +20,13 @@ import {
   FileDir,
   oldComponentMetadata,
 } from "./types";
-import DriveRow, { DRIVE_ROW_STYLES } from "./DriveRow";
+import DriveRow from "./DriveRow";
 import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
 import { IconCirclePlus, IconStar } from "@src/icons";
 import RenameDataModal from "./RenameDataModal";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useDrive } from "@src/state/drive/hooks";
-import {
-  fetchTreeThunk,
-  navigateToDriveByPath,
-} from "@src/state/drive/driveSlice";
+import { navigateToDriveByPath } from "@src/state/drive/driveSlice";
 import { useSetter } from "@src/store/accessors";
 import "./styles.scss";
 

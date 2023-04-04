@@ -80,7 +80,7 @@ export interface ComponentCardProps extends SectionCardProps {
   manifestData: ResearchObjectV1;
 }
 
-const findTarget = (
+export const findTarget = (
   component: ResearchObjectV1Component
 ): UiComponentDefinition | undefined => {
   const foundEntry = COMPONENT_LIBRARY.find((target) => {

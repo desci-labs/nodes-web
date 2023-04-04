@@ -12,17 +12,15 @@ import { BytesToHumanFileSize } from "@components/utils";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import {
   IconCodeRepo,
-  IconCPU,
   IconData,
   IconDirectory,
-  IconIpfs,
   IconPlayRounded,
   IconQuotes,
   IconResearchNode,
   IconResearchReport,
   IconStar,
 } from "@icons";
-import { useCallback, useMemo, useRef } from "react";
+import React, { useCallback, useRef } from "react";
 import {
   AccessStatus,
   DriveNonComponentTypes,
@@ -35,34 +33,22 @@ import { useInteractionHandler } from "./ContextMenu/useActionHandler";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { everyRow } from ".";
 import "./styles.scss";
-import { starComponent, starComponentThunk } from "@src/state/drive/driveSlice";
+import { starComponentThunk } from "@src/state/drive/driveSlice";
 import { useSetter } from "@src/store/accessors";
-
-export const DRIVE_ROW_STYLES = [
-  "justify-self-start w-44 2xl:w-full min-w-44 flex-grow-3", // file
-  "hidden 2xl:block w-48", // last modified
-  "hidden xl:block", // type
-  "px-3 py-2 hover:bg-neutrals-gray-1 rounded-lg cursor-default hidden xl:block w-32 text-center", // status
-  "w-20 hidden 2xl:block", // file size
-  "w-10 lg:w-32 hidden lg:block text-center", //metadata
-  "w-10 hidden lg:block text-center", // cite
-  "w-10 hidden lg:block text-center", // use
-];
+import { findTarget } from "@src/components/molecules/ComponentCard";
+import { COMPONENT_LIBRARY, UiComponentDefinition } from "../ComponentLibrary";
 
 function renderComponentIcon(file: DriveObject) {
-  const classes = "w-[34px] h-[34px]";
-  switch (file.componentType) {
-    case DriveNonComponentTypes.MANIFEST:
-      return <IconResearchNode className={classes} />;
-    case ResearchObjectComponentType.PDF:
-      return <IconResearchReport className={classes} />;
-    case ResearchObjectComponentType.DATA:
-      return <IconData className={classes} />;
-    case ResearchObjectComponentType.CODE:
-      return <IconCodeRepo className={classes} />;
-    default:
-      return <IconResearchNode className={classes} />;
-  }
+  const classes = "!w-[20px] !h-[20px]";
+  const foundEntry = COMPONENT_LIBRARY.find((target: UiComponentDefinition) => {
+    return target.componentType === file.componentType;
+  });
+  const { icon } = foundEntry!;
+  const iconOverwrite = React.cloneElement(icon, {
+    className: `${icon.props.className}`,
+    ringClassName: `${classes}`,
+  });
+  return iconOverwrite;
 }
 
 export default function DriveRow({
@@ -226,7 +212,9 @@ DriveRowProps) {
             />
           ) : (
             // <IconIpfs height={20} width={17.3} />
-            renderComponentIcon(file)
+            <div className="scale-[65%] w-[34px]">
+              {renderComponentIcon(file)}
+            </div>
           )}
         </span>
         <span className="truncate max-w-sm">{file.name}</span>

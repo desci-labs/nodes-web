@@ -13,14 +13,12 @@ import {
 } from "@src/components/organisms/Drive";
 
 import { v4 as uuidv4 } from "uuid";
-
-export type cidString = string;
-export type componentId = string;
+import { DrivePath } from "./types";
 
 export function generatePathCompMap(
   manifest: ResearchObjectV1
-): Record<cidString, ResearchObjectV1Component> {
-  const componentsMap: Record<cidString, ResearchObjectV1Component> = {};
+): Record<DrivePath, ResearchObjectV1Component> {
+  const componentsMap: Record<DrivePath, ResearchObjectV1Component> = {};
   manifest.components.forEach((c) => {
     switch (c.type) {
       case ResearchObjectComponentType.CODE:
@@ -62,7 +60,7 @@ export const DRIVE_EXTERNAL_LINKS_PATH = "externallinks";
 //Convert IPFS tree to DriveObject tree V2
 export function convertIpfsTreeToDriveObjectTree(
   tree: DriveObject[],
-  pathToCompMap: Record<cidString, ResearchObjectV1Component>
+  pathToCompMap: Record<DrivePath, ResearchObjectV1Component>
 ) {
   tree.forEach((branch) => {
     const pathSplit = branch.path?.split("/");
@@ -71,8 +69,8 @@ export function convertIpfsTreeToDriveObjectTree(
       branch.path = pathSplit.join("/");
     }
     const component = pathToCompMap[branch.path!];
-    // debugger;
-    branch.componentType = component?.type || DriveNonComponentTypes.UNKNOWN;
+    branch.componentType =
+      component?.type || ResearchObjectComponentType.UNKNOWN;
     branch.accessStatus = AccessStatus.PRIVATE; // FIXME, HARDCODED, PRIVCIDMAP
     branch.metadata = extractComponentMetadata(component);
     branch.starred = component?.starred || false;
