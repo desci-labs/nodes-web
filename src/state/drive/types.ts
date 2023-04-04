@@ -1,4 +1,7 @@
-import { ResearchObjectComponentType } from "@src/../../nodes/desci-models/dist";
+import {
+  ResearchObjectComponentSubtypes,
+  ResearchObjectComponentType,
+} from "@src/../../nodes/desci-models/dist";
 import { DriveObject } from "@src/components/organisms/Drive";
 
 export interface NavigateToDriveByPathAction {
@@ -40,6 +43,7 @@ export interface StarComponentThunkPayload {
 export interface AssignTypeThunkPayload {
   item: DriveObject;
   type: ResearchObjectComponentType;
+  subType?: ResearchObjectComponentSubtypes;
 }
 
 export type DrivePath = string;

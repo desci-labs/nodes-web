@@ -452,7 +452,7 @@ export const assignTypeThunk = createAsyncThunk(
     const state = getState() as RootState;
     const { manifest } = state.nodes.nodeReader;
     const { deprecated } = state.drive;
-    const { item, type } = payload;
+    const { item, type, subType } = payload;
 
     //Deprecated type assignment unhandled, temporarily disabled to prevent errors
     if (!manifest || deprecated) return;
@@ -468,7 +468,11 @@ export const assignTypeThunk = createAsyncThunk(
       dispatch(
         updateComponent({
           index: existingCompIdx,
-          update: { type, payload: { ...urlOrCidProps } },
+          update: {
+            type,
+            ...(subType ? { subType } : {}),
+            payload: { ...urlOrCidProps },
+          },
         })
       );
     } else {
@@ -476,6 +480,7 @@ export const assignTypeThunk = createAsyncThunk(
         id: uuidv4(),
         name: item.name,
         type: type,
+        ...(subType ? { subType } : {}),
         payload: {
           path: item.path,
           ...urlOrCidProps,
