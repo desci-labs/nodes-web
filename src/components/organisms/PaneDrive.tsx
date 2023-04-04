@@ -706,17 +706,19 @@ const PaneDrive = () => {
               setShowEditMetadata(false);
             }}
           />
-          <ComponentMetadataPopover
-            currentObjectId={currentObjectId!}
-            manifestData={manifestData!}
-            mode={mode}
-            componentId={OldComponentMetadata?.componentId!}
-            isVisible={!!OldComponentMetadata}
-            onClose={() => {
-              if (OldComponentMetadata) OldComponentMetadata.cb();
-              setOldComponentMetadata(null);
-            }}
-          />
+          {!!OldComponentMetadata && (
+            <ComponentMetadataPopover
+              currentObjectId={currentObjectId!}
+              manifestData={manifestData!}
+              mode={mode}
+              componentId={OldComponentMetadata?.componentId!}
+              isVisible={true}
+              onClose={() => {
+                if (OldComponentMetadata) OldComponentMetadata.cb();
+                setOldComponentMetadata(null);
+              }}
+            />
+          )}
           <SidePanelStorage />
         </div>
       </ContextMenuProvider>

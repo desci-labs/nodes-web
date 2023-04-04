@@ -4,7 +4,7 @@ const DialogViewer = () => {
   const { dialogs, setDialogs } = useManuscriptController(["dialogs"]);
   return dialogs.length ? (
     <div
-      className="fixed w-screen h-screen bg-[rgba(0,0,0,0.4)] z-[150] top-0"
+      className="fixed w-screen h-screen bg-[rgba(0,0,0,0.4)] z-[1150] top-0"
       onClick={(e) => {
         if (!(e.target as HTMLElement).classList.contains("modal-body")) {
           setTimeout(() => setDialogs(dialogs.slice(1)));
