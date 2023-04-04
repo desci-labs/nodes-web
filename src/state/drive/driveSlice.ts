@@ -97,15 +97,16 @@ export const driveSlice = createSlice({
       if (state.status !== "succeeded" || !state.nodeTree) return;
       const { path } = action.payload;
 
-      const optimizedSearch = findDriveByPath(state.nodeTree, path);
-      let driveFound = optimizedSearch
-        ? optimizedSearch
-        : driveBfsByPath(state.nodeTree!, path);
+      let driveFound = state.deprecated
+        ? driveBfsByPath(state.nodeTree!, path)
+        : findDriveByPath(state.nodeTree!, path);
       if (driveFound && driveFound.type === FileType.File) {
         const pathSplit = path.split("/");
         pathSplit.pop();
         const parentPath = pathSplit.join("/");
-        driveFound = driveBfsByPath(state.nodeTree!, parentPath);
+        let driveFound = state.deprecated
+          ? driveBfsByPath(state.nodeTree!, path)
+          : findDriveByPath(state.nodeTree!, path);
       }
       if (!driveFound) {
         console.error(
@@ -237,10 +238,9 @@ export const driveSlice = createSlice({
         if (externalLinks.contains?.length) root.contains?.push(externalLinks);
         state.nodeTree = root;
 
-        const driveFound = driveBfsByPath(
-          state.nodeTree!,
-          state.currentDrive?.path!
-        );
+        const driveFound = state.deprecated
+          ? driveBfsByPath(state.nodeTree!, state.currentDrive?.path!)
+          : findDriveByPath(state.nodeTree!, state.currentDrive?.path!);
         if (driveFound) {
           state.currentDrive = driveFound;
         }
