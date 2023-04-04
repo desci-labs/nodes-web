@@ -144,7 +144,7 @@ const ComponentUseModal = ({
       }}
       $scrollOverlay={true}
     >
-      <div className="px-6 py-5 text-white relative max-w-[90vw]">
+      <div className="px-6 py-5 text-white relative lg:max-w-[90vw]">
         <Modal.Header
           title="Interact with Node using dPID"
           subTitle="You can use the granular dPID of the file you have selected interact with the associated data."
