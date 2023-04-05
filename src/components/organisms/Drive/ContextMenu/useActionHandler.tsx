@@ -24,7 +24,7 @@ export const getActionState = (action: Actions, file: DriveObject) => {
   switch (action) {
     case Actions.PREVIEW:
       return {
-        disabled: file.type !== FileType.File,
+        disabled: file.type !== FileType.FILE,
       };
     case Actions.RENAME:
       return {

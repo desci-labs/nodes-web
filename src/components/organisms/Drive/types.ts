@@ -6,8 +6,8 @@ import {
 import { DatasetMetadataInfo, MetaStaging } from "../PaneDrive";
 
 export enum FileType {
-  Dir = "dir",
-  File = "file",
+  DIR = "dir",
+  FILE = "file",
 }
 export interface FileDir {
   name: string;

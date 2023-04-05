@@ -137,7 +137,7 @@ DriveRowProps) {
   const handleRef = useCallback(
     (node: HTMLDivElement) => {
       if (
-        file.type === FileType.Dir &&
+        file.type === FileType.DIR &&
         file.parent?.path?.toLowerCase().includes("noderoot")
       )
         return;
@@ -208,7 +208,7 @@ DriveRowProps) {
         }}
       >
         <span>
-          {file.type === FileType.Dir ? (
+          {file.type === FileType.DIR ? (
             <IconDirectory
               fill="#28AAC4"
               className={`w-[34px] ${

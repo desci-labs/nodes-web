@@ -327,7 +327,7 @@ const PaneDrive = () => {
           accessStatus: AccessStatus.UPLOADING,
           metadata: {}, //TO ADD METADATA
           cid: DEFAULT_CID_PENDING,
-          type: p.isDirectory ? FileType.Dir : FileType.File,
+          type: p.isDirectory ? FileType.DIR : FileType.FILE,
           path: cxtPath + p.path,
           uid: uid,
         };

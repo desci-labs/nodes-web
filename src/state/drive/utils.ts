@@ -9,11 +9,16 @@ import {
   DriveMetadata,
   DriveNonComponentTypes,
   DriveObject,
+  FileDir,
   FileType,
 } from "@src/components/organisms/Drive";
 
 import { v4 as uuidv4 } from "uuid";
 import { DrivePath } from "./types";
+
+export function neutralizePath(path: DrivePath) {
+  return path.replace(/^[^/]+/, DRIVE_NODE_ROOT_PATH);
+}
 
 export function generatePathCompMap(
   manifest: ResearchObjectV1
@@ -32,6 +37,56 @@ export function generatePathCompMap(
     }
   });
   return componentsMap;
+}
+
+export function recursiveFlattenTree(tree: FileDir[] | DriveObject[]) {
+  const contents: any = [];
+  tree.forEach((fd) => {
+    contents.push(fd);
+    if (fd.type === "dir" && fd.contains) {
+      contents.push(...recursiveFlattenTree(fd.contains! as any));
+    }
+  });
+  return contents;
+}
+
+export function generateFlatPathDriveMap(
+  tree: DriveObject[]
+): Record<DrivePath, DriveObject> {
+  const contents = recursiveFlattenTree(tree);
+  const map: Record<DrivePath, DriveObject> = {};
+  contents.forEach((d: DriveObject) => {
+    const neutralPath = neutralizePath(d.path!);
+    map[neutralPath] = d;
+  });
+  return map;
+}
+
+export function generatePathSizeMap(
+  flatPathDriveMap: Record<DrivePath, DriveObject>
+): Record<DrivePath, number> {
+  const pathSizeMap: Record<DrivePath, number> = {};
+  const dirKeys: DrivePath[] = [];
+  Object.entries(flatPathDriveMap).forEach(([path, drive]) => {
+    if (drive.type === FileType.DIR) {
+      dirKeys.push(path);
+    } else {
+      pathSizeMap[path] = drive.size;
+    }
+  });
+
+  const dirSizeMap: Record<DrivePath, number> = {};
+  dirKeys.forEach((dirPath) => {
+    const dirSize = Object.entries(pathSizeMap).reduce(
+      (acc: number, [path, size]) => {
+        if (path.startsWith(dirPath)) return acc + size;
+        return acc;
+      },
+      0
+    );
+    dirSizeMap[dirPath] = dirSize || 0;
+  });
+  return { ...pathSizeMap, ...dirSizeMap };
 }
 
 export function extractComponentMetadata(
@@ -77,7 +132,8 @@ export function inheritComponentType(
 //Convert IPFS tree to DriveObject tree V2
 export function convertIpfsTreeToDriveObjectTree(
   tree: DriveObject[],
-  pathToCompMap: Record<DrivePath, ResearchObjectV1Component>
+  pathToCompMap: Record<DrivePath, ResearchObjectV1Component>,
+  pathToSizeMap: Record<DrivePath, number>
 ) {
   tree.forEach((branch) => {
     const pathSplit = branch.path?.split("/");
@@ -95,11 +151,13 @@ export function convertIpfsTreeToDriveObjectTree(
     if (
       branch.contains &&
       branch.contains.length &&
-      branch.type === FileType.Dir
+      branch.type === FileType.DIR
     ) {
+      branch.size = pathToSizeMap[branch.path!] || 0;
       branch.contains = convertIpfsTreeToDriveObjectTree(
         branch.contains,
-        pathToCompMap
+        pathToCompMap,
+        pathToSizeMap
       );
     }
   });
@@ -111,7 +169,7 @@ export function deleteAllParents(tree: DriveObject) {
   delete tree.parent;
   tree.contains?.forEach((f) => {
     delete f.parent;
-    if (f.type === FileType.Dir && f.contains?.length) {
+    if (f.type === FileType.DIR && f.contains?.length) {
       f = deleteAllParents(f);
     }
   });

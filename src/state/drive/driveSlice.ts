@@ -36,6 +36,8 @@ import {
   generatePathCompMap,
   urlOrCid,
   findDriveByPath,
+  generateFlatPathDriveMap,
+  generatePathSizeMap,
 } from "./utils";
 import {
   AddFilesToDrivePayload,
@@ -97,7 +99,7 @@ export const driveSlice = createSlice({
       let driveFound = state.deprecated
         ? driveBfsByPath(state.nodeTree!, path)
         : findDriveByPath(state.nodeTree!, path);
-      if (driveFound && driveFound.type === FileType.File) {
+      if (driveFound && driveFound.type === FileType.FILE) {
         const pathSplit = path.split("/");
         pathSplit.pop();
         const parentPath = pathSplit.join("/");
@@ -202,11 +204,14 @@ export const driveSlice = createSlice({
 
         //Generate a map of existing components
         const pathToCompMap = generatePathCompMap(manifest);
+        const pathToDriveMap = generateFlatPathDriveMap(tree);
+        const pathToSizeMap = generatePathSizeMap(pathToDriveMap); //Sources dir sizes
 
         //Convert IPFS tree to DriveObject tree
         const driveObjectTree = convertIpfsTreeToDriveObjectTree(
           tree as DriveObject[],
-          pathToCompMap
+          pathToCompMap,
+          pathToSizeMap
         );
         root.contains = driveObjectTree;
 
@@ -224,7 +229,7 @@ export const driveSlice = createSlice({
                 name: c.name,
                 componentType: ResearchObjectComponentType.LINK,
                 cid: c.payload.url,
-                type: FileType.File,
+                type: FileType.FILE,
                 path:
                   DRIVE_NODE_ROOT_PATH + "/" + DRIVE_EXTERNAL_LINKS_PATH + c.id,
                 parent: externalLinks,

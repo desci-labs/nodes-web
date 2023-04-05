@@ -290,7 +290,7 @@ function DriveRow({
         }}
       >
         <span>
-          {file.type === FileType.Dir ? (
+          {file.type === FileType.DIR ? (
             <IconDirectory />
           ) : (
             <IconIpfs height={20} width={17.3} />

@@ -212,7 +212,7 @@ const DriveDatasetMetadataPopOver = (
                 setIsSaving(false);
                 if (hasDirs) {
                   props.metaStaging.forEach((f) => {
-                    if (f.file.type === FileType.Dir)
+                    if (f.file.type === FileType.DIR)
                       findAndInheritSubMetadata(manifestData, f.file);
                   });
                 }

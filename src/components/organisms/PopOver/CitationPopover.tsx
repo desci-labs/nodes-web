@@ -98,7 +98,7 @@ const CitationComponent = () => {
     if (!componentToCite) return "";
 
     const component =
-      componentToCite.type === FileType.Dir
+      componentToCite.type === FileType.DIR
         ? componentToCite?.contains?.[0] ?? null
         : componentToCite;
     if (!component) return dpidLink;
@@ -134,7 +134,7 @@ const CitationComponent = () => {
       if (splitPath && splitPath.length > 1) {
         let newPath = splitPath.slice(1);
         newPath.unshift(componentParent.name);
-        if (componentToCite.type === FileType.Dir) {
+        if (componentToCite.type === FileType.DIR) {
           newPath = [componentParent.name];
         }
         fqiDataSuffix = newPath.join("/");
@@ -280,8 +280,6 @@ const CitationComponent = () => {
     </div>
   );
 };
-
-
 
 function Box(props: PropsWithChildren<{}>) {
   return (
