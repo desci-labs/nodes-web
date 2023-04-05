@@ -1,12 +1,8 @@
 import RadialLoader from "@components/atoms/RadialLoader";
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { IconDirectory, IconFolderStroke, IconGreenCheck, IconX } from "@icons";
 import React, { useEffect, useState } from "react";
 import ReactTooltip from "react-tooltip";
-import {
-  removeCidsFromPath,
-  SessionStorageKeys,
-} from "@src/components/driveUtils";
+import { SessionStorageKeys } from "@src/components/driveUtils";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { setComponentStack } from "@src/state/nodes/viewer";
@@ -27,7 +23,6 @@ const UploadPanel: React.FC<UploadPanelProps> = ({ show }) => {
   const { batchUploadProgress, uploadQueue } = useDrive();
   const dispatch = useSetter();
 
-  const { setDriveJumpDir } = useManuscriptController([]);
   const [localQueue, setLocalQueue] = useState<UploadQueueItem[]>([]);
   const [uploadTransitioned, setUploadTransitioned] = useState<
     Record<string, boolean>
@@ -41,11 +36,11 @@ const UploadPanel: React.FC<UploadPanelProps> = ({ show }) => {
       const localBatches = new Map();
 
       const diffAdditions = uploadQueue.filter(
-        (qI) => !localBatches.has(qI.batchUid)
+        (qI: UploadQueueItem) => !localBatches.has(qI.batchUid)
       );
 
       const newUploadsTransitioned = Object.fromEntries(
-        diffAdditions.map((e) => [e.batchUid, false])
+        diffAdditions.map((e: UploadQueueItem) => [e.batchUid, false])
       );
 
       setUploadTransitioned((prev) => ({ ...prev, ...newUploadsTransitioned }));
@@ -130,7 +125,7 @@ const UploadPanel: React.FC<UploadPanelProps> = ({ show }) => {
                   <RadialLoader percent={batchUploadProgress[qI.batchUid]} />
                 ) : uploadTransitioned[qI.batchUid] && viewingTargetNode ? (
                   <IconDirectory
-                    className="w-[22px] h-[22px] animate-expandOut animate-fadeIn cursor-pointer"
+                    className="w-[22px] h-[22px] animate-expandOut animate-fadeIn cursor-pointer fill-tint-primary"
                     data-tip={"Show File Location"}
                     data-place="top"
                     data-type="info"
