@@ -110,6 +110,30 @@ export function extractComponentMetadata(
   return metadata;
 }
 
+export function inheritMetadata(
+  path: DrivePath,
+  pathToCompMap: Record<DrivePath, ResearchObjectV1Component>
+) {
+  const comp = pathToCompMap[path];
+  if (comp) {
+    const specificMetadata = extractComponentMetadata(comp);
+    if (Object.keys(specificMetadata).length) return specificMetadata;
+  }
+
+  const pathSplit = path.split("/");
+  if (pathSplit.length < 3) return {};
+  while (pathSplit.length > 1) {
+    pathSplit.pop();
+    const parentPath = pathSplit.join("/");
+    const parent = pathToCompMap[parentPath];
+    if (parent) {
+      const potentialMetadata = extractComponentMetadata(parent);
+      if (Object.keys(potentialMetadata).length) return potentialMetadata;
+    }
+  }
+  return {};
+}
+
 export const DRIVE_EXTERNAL_LINKS_PATH = "externallinks";
 
 export function inheritComponentType(
@@ -136,16 +160,13 @@ export function convertIpfsTreeToDriveObjectTree(
   pathToSizeMap: Record<DrivePath, number>
 ) {
   tree.forEach((branch) => {
-    const pathSplit = branch.path?.split("/");
-    if (pathSplit) {
-      pathSplit[0] = DRIVE_NODE_ROOT_PATH;
-      branch.path = pathSplit.join("/");
-    }
+    const neutralPath = neutralizePath(branch.path!);
+    branch.path = neutralPath;
     const component = pathToCompMap[branch.path!];
     branch.componentType =
       component?.type || inheritComponentType(branch, pathToCompMap);
     branch.accessStatus = AccessStatus.PRIVATE; // FIXME, HARDCODED, PRIVCIDMAP
-    branch.metadata = extractComponentMetadata(component);
+    branch.metadata = inheritMetadata(branch.path, pathToCompMap);
     branch.starred = component?.starred || false;
     branch.uid = component?.id || uuidv4(); //add cached uuids
     if (
