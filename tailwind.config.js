@@ -26,14 +26,14 @@ module.exports = {
         gradient: "gradients 3s ease infinite",
         wiggle: "wiggle 0.3s ease-in-out infinite",
         float: "float 3s ease-in-out infinite",
-        pulsatingGlow: "pulsatingGlow 2.5s ease-in-out",
+        pulsatingGlow: "pulsatingGlow 2.5s ease-in-out 0.2s",
       },
       keyframes: {
         pulsatingGlow: {
           "0%, 100%": {
             boxShadow: "0 0 0px rgba(0, 225, 255, 0.5)",
           },
-          "50%": {
+          "40%, 65%": {
             boxShadow: "0 0 15px rgba(0, 225, 255, 1)",
           },
         },
