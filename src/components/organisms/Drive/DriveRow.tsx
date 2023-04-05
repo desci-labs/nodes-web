@@ -66,7 +66,7 @@ export default function DriveRow({
   canUse,
 }: // setOldComponentMetadata,
 DriveRowProps) {
-  const contextRef = useRef<HTMLLIElement>();
+  const contextRef = useRef<HTMLDivElement>();
   const { init } = useDriveContext(file);
   const { handleDbClick } = useInteractionHandler();
   const { setUseMenuCids, setShowCitationModal, setComponentToCite } =
@@ -135,7 +135,7 @@ DriveRowProps) {
 
   // const isNodeRoot = isNodeRootDrive(file);
   const handleRef = useCallback(
-    (node: HTMLLIElement) => {
+    (node: HTMLDivElement) => {
       if (
         file.type === FileType.Dir &&
         file.parent?.path?.toLowerCase().includes("noderoot")
@@ -171,9 +171,17 @@ DriveRowProps) {
     //   }}
     // >
     <div
+      ref={handleRef}
       className={`singleRow contents !bg-neutrals-gray-2 ${
         selected ? "singleRowSelected" : null
       }`}
+      onDoubleClick={(e) => handleDbClick(e, file)}
+      onClick={(e) => {
+        if (e.ctrlKey) {
+          e.stopPropagation();
+          toggleSelected(index, file.componentType);
+        }
+      }}
     >
       <li className={`${everyRow}`}>
         <IconStar
@@ -188,7 +196,6 @@ DriveRowProps) {
         />
       </li>
       <li
-        ref={handleRef}
         className={`${everyRow} !justify-start gap-1 cursor-pointer`}
         onClick={(e) => {
           if (e.ctrlKey) return;

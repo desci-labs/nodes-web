@@ -17,16 +17,25 @@ $columns: 7;
         border-bottom-right-radius: var(--borderRadius);
         border-bottom-left-radius: var(--borderRadius);
         &>li {
-            border-bottom: none
+            border-bottom: none;
         }
     }
     &:hover > li {
-        background: #333
+        background: #333;
+        border-bottom-right-radius: var(--borderRadius)!important;
+        border-bottom-left-radius: var(--borderRadius)!important;
     } 
 }
 
 .singleRowSelected {
-    background: rgba(40, 169, 195, 0.5); //tint-primary
+    &>li {
+        background: rgba(40, 169, 195, 0.5); //tint-primary
+        &:last-of-type {
+            border-bottom-right-radius: var(--borderRadius);
+            border-bottom-left-radius: var(--borderRadius);
+        }
+    }
+
     &:hover > li {
         background: rgba(40, 169, 195, 0.75); //tint-primary
     }

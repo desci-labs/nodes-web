@@ -134,6 +134,7 @@ import { ReactComponent as IconKebab } from "@images/icons/kebab.svg";
 import { ReactComponent as IconStar } from "@images/icons/star.svg";
 import { ReactComponent as IconQuotes } from "@images/icons/quotes.svg";
 import { ReactComponent as IconPlayRounded } from "@images/icons/play.svg";
+import { ReactComponent as IconAssignType } from "@images/icons/assign-type-icon.svg";
 
 export type SvgIconProps = FC<
   React.SVGProps<SVGSVGElement> & {
@@ -142,6 +143,7 @@ export type SvgIconProps = FC<
 >;
 
 export {
+  IconAssignType,
   IconPlayRounded,
   IconQuotes,
   IconStar,

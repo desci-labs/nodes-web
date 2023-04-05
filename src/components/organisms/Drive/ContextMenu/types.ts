@@ -5,4 +5,5 @@ export enum Actions {
   // SHARE = "SHARE",
   // GET_LINK = "GET_LINK",
   REMOVE = "REMOVE",
+  ASSIGN_TYPE = "ASSIGN_TYPE",
 }
