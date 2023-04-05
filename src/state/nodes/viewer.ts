@@ -12,6 +12,7 @@ import { RootState } from "@src/store";
 import axios from "axios";
 import { Path } from "react-router";
 import { DrivePath } from "../drive/types";
+import { update } from "react-spring";
 
 type ReaderMode = "reader" | "editor";
 
@@ -159,6 +160,13 @@ export const nodeReaderSlice = createSlice({
       }>
     ) => {
       if (!state.manifest) return;
+      if ("payload" in payload.update) {
+        // Prevent previous payload overwrite
+        payload.update.payload = {
+          ...state.manifest.components[payload.index].payload,
+          ...payload.update.payload,
+        };
+      }
       state.manifest.components[payload.index] = {
         ...state.manifest.components[payload.index],
         ...payload.update,
