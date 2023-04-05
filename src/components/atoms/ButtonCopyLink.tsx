@@ -1,14 +1,16 @@
 import { IconCopyLink } from "@icons";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, PropsWithChildren } from "react";
 import ReactTooltip from "react-tooltip";
+import { Place } from "react-tooltip";
 
 interface ButtonCopyLinkProps {
   text: string;
   invert?: boolean;
   size?: number;
+  place: Place;
 }
 
-const ButtonCopyLink = (props: ButtonCopyLinkProps) => {
+const ButtonCopyLink = (props: PropsWithChildren<ButtonCopyLinkProps>) => {
   const { text } = props;
   const [isCopied, setIsCopied] = useState(false);
   const ref = useRef(null);
@@ -38,18 +40,22 @@ const ButtonCopyLink = (props: ButtonCopyLinkProps) => {
           props.invert
             ? "bg-transparent hover:bg-neutrals-gray-7 active:bg-black text-black"
             : "bg-black hover:bg-neutrals-gray-3 active:bg-black text-white"
-        } w-7 h-7 flex justify-center items-center rounded-lg`}
+        } p-2 w-fit h-fit flex justify-center items-center rounded-lg`}
         onClick={handleClick}
         data-tip={isCopied ? "Copied" : "Copy Link"}
         data-place="bottom"
         data-type="info"
         data-background-color="black"
       >
-        <IconCopyLink
-          fill={props.invert ? "black" : "white"}
-          height={props.size || 16}
-          width={props.size || 16}
-        />
+        {props.children ? (
+          props.children
+        ) : (
+          <IconCopyLink
+            fill={props.invert ? "black" : "white"}
+            height={props.size || 16}
+            width={props.size || 16}
+          />
+        )}
       </button>
     </span>
   );

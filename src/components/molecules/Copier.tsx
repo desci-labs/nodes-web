@@ -1,5 +1,5 @@
 import { CheckIcon } from "@heroicons/react/solid";
-import { ButtonHTMLAttributes, FC, useState } from "react";
+import { ButtonHTMLAttributes, FC, PropsWithChildren, useState } from "react";
 import { BsClipboard } from "react-icons/bs";
 
 export function useCopier() {

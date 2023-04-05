@@ -141,7 +141,7 @@ const PdfHeader = () => {
     publicView,
     userProfile.userId,
   ]);
-  console.log("Can share", canShare);
+
   const openMenu = () => {
     if (userProfile.userId > 0) {
       dispatch(toggleToolbar(!isToolbarVisible));
