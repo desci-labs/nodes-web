@@ -1,4 +1,4 @@
-import { addDatasetComponent, updateDatasetComponent } from "@api/index";
+import { addDatasetComponent } from "@api/index";
 import DropTargetFullScreen from "@components/atoms/DropTargetFullScreen";
 import SpacerHorizontal from "@components/atoms/SpacerHorizontal";
 import {
@@ -349,20 +349,25 @@ const PaneDrive = () => {
       dispatch(setShowUploadPanel(true));
       const snapshotNodeUuid = currentObjectId!;
       try {
-        const { manifest, rootDataCid, manifestCid, tree, date } =
-          await updateDatasetComponent(
-            currentObjectId!,
-            files,
-            manifestData!,
-            updateContext.path,
-            (e) => {
-              const perc = Math.ceil((e.loaded / e.total) * 100);
-              const passedPerc = perc < 90 ? perc : 90;
-              dispatch(
-                updateBatchUploadProgress({ batchUid, progress: passedPerc })
-              );
-            }
-          );
+        // const { manifest, rootDataCid, manifestCid, tree, date } =
+        //   await updateDatasetComponent(
+        //     currentObjectId!,
+        //     files,
+        //     manifestData!,
+        //     updateContext.path,
+        //     (e) => {
+        //       const perc = Math.ceil((e.loaded / e.total) * 100);
+        //       const passedPerc = perc < 90 ? perc : 90;
+        //       dispatch(
+        //         updateBatchUploadProgress({ batchUid, progress: passedPerc })
+        //       );
+        //     }
+        //   );
+        const rootDataCid = "delete";
+        const manifest = {} as any;
+        const tree = [] as any;
+        const date = "delete";
+        const manifestCid = "delete";
         dispatch(removeBatchFromUploadQueue({ batchUid }));
         if (rootDataCid) {
           setPrivCidMap({ ...privCidMap, [rootDataCid]: true });

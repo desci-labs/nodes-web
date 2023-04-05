@@ -14,6 +14,7 @@ import {
   PublicDataReference,
   PublicDataReferenceOnIpfsMirror,
 } from "@src/types/client";
+import { CidString, DrivePath, ExternalCid } from "@src/state/drive/types";
 export const SCIWEAVE_URL =
   process.env.REACT_APP_NODES_API || "http://localhost:5420";
 
@@ -365,18 +366,40 @@ export const getDataset = async (cid: string, nodeUuid: string) => {
   return data;
 };
 
-export const updateDatasetComponent = async (
-  uuid: string,
-  files: FileList | FileSystemEntry[],
-  manifest: ResearchObjectV1,
-  contextPath: string,
-  onProgress?: (e: ProgressEvent) => void
-) => {
+export interface UpdateDag {
+  uuid: string;
+  files?: FileList | FileSystemEntry[];
+  manifest: ResearchObjectV1;
+  contextPath: DrivePath;
+  componentType?: ResearchObjectComponentType;
+  componentSubType?: ResearchObjectComponentSubtypes;
+  externalCids?: ExternalCid[];
+  onProgress?: (e: ProgressEvent) => void;
+}
+
+export const updateDag = async ({
+  uuid,
+  files,
+  manifest,
+  contextPath,
+  onProgress,
+  componentType,
+  componentSubType,
+  externalCids,
+}: UpdateDag) => {
+  if (files?.length && externalCids?.length)
+    return { error: "Cannot update DAG with both files and externalCids" };
+  if (!files?.length && !externalCids?.length)
+    return { error: "Missing content, files or externalCid" };
   const formData = new FormData();
   formData.append("uuid", uuid);
   formData.append("manifest", JSON.stringify(manifest));
+  if (componentType) formData.append("componentType", componentType);
+  if (componentSubType) formData.append("componentSubType", componentSubType);
+  if (externalCids?.length)
+    formData.append("externalCid", JSON.stringify(externalCids));
   formData.append("contextPath", contextPath);
-  if (files.length) {
+  if (files?.length) {
     if (files instanceof FileList) {
       Array.prototype.forEach.call(files, (f) => {
         formData.append("files", f);
