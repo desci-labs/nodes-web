@@ -1,13 +1,22 @@
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { DriveObject, FileType } from "../types";
 import { Actions } from "./types";
-import { ResearchObjectComponentType } from "@desci-labs/desci-models";
+import {
+  ResearchObjectComponentType,
+  ResearchObjectV1,
+  ResearchObjectV1Component,
+} from "@desci-labs/desci-models";
 import { isRootComponentDrive } from "@src/components/driveUtils";
 import { deleteDatasetComponent } from "@src/api";
 import { useDriveUpdater } from "../../PaneDrive";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useDispatch } from "react-redux";
 import { setComponentStack, setManifestData } from "@src/state/nodes/viewer";
+import { useDriveContext } from "./Index";
+import { useSetter } from "@src/store/accessors";
+import { assignTypeThunk } from "@src/state/drive/driveSlice";
+import { setComponentTypeBeingAssignedTo } from "@src/state/drive/driveSlice";
+import { useDrive } from "@src/state/drive/hooks";
 
 const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
 
@@ -32,6 +41,8 @@ export const getActionState = (action: Actions, file: DriveObject) => {
           file.componentType === ResearchObjectComponentType.DATA
         ),
       };
+    case Actions.ASSIGN_TYPE:
+      return { disabled: false };
     default:
       return { disabled: true };
   }
@@ -50,7 +61,7 @@ export default function useActionHandler() {
       ].includes(file.componentType as ResearchObjectComponentType)
     ) {
       const component = manifestData?.components.find(
-        (c) => c.payload.url === file.cid
+        (c: ResearchObjectV1Component) => c.payload.url === file.cid
       );
       if (component) {
         dispatch(setComponentStack([component]));
@@ -96,12 +107,16 @@ export default function useActionHandler() {
       manifestData
     ) {
       const comp = manifestData.components.find(
-        (c) => c.payload.cid === file.cid
+        (c: ResearchObjectV1Component) => c.payload.cid === file.cid
       );
       if (comp) setRenameComponentId(comp.id);
       return;
     }
     setRenameComponentId(file.cid);
+  }
+
+  async function assignType(file: DriveObject) {
+    dispatch(setComponentTypeBeingAssignedTo(file.path!));
   }
 
   const handler: Record<
@@ -112,6 +127,7 @@ export default function useActionHandler() {
     PREVIEW: preview,
     DOWNLOAD: null,
     REMOVE: remove,
+    ASSIGN_TYPE: assignType,
   };
 
   return handler;
