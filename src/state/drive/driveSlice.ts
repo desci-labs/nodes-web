@@ -5,7 +5,7 @@ import {
   createSlice,
 } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
-import { getDatasetTree, updateDatasetComponent } from "@src/api";
+import { getDatasetTree, updateDag } from "@src/api";
 import {
   DriveNonComponentTypes,
   DriveObject,
@@ -338,9 +338,15 @@ export const addFilesToDrive = createAsyncThunk(
   "drive/addFiles",
   async (payload: AddFilesToDrivePayload, { getState, dispatch }) => {
     const state = getState() as RootState;
-    const { manifest, currentObjectId, manifestCid } = state.nodes.nodeReader;
+    const { manifest, currentObjectId } = state.nodes.nodeReader;
     const { nodeTree } = state.drive;
-    const { files, overwritePathContext } = payload;
+    const {
+      files,
+      overwritePathContext,
+      externalCids,
+      componentType,
+      componentSubType,
+    } = payload;
     if (!nodeTree || !manifest) return;
 
     //Transform files to usable data for displaying state (upload panel items, optimistic drives)
@@ -387,19 +393,22 @@ export const addFilesToDrive = createAsyncThunk(
         manifestCid,
         tree,
         date,
-      } = await updateDatasetComponent(
-        currentObjectId!,
+      } = await updateDag({
+        uuid: currentObjectId!,
         files,
         manifest,
-        contextPath!,
-        (e) => {
+        contextPath,
+        externalCids,
+        componentType,
+        componentSubType,
+        onProgress: (e) => {
           const perc = Math.ceil((e.loaded / e.total) * 100);
           const passedPerc = perc < 90 ? perc : 90;
           dispatch(
             updateBatchUploadProgress({ batchUid, progress: passedPerc })
           );
-        }
-      );
+        },
+      });
       dispatch(removeBatchFromUploadQueue({ batchUid }));
       if (rootDataCid && updatedManifest && manifestCid) {
         // setPrivCidMap({ ...privCidMap, [rootDataCid]: true }); //later when privCidMap available

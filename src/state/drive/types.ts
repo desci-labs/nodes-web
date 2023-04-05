@@ -11,8 +11,11 @@ export interface NavigateToDriveByPathAction {
 }
 
 export interface AddFilesToDrivePayload {
-  files: FileList | FileSystemEntry[];
+  files?: FileList | FileSystemEntry[];
+  externalCids?: ExternalCid[];
   overwritePathContext?: string;
+  componentType?: ResearchObjectComponentType;
+  componentSubType?: ResearchObjectComponentSubtypes;
 }
 
 export interface UploadQueueItem {
@@ -49,3 +52,7 @@ export interface AssignTypeThunkPayload {
 export type DrivePath = string;
 export type CidString = string;
 export type ComponentId = string;
+
+//Path expected here is the same as regular file drop path, i.e. /hey.txt, or /folder/hey.txt
+type Path = string;
+export type ExternalCid = Record<Path, CidString>;
