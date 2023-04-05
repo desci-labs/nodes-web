@@ -57,6 +57,23 @@ export function extractComponentMetadata(
 
 export const DRIVE_EXTERNAL_LINKS_PATH = "externallinks";
 
+export function inheritComponentType(
+  drive: DriveObject,
+  pathToCompMap: Record<DrivePath, ResearchObjectV1Component>
+) {
+  const pathSplit = drive.path!.split("/");
+  if (pathSplit.length < 3) return ResearchObjectComponentType.UNKNOWN;
+  while (pathSplit.length > 1) {
+    pathSplit.pop();
+    const parentPath = pathSplit.join("/");
+    const parent = pathToCompMap[parentPath];
+    if (parent && parent.type !== ResearchObjectComponentType.UNKNOWN) {
+      return parent.type;
+    }
+  }
+  return ResearchObjectComponentType.UNKNOWN;
+}
+
 //Convert IPFS tree to DriveObject tree V2
 export function convertIpfsTreeToDriveObjectTree(
   tree: DriveObject[],
@@ -70,7 +87,7 @@ export function convertIpfsTreeToDriveObjectTree(
     }
     const component = pathToCompMap[branch.path!];
     branch.componentType =
-      component?.type || ResearchObjectComponentType.UNKNOWN;
+      component?.type || inheritComponentType(branch, pathToCompMap);
     branch.accessStatus = AccessStatus.PRIVATE; // FIXME, HARDCODED, PRIVCIDMAP
     branch.metadata = extractComponentMetadata(component);
     branch.starred = component?.starred || false;
