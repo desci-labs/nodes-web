@@ -371,11 +371,14 @@ export const publishResearchObject = async (input: {
 export const getDatasetTree = async (
   cid: string,
   nodeUuid: string,
-  pub = false
+  pub = false,
+  shareId = ""
 ) => {
   const route = pub ? "pubTree" : "retrieveTree";
   const { data } = await axios.get(
-    `${SCIWEAVE_URL}/v1/datasets/${route}/${nodeUuid}/${cid}`,
+    `${SCIWEAVE_URL}/v1/datasets/${route}/${nodeUuid}/${cid}${
+      shareId ? "/" + shareId : ""
+    }`,
     config()
   );
   return data;

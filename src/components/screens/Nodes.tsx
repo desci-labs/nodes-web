@@ -23,6 +23,7 @@ export type ManuscriptLoaderData =
       manifest: ResearchObjectV1;
       mode: ReaderMode;
       params: Params<string>;
+      shareId?: string;
     }
   | {
       mode: "reader";
@@ -96,8 +97,9 @@ export const manuscriptLoader = async ({
         manifest,
         manifestUrl,
         params,
-        privateCids: privCids ?? [],
         mode: "reader",
+        shareId,
+        privateCids: privCids ?? [],
       };
     } else if (splet) {
       const [uuid, version, componentIndex, annotationIndex] = splet.split("/");

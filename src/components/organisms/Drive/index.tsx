@@ -79,6 +79,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
     manifest: manifestData,
     publicView,
     currentObjectId,
+    shareId,
   } = useNodeReader();
 
   const [selected, setSelected] = useState<
@@ -189,10 +190,16 @@ const DriveTable: React.FC<DriveTableProps> = ({
               ? lastPathUidMap
               : undefined;
           //getAllTrees mutates nodeDrived
-          await getAllTrees(nodeDrived!, currentObjectId!, manifestData!, {
-            pathUidMap: provideMap,
-            public: publicView,
-          });
+          await getAllTrees(
+            nodeDrived!,
+            currentObjectId!,
+            manifestData!,
+            {
+              pathUidMap: provideMap,
+              public: publicView,
+            },
+            shareId
+          );
 
           //fill sizes and metadata (dont remove for now)
           setDirectory((old) => {

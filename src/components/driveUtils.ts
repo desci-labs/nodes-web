@@ -217,7 +217,8 @@ export async function getAllTrees(
   nodeDrived: DriveObject,
   nodeUuid: string,
   manifest: ResearchObjectV1,
-  options?: GetAllTreesOptions
+  options?: GetAllTreesOptions,
+  shareId?: string
 ) {
   if (!Array.isArray(nodeDrived.contains)) return nodeDrived;
   const dataDriveIdx = nodeDrived?.contains?.findIndex(
@@ -233,7 +234,8 @@ export async function getAllTrees(
       const { tree, date } = await getDatasetTree(
         dataComp.cid!,
         nodeUuid,
-        options?.public
+        options?.public,
+        shareId
       );
       if (!tree) return dataComp;
       // debugger;

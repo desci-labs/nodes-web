@@ -22,6 +22,7 @@ import {
   resetNodeViewer,
   setComponentStack,
   setCurrentObjectId,
+  setCurrentShareId,
   setIsNew,
   setManifest,
   setManifestCid,
@@ -48,13 +49,20 @@ export default function useManuscriptReader(publicView: boolean = false) {
     "showUploadPanel",
   ]);
 
+  console.log("Parsed Manusciprt", parsedManuscript);
   const initPrivateReader = async (cid: string) => {
-    console.log("Parsed Manusciprt", parsedManuscript);
     if (
       !publicView &&
       "manifest" in parsedManuscript &&
       "cid" in parsedManuscript
     ) {
+      // update shareId
+      if ("shareId" in parsedManuscript) {
+        dispatch(setCurrentShareId(parsedManuscript.shareId!));
+      } else {
+        dispatch(setCurrentShareId(""));
+      }
+
       dispatch(setIsNew(false));
       dispatch(setCurrentPdf(""));
 
