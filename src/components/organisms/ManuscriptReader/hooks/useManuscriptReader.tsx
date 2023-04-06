@@ -49,6 +49,7 @@ export default function useManuscriptReader(publicView: boolean = false) {
   ]);
 
   const initPrivateReader = async (cid: string) => {
+    console.log("Parsed Manusciprt", parsedManuscript);
     if (
       !publicView &&
       "manifest" in parsedManuscript &&
@@ -61,7 +62,7 @@ export default function useManuscriptReader(publicView: boolean = false) {
       dispatch(setResearchPanelTab(ResearchTabs.current));
 
       // TODO: remove line to support reader mode in private share
-      if (mode !== "editor") {
+      if (mode !== parsedManuscript.mode) {
         dispatch(toggleMode());
       }
       dispatch(setIsAnnotating(false));

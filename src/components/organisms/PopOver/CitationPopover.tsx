@@ -2,7 +2,6 @@ import PrimaryButton from "@components/atoms/PrimaryButton";
 import { useManuscriptController } from "@components/organisms/ManuscriptReader/ManuscriptController";
 import { IconWarning } from "@icons";
 import {
-  ButtonHTMLAttributes,
   PropsWithChildren,
   useCallback,
   useEffect,
@@ -10,7 +9,7 @@ import {
   useState,
 } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { CopyButton, useCopier } from "@components/molecules/Copier";
+import { CopyButton } from "@components/molecules/Copier";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import { getPublishedVersions } from "@src/api";
 import { AccessStatus, DriveObject, FileDir, FileType } from "../Drive";
@@ -19,8 +18,6 @@ import {
   DEFAULT_RESULT,
   getFormatter,
 } from "@src/helper/citation";
-import { BsClipboard } from "react-icons/bs";
-import { CheckIcon } from "@heroicons/react/solid";
 import { useUser } from "@src/state/user/hooks";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";

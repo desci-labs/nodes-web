@@ -28,6 +28,7 @@ import PaneHelp from "@src/components/organisms/PaneHelp";
 import AppWrapper from "@src/App/Providers/AppWrapper";
 import PaneNodeCollection from "@src/components/organisms/PaneNodeCollection";
 import ManuscriptReader from "@src/components/organisms/ManuscriptReader";
+import PrivateViewer from "./PrivateViewer";
 
 const Terms = lazy(() => import("@src/components/screens/Terms"));
 const Privacy = lazy(() => import("@src/components/screens/Privacy"));
@@ -97,6 +98,11 @@ export const appRouter = createBrowserRouter(
         }
       />
       <Route path="/*" element={<PublicViewer />} loader={manuscriptLoader} />
+      <Route
+        path="/share/:shareId"
+        element={<PrivateViewer />}
+        loader={manuscriptLoader}
+      />
     </>
   )
 );

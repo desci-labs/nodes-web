@@ -86,7 +86,7 @@ export default function ShareModal() {
       {currentTab === ShareTabs.Invite && (
         <Modal.Footer>
           <div className="flex items-center justify-start w-full">
-            <CopyShareLink link="private link" />
+            <CopyShareLink link="http://localhost:3000/share/O6IxySOS27" />
           </div>
         </Modal.Footer>
       )}

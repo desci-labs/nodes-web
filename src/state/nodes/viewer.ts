@@ -11,7 +11,7 @@ import { cleanupManifestUrl } from "@src/components/utils";
 import { RootState } from "@src/store";
 import axios from "axios";
 
-type ReaderMode = "reader" | "editor";
+export type ReaderMode = "reader" | "editor";
 
 export enum ResearchTabs {
   current = "current",
