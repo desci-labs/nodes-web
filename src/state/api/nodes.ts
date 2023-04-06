@@ -49,9 +49,36 @@ export const nodesApi = api.injectEndpoints({
             const {
               data: { shareId },
             } = await queryFulfilled;
-            console.log("create shareId", shareId);
-            await dispatch(
+            dispatch(
               nodesApi.util.updateQueryData("privateShare", args, () => shareId)
+            );
+            dispatch(
+              nodesApi.util.invalidateTags([
+                { type: tags.privateShare, id: args },
+              ])
+            );
+          } catch (error) {}
+        },
+      }
+    ),
+    revokeShareLink: builder.mutation<{ shareId: string; ok: boolean }, string>(
+      {
+        query: (shareId: string) => {
+          return {
+            url: `${endpoints.v1.nodes.share.revoke}/${shareId}`,
+            method: "POST",
+          };
+        },
+        async onQueryStarted(args: string, { dispatch, queryFulfilled }) {
+          try {
+            await queryFulfilled;
+            dispatch(
+              nodesApi.util.updateQueryData("privateShare", args, () => "")
+            );
+            dispatch(
+              nodesApi.util.invalidateTags([
+                { type: tags.privateShare, id: args },
+              ])
             );
           } catch (error) {}
         },
@@ -63,5 +90,6 @@ export const nodesApi = api.injectEndpoints({
 export const {
   useGetNodesQuery,
   usePrivateShareQuery,
+  useRevokeShareLinkMutation,
   useCreateShareLinkMutation,
 } = nodesApi;

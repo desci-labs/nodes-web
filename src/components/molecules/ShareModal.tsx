@@ -13,13 +13,15 @@ import {
   useCreateShareLinkMutation,
   useGetNodesQuery,
   usePrivateShareQuery,
+  useRevokeShareLinkMutation,
 } from "@src/state/api/nodes";
-import ButtonSecondary from "../atoms/ButtonSecondary";
-import { IconCopyLink } from "@src/icons";
-import { useCopier } from "./Copier";
+import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
+import { IconCircleX, IconCopyLink } from "@src/icons";
+import { useCopier } from "@src/components/molecules/Copier";
 import { useSetter } from "@src/store/accessors";
 import { tags } from "@src/state/api/tags";
-import DefaultSpinner from "../atoms/DefaultSpinner";
+import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
+import PrimaryButton from "@src/components/atoms/PrimaryButton";
 
 enum ShareTabs {
   Invite = "Invite",
@@ -35,7 +37,10 @@ export default function ShareModal(props: ModalProps) {
   const { data: shareId } = usePrivateShareQuery(currentObjectId!, {
     skip: !currentObjectId,
   });
-  const [createShareLink, { isLoading }] = useCreateShareLinkMutation();
+  const [createShareLink, { isLoading, isSuccess: isCreated }] =
+    useCreateShareLinkMutation();
+  const [revokeShareLink, { isLoading: isRevoking }] =
+    useRevokeShareLinkMutation();
 
   useEffect(() => {
     dispatch(
@@ -101,10 +106,10 @@ export default function ShareModal(props: ModalProps) {
       </div>
       {currentTab === ShareTabs.Invite && (
         <Modal.Footer>
-          <div className="flex items-center justify-start w-full">
+          <div className="flex items-center justify-start w-full gap-2">
             {!shareId && (
               <ButtonSecondary
-                disabled={isLoading}
+                disabled={isLoading || isCreated}
                 onClick={() => createShareLink(currentObjectId!)}
               >
                 {isLoading ? (
@@ -120,6 +125,26 @@ export default function ShareModal(props: ModalProps) {
                   {isLoading ? "Creating link" : "Create private link"}
                 </span>
               </ButtonSecondary>
+            )}
+            {shareId && (
+              <PrimaryButton
+                disabled={isRevoking}
+                onClick={() => revokeShareLink(currentObjectId!)}
+                className="flex gap-1"
+              >
+                {isRevoking ? (
+                  <DefaultSpinner color="white" size={20} />
+                ) : (
+                  <IconCircleX
+                    className="fill-black group-hover:fill-black"
+                    width={20}
+                    height={20}
+                  />
+                )}
+                <span className="ml-1">
+                  {isRevoking ? "Revoking" : "Revoke link"}
+                </span>
+              </PrimaryButton>
             )}
             {shareId && (
               <CopyShareLink link={`http://localhost:3000/share/${shareId}`} />
