@@ -63,7 +63,6 @@ const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
       <CurrentPdfManager />
       {publicView && <PublicViewer isLoading={isLoading} />}
       {!publicView && <Editor isLoading={isLoading} />}
-      <ShareModal />
       <PublicationDetailsModal />
     </ManuscriptWrapper>
   );

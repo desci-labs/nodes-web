@@ -27,6 +27,7 @@ import {
 } from "@src/state/nodes/hooks";
 import { setLoadState } from "@src/state/nodes/pdf";
 import { useGetNodesQuery } from "@src/state/api/nodes";
+import ShareModal from "@src/components/molecules/ShareModal";
 
 const HeadWrapper = styled.div.attrs({
   className: `fixed w-screen app-header`,
@@ -74,8 +75,16 @@ const PdfHeader = () => {
   const { componentStack, publicView, currentObjectId } = useNodeReader();
   const { data: nodes, isLoading } = useGetNodesQuery();
 
-  const { setShowShareMenu, isAddingComponent, isAddingSubcomponent } =
-    useManuscriptController(["isAddingComponent", "isAddingSubcomponent"]);
+  const {
+    setShowShareMenu,
+    showShareMenu,
+    isAddingComponent,
+    isAddingSubcomponent,
+  } = useManuscriptController([
+    "isAddingComponent",
+    "isAddingSubcomponent",
+    "showShareMenu",
+  ]);
 
   const isPdfActiveComponent =
     componentStack[componentStack.length - 1]?.type ===
@@ -199,6 +208,7 @@ const PdfHeader = () => {
             <PrimaryButton
               className="py-1.5"
               onClick={() => {
+                console.log("click show modal", showShareMenu);
                 setShowShareMenu(true);
                 postUserAction(
                   AvailableUserActionLogTypes.btnShare,
@@ -231,6 +241,9 @@ const PdfHeader = () => {
           ></div>
         </div>
       ) : null}
+      {showShareMenu && (
+        <ShareModal isOpen={true} onDismiss={() => setShowShareMenu(false)} />
+      )}
     </HeadWrapper>
   );
 };

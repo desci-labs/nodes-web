@@ -6,6 +6,10 @@ export const endpoints = {
     },
     nodes: {
       index: "/nodes",
+      share: {
+        index: "/nodes/share",
+        revoke: "/nodes/revokeShare",
+      },
     },
     pub: {
       versions: "/pub/versions/",

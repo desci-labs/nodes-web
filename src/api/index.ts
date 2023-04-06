@@ -219,7 +219,7 @@ export const resolvePrivateResearchObjectStub = async (
 };
 export const verifyPrivateShareLink = async (shareId?: string) => {
   const { data } = await axios.get(
-    `${SCIWEAVE_URL}/v1/nodes/share/${shareId}`,
+    `${SCIWEAVE_URL}/v1/nodes/share/verify/${shareId}`,
     config()
   );
   return data;
