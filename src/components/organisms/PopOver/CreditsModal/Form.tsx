@@ -50,7 +50,8 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
       <Controller
         name="name"
         control={control}
-        render={({ field }: any) => (
+        defaultValue=""
+        render={({ field, value, fieldState }: any) => (
           <InsetLabelSmallInput
             label="Full Name"
             field={field}
