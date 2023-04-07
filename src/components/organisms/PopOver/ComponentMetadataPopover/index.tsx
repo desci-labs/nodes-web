@@ -281,7 +281,7 @@ interface ComponentMetadataPopoverProps {
   currentObjectId: string;
   manifestData: ResearchObjectV1;
   isVisible: boolean;
-  mode: string;
+  // mode: string;
   onClose?: () => void;
 }
 
@@ -302,10 +302,10 @@ const ComponentMetadataPopover = (
     undefined
   );
 
-  const { publicView } = useNodeReader();
+  const { publicView, mode } = useNodeReader();
   const manifestData = props.manifestData;
   const currentObjectId = props.currentObjectId;
-  const mode = props.mode;
+  // const mode = props.mode;
 
   useEffect(() => {
     if (manifestData && currentObjectId) {
@@ -415,7 +415,7 @@ const ComponentMetadataPopover = (
       <div className="flex flex-row justify-end gap-4 items-center h-16 w-full dark:bg-[#272727] border-t border-t-[#81C3C8] rounded-b-lg p-4">
         <PrimaryButton
           onClick={() => {
-            if (publicView) {
+            if (publicView || mode === "reader") {
               props.onClose();
             } else {
               formRef.current!.submit();
