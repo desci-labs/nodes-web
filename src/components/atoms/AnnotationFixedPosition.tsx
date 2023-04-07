@@ -6,6 +6,7 @@ import SlideDown from "react-slidedown";
 import EditAnnotationBody from "./EditAnnotationBody";
 import EditAnnotationFooter from "./EditAnnotationFooter";
 import ButtonCopyLink from "@components/atoms/ButtonCopyLink";
+import { useNodeReader } from "@src/state/nodes/hooks";
 
 interface AnnotationFixedPositionProps {
   isEditingAnnotation: boolean;
@@ -49,6 +50,8 @@ const AnnotationFixedPosition = ({
     "minHeight",
     isEditingAnnotation ? 180 : isCode ? 160 : 0
   );
+
+  const { currentObjectId } = useNodeReader();
   return (
     <div
       className={`flex rounded-md ${
@@ -196,11 +199,7 @@ const AnnotationFixedPosition = ({
               />
             ) : (
               <ButtonCopyLink
-                text={
-                  `${localStorage.getItem("manifest-url")}?annotation=${
-                    annotation.id
-                  }` || ""
-                }
+                text={`${currentObjectId}?annotation=${annotation.id}` || ""}
               />
             )}
           </div>
