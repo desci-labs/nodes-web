@@ -91,10 +91,12 @@ const AddComponentPopOver = (
     setIsAddingSubcomponent,
     setAddComponentType,
     setAddComponentSubType,
+    addFilesWithoutContext,
   } = useManuscriptController([
     "privCidMap",
     "addComponentType",
     "addComponentSubType",
+    "addFilesWithoutContext",
   ]);
 
   const dispatch = useSetter();
@@ -232,6 +234,7 @@ const AddComponentPopOver = (
           files: files,
           componentType: addComponentType!,
           componentSubType: addComponentSubType || undefined,
+          ...(addFilesWithoutContext ? { overwriteContext: "root" } : {}),
           onSuccess: (manifestData: ResearchObjectV1) => {
             /**
              * Force newly added component to appear

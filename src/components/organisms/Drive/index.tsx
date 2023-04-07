@@ -79,8 +79,13 @@ const DriveTable: React.FC<DriveTableProps> = ({
   // renameComponentId,
   // setRenameComponentId,
 }) => {
-  const { setIsAddingComponent, driveJumpDir, setDriveJumpDir, privCidMap } =
-    useManuscriptController(["driveJumpDir", "privCidMap"]);
+  const {
+    setIsAddingComponent,
+    driveJumpDir,
+    setDriveJumpDir,
+    privCidMap,
+    setAddFilesWithoutContext,
+  } = useManuscriptController(["driveJumpDir", "privCidMap"]);
 
   const {
     manifest: manifestData,
@@ -302,6 +307,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
           <div className="w-42 self-end">
             <ButtonSecondary
               onClick={() => {
+                setAddFilesWithoutContext(false);
                 setIsAddingComponent(true);
               }}
             >

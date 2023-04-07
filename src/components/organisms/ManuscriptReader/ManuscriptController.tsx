@@ -68,6 +68,7 @@ interface State {
   privCidMap: Record<string, boolean>;
   forceRefreshDrive: boolean;
   showAddNewNode: boolean;
+  addFilesWithoutContext: boolean;
 }
 
 export const LS_PENDING_COMMITS_KEY = "DESCI_PENDING_COMMITS";
@@ -121,6 +122,7 @@ export const initialState: State = {
   privCidMap: {},
   forceRefreshDrive: false,
   showAddNewNode: false,
+  addFilesWithoutContext: false,
 };
 
 export interface IndexedNodeVersion {
