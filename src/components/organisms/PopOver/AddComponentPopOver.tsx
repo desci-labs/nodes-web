@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import {
   RESEARCH_OBJECT_NODES_PREFIX,
   ResearchObjectComponentType,
+  ResearchObjectV1,
 } from "@desci-labs/desci-models";
 import AddLinkComponent from "@components/molecules/AddComponentFlow/AddLinkComponent";
 import AddDataComponent from "@components/molecules/AddComponentFlow/AddDataComponent";
@@ -228,6 +229,11 @@ const AddComponentPopOver = (
           files: files,
           componentType: addComponentType!,
           componentSubType: addComponentSubType || undefined,
+          onSuccess: (manifestData: ResearchObjectV1) => {
+            const components = manifestData.components!;
+            dispatch(setComponentStack([components[components.length - 1]]));
+            close(true);
+          },
         })
       );
 
@@ -288,10 +294,9 @@ const AddComponentPopOver = (
        * Force newly added component to appear
        */
 
-      // const components = manifestData.components!;
-      // dispatch(setComponentStack([components[components.length - 1]]));
-
-      // close(true);
+      const components = manifestData.components!;
+      dispatch(setComponentStack([components[components.length - 1]]));
+      close(true);
     } catch (err) {
       let resp = (err as any).response;
       const errorMessage = resp.data.error;

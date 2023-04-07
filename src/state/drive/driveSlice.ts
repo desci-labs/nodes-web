@@ -347,6 +347,7 @@ export const addFilesToDrive = createAsyncThunk(
       externalCids,
       componentType,
       componentSubType,
+      onSuccess,
     } = payload;
     if (!nodeTree || !manifest) return;
     // debugger;
@@ -412,6 +413,7 @@ export const addFilesToDrive = createAsyncThunk(
           );
         },
       });
+      if (onSuccess) onSuccess(updatedManifest);
       dispatch(removeBatchFromUploadQueue({ batchUid }));
       if (rootDataCid && updatedManifest && manifestCid) {
         // setPrivCidMap({ ...privCidMap, [rootDataCid]: true }); //later when privCidMap available

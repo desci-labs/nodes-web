@@ -1,6 +1,7 @@
 import {
   ResearchObjectComponentSubtypes,
   ResearchObjectComponentType,
+  ResearchObjectV1,
 } from "@src/../../nodes/desci-models/dist";
 import { DriveObject } from "@src/components/organisms/Drive";
 
@@ -16,7 +17,7 @@ export interface AddFilesToDrivePayload {
   overwritePathContext?: string;
   componentType?: ResearchObjectComponentType;
   componentSubType?: ResearchObjectComponentSubtypes;
-  onSuccess?: () => void;
+  onSuccess?: (manifest: ResearchObjectV1) => void;
 }
 
 export interface UploadQueueItem {
