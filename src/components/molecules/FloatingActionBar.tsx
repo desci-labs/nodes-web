@@ -85,7 +85,7 @@ const FloatingActionBar = () => {
       }
     />,
     <div
-      key="tooltip-compontent-annotate"
+      key="tooltip-component-annotate"
       className="w-8 h-8 rounded-full flex items-center justify-center group transition-transform bg-black cursor-pointer"
       onClick={() => {
         dispatch(setIsAnnotating(!isAnnotating));
