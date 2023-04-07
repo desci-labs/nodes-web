@@ -368,7 +368,7 @@ export const getDataset = async (cid: string, nodeUuid: string) => {
 
 export interface UpdateDag {
   uuid: string;
-  files?: FileList | FileSystemEntry[];
+  files?: FileList | FileSystemEntry[] | File[];
   manifest: ResearchObjectV1;
   contextPath: DrivePath;
   componentType?: ResearchObjectComponentType;
@@ -400,11 +400,7 @@ export const updateDag = async ({
     formData.append("externalCid", JSON.stringify(externalCids));
   formData.append("contextPath", contextPath);
   if (files?.length) {
-    if (files instanceof FileList) {
-      Array.prototype.forEach.call(files, (f) => {
-        formData.append("files", f);
-      });
-    } else {
+    if (files[0] instanceof FileSystemEntry) {
       const entryList = files as FileSystemEntry[];
       for (let i = 0; i < entryList.length; i++) {
         const f = entryList[i];
@@ -416,6 +412,10 @@ export const updateDag = async ({
 
         formData.append("files", new File([tempFile], fileName));
       }
+    } else {
+      Array.prototype.forEach.call(files, (f) => {
+        formData.append("files", f);
+      });
     }
   }
 

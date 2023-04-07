@@ -30,6 +30,9 @@ import {
   setManifest,
 } from "@src/state/nodes/viewer";
 import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
+import { useDispatch } from "react-redux";
+import { addFilesToDrive } from "@src/state/drive/driveSlice";
+import { useFileUpload } from "react-use-file-upload/dist/lib/useFileUpload";
 
 export const componentData = {
   [ResearchObjectComponentType.PDF]: {
@@ -100,7 +103,8 @@ const AddComponentPopOver = (
   const [error, setError] = useState<string>();
   const [customSubtype, setCustomSubtype] = useState<string>("");
 
-  const [fileLink, setFileLink] = useState<string>();
+  // const [fileLink, setFileLink] = useState<string>();
+  const { files, clearAllFiles, setFiles } = useFileUpload();
 
   const navigate = useNavigate();
 
@@ -112,7 +116,7 @@ const AddComponentPopOver = (
     setAddComponentType(null);
     setAddComponentSubType(null);
     setLoading(false);
-    setFileLink(undefined);
+    // setFileLink(undefined);
     props.onClose(force);
   };
 
@@ -155,7 +159,10 @@ const AddComponentPopOver = (
             setSubType={setAddComponentSubType}
             customSubtype={customSubtype}
             setCustomSubtype={setCustomSubtype}
-            setFileLink={setFileLink}
+            files={files}
+            clearAllFiles={clearAllFiles}
+            setFiles={setFiles}
+            // setFileLink={setFileLink}
             urlOrDoi={urlOrDoi}
             setUrlOrDoi={setUrlOrDoi}
           />
@@ -190,7 +197,7 @@ const AddComponentPopOver = (
     if (!addComponentType) return true;
     switch (addComponentType) {
       case ResearchObjectComponentType.PDF:
-        return !(fileLink?.length || (urlOrDoi && urlOrDoi.length));
+        return !(files.length || (urlOrDoi && urlOrDoi.length));
       case ResearchObjectComponentType.CODE:
         return !(
           addComponentType === ResearchObjectComponentType.CODE &&
@@ -210,70 +217,81 @@ const AddComponentPopOver = (
       console.log("ADD DATA", manifestData, currentObjectId, {
         manifest: manifestData!,
         uuid: currentObjectId!,
-        componentUrl: urlOrDoi! || fileLink!,
+        componentUrl: urlOrDoi! || files!,
         title: componentTitle,
         componentType: addComponentType!,
         componentSubtype: addComponentSubType || undefined,
       });
-      const res = await addComponentToDraft({
-        manifest: manifestData!,
-        uuid: currentObjectId!,
-        componentUrl: urlOrDoi! || fileLink!,
-        title: componentTitle,
-        componentType: addComponentType!,
-        componentSubtype: addComponentSubType || undefined,
-      });
+      // debugger;
+      dispatch(
+        addFilesToDrive({
+          files: files,
+          componentType: addComponentType!,
+          componentSubType: addComponentSubType || undefined,
+        })
+      );
 
-      const manifestUrl = cleanupManifestUrl(res.uri || res.manifestUrl);
-      let localManifestData = null;
-      if (res.manifestData) {
-        dispatch(setManifest(res.manifestData));
-        localManifestData = res.manifestData;
+      //no longer used
+      // const res = await addComponentToDraft({
+      //   manifest: manifestData!,
+      //   uuid: currentObjectId!,
+      //   componentUrl: urlOrDoi! || fileLink!,
+      //   title: componentTitle,
+      //   componentType: addComponentType!,
+      //   componentSubtype: addComponentSubType || undefined,
+      // });
 
-        //update priv cids
-        const latestComponent =
-          res.manifestData.components[res.manifestData.components.length - 1];
-        const latestCompCid = latestComponent.payload?.url
-          ? latestComponent.payload.url
-          : latestComponent.payload?.cid
-          ? latestComponent.payload.cid
-          : null;
-        if (latestCompCid) {
-          setPrivCidMap({ ...privCidMap, [latestCompCid]: true });
-        }
-      } else {
-        const { data } = await axios.get(manifestUrl);
-        dispatch(setManifest(data));
-        localManifestData = data;
-        // update priv cids
-        const latestComponent = data.components[data.components.length - 1];
-        const latestCompCid = latestComponent.payload?.url
-          ? latestComponent.payload.url
-          : latestComponent.payload?.cid
-          ? latestComponent.payload.cid
-          : null;
-        if (latestCompCid) {
-          setPrivCidMap({ ...privCidMap, [latestCompCid]: true });
-        }
-      }
-      localStorage.setItem("manifest-url", manifestUrl);
-      if (!currentObjectId) {
-        /**
-         * If adding this component triggers a new node creation, redirect to the new node
-         */
+      // const manifestUrl = cleanupManifestUrl(res.uri || res.manifestUrl);
+      // let localManifestData = null;
+      // if (res.manifestData) {
+      //   dispatch(setManifest(res.manifestData));
+      //   localManifestData = res.manifestData;
 
-        dispatch(setCurrentObjectId(res.node.uuid));
-        navigate(`/nodes/${RESEARCH_OBJECT_NODES_PREFIX}${res.node.uuid}`);
-      }
+      //update priv cids
+      // const latestComponent =
+      //   res.manifestData.components[res.manifestData.components.length - 1];
+      // const latestCompCid = latestComponent.payload?.url
+      //   ? latestComponent.payload.url
+      //   : latestComponent.payload?.cid
+      //   ? latestComponent.payload.cid
+      //   : null;
+      // if (latestCompCid) {
+      //   setPrivCidMap({ ...privCidMap, [latestCompCid]: true });
+      // }
+      // } else {
+      //   const { data } = await axios.get(manifestUrl);
+      //   dispatch(setManifest(data));
+      //   localManifestData = data;
+      //   // update priv cids
+      //   const latestComponent = data.components[data.components.length - 1];
+      //   const latestCompCid = latestComponent.payload?.url
+      //     ? latestComponent.payload.url
+      //     : latestComponent.payload?.cid
+      //     ? latestComponent.payload.cid
+      //     : null;
+      //   if (latestCompCid) {
+      //     setPrivCidMap({ ...privCidMap, [latestCompCid]: true });
+      //   }
+      // }
+
+      //Maybe still neccessary
+      // if (!currentObjectId) {
+      //   /**
+      //    * If adding this component triggers a new node creation, redirect to the new node
+      //    */
+
+      //   dispatch(setCurrentObjectId(res.node.uuid));
+      //   navigate(`/nodes/${RESEARCH_OBJECT_NODES_PREFIX}${res.node.uuid}`);
+      // }
 
       /**
        * Force newly added component to appear
        */
 
-      const components = localManifestData.components!;
-      dispatch(setComponentStack([components[components.length - 1]]));
+      // const components = manifestData.components!;
+      // dispatch(setComponentStack([components[components.length - 1]]));
 
-      close(true);
+      // close(true);
     } catch (err) {
       let resp = (err as any).response;
       const errorMessage = resp.data.error;

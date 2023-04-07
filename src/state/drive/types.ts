@@ -11,11 +11,12 @@ export interface NavigateToDriveByPathAction {
 }
 
 export interface AddFilesToDrivePayload {
-  files?: FileList | FileSystemEntry[];
+  files?: FileList | FileSystemEntry[] | File[];
   externalCids?: ExternalCid[];
   overwritePathContext?: string;
   componentType?: ResearchObjectComponentType;
   componentSubType?: ResearchObjectComponentSubtypes;
+  onSuccess?: () => void;
 }
 
 export interface UploadQueueItem {

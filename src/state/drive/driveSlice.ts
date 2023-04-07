@@ -38,6 +38,7 @@ import {
   findDriveByPath,
   generateFlatPathDriveMap,
   generatePathSizeMap,
+  arrayToFileList,
 } from "./utils";
 import {
   AddFilesToDrivePayload,
@@ -348,11 +349,13 @@ export const addFilesToDrive = createAsyncThunk(
       componentSubType,
     } = payload;
     if (!nodeTree || !manifest) return;
+    // debugger;
 
     //Transform files to usable data for displaying state (upload panel items, optimistic drives)
     const dirs: Record<string, string> = {};
     const fileInfo = Array.prototype.filter
       .call(files, (f) => {
+        if (!("fullPath" in f)) f.fullPath = "/" + f.name;
         const split = f.fullPath.split("/");
         if (split.length === 2) return split;
         if (split.length === 3) {

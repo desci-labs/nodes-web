@@ -14,7 +14,10 @@ interface Props {
   setSubType: React.Dispatch<any>;
   customSubtype: string;
   setCustomSubtype: (value: React.SetStateAction<string>) => void;
-  setFileLink: React.Dispatch<React.SetStateAction<string | undefined>>;
+  // setFileLink: React.Dispatch<React.SetStateAction<string | undefined>>;
+  files: File[];
+  setFiles: (e: Event) => void;
+  clearAllFiles: () => void;
   urlOrDoi: string | undefined;
   setUrlOrDoi: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
@@ -24,28 +27,28 @@ const AddDocumentComponent: React.FC<Props> = ({
   setSubType,
   customSubtype,
   setCustomSubtype,
-  setFileLink,
+  files,
+  setFiles,
+  clearAllFiles,
   urlOrDoi,
   setUrlOrDoi,
 }) => {
-  const { files, clearAllFiles, setFiles } = useFileUpload();
-
   useEffect(() => {
     return () => {
       clearAllFiles();
     };
   }, []);
 
-  useEffect(() => {
-    if (files && files.length) {
-      let reader = new FileReader();
-      const file = files[0];
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        setFileLink(reader.result!.toString());
-      };
-    }
-  }, [files]);
+  // useEffect(() => {
+  //   if (files && files.length) {
+  //     let reader = new FileReader();
+  //     const file = files[0];
+  //     reader.readAsDataURL(file);
+  //     reader.onload = () => {
+  //       setFileLink(reader.result!.toString());
+  //     };
+  //   }
+  // }, [files]);
   return (
     <div>
       <div className="my-3">
@@ -66,10 +69,7 @@ const AddDocumentComponent: React.FC<Props> = ({
         <div className="flex flex-col gap-6 items-center">
           <UploadPDF
             files={files}
-            clearAllFiles={() => {
-              clearAllFiles();
-              setFileLink(undefined);
-            }}
+            clearAllFiles={clearAllFiles}
             setFiles={setFiles}
           />
           {!files || !files.length ? (
