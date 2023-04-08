@@ -694,10 +694,8 @@ const PaneDrive = () => {
           <DriveDatasetMetadataPopOver
             currentObjectId={currentObjectId!}
             manifestData={manifestData!}
-            mode={mode}
             datasetMetadataInfoRef={datasetMetadataInfoRef}
             metaStaging={metaStaging}
-            // componentId={component.id}
             isVisible={showEditMetadata}
             onClose={() => {
               delete datasetMetadataInfoRef.current.rootCid;
@@ -709,7 +707,6 @@ const PaneDrive = () => {
           <ComponentMetadataPopover
             currentObjectId={currentObjectId!}
             manifestData={manifestData!}
-            mode={mode}
             componentId={OldComponentMetadata?.componentId!}
             isVisible={!!OldComponentMetadata}
             onClose={() => {
