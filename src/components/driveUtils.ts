@@ -18,7 +18,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "./molecules/AnnotationEditor/components";
 import { UploadQueueItem } from "@src/state/drive/types";
-import { recursiveFlattenTree } from "@src/state/drive/utils";
+import { formatDbDate, recursiveFlattenTree } from "@src/state/drive/utils";
 
 export const tempDate = "12/02/2022 7:00PM";
 
@@ -194,24 +194,6 @@ export function manifestToVirtualDrives(
 }
 
 export const DRIVE_NODE_ROOT_PATH = "root";
-
-export function formatDbDate(date: string | Date | number) {
-  if (typeof date === "string") date = new Date(date);
-  return new Intl.DateTimeFormat("default", {
-    day: "numeric",
-    month: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    hour12: true,
-  })
-    .format(date)
-    .toString()
-    .replace(/\s+(AM|PM|am|pm)/, "$1")
-    .split(",")
-    .join("")
-    .toUpperCase();
-}
 
 interface GetAllTreesOptions {
   pathUidMap?: Record<string, string>;

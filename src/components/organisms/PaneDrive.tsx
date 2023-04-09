@@ -11,7 +11,6 @@ import {
   fillOuterSizes,
   findDriveByPath,
   findRootComponentCid,
-  formatDbDate,
   generateFlatPathUidMap,
   gracefullyAssignTreeUids,
   ipfsTreeToDriveTree,
@@ -67,6 +66,7 @@ import {
   setShowUploadPanel,
   updateBatchUploadProgress,
 } from "@src/state/drive/driveSlice";
+import { formatDbDate } from "@src/state/drive/utils";
 
 export interface DatasetMetadataInfo {
   prepopulateFromName?: string;

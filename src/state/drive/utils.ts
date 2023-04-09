@@ -3,7 +3,7 @@ import {
   ResearchObjectV1,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
-import { DRIVE_NODE_ROOT_PATH } from "@src/components/driveUtils";
+import { DRIVE_NODE_ROOT_PATH, tempDate } from "@src/components/driveUtils";
 import {
   AccessStatus,
   DriveMetadata,
@@ -169,6 +169,7 @@ export function convertIpfsTreeToDriveObjectTree(
     branch.metadata = inheritMetadata(branch.path, pathToCompMap);
     branch.starred = component?.starred || false;
     branch.uid = component?.id || uuidv4(); //add cached uuids
+    branch.lastModified = formatDbDate(branch.lastModified) || tempDate;
     if (
       branch.contains &&
       branch.contains.length &&
@@ -237,4 +238,22 @@ export function urlOrCid(cid: string, type: ResearchObjectComponentType) {
     default:
       return { cid };
   }
+}
+
+export function formatDbDate(date: string | Date | number) {
+  if (typeof date === "string") date = new Date(date);
+  return new Intl.DateTimeFormat("default", {
+    day: "numeric",
+    month: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  })
+    .format(date)
+    .toString()
+    .replace(/\s+(AM|PM|am|pm)/, "$1")
+    .split(",")
+    .join("")
+    .toUpperCase();
 }
