@@ -3,11 +3,12 @@ import React, { Ref } from "react";
 interface Props {
   autoUpload?: boolean;
   customReq: (files: FileList) => void;
-  ref: Ref<HTMLInputElement | null>;
 }
 
-const FileUploaderBare = React.forwardRef(
-  ({ autoUpload, customReq, ref }: Props) => {
+const FileUploaderBare = React.forwardRef<HTMLInputElement, Props>(({
+  autoUpload, customReq},
+  ref
+  ) => {
     async function onChange(e: React.ChangeEvent<HTMLInputElement>) {
       const { files } = e.target as any;
       console.log("files: ", files);
