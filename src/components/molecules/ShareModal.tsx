@@ -78,7 +78,7 @@ export default function ShareModal(props: ModalProps) {
           title="Share Research Node"
           onDismiss={props?.onDismiss}
         />
-        <div className="flex items-center justify-center w-full">
+        {canSharePublished ? <div className="flex items-center justify-center w-full">
           <SwitchBar
             style={{ margin: "1rem 0 1rem 0", height: 35, maxWidth: 400 }}
           >
@@ -100,7 +100,7 @@ export default function ShareModal(props: ModalProps) {
               </p>
             </SwitchButton>
           </SwitchBar>
-        </div>
+        </div> : null}
         {currentTab === ShareTabs.Invite && <NodeInvite />}
         {currentTab === ShareTabs.Public && <SharePublished />}
       </div>
