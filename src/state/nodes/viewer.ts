@@ -11,7 +11,7 @@ import { cleanupManifestUrl } from "@src/components/utils";
 import { RootState } from "@src/store";
 import axios from "axios";
 
-type ReaderMode = "reader" | "editor";
+export type ReaderMode = "reader" | "editor";
 
 export enum ResearchTabs {
   current = "current",
@@ -39,6 +39,7 @@ interface NodeReaderPref {
   publicView: boolean;
   editingNodeParams?: EditNodeParams | null;
   currentObjectId?: string;
+  shareId?: string;
   isDraggingFiles: boolean;
   isCommitPanelOpen: boolean;
   manifest?: ResearchObjectV1;
@@ -248,6 +249,9 @@ export const nodeReaderSlice = createSlice({
     setCurrentObjectId: (state, { payload }: PayloadAction<string>) => {
       state.currentObjectId = payload;
     },
+    setCurrentShareId: (state, { payload }: PayloadAction<string>) => {
+      state.shareId = payload;
+    },
     setIsDraggingFiles: (state, { payload }: PayloadAction<boolean>) => {
       state.isDraggingFiles = payload;
     },
@@ -410,6 +414,7 @@ export const {
   deleteAnnotation,
   toggleCommitPanel,
   setComponentStack,
+  setCurrentShareId,
   setIsDraggingFiles,
   setCurrentObjectId,
   toggleResearchPanel,

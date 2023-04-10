@@ -1,4 +1,3 @@
-import React, { ButtonHTMLAttributes } from "react";
 import tw from "tailwind-styled-components";
 
 const ButtonSecondary = tw.button`

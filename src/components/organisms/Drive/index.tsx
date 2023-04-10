@@ -17,7 +17,14 @@ import DriveBreadCrumbs, {
 import PopOverUseMenu from "@components/molecules/PopOverUseMenu";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  ButtonHTMLAttributes,
+  HTMLProps,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useClickAway } from "react-use";
 import { DatasetMetadataInfo, MetaStaging } from "../PaneDrive";
 import StatusInfo from "./StatusInfo";
@@ -56,6 +63,15 @@ interface DriveTableProps {
   setRenameComponentId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
+function UploadButton(props: ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <ButtonSecondary onClick={props.onClick}>
+      <IconCirclePlus className="group-hover:hidden" fill="white" />
+      <IconCirclePlus className="group-hover:!block hidden" fill="black" /> Add
+    </ButtonSecondary>
+  );
+}
+
 const DriveTable: React.FC<DriveTableProps> = ({
   directory,
   setDirectory,
@@ -79,6 +95,8 @@ const DriveTable: React.FC<DriveTableProps> = ({
     manifest: manifestData,
     publicView,
     currentObjectId,
+    shareId,
+    mode,
   } = useNodeReader();
 
   const [selected, setSelected] = useState<
@@ -189,10 +207,16 @@ const DriveTable: React.FC<DriveTableProps> = ({
               ? lastPathUidMap
               : undefined;
           //getAllTrees mutates nodeDrived
-          await getAllTrees(nodeDrived!, currentObjectId!, manifestData!, {
-            pathUidMap: provideMap,
-            public: publicView,
-          });
+          await getAllTrees(
+            nodeDrived!,
+            currentObjectId!,
+            manifestData!,
+            {
+              pathUidMap: provideMap,
+              public: publicView,
+            },
+            shareId
+          );
 
           //fill sizes and metadata (dont remove for now)
           setDirectory((old) => {
@@ -322,18 +346,13 @@ const DriveTable: React.FC<DriveTableProps> = ({
         <div className="w-full flex flex-row -mt-8">
           <div className="flex-grow"></div>
           <div className="w-42 self-end">
-            <ButtonSecondary
-              onClick={() => {
-                setIsAddingComponent(true);
-              }}
-            >
-              <IconCirclePlus className="group-hover:hidden" fill="white" />
-              <IconCirclePlus
-                className="group-hover:!block hidden"
-                fill="black"
-              />{" "}
-              Add
-            </ButtonSecondary>
+            {mode === "editor" && (
+              <UploadButton
+                onClick={() => {
+                  setIsAddingComponent(true);
+                }}
+              />
+            )}
           </div>
         </div>
       ) : null}

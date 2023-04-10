@@ -33,7 +33,6 @@ export default function useReaderEffects(publicView: boolean = false) {
   useEffect(() => {
     dispatch(setPreferences({ hideFooter: true, hideHeader: true }));
     if (publicView && mode !== "reader") {
-      // toggleMode();
       dispatch(toggleMode());
     } else {
       setMounted(true);
@@ -50,7 +49,7 @@ export default function useReaderEffects(publicView: boolean = false) {
    */
   // TODO: move to auth provider logic to refresh expired jwt token
   useEffect(() => {
-    if (userProfile) {
+    if (userProfile?.userId > 0) {
       if (!cid || !cid.length) {
         //  || cid.startsWith(RESEARCH_OBJECT_NODES_PREFIX)
         console.log(

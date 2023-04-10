@@ -44,7 +44,6 @@ interface DriveDatasetMetadataPopoverProps {
   currentObjectId: string;
   manifestData: ResearchObjectV1;
   isVisible: boolean;
-  mode: string;
   onClose?: () => void;
   datasetMetadataInfoRef: React.MutableRefObject<DatasetMetadataInfo>;
 }
@@ -57,8 +56,7 @@ const DriveDatasetMetadataPopOver = (
   props: DriveDatasetMetadataPopoverProps & typeof defaultProps
 ) => {
   const dispatch = useSetter();
-  const { publicView } = useNodeReader();
-  // const { saveManifest, isSaving } = useSaveManifest();
+  const { publicView, mode } = useNodeReader();
   const [isSaving, setIsSaving] = useState(false);
   const formRef = useRef<HTMLFormElement | null>(null);
   const [componentIndexes, setComponentIndexes] = useState<
@@ -71,7 +69,6 @@ const DriveDatasetMetadataPopOver = (
 
   const manifestData = props.manifestData;
   const currentObjectId = props.currentObjectId;
-  const mode = props.mode;
 
   const rootCid = props.datasetMetadataInfoRef.current.rootCid;
 

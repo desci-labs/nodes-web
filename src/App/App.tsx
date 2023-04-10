@@ -15,6 +15,7 @@ const App = () => {
   useEffect(() => {
     if (error) {
       console.error(error);
+      
       if (location.pathname.indexOf("/nodes/start") > -1) {
         navigate(site.app);
       }
