@@ -7,6 +7,7 @@ import useCreditsForm from "./useCreditsForm";
 import SelectList from "@src/components/molecules/FormInputs/SelectList";
 import { ResearchObjectV1AuthorRole } from "@desci-labs/desci-models";
 import { PatternFormat } from "react-number-format";
+import { ExternalLinkIcon } from "@heroicons/react/solid";
 
 const authorRoles = Object.values(ResearchObjectV1AuthorRole).map(
   (role, idx) => ({
@@ -91,16 +92,15 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
             />
           )}
         />
-        <span className="text-red-400 text-xs">{errors.orcid?.message}</span>
-        {orcid && (
+        {(errors.orcid?.message) ? (<span className="text-red-400 text-xs h-8 block">{errors.orcid?.message}</span>) : (
           <a
-            className="block text-md font-extrabold text-tint-primary hover:text-tint-primary-hover tracking-tight disabled:text-neutrals-gray-4"
+            className="flex flex-row gap-1 items-center h-8 text-md font-extrabold text-tint-primary hover:text-tint-primary-hover tracking-tight disabled:text-neutrals-gray-4"
             href={`${errors?.orcid ? "" : `${ORCID_SITE}${orcid}`}`}
             target="_blank"
             rel="noreferrer"
             aria-disabled={!!errors?.orcid}
           >
-            Find ORCID PID
+            Open ORCiD Record <ExternalLinkIcon height={16} />
           </a>
         )}
       </div>

@@ -44,7 +44,7 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
         >
           {methods.formState.isSubmitting ? (
             <div className="flex flex-row gap-2 items-center w-full justify-center">
-              saving <DefaultSpinner color="black" size={20} />
+              Saving <DefaultSpinner color="black" size={20} />
             </div>
           ) : (
             <span>Save</span>
