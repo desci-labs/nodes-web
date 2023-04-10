@@ -5,8 +5,8 @@ interface Props {
   customReq: (files: FileList) => void;
 }
 
-const FileUploaderBare = React.forwardRef<HTMLInputElement, Props>(({
-  autoUpload, customReq},
+const FileUploaderBare = React.forwardRef<HTMLInputElement, Props>((
+  { autoUpload, customReq },
   ref
   ) => {
     async function onChange(e: React.ChangeEvent<HTMLInputElement>) {
