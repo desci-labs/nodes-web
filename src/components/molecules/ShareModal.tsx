@@ -63,7 +63,7 @@ export default function ShareModal(props: ModalProps) {
   const canSharePublished = publicView || !!versions;
 
   const [currentTab, setCurrentTab] = useState(() =>
-    canSendInvite ? ShareTabs.Invite : ShareTabs.Public
+    canSharePublished ? ShareTabs.Public : ShareTabs.Invite
   );
 
   return (
@@ -83,20 +83,20 @@ export default function ShareModal(props: ModalProps) {
             style={{ margin: "1rem 0 1rem 0", height: 35, maxWidth: 400 }}
           >
             <SwitchButton
-              isSelected={currentTab === ShareTabs.Invite}
-              onClick={() => setCurrentTab(ShareTabs.Invite)}
-            >
-              <p className="text-xs flex justify-center items-center h-full capitalize">
-                Invite Collaborator
-              </p>
-            </SwitchButton>
-            <SwitchButton
               isSelected={currentTab === ShareTabs.Public}
               onClick={() => setCurrentTab(ShareTabs.Public)}
               disabled={!canSharePublished}
             >
               <p className="text-xs flex justify-center items-center h-full capitalize">
                 Share Published version
+              </p>
+            </SwitchButton>
+            <SwitchButton
+              isSelected={currentTab === ShareTabs.Invite}
+              onClick={() => setCurrentTab(ShareTabs.Invite)}
+            >
+              <p className="text-xs flex justify-center items-center h-full capitalize">
+                Invite Collaborator
               </p>
             </SwitchButton>
           </SwitchBar>
@@ -116,7 +116,7 @@ export default function ShareModal(props: ModalProps) {
                   <DefaultSpinner color="white" size={24} />
                 ) : (
                   <IconCopyLink
-                    className="fill-white group-hover:fill-black"
+                    className={`fill-white transition-colors ${isLoading || isCreated ? '' : 'group-hover:fill-black'}`}
                     width={20}
                     height={20}
                   />
@@ -125,6 +125,9 @@ export default function ShareModal(props: ModalProps) {
                   {isLoading ? "Creating link" : "Create private link"}
                 </span>
               </ButtonSecondary>
+            )}
+            {shareId && (
+              <CopyShareLink link={`http://localhost:3000/share/${shareId}`} />
             )}
             {shareId && (
               <PrimaryButton
@@ -145,9 +148,6 @@ export default function ShareModal(props: ModalProps) {
                   {isRevoking ? "Revoking" : "Revoke link"}
                 </span>
               </PrimaryButton>
-            )}
-            {shareId && (
-              <CopyShareLink link={`http://localhost:3000/share/${shareId}`} />
             )}
           </div>
         </Modal.Footer>
@@ -170,13 +170,12 @@ export function CopyShareLink(
       disabled={copied}
     >
       <IconCopyLink
-        className={`${
-          copied ? "fill-neutrals-gray-7" : "fill-white group-hover:fill-black"
-        } `}
+        className={`transition-colors ${copied ? "fill-neutrals-gray-7" : "fill-white group-hover:text-black group-hover:fill-black"
+          } `}
         width={20}
         height={20}
       />
-      <span>{copied ? "Link copied" : "Copy Read-Only link"}</span>
+      <span className="w-36 block">{copied ? "Link copied" : "Copy Read-Only link"}</span>
     </ButtonSecondary>
   );
 }
