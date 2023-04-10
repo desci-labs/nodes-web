@@ -255,7 +255,7 @@ export default memo(function CreateNodeModal({
                     title: manifestTitle || "",
                     defaultLicense: manifestLicense?.name,
                     components: [],
-                    contributors: [],
+                    authors: [],
                     researchFields,
                   })
                 );

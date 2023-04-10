@@ -68,7 +68,6 @@ export default function SelectList(props: SelectListProps) {
   return (
     <div>
       <StyledListBoxInput
-        // value={value}
         defaultValue={value}
         onChange={onHandleChange}
         aria-labelledby={labelId}
@@ -104,12 +103,12 @@ export default function SelectList(props: SelectListProps) {
         </ListboxButton>
         <ListboxPopover
           portal={true}
-          className="relative mt-2 max-h-96 min-h-[100px]"
+          className="relative mt-2 max-h-96"
           onBlur={() => {
             setTouched(true);
           }}
         >
-          <PerfectScrollbar className="max-h-96 min-h-[150px] h-fit overflow-hidden overflow-y-scroll">
+          <PerfectScrollbar className="max-h-96 min-h-[120px] h-fit overflow-hidden overflow-y-scroll">
             <Transition
               show={true}
               as={Fragment}
