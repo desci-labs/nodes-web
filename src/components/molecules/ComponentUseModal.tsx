@@ -136,6 +136,7 @@ const ComponentUseModal = ({
       ResearchObjectComponentType.PDF,
     ].includes(componentToUse.componentType as ResearchObjectComponentType);
 
+  console.log("Use", file, manifestData);
   return (
     <Modal
       {...restProps}

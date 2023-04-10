@@ -10,9 +10,11 @@ import {
 } from "@src/components/organisms/Drive/types";
 import { useCallback, useMemo } from "react";
 
+const DEFAULT_VALUE = { dpid: "", fqi: "", license: "Not Specified" };
+
 export default function useComponentDpid(componentToUse: DriveObject) {
-  const { currentObjectId, manifest: manifestData } = useNodeReader();
   const { versions } = useCurrentNodeVersion();
+  const { currentObjectId, manifest: manifestData } = useNodeReader();
 
   const isDpidSupported = !!manifestData?.dpid;
   const version = versions.length - 1;
@@ -35,14 +37,19 @@ export default function useComponentDpid(componentToUse: DriveObject) {
   const resolveDpid = useCallback((): {
     dpid: string;
     fqi: string;
+    license: string;
   } => {
-    if (!componentToUse) return { dpid: "", fqi: "" };
+    if (!componentToUse) return DEFAULT_VALUE;
 
     const component =
       componentToUse.type === FileType.Dir
         ? componentToUse?.contains?.[0] ?? null
         : componentToUse;
-    if (!component) return { dpid: dpidLink, fqi: "" };
+
+    if (!component) return DEFAULT_VALUE;
+
+    const license =
+      component.metadata.licenseType ?? manifestData.defaultLicense;
 
     let componentParent: DriveObject | FileDir = component;
     while (
@@ -101,13 +108,14 @@ export default function useComponentDpid(componentToUse: DriveObject) {
         ? codeLink
         : link;
 
-    return { dpid, fqi };
+    return { dpid, fqi, license };
   }, [
     componentToUse,
     currentObjectId,
     dpidLink,
     isDpidSupported,
     manifestData?.components,
+    manifestData.defaultLicense,
     manifestData?.dpid?.id,
     version,
   ]);
