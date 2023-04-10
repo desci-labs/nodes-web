@@ -228,7 +228,7 @@ const ComponentMetadataForm = React.forwardRef(
             limits.
           </div>
         </div>
-        <div className="py-3 my-3">
+        {props.component.type !== ResearchObjectComponentType.LINK && (<div className="py-3 my-3">
           <Controller
             name="licenseType"
             control={control}
@@ -242,12 +242,9 @@ const ComponentMetadataForm = React.forwardRef(
                   mandatory={true}
                   data={PDF_LICENSE_TYPES}
                   defaultValue={defaultLicense}
-                  field={{
-                    ...field,
-                    value: val || field.value || defaultLicense,
-                  }}
+                  field={{ ...field, value: val || field.value || defaultLicense }}
                 />
-              );
+              )
             }}
           />
           <div className="text-xs mt-2">
@@ -274,7 +271,7 @@ const ComponentMetadataForm = React.forwardRef(
             </a>
           </div>
         </div>
-        {/* <input type="submit" /> */}
+        )}
       </div>
     );
   }

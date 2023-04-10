@@ -2,10 +2,9 @@ import Identicon from "@components/atoms/Identicon";
 import TooltipIcon from "@components/atoms/TooltipIcon";
 import CollapsibleSection from "@components/organisms/CollapsibleSection";
 import { IconCirclePlus, IconDeleteForever, IconInfo, IconPen } from "icons";
-import Section from "../../Section";
-import SectionHeader from "../../Section/SectionHeader";
+import Section from "@src/components/organisms/SidePanel/ManuscriptSidePanel/Section";
+import SectionHeader from "@src/components/organisms/SidePanel/ManuscriptSidePanel/Section/SectionHeader";
 import { ResearchObjectV1Author } from "@desci-labs/desci-models";
-import ClickableAddIcon from "@components/atoms/ClickableIcon/ClickableAddIcon";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { PropsWithChildren, useState } from "react";
 import CreditsModal from "@src/components/organisms/PopOver/CreditsModal/CreditsModal";
@@ -33,7 +32,6 @@ const Credits = (props: CreditsProps) => {
   const isEditing = mode === "editor";
 
   const handleDelete = (authorIndex: number) => {
-    console.log("Delete", authorIndex, manifestData?.authors?.[authorIndex]);
     dispatch(removeAuthor({ authorIndex }));
     dispatch(saveManifestDraft({}));
   };
@@ -41,12 +39,11 @@ const Credits = (props: CreditsProps) => {
   return (
     <CollapsibleSection
       startExpanded={true}
-      forceExpand={mode === "editor"}
       title={
         <div className="flex w-full justify-between">
           <div>
             <span>Credit</span>
-            {isEditing && manifestData?.authors?.length ? (
+            {!publicView && isEditing && manifestData?.authors?.length ? (
               <span
                 className="text-xs text-tint-primary hover:text-tint-primary-hover cursor-pointer ml-1 mb-0.5 font-bold"
                 onClick={(e: React.MouseEvent<HTMLSpanElement>) => {
@@ -70,13 +67,6 @@ const Credits = (props: CreditsProps) => {
             )}
           </div>
         </div>
-      }
-      collapseIconComponent={
-        isEditing
-          ? () => {
-              return <ClickableAddIcon onClick={() => setIsOpen(true)} />;
-            }
-          : undefined
       }
       className="mb-4"
     >
@@ -114,7 +104,9 @@ const Credits = (props: CreditsProps) => {
                           <span className="text-sm font-bold">
                             {author.name}
                           </span>
-                          <span className="text-xs text-gray-400">Author</span>
+                          <span className="text-xs text-gray-400">
+                            {author.role}
+                          </span>
                         </div>
                       )}
                       action={() => (
