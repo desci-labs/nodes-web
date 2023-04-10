@@ -80,11 +80,13 @@ export default function DriveRow({
   const contextRef = useRef<HTMLUListElement>();
   const { init } = useDriveContext(file);
   const { handleDbClick } = useInteractionHandler();
-  const { setShowCitationModal, setComponentToCite } = useManuscriptController([
-    "componentToCite",
-    "componentToUse",
-  ]);
-  const { manifest: manifestData, publicView } = useNodeReader();
+  const { setShowCitationModal, setComponentToCite } =
+    useManuscriptController(["componentToCite"]);
+  const {
+    manifest: manifestData,
+    publicView,
+    mode,
+  } = useNodeReader();
 
   const handleEditMetadata = () => {
     // debugger;
@@ -162,6 +164,14 @@ export default function DriveRow({
     [file.parent?.path, file.type, init]
   );
 
+  const isStatusActionDisabled =
+    !canEditMetadata ||
+    (file.componentType === ResearchObjectComponentType.DATA &&
+      mode === "reader");
+
+  const getStatusButtonLabel = () =>
+    isNodeRoot ? "Metadata Status" : "Edit Metadata";
+
   return (
     <ul
       ref={handleRef}
@@ -227,7 +237,7 @@ export default function DriveRow({
           <li className={`${DRIVE_ROW_STYLES[5]}`}>
             <StatusButton
               status={metaStatus}
-              disabled={!canEditMetadata}
+              disabled={isStatusActionDisabled}
               className={`lg:w-[125px] justify-center ${
                 isNodeRoot ? "pointer-events-none" : "gap-2.5"
               }`}
@@ -235,7 +245,7 @@ export default function DriveRow({
             >
               <>
                 <span className="hidden lg:block">
-                  {isNodeRoot ? "Metadata Status" : "Edit Metadata"}
+                  {getStatusButtonLabel()}
                 </span>
                 <span className="lg:hidden">
                   {isNodeRoot ? "Status" : "Edit"}
@@ -247,6 +257,11 @@ export default function DriveRow({
       )}
       <li className={`${DRIVE_ROW_STYLES[6]}`}>
         <BlackGenericButton
+          disabled={
+            ![AccessStatus.PUBLIC, AccessStatus.PARTIAL].includes(
+              file.accessStatus
+            )
+          }
           onClick={() => {
             setComponentToCite(file);
             setShowCitationModal(true);

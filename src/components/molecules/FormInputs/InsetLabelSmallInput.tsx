@@ -61,7 +61,6 @@ const InsetLabelSmallInput = forwardRef<
     pattern,
     onChange,
   } = props;
-
   const InputComponent = multiline ? TextArea : Input;
 
   return (

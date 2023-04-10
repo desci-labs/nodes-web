@@ -13,18 +13,18 @@ import { useCallback, useMemo } from "react";
 const DEFAULT_VALUE = { dpid: "", fqi: "", license: "Not Specified" };
 
 export default function useComponentDpid(componentToUse: DriveObject) {
-  const { versions } = useCurrentNodeVersion();
+  const versionIndex = useCurrentNodeVersion();
   const { currentObjectId, manifest: manifestData } = useNodeReader();
 
   const isDpidSupported = !!manifestData?.dpid;
-  const version = versions.length - 1;
-
+  const version = versionIndex?.versions.length - 1 || 1;
+  console.log("versions", isDpidSupported, versionIndex, manifestData);
   const dpidLink = useMemo(
     () =>
       isDpidSupported
         ? `https://${
             manifestData?.dpid?.prefix ? manifestData?.dpid?.prefix + "." : ""
-          }dpid.org/${manifestData?.dpid?.id}/v${version || 1}`
+          }dpid.org/${manifestData?.dpid?.id}/v${version}`
         : "",
     [
       version,
@@ -49,7 +49,9 @@ export default function useComponentDpid(componentToUse: DriveObject) {
     if (!component) return DEFAULT_VALUE;
 
     const license =
-      component.metadata.licenseType ?? manifestData.defaultLicense;
+      component.metadata.licenseType ||
+      manifestData?.defaultLicense ||
+      DEFAULT_VALUE.license;
 
     let componentParent: DriveObject | FileDir = component;
     while (
@@ -103,10 +105,11 @@ export default function useComponentDpid(componentToUse: DriveObject) {
 
     let codeLink = `${window.location.protocol}//${window.location.host}/${fqi}`;
 
-    const dpid =
-      component.componentType === ResearchObjectComponentType.CODE
+    const dpid = isDpidSupported
+      ? component.componentType === ResearchObjectComponentType.CODE
         ? codeLink
-        : link;
+        : link
+      : "";
 
     return { dpid, fqi, license };
   }, [
@@ -115,7 +118,7 @@ export default function useComponentDpid(componentToUse: DriveObject) {
     dpidLink,
     isDpidSupported,
     manifestData?.components,
-    manifestData.defaultLicense,
+    manifestData?.defaultLicense,
     manifestData?.dpid?.id,
     version,
   ]);

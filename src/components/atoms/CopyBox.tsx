@@ -29,8 +29,9 @@ const CopyBox = ({
       <h1 className="font-bold select-none">{title}</h1>
       <div className="my-1">{children}</div>
       <button
-        className="text-tint-primary font-bold hover:text-tint-primary-hover"
+        className="text-tint-primary font-bold hover:text-tint-primary-hover disabled:text-neutrals-gray-4"
         onClick={handleCopy}
+        disabled={!copyText}
       >
         {copyBtn}
       </button>

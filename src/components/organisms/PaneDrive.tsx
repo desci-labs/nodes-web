@@ -82,8 +82,8 @@ export interface NodeDriveSetter {
   setRenameComponentId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 export const nodeDriveSetContext = createContext<NodeDriveSetter>({
-  setDirectory: () => {},
-  setRenameComponentId: () => {},
+  setDirectory: () => { },
+  setRenameComponentId: () => { },
 });
 
 const datasetMetadataInfoRefDefaults: DatasetMetadataInfo = {
@@ -218,11 +218,11 @@ const PaneDrive = () => {
             placeHolder.lastModified = formattedDate;
           placeHolder.contains!.forEach(
             (fd, idx) =>
-              (placeHolder.contains![idx] = ipfsTreeToDriveTree(
-                fd,
-                formattedDate,
-                manifestData!
-              ))
+            (placeHolder.contains![idx] = ipfsTreeToDriveTree(
+              fd,
+              formattedDate,
+              manifestData!
+            ))
           );
           placeHolder.accessStatus = AccessStatus.PRIVATE;
         }
@@ -452,11 +452,11 @@ const PaneDrive = () => {
               dataComp.path = newPath;
               dataComp.contains?.forEach(
                 (fd, idx) =>
-                  (dataComp.contains![idx] = ipfsTreeToDriveTree(
-                    fd,
-                    formatDbDate(date),
-                    manifest
-                  ))
+                (dataComp.contains![idx] = ipfsTreeToDriveTree(
+                  fd,
+                  formatDbDate(date),
+                  manifest
+                ))
               );
 
               old.forEach((item) => {
@@ -660,9 +660,8 @@ const PaneDrive = () => {
         <div className="flex flex-col relative">
           {loading ? (
             <div
-              className={`flex justify-center items-center flex-col w-[calc(100%-320px)] h-full fixed bg-neutrals-black overflow-hidden top-0 z-[50] gap-3 ${
-                loading ? "" : "hidden"
-              }`}
+              className={`flex justify-center items-center flex-col w-[calc(100%-320px)] h-full fixed bg-neutrals-black overflow-hidden top-0 z-[50] gap-3 ${loading ? "" : "hidden"
+                }`}
             >
               <LoaderDrive />
             </div>
@@ -690,33 +689,36 @@ const PaneDrive = () => {
               />
             </div>
           </PerfectScrollbar>
-
-          <DriveDatasetMetadataPopOver
-            currentObjectId={currentObjectId!}
-            manifestData={manifestData!}
-            mode={mode}
-            datasetMetadataInfoRef={datasetMetadataInfoRef}
-            metaStaging={metaStaging}
-            // componentId={component.id}
-            isVisible={showEditMetadata}
-            onClose={() => {
-              delete datasetMetadataInfoRef.current.rootCid;
-              delete datasetMetadataInfoRef.current.prepopulateFromName;
-              datasetMetadataInfoRef.current = datasetMetadataInfoRefDefaults;
-              setShowEditMetadata(false);
-            }}
-          />
-          <ComponentMetadataPopover
-            currentObjectId={currentObjectId!}
-            manifestData={manifestData!}
-            mode={mode}
-            componentId={OldComponentMetadata?.componentId!}
-            isVisible={!!OldComponentMetadata}
-            onClose={() => {
-              if (OldComponentMetadata) OldComponentMetadata.cb();
-              setOldComponentMetadata(null);
-            }}
-          />
+          {showEditMetadata && (
+            <DriveDatasetMetadataPopOver
+              currentObjectId={currentObjectId!}
+              manifestData={manifestData!}
+              mode={mode}
+              datasetMetadataInfoRef={datasetMetadataInfoRef}
+              metaStaging={metaStaging}
+              // componentId={component.id}
+              isVisible={showEditMetadata}
+              onClose={() => {
+                delete datasetMetadataInfoRef.current.rootCid;
+                delete datasetMetadataInfoRef.current.prepopulateFromName;
+                datasetMetadataInfoRef.current = datasetMetadataInfoRefDefaults;
+                setShowEditMetadata(false);
+              }}
+            />
+          )}
+          {!!OldComponentMetadata && (
+            <ComponentMetadataPopover
+              currentObjectId={currentObjectId!}
+              manifestData={manifestData!}
+              mode={mode}
+              componentId={OldComponentMetadata?.componentId!}
+              isVisible={!!OldComponentMetadata}
+              onClose={() => {
+                if (OldComponentMetadata) OldComponentMetadata.cb();
+                setOldComponentMetadata(null);
+              }}
+            />
+          )}
           <SidePanelStorage />
         </div>
       </ContextMenuProvider>

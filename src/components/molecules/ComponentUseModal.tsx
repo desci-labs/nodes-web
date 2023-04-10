@@ -57,8 +57,7 @@ const ComponentUseModal = ({
 }: ModalProps & UseModalProps) => {
   const { setComponentToUse } = useManuscriptController(["componentToUse"]);
   const { manifest: manifestData } = useNodeReader();
-  const { dpid, fqi } = useComponentDpid(componentToUse!);
-  console.log(componentToUse);
+  const { dpid, fqi, license } = useComponentDpid(componentToUse!);
   const handler = useActionHandler();
 
   const file = componentToUse;
@@ -136,7 +135,6 @@ const ComponentUseModal = ({
       ResearchObjectComponentType.PDF,
     ].includes(componentToUse.componentType as ResearchObjectComponentType);
 
-  console.log("Use", file, manifestData);
   return (
     <Modal
       {...restProps}
@@ -262,8 +260,7 @@ const ComponentUseModal = ({
             </div>
             <span className="text-sm gap-2 hidden lg:flex">
               <span className="inline-block">
-                License Type:{" "}
-                <b>{file.metadata.licenseType ?? "Not Specified"}</b>{" "}
+                License Type: <b>{license}</b>{" "}
               </span>
               <button
                 className="text-tint-primary hover:text-tint-primary-hover"

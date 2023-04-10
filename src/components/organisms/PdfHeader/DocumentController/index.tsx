@@ -51,6 +51,7 @@ const DocumentController = (props: DocumentControllerProps) => {
       setIsMounted(true);
     }
   };
+
   return (
     <Wrapper>
       <PaginationControl />
@@ -77,7 +78,7 @@ const DocumentController = (props: DocumentControllerProps) => {
               );
               if (
                 selectedComponent &&
-                selectedComponent.type == ResearchObjectComponentType.PDF
+                selectedComponent.type === ResearchObjectComponentType.PDF
               ) {
                 let url = cleanupManifestUrl(
                   (selectedComponent as PdfComponent).payload.url
@@ -112,11 +113,12 @@ const DocumentController = (props: DocumentControllerProps) => {
           />
         </div>
       </Control>
+      {/* // TODO: Only display the (Edit/Preview) button for auth & Guarded users  */}
       <div className="invisible absolute -right-36 w-36 flex h-[15px]">
         <ControllerDivider />
         <button
           ref={(ref) => ((editButtonRef as any).current = ref)}
-          data-tip={mode == "editor" ? "View as a reader" : "Edit your object"}
+          data-tip={mode === "editor" ? "View as a reader" : "Edit your object"}
           data-place="bottom"
           onClick={() => {
             if (mode !== "editor") {
@@ -130,7 +132,7 @@ const DocumentController = (props: DocumentControllerProps) => {
           }}
           className={`w-20 cursor-pointer transition-colors px-4 leading-none text-xs py-0 h-[24px] rounded-md -mt-[4px] whitespace-nowrap bg-gray-900 text-gray-100 hover:bg-gray-800`}
         >
-          {mode == "editor" ? "Preview" : "Edit"}
+          {mode === "editor" ? "Preview" : "Edit"}
         </button>
       </div>
     </Wrapper>

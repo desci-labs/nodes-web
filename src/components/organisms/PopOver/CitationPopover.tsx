@@ -2,7 +2,6 @@ import PrimaryButton from "@components/atoms/PrimaryButton";
 import { useManuscriptController } from "@components/organisms/ManuscriptReader/ManuscriptController";
 import { IconWarning } from "@icons";
 import {
-  ButtonHTMLAttributes,
   PropsWithChildren,
   useCallback,
   useEffect,
@@ -10,7 +9,7 @@ import {
   useState,
 } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { CopyButton, useCopier } from "@components/molecules/Copier";
+import { CopyButton } from "@components/molecules/Copier";
 import {
   ResearchObjectComponentType,
   ResearchObjectV1Component,
@@ -22,17 +21,10 @@ import {
   DEFAULT_RESULT,
   getFormatter,
 } from "@src/helper/citation";
-import { BsClipboard } from "react-icons/bs";
-import { CheckIcon } from "@heroicons/react/solid";
 import { useUser } from "@src/state/user/hooks";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 import SelectList from "@src/components/molecules/FormInputs/SelectList";
-
-// Todo: implement a useNodeDetails hook to get the details of a the currentObjectId like (owner etc)
-// Todo: use the owner details to determine if the current user is the owner
-// Todo: if the current userId == ownerId, add extra features like profile
-// Todo: completion shortcut if user has not completed their  profile
 
 const CitationComponent = () => {
   const userProfile = useUser();
@@ -102,7 +94,9 @@ const CitationComponent = () => {
 
     const component =
       componentToCite.type === FileType.Dir
-        ? componentToCite?.contains?.[0] ?? null
+        ? componentToCite?.contains?.find(
+            (file) => file.accessStatus === AccessStatus.PUBLIC
+          ) ?? null
         : componentToCite;
     if (!component) return dpidLink;
 
@@ -285,8 +279,6 @@ const CitationComponent = () => {
   );
 };
 
-
-
 function Box(props: PropsWithChildren<{}>) {
   return (
     <div className="relative w-full bg-white dark:bg-[#272727] border border-transparent border-b border-b-[#969696] rounded-t-md shadow-sm py-2 text-left focus:outline-none sm:text-sm">
@@ -311,7 +303,7 @@ const CitationPopover = (props: ModalProps) => {
       $maxWidth={650}
       $scrollOverlay={true}
     >
-      <div className="px-6 py-5 text-white">
+      <div className="px-6 py-5 text-white max-w-[750px]">
         <Modal.Header
           onDismiss={close}
           title="Cite"
