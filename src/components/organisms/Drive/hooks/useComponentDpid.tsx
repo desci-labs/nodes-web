@@ -18,7 +18,6 @@ export default function useComponentDpid(componentToUse: DriveObject) {
 
   const isDpidSupported = !!manifestData?.dpid;
   const version = versionIndex?.versions.length - 1 || 1;
-  console.log("versions", isDpidSupported, versionIndex, manifestData);
   const dpidLink = useMemo(
     () =>
       isDpidSupported

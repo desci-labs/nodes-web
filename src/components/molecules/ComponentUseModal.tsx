@@ -130,10 +130,8 @@ const ComponentUseModal = ({
 
   const canPreview =
     componentToUse &&
-    [
-      ResearchObjectComponentType.CODE,
-      ResearchObjectComponentType.PDF,
-    ].includes(componentToUse.componentType as ResearchObjectComponentType);
+    ResearchObjectComponentType.CODE ===
+      (componentToUse.componentType as ResearchObjectComponentType);
 
   return (
     <Modal
@@ -161,7 +159,7 @@ const ComponentUseModal = ({
                 className="my-6 w-full overflow-hidden pr-2"
                 onHandleClick={handleEditMetadata}
               >
-                <>{file.metadata.licenseType ?? ""}</>
+                <>{license}</>
               </CodeBox>
               <DividerSimple />
             </div>
@@ -214,7 +212,7 @@ const ComponentUseModal = ({
               <DividerSimple />
             </div>
             <div className="my-6">
-              <h2>Preview in+ Nodes IDE</h2>
+              <h2>Preview in Nodes IDE</h2>
               <span className="text-neutrals-gray-4">
                 View data and run compute directly in Nodes IDE.
               </span>
