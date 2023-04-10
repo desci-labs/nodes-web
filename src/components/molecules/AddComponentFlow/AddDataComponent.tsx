@@ -10,7 +10,7 @@ interface Props {
 }
 
 export const ButtonAddData = ({ close }: Props) => {
-  const ref = useRef<HTMLInputElement>();
+  const ref = useRef<HTMLInputElement>(null);
   const { setDroppedFileList, setIsAddingComponent } = useManuscriptController(
     []
   );

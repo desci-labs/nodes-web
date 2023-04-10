@@ -9,6 +9,7 @@ import {
 } from "./schema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import CreditsForm from "./Form";
+import { ResearchObjectV1AuthorRole } from "@desci-labs/desci-models";
 
 export default function CreditsModal(props: ModalProps & CreditModalProps) {
   const methods = useForm<AuthorFormValues>({
@@ -16,23 +17,17 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
     defaultValues: {
       name: props?.author?.name,
       googleScholar: props?.author?.googleScholar ?? "",
+      role: props?.author?.role || ResearchObjectV1AuthorRole.AUTHOR,
       orcid: props?.author?.orcid ?? "",
-      orcid1: props?.author?.orcid?.split("-")[0] ?? "",
-      orcid2: props?.author?.orcid?.split("-")[1] ?? "",
-      orcid3: props?.author?.orcid?.split("-")[2] ?? "",
-      orcid4: props?.author?.orcid?.split("-")[3] ?? "",
     },
     reValidateMode: "onChange",
     resolver: yupResolver(authorsFormSchema),
   });
 
   return (
-    <Modal {...props} $maxWidth={650}>
+    <Modal {...props} $maxWidth={650} $scrollOverlay={true}>
       <div className="px-6 py-5 w-full lg:w-[650px] text-white">
-        <Modal.Header
-          title="Collaborator Details"
-          onDismiss={props.onDismiss}
-        />
+        <Modal.Header title="Contributor Details" onDismiss={props.onDismiss} />
         <FormProvider {...methods}>
           <CreditsForm {...props} />
         </FormProvider>
@@ -49,7 +44,7 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
         >
           {methods.formState.isSubmitting ? (
             <div className="flex flex-row gap-2 items-center w-full justify-center">
-              saving <DefaultSpinner color="black" size={20} />
+              Saving <DefaultSpinner color="black" size={20} />
             </div>
           ) : (
             <span>Save</span>

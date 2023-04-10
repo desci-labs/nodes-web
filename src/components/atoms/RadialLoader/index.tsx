@@ -19,7 +19,7 @@ const RadialLoader: React.FC<RadialLoaderProps> = ({
                 #272727 ${percent}%,
                 #ababab ${percent}.5%  
               )`,
-          clipPath: `circle(30% at 30% 30%);`,
+          clipPath: `circle(30% at 30% 30%)`,
         }}
       ></div>
       <div

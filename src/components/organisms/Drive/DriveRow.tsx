@@ -9,7 +9,10 @@ import {
 } from "@components/driveUtils";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { BytesToHumanFileSize } from "@components/utils";
-import { ResearchObjectComponentType } from "@desci-labs/desci-models";
+import {
+  ResearchObjectComponentType,
+  ResearchObjectV1Component,
+} from "@desci-labs/desci-models";
 import {
   IconCodeRepo,
   IconCPU,
@@ -88,7 +91,9 @@ export default function DriveRow({
   const handleEditMetadata = () => {
     // debugger;
     if (file.componentType !== ResearchObjectComponentType.DATA) {
-      const component = manifestData?.components.find((c) => c.id === file.cid);
+      const component = manifestData?.components.find(
+        (c: ResearchObjectV1Component) => c.id === file.cid
+      );
       if (!component) return;
       setOldComponentMetadata({
         componentId: component.id,
@@ -252,6 +257,11 @@ export default function DriveRow({
       )}
       <li className={`${DRIVE_ROW_STYLES[6]}`}>
         <BlackGenericButton
+          disabled={
+            ![AccessStatus.PUBLIC, AccessStatus.PARTIAL].includes(
+              file.accessStatus
+            )
+          }
           onClick={() => {
             setComponentToCite(file);
             setShowCitationModal(true);

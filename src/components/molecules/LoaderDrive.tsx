@@ -31,6 +31,7 @@ const LoaderDrive = () => {
           {[1, 2, 3].map((i) => {
             return (
               <div
+                key={i}
                 className={`h-9 w-full bg-neutrals-gray-1 ${
                   i == 3 ? "rounded-b-xl" : ""
                 }`}
