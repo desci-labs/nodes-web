@@ -26,6 +26,9 @@ import { useNodeReader } from "@src/state/nodes/hooks";
 import { saveManifestDraft, updateComponent } from "@src/state/nodes/viewer";
 import { useSetter } from "@src/store/accessors";
 import Modal from "../Modal/Modal";
+import { FormProvider, useForm } from "react-hook-form";
+import { DriveMetadata } from "@src/components/organisms/Drive/types";
+import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 
 export const DATASET_METADATA_FORM_DEFAULTS = {
   title: "",
@@ -64,12 +67,31 @@ const DriveDatasetMetadataPopOver = (
   const [showOverwriteDialog, setShowOverwriteDialog] =
     useState<boolean>(false);
   const [overWrite, setOverWrite] = useState<boolean>(false);
+  const { dialogs, setDialogs } = useManuscriptController(["dialogs"]);
 
   const manifestData = props.manifestData;
   const currentObjectId = props.currentObjectId;
   const mode = props.mode;
 
   const rootCid = props.datasetMetadataInfoRef.current.rootCid;
+
+  const data = props.datasetMetadataInfoRef.current.prepopulateMetadata;
+
+  const methods = useForm<DriveMetadata>({
+    defaultValues: {
+      title: data?.title || DATASET_METADATA_FORM_DEFAULTS.title,
+      ontologyPurl:
+        data?.ontologyPurl || DATASET_METADATA_FORM_DEFAULTS.ontologyPurl,
+      controlledVocabTerms:
+        data?.controlledVocabTerms ||
+        DATASET_METADATA_FORM_DEFAULTS.controlledVocabTerms,
+      keywords: data?.keywords || DATASET_METADATA_FORM_DEFAULTS.keywords,
+      description:
+        data?.description || DATASET_METADATA_FORM_DEFAULTS.description,
+      licenseType:
+        data?.licenseType || DATASET_METADATA_FORM_DEFAULTS.licenseType,
+    },
+  });
 
   const hasDirs = useMemo(() => {
     return props.metaStaging.some(
@@ -254,91 +276,128 @@ const DriveDatasetMetadataPopOver = (
     // return <div className="text-xs bg-red-500">component problem</div>;
   }
 
+  const onHandleDismiss = () => {
+    setDialogs([
+      ...dialogs,
+      {
+        title: "Are you sure?",
+        message: "You have some unsaved changes",
+        actions: ({ close }) => {
+          return (
+            <div className="flex gap-2 pt-4">
+              <button
+                className="text-md cursor-pointer rounded-md shadow-sm text-white bg-black px-3 py-1 hover:bg-neutrals-gray-2"
+                onClick={() => {
+                  close();
+                }}
+              >
+                No
+              </button>
+
+              <button
+                className="text-md cursor-pointer rounded-md shadow-sm text-white bg-red-700 px-3 py-1 hover:bg-neutrals-gray-3"
+                onClick={props?.onClose}
+              >
+                Yes
+              </button>
+            </div>
+          );
+        },
+      },
+    ]);
+  };
+
   return (
     <div>
       <Modal
         {...props}
         isOpen={props.isVisible}
-        onDismiss={() => props?.onClose()}
+        onDismiss={() =>
+          methods.formState.isDirty ? onHandleDismiss() : props?.onClose()
+        }
         $scrollOverlay={true}
         $maxWidth={700}
       >
-        <div
-          className={`rounded-lg bg-zinc-100 dark:bg-zinc-900 ${
-            showOverwriteDialog ? "hidden" : "animate-fadeIn"
-          }`}
-        >
-          <div className="py-4 px-6 text-neutrals-gray-5">
-            <Modal.Header
-              onDismiss={props.onClose}
-              title="Enter Metadatas"
-              subTitle=" Please fill in the metadata for open access data."
-            />
-            <div className="px-1">
-              {/**Have to force a re-render with props.isVisible */}
-              {/* <PerfectScrollbar className="max-h-[calc(100vh-300px)] h-[calc(100vh-300px)] overflow-y-scroll"> */}
-              {props.isVisible && mode === "editor" ? (
-                <DatasetMetadataForm
-                  ref={formRef}
-                  prepopulate={
-                    props.datasetMetadataInfoRef.current.prepopulateMetadata
+        <FormProvider {...methods}>
+          <div
+            className={`rounded-lg bg-zinc-100 dark:bg-zinc-900 ${
+              showOverwriteDialog ? "hidden" : "animate-fadeIn"
+            }`}
+          >
+            <div className="py-4 px-6 text-neutrals-gray-5">
+              <Modal.Header
+                onDismiss={
+                  methods.formState.isDirty ? onHandleDismiss : props?.onClose
+                }
+                title="Enter Metadatas"
+                subTitle=" Please fill in the metadata for open access data."
+              />
+              <div className="px-1">
+                {/**Have to force a re-render with props.isVisible */}
+                {/* <PerfectScrollbar className="max-h-[calc(100vh-300px)] h-[calc(100vh-300px)] overflow-y-scroll"> */}
+                {props.isVisible && mode === "editor" ? (
+                  <DatasetMetadataForm
+                    ref={formRef}
+                    prepopulate={
+                      props.datasetMetadataInfoRef.current.prepopulateMetadata
+                    }
+                    prepopulatingFrom={
+                      props.datasetMetadataInfoRef.current.prepopulateFromName
+                    }
+                    currentObjectId={currentObjectId!}
+                    onSubmit={onSubmit}
+                    // setNewMetadata={setNewMetadata}
+                    loading={isSaving}
+                    metaStaging={props.metaStaging}
+                    defaultLicense={props.manifestData.defaultLicense || ""}
+                  />
+                ) : // <ReadOnlyComponent component={component} />
+                null}
+                {/* </PerfectScrollbar> */}
+              </div>
+            </div>
+            <div className="flex flex-row justify-end gap-4 items-center h-16 w-full dark:bg-[#272727] border-t border-t-[#81C3C8] rounded-b-lg p-4">
+              <PrimaryButton
+                onClick={() => {
+                  console.log("submit");
+                  // debugger;
+                  if (publicView) {
+                    props.onClose();
+                  } else {
+                    if (hasDirs) {
+                      setShowOverwriteDialog(true);
+                    } else {
+                      //overwriting not an option (file)
+                      formRef.current!.submit!();
+                    }
                   }
-                  prepopulatingFrom={
-                    props.datasetMetadataInfoRef.current.prepopulateFromName
-                  }
-                  currentObjectId={currentObjectId!}
-                  onSubmit={onSubmit}
-                  // setNewMetadata={setNewMetadata}
-                  loading={isSaving}
-                  metaStaging={props.metaStaging}
-                  defaultLicense={props.manifestData.defaultLicense || ""}
-                />
-              ) : // <ReadOnlyComponent component={component} />
-              null}
-              {/* </PerfectScrollbar> */}
+                }}
+                disabled={isSaving && !publicView}
+              >
+                {isSaving ? (
+                  <DefaultSpinner color="black" size={24} />
+                ) : mode === "editor" ? (
+                  hasDirs ? (
+                    "Next"
+                  ) : (
+                    "Save"
+                  )
+                ) : (
+                  "Done"
+                )}
+              </PrimaryButton>
             </div>
           </div>
-          <div className="flex flex-row justify-end gap-4 items-center h-16 w-full dark:bg-[#272727] border-t border-t-[#81C3C8] rounded-b-lg p-4">
-            <PrimaryButton
-              onClick={() => {
-                console.log("submit");
-                // debugger;
-                if (publicView) {
-                  props.onClose();
-                } else {
-                  if (hasDirs) {
-                    setShowOverwriteDialog(true);
-                  } else {
-                    //overwriting not an option (file)
-                    formRef.current!.submit!();
-                  }
-                }
-              }}
-              disabled={isSaving && !publicView}
-            >
-              {isSaving ? (
-                <DefaultSpinner color="black" size={24} />
-              ) : mode === "editor" ? (
-                hasDirs ? (
-                  "Next"
-                ) : (
-                  "Save"
-                )
-              ) : (
-                "Done"
-              )}
-            </PrimaryButton>
-          </div>
-        </div>
-        {showOverwriteDialog && (
-          <OverwriteMetadataForm
-            setShowOverwriteDialog={setShowOverwriteDialog}
-            setOverWrite={setOverWrite}
-            loading={isSaving}
-            formRef={formRef}
-            overWrite={overWrite}
-          />
-        )}
+          {showOverwriteDialog && (
+            <OverwriteMetadataForm
+              setShowOverwriteDialog={setShowOverwriteDialog}
+              setOverWrite={setOverWrite}
+              loading={isSaving}
+              formRef={formRef}
+              overWrite={overWrite}
+            />
+          )}
+        </FormProvider>
       </Modal>
     </div>
   );
