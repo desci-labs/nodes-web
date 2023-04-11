@@ -17,6 +17,7 @@ const initialState: AppPreferences = {
   activeToolbar: TOOLBAR_ENTRY.collection,
   isToolbarVisible: false,
   showReferralModal: false,
+  isMobileView: false,
 };
 
 const slice = createSlice({
@@ -28,6 +29,9 @@ const slice = createSlice({
     },
     toggleTheme: (state) => {
       state.theme = state.theme === "dark" ? "light" : "dark";
+    },
+    toggleMobileView: (state) => {
+      state.isMobileView = state.isMobileView ? false : true;
     },
     setOrcid: (state, { payload }: PayloadAction<Partial<Orcid>>) => {
       state.orcid = { ...state.orcid, ...payload };
@@ -67,15 +71,16 @@ const slice = createSlice({
 
 export default slice.reducer;
 export const {
-  resetPreference,
+  setOrcid,
   toggleTheme,
+  setTorusKey,
+  toggleToolbar,
+  setPreferences,
+  resetPreference,
   setCheckingCode,
   setFooterHidden,
   setHeaderHidden,
-  setOrcid,
-  setTorusKey,
-  toggleToolbar,
   setActiveToolbar,
-  setPreferences,
+  toggleMobileView,
   setShowReferralModal,
 } = slice.actions;
