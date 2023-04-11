@@ -19,7 +19,6 @@ import { useManuscriptController } from "@src/components/organisms/ManuscriptRea
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import React, {
   ButtonHTMLAttributes,
-  HTMLProps,
   useEffect,
   useMemo,
   useRef,
