@@ -93,15 +93,10 @@ const CitationComponent = () => {
     if (!componentToCite) return "";
 
     const component =
-<<<<<<< HEAD
       componentToCite.type === FileType.DIR
-        ? componentToCite?.contains?.[0] ?? null
-=======
-      componentToCite.type === FileType.Dir
         ? componentToCite?.contains?.find(
             (file) => file.accessStatus === AccessStatus.PUBLIC
           ) ?? null
->>>>>>> 52304487ed24f7a75cec7157ef0b79fabb2eb4ed
         : componentToCite;
     if (!component) return dpidLink;
 
