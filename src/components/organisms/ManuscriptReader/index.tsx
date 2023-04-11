@@ -12,7 +12,6 @@ import useReaderEffects from "./hooks/useReaderEffects";
 import PublicViewer from "./PublicViewer";
 import Editor from "./Editor";
 import PublicationDetailsModal from "@src/components/molecules/NodeVersionDetails/PublicationDetailsModal";
-import PopOverShareMenu from "@src/components/molecules/PopOverShareMenu";
 import { useNodeReader } from "@src/state/nodes/hooks";
 
 const ManuscriptWrapper = styled(FlexRow)`
@@ -63,7 +62,6 @@ const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
       <CurrentPdfManager />
       {publicView && <PublicViewer isLoading={isLoading} />}
       {!publicView && <Editor isLoading={isLoading} />}
-      <PopOverShareMenu />
       <PublicationDetailsModal />
     </ManuscriptWrapper>
   );

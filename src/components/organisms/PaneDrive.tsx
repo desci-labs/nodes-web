@@ -598,32 +598,36 @@ const PaneDrive = () => {
           </div>
         </PerfectScrollbar>
 
-        {/* <DriveDatasetMetadataPopOver
-            currentObjectId={currentObjectId!}
-            manifestData={manifestData!}
-            mode={mode}
-            datasetMetadataInfoRef={datasetMetadataInfoRef}
-            metaStaging={metaStaging}
-            // componentId={component.id}
-            isVisible={showEditMetadata}
-            onClose={() => {
-              delete datasetMetadataInfoRef.current.rootCid;
-              delete datasetMetadataInfoRef.current.prepopulateFromName;
-              datasetMetadataInfoRef.current = datasetMetadataInfoRefDefaults;
-              setShowEditMetadata(false);
-            }}
-          /> */}
-        {/* <ComponentMetadataPopover
-            currentObjectId={currentObjectId!}
-            manifestData={manifestData!}
-            mode={mode}
-            componentId={OldComponentMetadata?.componentId!}
-            isVisible={!!OldComponentMetadata}
-            onClose={() => {
-              if (OldComponentMetadata) OldComponentMetadata.cb();
-              setOldComponentMetadata(null);
-            }}
-          /> */}
+        {/* {showEditMetadata && (
+            <DriveDatasetMetadataPopOver
+              currentObjectId={currentObjectId!}
+              manifestData={manifestData!}
+              mode={mode}
+              datasetMetadataInfoRef={datasetMetadataInfoRef}
+              metaStaging={metaStaging}
+              // componentId={component.id}
+              isVisible={showEditMetadata}
+              onClose={() => {
+                delete datasetMetadataInfoRef.current.rootCid;
+                delete datasetMetadataInfoRef.current.prepopulateFromName;
+                datasetMetadataInfoRef.current = datasetMetadataInfoRefDefaults;
+                setShowEditMetadata(false);
+              }}
+            />
+          )}
+          {!!OldComponentMetadata && (
+            <ComponentMetadataPopover
+              currentObjectId={currentObjectId!}
+              manifestData={manifestData!}
+              mode={mode}
+              componentId={OldComponentMetadata?.componentId!}
+              isVisible={!!OldComponentMetadata}
+              onClose={() => {
+                if (OldComponentMetadata) OldComponentMetadata.cb();
+                setOldComponentMetadata(null);
+              }}
+            />
+          )} */}
         <SidePanelStorage />
       </div>
     </ContextMenuProvider>

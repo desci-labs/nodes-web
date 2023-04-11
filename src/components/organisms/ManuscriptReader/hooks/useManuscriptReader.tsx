@@ -22,6 +22,7 @@ import {
   resetNodeViewer,
   setComponentStack,
   setCurrentObjectId,
+  setCurrentShareId,
   setIsNew,
   setManifest,
   setManifestCid,
@@ -47,19 +48,28 @@ export default function useManuscriptReader(publicView: boolean = false) {
     "isAddingSubcomponent",
   ]);
 
+  console.log("Parsed Manusciprt", parsedManuscript);
   const initPrivateReader = async (cid: string) => {
     if (
       !publicView &&
       "manifest" in parsedManuscript &&
       "cid" in parsedManuscript
     ) {
+      // update shareId
+      if ("shareId" in parsedManuscript) {
+        dispatch(setCurrentShareId(parsedManuscript.shareId!));
+      } else {
+        dispatch(setCurrentShareId(""));
+      }
+
       dispatch(setIsNew(false));
       dispatch(setCurrentPdf(""));
 
       dispatch(setCurrentObjectId(parsedManuscript.cid));
       dispatch(setResearchPanelTab(ResearchTabs.current));
 
-      if (mode !== "editor") {
+      // TODO: remove line to support reader mode in private share
+      if (mode !== parsedManuscript.mode) {
         dispatch(toggleMode());
       }
       dispatch(setIsAnnotating(false));

@@ -1,6 +1,5 @@
 import { getPublishedVersions, resolvePublishedManifest } from "@api/index";
 import PaneInfo from "@components/atoms/PaneInfo";
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import {
   ResearchObjectComponentType,
   ResearchObjectV1,
@@ -23,11 +22,10 @@ import {
 import { SpinnerCircular } from "spinners-react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
-import { useCopier } from "./Copier";
 import { CheckIcon } from "@heroicons/react/outline";
 import { useGetNodesQuery } from "@src/state/api/nodes";
 import { useNodeReader, useNodeVersions } from "@src/state/nodes/hooks";
-import Modal from "@src/components/molecules/Modal/Modal";
+import { useCopier } from "@src/components/molecules/Copier";
 
 function CopyButton(
   props: ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -67,16 +65,13 @@ function LinkCopier(
   );
 }
 
-const PopOverShareMenu = () => {
+export default function SharePublished() {
   const {
     manifest: manifestData,
     currentObjectId,
     publicView,
   } = useNodeReader();
   const versions = useNodeVersions(currentObjectId);
-  const { showShareMenu, setShowShareMenu } = useManuscriptController([
-    "showShareMenu",
-  ]);
   const [lastManifest, setLastManifest] = useState<
     ResearchObjectV1 | undefined
   >();
@@ -273,23 +268,5 @@ const PopOverShareMenu = () => {
     }
   }
 
-  const close = () => {
-    setShowShareMenu(false);
-  };
-
-  return (
-    <Modal
-      isOpen={showShareMenu}
-      onDismiss={close}
-      $maxWidth={600}
-      $scrollOverlay={true}
-    >
-      <div className="px-6 py-5 text-white relative min-w-[600px]">
-        <Modal.Header title="Share Node" onDismiss={close} />
-        {body}
-      </div>
-    </Modal>
-  );
-};
-
-export default PopOverShareMenu;
+  return body;
+}

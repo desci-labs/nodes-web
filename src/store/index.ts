@@ -47,7 +47,6 @@ const persistConfig = {
   version: 1,
   storage,
   migrate: createMigrate(migrations),
-  transforms: [nestedBlacklist],
   blacklist: [
     "user",
     "preferences",
@@ -56,14 +55,18 @@ const persistConfig = {
     "adminAnalytics",
     api.reducerPath,
   ],
+  transforms: [nestedBlacklist],
 };
 
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+const persistedReducer = persistReducer(
+  persistConfig,
+  rootReducer
+) as typeof rootReducer;
 
 export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware()
+    getDefaultMiddleware({ serializableCheck: false })
       .prepend(nodeReaderMiddleware.middleware)
       .concat([api.middleware]),
 });

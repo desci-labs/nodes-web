@@ -290,7 +290,7 @@ export const fetchTreeThunk = createAsyncThunk(
   "drive/fetchTree",
   async (_, { getState }) => {
     const state = getState() as RootState;
-    const { manifest, currentObjectId, manifestCid, publicView } =
+    const { manifest, currentObjectId, manifestCid, publicView, shareId } =
       state.nodes.nodeReader;
     // debugger;
     //determines if it's a old or new manifest
@@ -307,7 +307,8 @@ export const fetchTreeThunk = createAsyncThunk(
       const { tree } = await getDatasetTree(
         rootCid,
         currentObjectId!,
-        publicView
+        publicView,
+        shareId
       );
       return { tree, manifest };
     } else {
@@ -326,10 +327,16 @@ export const fetchTreeThunk = createAsyncThunk(
           : undefined;
 
       //options also takes in a public view boolean
-      await getAllTrees(rootDrive, currentObjectId!, manifest!, {
-        pathUidMap: provideMap,
-        public: publicView,
-      });
+      await getAllTrees(
+        rootDrive,
+        currentObjectId!,
+        manifest!,
+        {
+          pathUidMap: provideMap,
+          public: publicView,
+        },
+        shareId
+      );
       return { tree: deleteAllParents(rootDrive), deprecated: true };
     }
   }

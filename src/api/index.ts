@@ -32,8 +32,9 @@ export type ResearchObjectStub = {
   links?: any;
 };
 
-export const config = (): AxiosRequestConfig => {
+export const config = (preset?: AxiosRequestConfig): AxiosRequestConfig => {
   return {
+    ...preset,
     withCredentials: true,
     headers: {
       authorization: `Bearer ${localStorage.getItem("auth")}`,
@@ -185,13 +186,41 @@ export const __adminWaitlistPromote = async (id: string) => {
   return data;
 };
 
-export const getResearchObjectStub = async (id: string) => {
+export const getResearchObjectStub = async (id: string, shareId?: string) => {
   const { data } = await axios.get(
-    `${SCIWEAVE_URL}/v1/nodes/${id}${
-      process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE
-        ? `?g=${process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE}`
-        : ""
-    }`,
+    `${SCIWEAVE_URL}/v1/nodes/${id}`,
+    config({
+      params: {
+        shareId: shareId,
+        g: process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE
+          ? process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE
+          : "",
+      },
+    })
+  );
+  return data;
+};
+
+export const resolvePrivateResearchObjectStub = async (
+  id: string,
+  shareId?: string
+) => {
+  const { data } = await axios.get(
+    `${SCIWEAVE_URL}/v1/nodes/showPrivate/${id}`,
+    config({
+      params: {
+        shareId: shareId,
+        g: process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE
+          ? process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE
+          : "",
+      },
+    })
+  );
+  return data;
+};
+export const verifyPrivateShareLink = async (shareId?: string) => {
+  const { data } = await axios.get(
+    `${SCIWEAVE_URL}/v1/nodes/share/verify/${shareId}`,
     config()
   );
   return data;
@@ -343,11 +372,14 @@ export const publishResearchObject = async (input: {
 export const getDatasetTree = async (
   cid: string,
   nodeUuid: string,
-  pub = false
+  pub = false,
+  shareId = ""
 ) => {
   const route = pub ? "pubTree" : "retrieveTree";
   const { data } = await axios.get(
-    `${SCIWEAVE_URL}/v1/datasets/${route}/${nodeUuid}/${cid}`,
+    `${SCIWEAVE_URL}/v1/datasets/${route}/${nodeUuid}/${cid}${
+      shareId ? "/" + shareId : ""
+    }`,
     config()
   );
   return data;

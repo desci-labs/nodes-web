@@ -9,7 +9,10 @@ import {
 } from "@components/driveUtils";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { BytesToHumanFileSize } from "@components/utils";
-import { ResearchObjectComponentType } from "@desci-labs/desci-models";
+import {
+  ResearchObjectComponentType,
+  ResearchObjectV1Component,
+} from "@desci-labs/desci-models";
 import {
   IconCodeRepo,
   IconData,
@@ -71,14 +74,21 @@ DriveRowProps) {
   const { handleDbClick } = useInteractionHandler();
   const { setUseMenuCids, setShowCitationModal, setComponentToCite } =
     useManuscriptController(["componentToCite"]);
-  const { manifestCid, manifest: manifestData, publicView } = useNodeReader();
+  const {
+    manifestCid,
+    manifest: manifestData,
+    publicView,
+    mode,
+  } = useNodeReader();
 
   const dispatch = useSetter();
 
   // const handleEditMetadata = () => {
   //   // debugger;
   //   if (file.componentType !== ResearchObjectComponentType.DATA) {
-  //     const component = manifestData?.components.find((c) => c.id === file.cid);
+  //     const component = manifestData?.components.find(
+  //       (c: ResearchObjectV1Component) => c.id === file.cid
+  //     );
   //     if (!component) return;
   //     setOldComponentMetadata({
   //       componentId: component.id,
@@ -148,6 +158,14 @@ DriveRowProps) {
     },
     [file.parent?.path, file.type, init]
   );
+
+  const isStatusActionDisabled =
+    !canEditMetadata ||
+    (file.componentType === ResearchObjectComponentType.DATA &&
+      mode === "reader");
+
+  // const getStatusButtonLabel = () =>
+  //   isNodeRoot ? "Metadata Status" : "Edit Metadata";
 
   return (
     // <ul
@@ -244,6 +262,11 @@ DriveRowProps) {
       <li className={`${everyRow}`}>
         <BlackGenericButton
           className="w-7 h-7"
+          disabled={
+            ![AccessStatus.PUBLIC, AccessStatus.PARTIAL].includes(
+              file.accessStatus
+            )
+          }
           onClick={() => {
             setComponentToCite(file);
             setShowCitationModal(true);
