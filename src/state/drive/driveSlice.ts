@@ -22,7 +22,6 @@ import {
   createVirtualDrive,
   DEFAULT_CID_PENDING,
   DRIVE_NODE_ROOT_PATH,
-  formatDbDate,
   getAllTrees,
   ipfsTreeToDriveTree,
   manifestToVirtualDrives,
@@ -38,7 +37,6 @@ import {
   findDriveByPath,
   generateFlatPathDriveMap,
   generatePathSizeMap,
-  arrayToFileList,
 } from "./utils";
 import {
   AddFilesToDrivePayload,
@@ -395,7 +393,7 @@ export const addFilesToDrive = createAsyncThunk(
     dispatch(addItemsToUploadQueue({ items: uploadQueueItems }));
     dispatch(updateBatchUploadProgress({ batchUid: batchUid, progress: 0 }));
 
-    const contextPath = overwritePathContext || state.drive.currentDrive!.path;
+    const contextPath = overwritePathContext || state.drive.currentDrive!.path!;
     const snapshotNodeUuid = currentObjectId!;
     try {
       const {
