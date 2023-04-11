@@ -19,7 +19,7 @@ import {
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 import useActionHandler from "@src/components/organisms/Drive/ContextMenu/useActionHandler";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   findRootComponentCid,
   isRootComponentDrive,
@@ -277,6 +277,8 @@ const ComponentUseModal = ({
 
 const VideoAnimation = () => {
   const refVideo = useRef(null);
+  const [loaded, setLoaded] = useState(false);
+
   return (
     <div
       className={`overflow-hidden relative min-w-[300px] h-full flex items-center justify-center`}
@@ -301,9 +303,27 @@ const VideoAnimation = () => {
             boxShadow: "inset 0em 0em 40px 35px rgba(0, 0, 0, .3)",
           }}
         ></div>
+        <img
+          src="https://desci-labs-public.s3.amazonaws.com/node-front-preview.png"
+          alt="desci nodes use animation poster"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            borderRadius: "72%",
+            transform: "scale(1.5)",
+            visibility: !loaded ? "visible" : "hidden",
+          }}
+        />
         <video
           loop
           ref={refVideo}
+          onLoadedData={(e) => {
+            setLoaded(true);
+          }}
           playsInline
           autoPlay
           key={`cube-panel`}
@@ -314,9 +334,17 @@ const VideoAnimation = () => {
             objectFit: "cover",
             borderRadius: "72%",
             transform: "scale(1.5)",
+            visibility: loaded ? "visible" : "hidden",
           }}
           src={`https://desci-labs-public.s3.amazonaws.com/node-front.mp4`}
-        ></video>
+          preload="metadata"
+          poster="https://desci-labs-public.s3.amazonaws.com/node-front-preview.png"
+        >
+          <source
+            src="https://desci-labs-public.s3.amazonaws.com/node-front.mp4#t=0.1"
+            type="video/mp4"
+          />
+        </video>
       </div>
     </div>
   );

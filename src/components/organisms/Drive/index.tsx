@@ -95,7 +95,6 @@ const DriveTable: React.FC<DriveTableProps> = ({
     componentToUse,
     setComponentToUse,
   } = useManuscriptController(["driveJumpDir", "privCidMap", "componentToUse"]);
-  console.log("component to use", setComponentToUse);
   const {
     manifest: manifestData,
     publicView,
@@ -425,7 +424,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
           <Empty />
         )}
       </div>
-      {componentToUse && (
+      {!!componentToUse && (
         <ComponentUseModal
           isOpen={true}
           isMultiselecting={!!Object.keys(selected).length}
@@ -433,7 +432,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
           setShowEditMetadata={setShowEditMetadata}
           datasetMetadataInfoRef={datasetMetadataInfoRef}
           setOldComponentMetadata={setOldComponentMetadata}
-          componentToUse={componentToUse}
+          componentToUse={componentToUse!}
           index={selectedIndex}
           selectedFiles={selected}
           onDismiss={() => {
