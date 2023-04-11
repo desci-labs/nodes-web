@@ -15,7 +15,7 @@ import { setPublicView, toggleResearchPanel } from "@src/state/nodes/viewer";
 interface ReaderViewerProps {
   isLoading: boolean;
 }
-export default function PublicViewer({ isLoading }: ReaderViewerProps) {
+export default function Reader({ isLoading }: ReaderViewerProps) {
   const dispatch = useSetter();
   const { manifest: manifestData, componentStack } = useNodeReader();
 

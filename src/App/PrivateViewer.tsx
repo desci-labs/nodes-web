@@ -2,6 +2,8 @@ import ManuscriptReader from "@src/components/organisms/ManuscriptReader";
 import PdfHeader from "@src/components/organisms/PdfHeader";
 import useScroll from "@src/hooks/useScroll";
 import { Popovers } from "./Providers/AppWrapper";
+import { isMobile } from "react-device-detect";
+import MobileReader from "@src/components/organisms/ManuscriptReader/MobileReader/MobileReader";
 
 export default function PrivateViewer() {
   // page scroll behaviour init hook
@@ -13,10 +15,14 @@ export default function PrivateViewer() {
       className={`flex flex-col min-h-screen h-screen`}
       style={{ fontFamily: "Inter, sans-serif" }}
     >
-      <PdfHeader />
-      <Popovers />
+      {!isMobile && (
+        <>
+          <PdfHeader />
+          <Popovers />
+        </>
+      )}
       <div id="app" className="flex-grow">
-        <ManuscriptReader />
+        {isMobile ? <MobileReader /> : <ManuscriptReader />}
       </div>
     </div>
   );

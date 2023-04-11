@@ -6,6 +6,8 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Popovers } from "./Providers/AppWrapper";
 import { useUser } from "@src/state/user/hooks";
+import { isMobile } from "react-device-detect";
+import MobileReader from "@src/components/organisms/ManuscriptReader/MobileReader/MobileReader";
 
 const auth = localStorage.getItem("auth");
 export default function PublicViewer() {
@@ -33,10 +35,18 @@ export default function PublicViewer() {
       className={`flex flex-col min-h-screen h-screen`}
       style={{ fontFamily: "Inter, sans-serif" }}
     >
-      <PdfHeader />
-      <Popovers />
+      {!isMobile && (
+        <>
+          <PdfHeader />
+          <Popovers />
+        </>
+      )}
       <div id="app" className="flex-grow">
-        <ManuscriptReader publicView />
+        {isMobile ? (
+          <MobileReader publicView />
+        ) : (
+          <ManuscriptReader publicView />
+        )}
       </div>
     </div>
   );

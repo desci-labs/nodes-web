@@ -12,12 +12,14 @@ import { isMobile } from "react-device-detect";
 import { toggleMobileView } from "@src/state/preferences/preferencesSlice";
 import { useSetter } from "@src/store/accessors";
 import { useAppPreferences } from "@src/state/preferences/hooks";
+import Placeholder from "@components/organisms/ManuscriptReader/Placeholder";
 
 const MobileWrapper = styled(FlexRow)`
   background-color: #525659;
   position: relative;
   height: calc(100vh);
-  &::before {
+  width: 100%;
+  /* &::before {
     content: " ";
     width: 100%;
     height: 100%;
@@ -25,7 +27,7 @@ const MobileWrapper = styled(FlexRow)`
     top: 0;
     background-color: #525659;
     position: fixed;
-  }
+  } */
 `;
 
 interface ManuscriptReaderProps {
@@ -68,11 +70,7 @@ const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
   return (
     <MobileWrapper>
       <Header />
-      {/* <LoadProgressManager /> */}
-      {/* <CurrentPdfManager /> */}
-      {/* {publicView && <PublicViewer isLoading={isLoading} />} */}
-      {/* {!publicView && <Editor isLoading={isLoading} />} */}
-      {/* <PublicationDetailsModal /> */}
+      {isLoading && <Placeholder isLoading={true} fullHeight />}
     </MobileWrapper>
   );
 };
