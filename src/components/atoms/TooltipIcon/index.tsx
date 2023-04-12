@@ -1,6 +1,5 @@
-import { QuestionMarkCircleIcon } from "@heroicons/react/solid";
 import { uuid4 } from "@sentry/utils";
-import React, { FC, useEffect } from "react";
+import React, { useEffect } from "react";
 import { ReactElement } from "react-markdown/lib/react-markdown";
 import ReactTooltip, { Offset } from "react-tooltip";
 

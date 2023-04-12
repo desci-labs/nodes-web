@@ -20,8 +20,6 @@ export default function AppWrapper(props: PropsWithChildren<{}>) {
   // Orchid checker init
   useCheckOrcid();
 
-  console.log("isMobileview", isMobileView);
-
   return (
     <>
       <div

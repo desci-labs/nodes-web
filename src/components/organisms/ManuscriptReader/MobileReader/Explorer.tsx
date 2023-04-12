@@ -1,7 +1,6 @@
 import HistoryTab from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/History/HistoryTab";
 import SourceTab from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/SourceTab";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import ManuscriptComponentsSection from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/Components/ManuscriptComponentsSection";
 import { ResearchTabs, setResearchPanelTab } from "@src/state/nodes/viewer";
 import {
   SwitchBar,
@@ -9,6 +8,7 @@ import {
 } from "@src/components/atoms/SwitchBar/SwitchBar";
 import { useSetter } from "@src/store/accessors";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import ComponentsPreview from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/Components/ComponentsPreview";
 
 export default function Explorer() {
   const dispatch = useSetter();
@@ -51,7 +51,7 @@ export default function Explorer() {
       <PerfectScrollbar className="overflow-auto text-white">
         <div className="px-4">
           {researchPanelTab === ResearchTabs.current ? (
-            <ManuscriptComponentsSection />
+            <ComponentsPreview />
           ) : null}
           {researchPanelTab === ResearchTabs.history ? <HistoryTab /> : null}
           {researchPanelTab === ResearchTabs.source ? <SourceTab /> : null}

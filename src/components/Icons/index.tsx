@@ -78,7 +78,7 @@ export const ResearchNodeIcon = (props: SVGProps<SVGSVGElement>) => (
         width="33.1724"
         height="33.1724"
         fill="black"
-        fill-opacity="0.6"
+        fillOpacity="0.6"
       />
       <rect
         x="4.00857"
@@ -86,57 +86,57 @@ export const ResearchNodeIcon = (props: SVGProps<SVGSVGElement>) => (
         width="31.9819"
         height="31.9819"
         stroke="url(#paint0_linear_55_6946)"
-        stroke-width="1.19048"
+        strokeWidth="1.19048"
       />
     </g>
     <path
       d="M19.9998 19.5614V25.4336"
       stroke="white"
-      stroke-width="1.25099"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth="1.25099"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <path
       d="M19.9996 29.8375C21.2459 29.8375 22.2563 28.8516 22.2563 27.6355C22.2563 26.4193 21.2459 25.4334 19.9996 25.4334C18.7533 25.4334 17.7429 26.4193 17.7429 27.6355C17.7429 28.8516 18.7533 29.8375 19.9996 29.8375Z"
       stroke="white"
-      stroke-width="1.25099"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth="1.25099"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <path
       d="M28.2744 23.231V20.2949L23.4501 17.9039"
       stroke="white"
-      stroke-width="1.25099"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth="1.25099"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <path
       d="M28.2741 27.6349C29.5205 27.6349 30.5308 26.649 30.5308 25.4328C30.5308 24.2167 29.5205 23.2308 28.2741 23.2308C27.0278 23.2308 26.0175 24.2167 26.0175 25.4328C26.0175 26.649 27.0278 27.6349 28.2741 27.6349Z"
       stroke="white"
-      stroke-width="1.25099"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth="1.25099"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <path
       d="M11.7257 23.2311V20.295L16.6456 17.8705"
       stroke="white"
-      stroke-width="1.25099"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth="1.25099"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <path
       d="M11.7253 27.6349C12.9716 27.6349 13.982 26.649 13.982 25.4328C13.982 24.2167 12.9716 23.2308 11.7253 23.2308C10.479 23.2308 9.46863 24.2167 9.46863 25.4328C9.46863 26.649 10.479 27.6349 11.7253 27.6349Z"
       stroke="white"
-      stroke-width="1.25099"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth="1.25099"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <path
       d="M19.9998 19.5611C22.191 19.5611 23.9673 17.8278 23.9673 15.6896C23.9673 13.5514 22.191 11.8181 19.9998 11.8181C17.8087 11.8181 16.0323 13.5514 16.0323 15.6896C16.0323 17.8278 17.8087 19.5611 19.9998 19.5611Z"
       stroke="white"
-      stroke-width="1.25099"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth="1.25099"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <defs>
       <filter
@@ -146,9 +146,9 @@ export const ResearchNodeIcon = (props: SVGProps<SVGSVGElement>) => (
         width="75.5533"
         height="75.5533"
         filterUnits="userSpaceOnUse"
-        color-interpolation-filters="sRGB"
+        colorInterpolationFilters="sRGB"
       >
-        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+        <feFlood floodOpacity={0} result="BackgroundImageFix" />
         <feGaussianBlur in="BackgroundImageFix" stdDeviation="10.5952" />
         <feComposite
           in2="SourceAlpha"
@@ -170,8 +170,8 @@ export const ResearchNodeIcon = (props: SVGProps<SVGSVGElement>) => (
         y2="37.3532"
         gradientUnits="userSpaceOnUse"
       >
-        <stop stop-color="#00E3FF" />
-        <stop offset="1" stop-color="#0A697C" />
+        <stop stopColor="#00E3FF" />
+        <stop offset={1} stopColor="#0A697C" />
       </linearGradient>
     </defs>
   </svg>

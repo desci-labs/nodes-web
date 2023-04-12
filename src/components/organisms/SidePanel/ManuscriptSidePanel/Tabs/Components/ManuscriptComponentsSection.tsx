@@ -146,12 +146,7 @@ const ManuscriptComponentsSection = () => {
   const { setIsAddingComponent } = useManuscriptController([
     "isAddingComponent",
   ]);
-  const {
-    mode,
-    manifest: manifestData,
-    componentStack,
-    currentObjectId,
-  } = useNodeReader();
+  const { mode, manifest: manifestData, currentObjectId } = useNodeReader();
   const [isEditable, setIsEditable] = useState<boolean>(false);
 
   /**
@@ -246,13 +241,7 @@ const ManuscriptComponentsSection = () => {
                   index={index}
                   isEditable={isEditable}
                 >
-                  <ComponentCard
-                    component={component}
-                    currentObjectId={currentObjectId!}
-                    componentStack={componentStack}
-                    manifestData={manifestData!}
-                    mode={mode}
-                  />
+                  <ComponentCard component={component} />
                 </EditableHOC>
               )
             )}

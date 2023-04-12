@@ -8,25 +8,21 @@ import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
 import AnnotationSwitcher from "@components/atoms/AnnotationSwitcher";
 import {
   ExternalLinkComponent,
-  PdfComponent,
   PdfComponentPayload,
   ResearchObjectComponentType,
-  ResearchObjectV1,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 import { cleanupManifestUrl } from "@components/utils";
 import ComponentMetadataPopover from "@components/organisms/PopOver/ComponentMetadataPopover";
 import TooltipIcon from "@components/atoms/TooltipIcon";
 import ReactTooltip from "react-tooltip";
-import {
-  COMPONENT_LIBRARY,
-  UiComponentDefinition,
-} from "../organisms/ComponentLibrary";
+import { findTarget } from "@components/organisms/ComponentLibrary";
 import ButtonFair from "@components/atoms/ButtonFair";
 import { SessionStorageKeys } from "../driveUtils";
 import { useSetter } from "@src/store/accessors";
 import { setComponentStack } from "@src/state/nodes/viewer";
 import { updatePdfPreferences } from "@src/state/nodes/pdf";
+import { useNodeReader } from "@src/state/nodes/hooks";
 
 const CardWrapper: StyledComponent<
   "div",
@@ -70,30 +66,7 @@ export interface SectionCardProps {
 
 export interface ComponentCardProps extends SectionCardProps {
   component: ResearchObjectV1Component;
-  currentObjectId: string;
-  componentStack: ResearchObjectV1Component[];
-  mode: string;
-  manifestData: ResearchObjectV1;
 }
-
-const findTarget = (
-  component: ResearchObjectV1Component
-): UiComponentDefinition | undefined => {
-  const foundEntry = COMPONENT_LIBRARY.find((target) => {
-    const matchesType = target.componentType === component.type;
-    switch (target.componentType) {
-      case ResearchObjectComponentType.PDF:
-        const documentPayload = component as PdfComponent;
-        return (
-          matchesType && documentPayload.subtype === target.componentSubType
-        );
-      default:
-        return matchesType;
-    }
-  });
-
-  return foundEntry;
-};
 
 const labelFor = (component: ResearchObjectV1Component): string => {
   const obj = findTarget(component);
@@ -116,8 +89,8 @@ const iconFor = (
 
 const ComponentCard = (props: ComponentCardProps) => {
   const dispatch = useSetter();
-  const { component, componentStack, mode, currentObjectId, manifestData } =
-    props;
+  const { component } = props;
+  const { mode, componentStack } = useNodeReader();
   const [showComponentMetadata, setShowComponentMetadata] =
     useState<boolean>(false);
   const { setDriveJumpDir } = useManuscriptController([]);
@@ -197,6 +170,8 @@ const ComponentCard = (props: ComponentCardProps) => {
     copyLinkUrl = (component as ExternalLinkComponent).payload.url;
   }
 
+  const Icon = iconFor(component, false);
+
   return (
     <CardWrapper
       isSelected={isSelected}
@@ -224,7 +199,7 @@ const ComponentCard = (props: ComponentCardProps) => {
                 data-subtype={(component as any).subtype}
               >
                 <TooltipIcon
-                  icon={<>{iconFor(component, false)}</>}
+                  icon={Icon ? <Icon /> : <></>}
                   id={`icon_component_${component.id}`}
                   tooltip={labelFor(component)}
                   placement={"left"}
@@ -279,8 +254,6 @@ const ComponentCard = (props: ComponentCardProps) => {
       {showComponentMetadata &&
       component.type !== ResearchObjectComponentType.DATA ? (
         <ComponentMetadataPopover
-          currentObjectId={currentObjectId}
-          manifestData={manifestData}
           componentId={component.id}
           isVisible={showComponentMetadata}
           onClose={() => setShowComponentMetadata(false)}

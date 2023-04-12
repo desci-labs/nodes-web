@@ -116,7 +116,6 @@ const PaneDrive = () => {
     manifest: manifestData,
     isDraggingFiles,
     currentObjectId,
-    mode,
   } = useNodeReader();
 
   const [directory, setDirectory] = useState<Array<DriveObject>>([]);
@@ -218,11 +217,11 @@ const PaneDrive = () => {
             placeHolder.lastModified = formattedDate;
           placeHolder.contains!.forEach(
             (fd, idx) =>
-            (placeHolder.contains![idx] = ipfsTreeToDriveTree(
-              fd,
-              formattedDate,
-              manifestData!
-            ))
+              (placeHolder.contains![idx] = ipfsTreeToDriveTree(
+                fd,
+                formattedDate,
+                manifestData!
+              ))
           );
           placeHolder.accessStatus = AccessStatus.PRIVATE;
         }
@@ -291,6 +290,7 @@ const PaneDrive = () => {
         throw e;
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [setDirectory, nodeDrived, currentObjectId, manifestData]
   );
 
@@ -452,11 +452,11 @@ const PaneDrive = () => {
               dataComp.path = newPath;
               dataComp.contains?.forEach(
                 (fd, idx) =>
-                (dataComp.contains![idx] = ipfsTreeToDriveTree(
-                  fd,
-                  formatDbDate(date),
-                  manifest
-                ))
+                  (dataComp.contains![idx] = ipfsTreeToDriveTree(
+                    fd,
+                    formatDbDate(date),
+                    manifest
+                  ))
               );
 
               old.forEach((item) => {
@@ -660,8 +660,9 @@ const PaneDrive = () => {
         <div className="flex flex-col relative">
           {loading ? (
             <div
-              className={`flex justify-center items-center flex-col w-[calc(100%-320px)] h-full fixed bg-neutrals-black overflow-hidden top-0 z-[50] gap-3 ${loading ? "" : "hidden"
-                }`}
+              className={`flex justify-center items-center flex-col w-[calc(100%-320px)] h-full fixed bg-neutrals-black overflow-hidden top-0 z-[50] gap-3 ${
+                loading ? "" : "hidden"
+              }`}
             >
               <LoaderDrive />
             </div>
@@ -693,7 +694,6 @@ const PaneDrive = () => {
             <DriveDatasetMetadataPopOver
               currentObjectId={currentObjectId!}
               manifestData={manifestData!}
-              mode={mode}
               datasetMetadataInfoRef={datasetMetadataInfoRef}
               metaStaging={metaStaging}
               // componentId={component.id}
@@ -708,9 +708,6 @@ const PaneDrive = () => {
           )}
           {!!OldComponentMetadata && (
             <ComponentMetadataPopover
-              currentObjectId={currentObjectId!}
-              manifestData={manifestData!}
-              mode={mode}
               componentId={OldComponentMetadata?.componentId!}
               isVisible={!!OldComponentMetadata}
               onClose={() => {

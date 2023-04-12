@@ -12,7 +12,6 @@ import CreateableSelect from "@components/molecules/FormInputs/CreateableSelect"
 import {
   CommonComponentPayload,
   ResearchObjectComponentType,
-  ResearchObjectV1,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 import {
@@ -228,49 +227,55 @@ const ComponentMetadataForm = React.forwardRef(
             limits.
           </div>
         </div>
-        {props.component.type !== ResearchObjectComponentType.LINK && (<div className="py-3 my-3">
-          <Controller
-            name="licenseType"
-            control={control}
-            defaultValue={defaultLicense?.name}
-            render={({ field }: any) => {
-              const val = PDF_LICENSE_TYPES.find((l) => l.name === field.value);
-              return (
-                <SelectList
-                  label="License Type"
-                  className="mt-2"
-                  mandatory={true}
-                  data={PDF_LICENSE_TYPES}
-                  defaultValue={defaultLicense}
-                  field={{ ...field, value: val || field.value || defaultLicense }}
+        {props.component.type !== ResearchObjectComponentType.LINK && (
+          <div className="py-3 my-3">
+            <Controller
+              name="licenseType"
+              control={control}
+              defaultValue={defaultLicense?.name}
+              render={({ field }: any) => {
+                const val = PDF_LICENSE_TYPES.find(
+                  (l) => l.name === field.value
+                );
+                return (
+                  <SelectList
+                    label="License Type"
+                    className="mt-2"
+                    mandatory={true}
+                    data={PDF_LICENSE_TYPES}
+                    defaultValue={defaultLicense}
+                    field={{
+                      ...field,
+                      value: val || field.value || defaultLicense,
+                    }}
+                  />
+                );
+              }}
+            />
+            <div className="text-xs mt-2">
+              Your Node's default license type is{" "}
+              <span className="text-gray-500">
+                {props.defaultLicense || "not set"}
+              </span>
+              <br />
+              You can change the license for this specific component, if
+              appropriate.
+              <a
+                href="https://creativecommons.org/licenses/"
+                rel="noreferrer"
+                target="_blank"
+                className="flex gap-1 text-xs mb-1 group hover:text-tint-primary-hover text-tint-primary"
+              >
+                Learn more about Creative Commons Licenses
+                <IconViewLink
+                  stroke={"inherit"}
+                  width={12}
+                  strokeWidth={0.5}
+                  className="-mt-0.5 stroke-current"
                 />
-              )
-            }}
-          />
-          <div className="text-xs mt-2">
-            Your Node's default license type is{" "}
-            <span className="text-gray-500">
-              {props.defaultLicense || "not set"}
-            </span>
-            <br />
-            You can change the license for this specific component, if
-            appropriate.
-            <a
-              href="https://creativecommons.org/licenses/"
-              rel="noreferrer"
-              target="_blank"
-              className="flex gap-1 text-xs mb-1 group hover:text-tint-primary-hover text-tint-primary"
-            >
-              Learn more about Creative Commons Licenses
-              <IconViewLink
-                stroke={"inherit"}
-                width={12}
-                strokeWidth={0.5}
-                className="-mt-0.5 stroke-current"
-              />
-            </a>
+              </a>
+            </div>
           </div>
-        </div>
         )}
       </div>
     );
@@ -278,10 +283,7 @@ const ComponentMetadataForm = React.forwardRef(
 );
 interface ComponentMetadataPopoverProps {
   componentId: string;
-  currentObjectId: string;
-  manifestData: ResearchObjectV1;
   isVisible: boolean;
-  // mode: string;
   onClose?: () => void;
 }
 
@@ -297,16 +299,18 @@ const ComponentMetadataPopover = (
   const { isLoading: isSaving } = useManifestStatus();
   const { dialogs, setDialogs } = useManuscriptController(["dialogs"]);
 
-  const { publicView, mode } = useNodeReader();
-  const manifestData = props.manifestData;
-  const currentObjectId = props.currentObjectId;
-  // const mode = props.mode;
+  const {
+    publicView,
+    mode,
+    manifest: manifestData,
+    currentObjectId,
+  } = useNodeReader();
 
-  const componentIndex = manifestData.components.findIndex(
+  const componentIndex = manifestData?.components.findIndex(
     (c) => c.id === props.componentId
   );
 
-  const component = manifestData.components.find(
+  const component = manifestData?.components.find(
     (c) => c.id === props.componentId
   );
 

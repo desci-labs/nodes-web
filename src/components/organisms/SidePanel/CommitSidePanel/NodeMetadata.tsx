@@ -54,9 +54,6 @@ const NodeMetadata = (props: NodeMetadataProps) => {
       </CollapsibleSection>
       {selectedComponent && (
         <ComponentMetadataPopover
-          currentObjectId={currentObjectId!}
-          manifestData={manifestData!}
-          mode={mode}
           componentId={selectedComponent.id}
           isVisible={!!selectedComponent}
           onClose={() => setSelectedComponent(null)}
