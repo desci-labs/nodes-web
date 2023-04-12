@@ -153,6 +153,15 @@ export function inheritComponentType(
   return ResearchObjectComponentType.UNKNOWN;
 }
 
+export function hasPublic(tree: DriveObject): boolean {
+  return tree.contains!.some((fd) => {
+    const fdTyped = fd as FileDir;
+    if (fdTyped.published) return true;
+    if (fd.contains && fd.contains.length) return hasPublic(fd);
+    return false;
+  });
+}
+
 //Convert IPFS tree to DriveObject tree V2
 export function convertIpfsTreeToDriveObjectTree(
   tree: DriveObject[],
@@ -169,6 +178,13 @@ export function convertIpfsTreeToDriveObjectTree(
     branch.accessStatus = fileDirBranch.published
       ? AccessStatus.PUBLIC
       : AccessStatus.PRIVATE;
+
+    //Determine partials
+    if (!fileDirBranch.published && branch.contains && branch.contains.length) {
+      const isPartial = hasPublic(branch);
+      if (isPartial) branch.accessStatus = AccessStatus.PARTIAL;
+    }
+
     branch.metadata = inheritMetadata(branch.path, pathToCompMap);
     branch.starred = component?.starred || false;
     branch.uid = component?.id || uuidv4(); //add cached uuids
