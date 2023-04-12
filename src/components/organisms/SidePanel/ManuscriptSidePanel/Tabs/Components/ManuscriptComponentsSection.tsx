@@ -10,7 +10,7 @@ import {
 } from "@desci-labs/desci-models";
 import { IconData, IconDeleteForever, IconInfo, IconPen } from "icons";
 import React, { useState } from "react";
-import ComponentRenamePopover from "./PopOver/ComponentRenamePopover";
+import ComponentRenamePopover from "@components/organisms/PopOver/ComponentRenamePopover";
 // import useSaveManifest from "@src/hooks/useSaveManifest";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
@@ -153,24 +153,6 @@ const ManuscriptComponentsSection = () => {
     currentObjectId,
   } = useNodeReader();
   const [isEditable, setIsEditable] = useState<boolean>(false);
-
-  /**
-   * Commenting following section until understand what it does-- SI Jul-19-2022
-   */
-  // useEffect(() => {
-  //   if (
-  //     manifestData &&
-  //     manifestData.components &&
-  //     manifestData.components.length &&
-  //     (!componentStack || !componentStack.length)
-  //   ) {
-  //     setComponentStack([manifestData.components[0]]);
-  //     __log(
-  //       "ManuscriptComponentsSection::useEffect[manifestData, componentStack] Reset componentStack",
-  //       JSON.stringify(manifestData.components[0])
-  //     );
-  //   }
-  // }, [manifestData, componentStack]);
 
   /**
    * Hide component section if we don't have components

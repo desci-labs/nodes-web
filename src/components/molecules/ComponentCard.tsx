@@ -281,7 +281,6 @@ const ComponentCard = (props: ComponentCardProps) => {
         <ComponentMetadataPopover
           currentObjectId={currentObjectId}
           manifestData={manifestData}
-          mode={mode}
           componentId={component.id}
           isVisible={showComponentMetadata}
           onClose={() => setShowComponentMetadata(false)}

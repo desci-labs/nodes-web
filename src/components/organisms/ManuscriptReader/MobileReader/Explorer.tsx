@@ -1,7 +1,7 @@
-import HistoryTab from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/HistoryTab";
+import HistoryTab from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/History/HistoryTab";
 import SourceTab from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/SourceTab";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import ManuscriptComponentsSection from "@components/organisms/ManuscriptComponentsSection";
+import ManuscriptComponentsSection from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/Components/ManuscriptComponentsSection";
 import { ResearchTabs, setResearchPanelTab } from "@src/state/nodes/viewer";
 import {
   SwitchBar,

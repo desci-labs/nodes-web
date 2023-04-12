@@ -1,5 +1,5 @@
 import { SpinnerCircularFixed } from "spinners-react";
-import Section from "../Section";
+import Section from "@components/organisms/SidePanel/ManuscriptSidePanel/Section";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import ReactMarkdown from "react-markdown";

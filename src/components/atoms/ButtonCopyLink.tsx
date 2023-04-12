@@ -1,13 +1,11 @@
 import { IconCopyLink } from "@icons";
 import { useEffect, useState, useRef, PropsWithChildren } from "react";
 import ReactTooltip from "react-tooltip";
-import { Place } from "react-tooltip";
 
 interface ButtonCopyLinkProps {
   text: string;
   invert?: boolean;
   size?: number;
-  place: Place;
 }
 
 const ButtonCopyLink = (props: PropsWithChildren<ButtonCopyLinkProps>) => {
