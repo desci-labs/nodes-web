@@ -13,21 +13,20 @@ import { toggleMobileView } from "@src/state/preferences/preferencesSlice";
 import { useSetter } from "@src/store/accessors";
 import { useAppPreferences } from "@src/state/preferences/hooks";
 import Placeholder from "@components/organisms/ManuscriptReader/Placeholder";
+import Explorer from "./Explorer";
 
 const MobileWrapper = styled(FlexRow)`
   background-color: transparent;
   position: relative;
   height: calc(100vh);
   width: 100%;
-  /* &::before {
-    content: " ";
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
-    background-color: #525659;
-    position: fixed;
-  } */
+  left: 0;
+  top: 0;
+  background-color: #1e1e1e;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 `;
 
 interface ManuscriptReaderProps {
@@ -59,10 +58,10 @@ const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
   }, [currentObjectId]);
 
   useEffect(() => {
-    if (isMobile && !isMobileView) {
-      dispatch(toggleMobileView());
-    }
+    console.log("toggle mobile view", isMobileView, isMobile);
+    dispatch(toggleMobileView());
     return () => {
+      console.log("reset mobile view", isMobileView, isMobile);
       isMobileView && dispatch(toggleMobileView());
     };
   }, [dispatch, isMobileView]);
@@ -71,6 +70,7 @@ const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
     <MobileWrapper>
       <Header />
       {isLoading && <Placeholder isLoading={true} fullHeight />}
+      <Explorer />
     </MobileWrapper>
   );
 };

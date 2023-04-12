@@ -20,6 +20,8 @@ export default function AppWrapper(props: PropsWithChildren<{}>) {
   // Orchid checker init
   useCheckOrcid();
 
+  console.log("isMobileview", isMobileView);
+
   return (
     <>
       <div
@@ -39,7 +41,7 @@ export default function AppWrapper(props: PropsWithChildren<{}>) {
         ((!userProfile || !(userProfile as any).userId) &&
           localStorage.getItem("auth")) ? (
           <div className="fixed z-[101] bg-[#525659] h-screen w-screen">
-            <PdfHeader />
+            {!isMobileView && <PdfHeader />}
             <div className="w-full absolute z-[102] top-[52px] rounded-full h-[3px]">
               <div
                 className={`${"bg-tint-primary"} h-[3px]`}

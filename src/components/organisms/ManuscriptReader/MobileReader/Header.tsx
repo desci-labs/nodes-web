@@ -7,7 +7,7 @@ const TITLE = `Registered report: Transcriptional amplification in tumor cells w
 
 export default function Header() {
   return (
-    <div className="h-[27%] w-full p-2 mobile-reader-header relative flex items-end overflow-hidden">
+    <div className="h-[27%] w-full p-2 mobile-reader-header relative flex items-end overflow-hidden shrink-0">
       <IconShare width={30} color="white" className="absolute top-3 right-3" />
       <div className="pl-4 flex gap-3 items-center">
         <div className="shrink-0 w-fit">

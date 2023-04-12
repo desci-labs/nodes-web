@@ -16,9 +16,6 @@ module.exports = {
       crosshair: "crosshair",
     },
     extend: {
-      backgroundImage: {
-        "reader-header": "",
-      },
       animation: {
         scaleIn: "scaleIn 100ms ease-out",
         expandOut: "expandOut 350ms ease-out",
