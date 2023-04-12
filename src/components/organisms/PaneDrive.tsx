@@ -590,42 +590,34 @@ const PaneDrive = () => {
           <div id="tableWrapper" className="mt-5 h-full">
             <DriveTable
               setLoading={setLoading}
-              // setOldComponentMetadata={setOldComponentMetadata}
-              // directory={directory}
-              // setDirectory={setDirectory}
-              // setShowEditMetadata={setShowEditMetadata}
-              // datasetMetadataInfoRef={datasetMetadataInfoRef}
-              // setMetaStaging={setMetaStaging}
-              // showEditMetadata={showEditMetadata}
               breadCrumbs={breadCrumbs}
               setBreadCrumbs={setBreadCrumbs}
-              // renameComponentId={renameComponentId}
-              // setRenameComponentId={setRenameComponentId}
             />
           </div>
         </PerfectScrollbar>
 
-        {fileMetadataBeingEdited && (
-          <DriveDatasetMetadataPopOver
-            isVisible={!!fileMetadataBeingEdited}
-            onClose={() => {
-              dispatch(setFileMetadataBeingEditted(null));
-            }}
-          />
-        )}
-        {/* {!!OldComponentMetadata && (
-            <ComponentMetadataPopover
-              currentObjectId={currentObjectId!}
-              manifestData={manifestData!}
-              mode={mode}
-              componentId={OldComponentMetadata?.componentId!}
-              isVisible={!!OldComponentMetadata}
+        {fileMetadataBeingEdited &&
+          fileMetadataBeingEdited.componentType ===
+            ResearchObjectComponentType.DATA && (
+            <DriveDatasetMetadataPopOver
+              isVisible={!!fileMetadataBeingEdited}
               onClose={() => {
-                if (OldComponentMetadata) OldComponentMetadata.cb();
-                setOldComponentMetadata(null);
+                dispatch(setFileMetadataBeingEditted(null));
               }}
             />
-          )} */}
+          )}
+        {fileMetadataBeingEdited &&
+          (fileMetadataBeingEdited.componentType ===
+            ResearchObjectComponentType.PDF ||
+            fileMetadataBeingEdited.componentType ===
+              ResearchObjectComponentType.CODE) && (
+            <ComponentMetadataPopover
+              isVisible={!!fileMetadataBeingEdited}
+              onClose={() => {
+                dispatch(setFileMetadataBeingEditted(null));
+              }}
+            />
+          )}
         <SidePanelStorage />
       </div>
     </ContextMenuProvider>

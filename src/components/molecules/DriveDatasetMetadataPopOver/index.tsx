@@ -216,7 +216,7 @@ const DriveDatasetMetadataPopOver = (
                 onDismiss={
                   methods.formState.isDirty ? onHandleDismiss : props?.onClose
                 }
-                title="Enter Metadatas"
+                title="Edit Metadata"
                 subTitle=" Please fill in the metadata for open access data."
               />
               <div className="px-1">
