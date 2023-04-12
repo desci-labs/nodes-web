@@ -14,7 +14,10 @@ import { useDispatch } from "react-redux";
 import { setComponentStack, setManifestData } from "@src/state/nodes/viewer";
 import { useDriveContext } from "./Index";
 import { useSetter } from "@src/store/accessors";
-import { assignTypeThunk } from "@src/state/drive/driveSlice";
+import {
+  assignTypeThunk,
+  setFileMetadataBeingEditted,
+} from "@src/state/drive/driveSlice";
 import { setComponentTypeBeingAssignedTo } from "@src/state/drive/driveSlice";
 import { useDrive } from "@src/state/drive/hooks";
 
@@ -42,6 +45,8 @@ export const getActionState = (action: Actions, file: DriveObject) => {
         ),
       };
     case Actions.ASSIGN_TYPE:
+      return { disabled: false };
+    case Actions.EDIT_METADATA:
       return { disabled: false };
     default:
       return { disabled: true };
@@ -119,6 +124,10 @@ export default function useActionHandler() {
     dispatch(setComponentTypeBeingAssignedTo(file.path!));
   }
 
+  async function editMetadata(file: DriveObject) {
+    dispatch(setFileMetadataBeingEditted(file));
+  }
+
   const handler: Record<
     Actions,
     ((file: DriveObject) => Promise<void>) | null
@@ -128,6 +137,7 @@ export default function useActionHandler() {
     DOWNLOAD: null,
     REMOVE: remove,
     ASSIGN_TYPE: assignType,
+    EDIT_METADATA: editMetadata,
   };
 
   return handler;
