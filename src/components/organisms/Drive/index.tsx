@@ -174,6 +174,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
 
   //loads all dataset trees, and fills data sizes
   useEffect(() => {
+    let isMounted = true
     if (!manifestData?.components) {
       setLoading(false);
       return;
@@ -191,7 +192,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
           setDirectory(nodeDrived.contains!);
           setBreadCrumbs([{ name: "Research Node", drive: nodeDrived }]);
           //* Populate virtual node drive for data components
-          fetchTrees();
+          fetchTrees()
         }
         async function fetchTrees() {
           const lastPathUidMap = JSON.parse(
@@ -236,14 +237,18 @@ const DriveTable: React.FC<DriveTableProps> = ({
             resetAccessStatus(virtualData);
             const sizesFilledDrive = fillOuterSizes(virtualData);
             const newDir = [...sizesFilledDrive.contains!];
-            setJumpReady(true);
-            setLoading(false);
             return newDir;
           });
+          if (isMounted) setJumpReady(true);
+          setLoading(false);
+
         }
 
         return nodeDrived;
       });
+      return () => {
+        isMounted = false
+      }
   }, [nodeDrived, manifestData]);
 
   function toggleSelected(
