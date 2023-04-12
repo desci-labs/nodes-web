@@ -68,7 +68,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
     mode,
   } = useNodeReader();
 
-  const { nodeTree, status, currentDrive } = useDrive();
+  const { nodeTree, status, currentDrive, deprecated } = useDrive();
   const dispatch = useSetter();
 
   const [selected, setSelected] = useState<
@@ -249,10 +249,16 @@ const DriveTable: React.FC<DriveTableProps> = ({
         <ul
           className={`bg-neutrals-gray-1 grid list-none font-medium text-sm text-white select-none items-center rounded-t-xl rounded-b-xl h-full`}
           style={{
-            gridTemplateColumns: `${ColWidths.STARRED} ${ColWidths.FILE_NAME} ${ColWidths.LAST_MODIFIED} ${ColWidths.STATUS} ${ColWidths.FILE_SIZE} ${ColWidths.CITE} ${ColWidths.USE}`,
+            gridTemplateColumns: `${deprecated ? "" : ColWidths.STARRED} ${
+              ColWidths.FILE_NAME
+            } ${ColWidths.LAST_MODIFIED} ${ColWidths.STATUS} ${
+              ColWidths.FILE_SIZE
+            } ${ColWidths.CITE} ${ColWidths.USE}`,
           }}
         >
-          <li className={`${everyRow} ${headerRow}`}>
+          <li
+            className={`${everyRow} ${headerRow} ${deprecated ? "hidden" : ""}`}
+          >
             <IconStar
               className="fill-tint-primary stroke-tint-primary"
               width={18}
@@ -289,6 +295,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
                   selectedFiles={selected}
                   canEditMetadata={canEditMetadata}
                   canUse={canUse}
+                  deprecated={deprecated}
                 />
               );
             })

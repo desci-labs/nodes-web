@@ -52,6 +52,7 @@ export default function DriveRow({
   selectedFiles,
   canEditMetadata,
   canUse,
+  deprecated,
 }: // setOldComponentMetadata,
 DriveRowProps) {
   const contextRef = useRef<HTMLDivElement>();
@@ -97,7 +98,7 @@ DriveRowProps) {
         }
       }}
     >
-      <li className={`${everyRow}`}>
+      <li className={`${everyRow} ${deprecated ? "hidden" : ""}`}>
         <IconStar
           className={`cursor-pointer ${
             file.starred

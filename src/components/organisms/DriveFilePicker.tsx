@@ -133,7 +133,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
 
         return nodeDrived;
       });
-  }, [currentObjectId, manifestCid, manifestData, privCidMap, publicView]);
+  }, [currentObjectId, manifestCid, manifestData, publicView]);
 
   useEffect(() => {
     ReactTooltip.rebuild();
