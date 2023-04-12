@@ -1,18 +1,7 @@
 import BlackGenericButton from "@components/atoms/BlackGenericButton";
-import StatusButton, { ButtonState } from "@components/atoms/StatusButton";
-import {
-  findRootComponentCid,
-  getMetadataStatus,
-  getVirtualDriveMetadataStatus,
-  isNodeRootDrive,
-  isRootComponentDrive,
-} from "@components/driveUtils";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { BytesToHumanFileSize } from "@components/utils";
-import {
-  ResearchObjectComponentType,
-  ResearchObjectV1Component,
-} from "@desci-labs/desci-models";
+import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import {
   IconCodeRepo,
   IconData,
@@ -38,7 +27,6 @@ import { everyRow } from ".";
 import "./styles.scss";
 import { starComponentThunk } from "@src/state/drive/driveSlice";
 import { useSetter } from "@src/store/accessors";
-import { findTarget } from "@src/components/molecules/ComponentCard";
 import { COMPONENT_LIBRARY, UiComponentDefinition } from "../ComponentLibrary";
 
 function renderComponentIcon(file: DriveObject) {
@@ -60,10 +48,7 @@ export default function DriveRow({
   selected,
   isMultiselecting,
   toggleSelected,
-  // setShowEditMetadata,
   exploreDirectory,
-  // datasetMetadataInfoRef,
-  // setMetaStaging,
   selectedFiles,
   canEditMetadata,
   canUse,
@@ -74,76 +59,10 @@ DriveRowProps) {
   const { handleDbClick } = useInteractionHandler();
   const { setUseMenuCids, setShowCitationModal, setComponentToCite } =
     useManuscriptController(["componentToCite"]);
-  const {
-    manifestCid,
-    manifest: manifestData,
-    publicView,
-    mode,
-  } = useNodeReader();
+  const { manifestCid, mode } = useNodeReader();
 
   const dispatch = useSetter();
 
-  // const handleEditMetadata = () => {
-  //   // debugger;
-  //   if (file.componentType !== ResearchObjectComponentType.DATA) {
-  //     const component = manifestData?.components.find(
-  //       (c: ResearchObjectV1Component) => c.id === file.cid
-  //     );
-  //     if (!component) return;
-  //     setOldComponentMetadata({
-  //       componentId: component.id,
-  //       cb: () => {
-  //         const { keywords, description, licenseType } = component.payload;
-
-  //         const newMetadata = { keywords, description, licenseType };
-  //         file.metadata = newMetadata;
-  //       },
-  //     });
-  //   }
-
-  //   if (file.componentType === ResearchObjectComponentType.DATA) {
-  //     // debugger;
-  //     if (!isMultiselecting)
-  //       setMetaStaging([
-  //         {
-  //           file: file,
-  //           index: index,
-  //         },
-  //       ]);
-
-  //     if (isMultiselecting) {
-  //       datasetMetadataInfoRef.current.prepopulateFromName = file.name;
-  //       const staging = Object.keys(selectedFiles).map((fileIndex: string) => {
-  //         const parentDriveObj = file.parent;
-  //         const selectedFile = parentDriveObj?.contains![
-  //           parseInt(fileIndex)
-  //         ] as DriveObject;
-  //         return {
-  //           file: selectedFile!,
-  //         };
-  //       });
-  //       setMetaStaging(staging);
-  //     }
-
-  //     //dag file/dir (submetadata)
-  //     if (!isRootComponentDrive(file)) {
-  //       const rootCid = findRootComponentCid(file);
-  //       if (rootCid) datasetMetadataInfoRef.current.rootCid = rootCid;
-  //     }
-  //     datasetMetadataInfoRef.current.prepopulateMetadata = file.metadata;
-
-  //     if (setShowEditMetadata) setShowEditMetadata(true);
-  //   }
-  // };
-
-  // const metaStatus = useMemo(() => {
-  //   if (isNodeRootDrive(file)) return getVirtualDriveMetadataStatus(file);
-  //   return getMetadataStatus(file);
-  //   // DONT ADJUST DEPENDENCY ARRAY
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [file.metadata]);
-
-  // const isNodeRoot = isNodeRootDrive(file);
   const handleRef = useCallback(
     (node: HTMLDivElement) => {
       if (
@@ -164,30 +83,7 @@ DriveRowProps) {
     (file.componentType === ResearchObjectComponentType.DATA &&
       mode === "reader");
 
-  // const getStatusButtonLabel = () =>
-  //   isNodeRoot ? "Metadata Status" : "Edit Metadata";
-
   return (
-    // <ul
-    //   ref={handleRef}
-    //   className={`h-[48px] grid list-none font-medium text-sm text-white content-center justify-items-center items-center gap-10 border-b border-[#555659] last-of-type:border-none px-5 last-of-type:rounded-b-xl select-none
-    //    ${
-    //      selected
-    //        ? "bg-tint-primary bg-opacity-50 hover:bg-tint-primary hover:bg-opacity-75"
-    //        : "hover:bg-neutrals-gray-2"
-    //    }`}
-    //   style={{
-    //     gridTemplateColumns:
-    //       "2fr repeat(4, minmax(auto, 1fr)) minmax(125px, auto) repeat(2, 40px)",
-    //   }}
-    //   onDoubleClick={(e) => handleDbClick(e, file)}
-    //   onClick={(e) => {
-    //     if (e.ctrlKey) {
-    //       e.stopPropagation();
-    //       toggleSelected(index, file.componentType);
-    //     }
-    //   }}
-    // >
     <div
       ref={handleRef}
       className={`singleRow contents !bg-neutrals-gray-2 ${
@@ -236,7 +132,6 @@ DriveRowProps) {
               }`}
             />
           ) : (
-            // <IconIpfs height={20} width={17.3} />
             <div className="scale-[65%] w-[34px]">
               {renderComponentIcon(file)}
             </div>
@@ -257,7 +152,6 @@ DriveRowProps) {
         className={`${everyRow}`}
       >
         {BytesToHumanFileSize(file.size)}
-        {/* <button className="" onClick={() => setRenameComponentId(file.cid)}>rn</button> */}
       </li>
       <li className={`${everyRow}`}>
         <BlackGenericButton

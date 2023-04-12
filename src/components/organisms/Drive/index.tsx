@@ -10,23 +10,9 @@ import DriveBreadCrumbs, {
 import PopOverUseMenu from "@components/molecules/PopOverUseMenu";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
-import React, {
-  ButtonHTMLAttributes,
-  HTMLProps,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { useClickAway } from "react-use";
-import { DatasetMetadataInfo, MetaStaging } from "../PaneDrive";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import StatusInfo from "./StatusInfo";
-import {
-  DriveNonComponentTypes,
-  DriveObject,
-  FileDir,
-  oldComponentMetadata,
-} from "./types";
+import { DriveNonComponentTypes, DriveObject, FileDir } from "./types";
 import DriveRow from "./DriveRow";
 import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
 import { IconCirclePlus, IconStar } from "@src/icons";
@@ -56,44 +42,17 @@ enum ColWidths {
 }
 
 interface DriveTableProps {
-  // directory: DriveObject[];
-  // setDirectory: React.Dispatch<React.SetStateAction<DriveObject[]>>;
-  // setShowEditMetadata: React.Dispatch<React.SetStateAction<boolean>>;
-  // datasetMetadataInfoRef: React.MutableRefObject<DatasetMetadataInfo>;
-  // setMetaStaging: React.Dispatch<React.SetStateAction<MetaStaging[]>>;
-  // showEditMetadata: boolean;
   setBreadCrumbs: React.Dispatch<React.SetStateAction<BreadCrumb[]>>;
   breadCrumbs: BreadCrumb[];
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  // setOldComponentMetadata: (
-  //   value: React.SetStateAction<oldComponentMetadata | null>
-  // ) => void;
   // renameComponentId: string | null;
   // setRenameComponentId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-function UploadButton(props: ButtonHTMLAttributes<HTMLButtonElement>) {
-  return (
-    <ButtonSecondary onClick={props.onClick}>
-      <IconCirclePlus className="group-hover:hidden" fill="white" />
-      <IconCirclePlus className="group-hover:!block hidden" fill="black" /> Add
-    </ButtonSecondary>
-  );
-}
-
 const DriveTable: React.FC<DriveTableProps> = ({
-  // directory,
-  // setDirectory,
-  // setShowEditMetadata,
-  // datasetMetadataInfoRef,
-  // setMetaStaging,
-  // showEditMetadata,
   breadCrumbs,
   setBreadCrumbs,
   setLoading,
-  // setOldComponentMetadata,
-  // renameComponentId,
-  // setRenameComponentId,
 }) => {
   const {
     setIsAddingComponent,
@@ -107,7 +66,6 @@ const DriveTable: React.FC<DriveTableProps> = ({
     manifest: manifestData,
     publicView,
     currentObjectId,
-    shareId,
     mode,
   } = useNodeReader();
 
@@ -121,10 +79,6 @@ const DriveTable: React.FC<DriveTableProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [jumpReady, setJumpReady] = useState<boolean>(false);
-
-  // useClickAway(containerRef, () => {
-  //   if (!showEditMetadata && Object.keys(selected).length) setSelected({});
-  // });
 
   function exploreDirectory(
     name: FileDir["name"] | DriveObject["name"],
@@ -141,37 +95,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
     setBreadCrumbs(breadCrumbs.slice(0, index + 1));
   }
 
-  //converts manifest to driveObj on component mount or nodeId change
-  /*   useEffect(() => {
-    if (!manifestData?.components) return;
-    const localNodeDrived = manifestToVirtualDrives(
-      manifestData,
-      "virtual",
-      privCidMap
-    );
-
-    // recover uids if cached
-    const lastNodeId = JSON.parse(
-      sessionStorage.getItem(SessionStorageKeys.lastNodeId)!
-    );
-    if (lastNodeId === currentObjectId!) {
-      const storedPathUidMap = sessionStorage.getItem("Drive::pathUidMap");
-      const lastPathUidMap = JSON.parse(storedPathUidMap!);
-      if (lastPathUidMap) {
-        console.log("[DRIVE RESUME] Recovered last path uid map");
-        gracefullyAssignTreeUids(
-          localNodeDrived.contains! as any,
-          undefined,
-          lastPathUidMap
-        );
-      }
-    }
-
-    if (setNodeDrived) setNodeDrived(localNodeDrived);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentObjectId]); */
-
-  //resume from previous dir when ready
+  //*deprecated: to be removed* resume from previous dir when ready
   useEffect(() => {
     const lastDirUid = JSON.parse(
       sessionStorage.getItem(SessionStorageKeys.lastDirUid)!
@@ -187,7 +111,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jumpReady]);
 
-  //loads all dataset trees, and fills data sizes
+  //*Almost deprecated, remove after breadcrumbs migrated* loads all dataset trees, and fills data sizes
   useEffect(() => {
     // debugger;
     if (!nodeTree) return;
@@ -202,30 +126,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
     ) {
       (window as any).lastObjectId = currentObjectId!;
       setBreadCrumbs([{ name: "Research Node", drive: nodeTree! }]);
-      //* Populate virtual node drive for data components
     }
-
-    //fill sizes and metadata (dont remove for now)
-    //   setDirectory((old) => {
-    //     if (!old) return old;
-    //     const isNodeRoot = old.findIndex((fd) => fd.name === "Research Reports");
-    //     if (isNodeRoot === -1) return old;
-
-    //     const virtualData = createVirtualDrive({
-    //       name: "Data",
-    //       path: DRIVE_DATA_PATH,
-    //       componentType: ResearchObjectComponentType.DATA,
-    //       contains: old,
-    //     });
-
-    //     resetAccessStatus(virtualData);
-    //     const sizesFilledDrive = fillOuterSizes(virtualData);
-    //     const newDir = [...sizesFilledDrive.contains!];
-    //     setJumpReady(true);
-    //     setLoading(false);
-    //     return newDir;
-    //   });
-    //   setLoading(false);
   }, [nodeTree]);
 
   function toggleSelected(
@@ -386,13 +287,9 @@ const DriveTable: React.FC<DriveTableProps> = ({
                   selected={!!selected[idx]}
                   toggleSelected={toggleSelected}
                   isMultiselecting={!!Object.keys(selected).length}
-                  // setMetaStaging={setMetaStaging}
-                  // setShowEditMetadata={setShowEditMetadata}
-                  // datasetMetadataInfoRef={datasetMetadataInfoRef}
                   selectedFiles={selected}
                   canEditMetadata={canEditMetadata}
                   canUse={canUse}
-                  // setOldComponentMetadata={setOldComponentMetadata}
                 />
               );
             })
