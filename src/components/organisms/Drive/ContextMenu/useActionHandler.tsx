@@ -47,7 +47,13 @@ export const getActionState = (action: Actions, file: DriveObject) => {
     case Actions.ASSIGN_TYPE:
       return { disabled: false };
     case Actions.EDIT_METADATA:
-      return { disabled: false };
+      return {
+        disabled: !(
+          file.componentType === ResearchObjectComponentType.DATA ||
+          file.componentType === ResearchObjectComponentType.PDF ||
+          file.componentType === ResearchObjectComponentType.CODE
+        ),
+      };
     default:
       return { disabled: true };
   }
