@@ -32,6 +32,7 @@ import { tags } from "@src/state/api/tags";
 import { nodesApi } from "@src/state/api/nodes";
 import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 import WalletManagerModal from "@src/components/molecules/WalletManagerModal";
+import { fetchTreeThunk } from "@src/state/drive/driveSlice";
 
 export const LOCALSTORAGE_TXN_LIST = "desci:txn-list";
 
@@ -39,7 +40,6 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
   const [loading, setLoading] = useState(false);
   const [address, setAddress] = useState<string>("0x");
   const [error, setError] = useState<string>();
-  const { setPrivCidMap, setForceRefreshDrive } = useManuscriptController();
   const [openWalet, setOpenWallet] = useState(false);
 
   const dispatch = useSetter();
@@ -240,9 +240,7 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
           },
         });
 
-        //force a drive refresh
-        setPrivCidMap({});
-        setTimeout(() => setForceRefreshDrive(true));
+        setTimeout(() => dispatch(fetchTreeThunk()));
 
         props.onSuccess?.();
         close();

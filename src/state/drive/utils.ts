@@ -160,12 +160,15 @@ export function convertIpfsTreeToDriveObjectTree(
   pathToSizeMap: Record<DrivePath, number>
 ) {
   tree.forEach((branch) => {
+    const fileDirBranch = branch as FileDir;
     const neutralPath = neutralizePath(branch.path!);
     branch.path = neutralPath;
     const component = pathToCompMap[branch.path!];
     branch.componentType =
       component?.type || inheritComponentType(branch, pathToCompMap);
-    branch.accessStatus = AccessStatus.PRIVATE; // FIXME, HARDCODED, PRIVCIDMAP
+    branch.accessStatus = fileDirBranch.published
+      ? AccessStatus.PUBLIC
+      : AccessStatus.PRIVATE;
     branch.metadata = inheritMetadata(branch.path, pathToCompMap);
     branch.starred = component?.starred || false;
     branch.uid = component?.id || uuidv4(); //add cached uuids

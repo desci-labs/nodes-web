@@ -566,14 +566,3 @@ export const postUserAction = async (
   );
   return data;
 };
-
-export const getPublishStatus = async (
-  manifestCid: string,
-  nodeUuid: string
-) => {
-  const { data } = await axios.get(
-    `${SCIWEAVE_URL}/v1/nodes/publishStatus/${nodeUuid}/${manifestCid}`
-  );
-  // debugger
-  return data;
-};

@@ -320,7 +320,7 @@ export const fetchTreeThunk = createAsyncThunk(
       return { tree, manifest };
     } else {
       //fallback to construct deprecated tree
-      const rootDrive = manifestToVirtualDrives(manifest!, manifestCid, {});
+      const rootDrive = manifestToVirtualDrives(manifest!, manifestCid);
 
       const lastPathUidMap = JSON.parse(
         sessionStorage.getItem(SessionStorageKeys.pathUidMap)!
@@ -430,7 +430,6 @@ export const addFilesToDrive = createAsyncThunk(
       if (onSuccess) onSuccess(updatedManifest);
       dispatch(removeBatchFromUploadQueue({ batchUid }));
       if (rootDataCid && updatedManifest && manifestCid) {
-        // setPrivCidMap({ ...privCidMap, [rootDataCid]: true }); //later when privCidMap available
         const latestState = getState() as RootState;
         if (snapshotNodeUuid === latestState.nodes.nodeReader.currentObjectId) {
           dispatch(updateBatchUploadProgress({ batchUid, progress: 100 }));

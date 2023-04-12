@@ -84,8 +84,7 @@ export const DRIVE_CODE_PATH = "Code";
 
 export function manifestToVirtualDrives(
   manifest: ResearchObjectV1,
-  cid: string,
-  privCidMap: Record<string, boolean>
+  cid: string
 ): DriveObject {
   const virtualData = createVirtualDrive({
     name: "Data",
@@ -113,10 +112,10 @@ export function manifestToVirtualDrives(
     componentMetadata.licenseType = c.payload.licenseType;
     componentMetadata.title = c.payload.title || c.name;
     if (c.type === ResearchObjectComponentType.PDF) {
-      const accessState =
-        c.payload.url in privCidMap
-          ? AccessStatus.PRIVATE
-          : AccessStatus.PUBLIC;
+      const accessState = AccessStatus.PUBLIC;
+      // c.payload.url in privCidMap
+      //   ? AccessStatus.PRIVATE
+      //   : AccessStatus.PUBLIC;
       const driveObj: DriveObject = {
         name: c.name,
         cid: c.payload.url,
@@ -132,10 +131,10 @@ export function manifestToVirtualDrives(
       virtualPdfs.contains?.push(driveObj);
     }
     if (c.type === ResearchObjectComponentType.CODE) {
-      const accessState =
-        c.payload.url in privCidMap
-          ? AccessStatus.PRIVATE
-          : AccessStatus.PUBLIC;
+      const accessState = AccessStatus.PUBLIC;
+      // c.payload.url in privCidMap
+      //   ? AccessStatus.PRIVATE
+      //   : AccessStatus.PUBLIC;
       const driveObj: DriveObject = {
         name: c.name,
         cid: c.payload.url,
@@ -151,10 +150,10 @@ export function manifestToVirtualDrives(
       virtualCodeRepos.contains?.push(driveObj);
     }
     if (c.type === ResearchObjectComponentType.DATA) {
-      const accessState =
-        c.payload.cid in privCidMap
-          ? AccessStatus.PRIVATE
-          : AccessStatus.PUBLIC;
+      const accessState = AccessStatus.PUBLIC;
+      // c.payload.cid in privCidMap
+      //   ? AccessStatus.PRIVATE
+      //   : AccessStatus.PUBLIC;
       componentMetadata.ontologyPurl = c.payload.ontologyPurl;
       componentMetadata.controlledVocabTerms = c.payload.controlledVocabTerms;
       const driveObj: DriveObject = {

@@ -42,7 +42,7 @@ export default function useManuscriptReader(publicView: boolean = false) {
   const dispatch = useSetter();
   const { mode } = useNodeReader();
 
-  const { setPrivCidMap, scrollToPage$ } = useManuscriptController([
+  const { scrollToPage$ } = useManuscriptController([
     "scrollToPage$",
     "isAddingComponent",
     "isAddingSubcomponent",
@@ -73,12 +73,6 @@ export default function useManuscriptReader(publicView: boolean = false) {
         dispatch(toggleMode());
       }
       dispatch(setIsAnnotating(false));
-
-      if ("privateCids" in parsedManuscript) {
-        const cidMap: Record<string, boolean> = {};
-        parsedManuscript.privateCids.forEach((c: string) => (cidMap[c] = true));
-        setPrivCidMap(cidMap);
-      }
 
       dispatch(setManifest(parsedManuscript.manifest));
       const manifestUrlCleaned = cleanupManifestUrl(

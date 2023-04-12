@@ -54,7 +54,6 @@ const DriveTable: React.FC<DriveTableProps> = ({
   const [directory, setDirectory] = useState<DriveObject[]>([]);
   const [, /* nodeDrived */ setNodeDrived] = useState<DriveObject | null>();
 
-  const { privCidMap } = useManuscriptController(["privCidMap"]);
   const {
     manifest: manifestData,
     currentObjectId,
@@ -89,11 +88,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
 
   useEffect(() => {
     if (!manifestData?.components) return;
-    const localNodeDrived = manifestToVirtualDrives(
-      manifestData,
-      manifestCid!,
-      privCidMap
-    );
+    const localNodeDrived = manifestToVirtualDrives(manifestData, manifestCid!);
     if (setNodeDrived) setNodeDrived(localNodeDrived);
     // setFullDirectory(nodeDrived.contains!);
 

@@ -65,7 +65,6 @@ interface State {
   driveJumpDir: DriveJumpingParams | null;
   showProfileUpdater: boolean;
   componentToCite: DriveObject | null;
-  privCidMap: Record<string, boolean>;
   forceRefreshDrive: boolean;
   showAddNewNode: boolean;
   addFilesWithoutContext: boolean;
@@ -119,7 +118,6 @@ export const initialState: State = {
   showPublicationDetails: false,
   driveJumpDir: null,
   showProfileUpdater: false,
-  privCidMap: {},
   forceRefreshDrive: false,
   showAddNewNode: false,
   addFilesWithoutContext: false,

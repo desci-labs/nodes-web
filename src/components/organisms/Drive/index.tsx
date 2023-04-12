@@ -58,9 +58,8 @@ const DriveTable: React.FC<DriveTableProps> = ({
     setIsAddingComponent,
     driveJumpDir,
     setDriveJumpDir,
-    privCidMap,
     setAddFilesWithoutContext,
-  } = useManuscriptController(["driveJumpDir", "privCidMap"]);
+  } = useManuscriptController(["driveJumpDir"]);
 
   const {
     manifest: manifestData,

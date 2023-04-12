@@ -83,8 +83,6 @@ const AddComponentPopOver = (
   props: ModalProps & { onClose: (force: boolean) => void }
 ) => {
   const {
-    privCidMap,
-    setPrivCidMap,
     addComponentType,
     addComponentSubType,
     setIsAddingComponent,
@@ -93,7 +91,6 @@ const AddComponentPopOver = (
     setAddComponentSubType,
     addFilesWithoutContext,
   } = useManuscriptController([
-    "privCidMap",
     "addComponentType",
     "addComponentSubType",
     "addFilesWithoutContext",
@@ -256,7 +253,7 @@ const AddComponentPopOver = (
       //   navigate(`/nodes/${RESEARCH_OBJECT_NODES_PREFIX}${res.node.uuid}`);
       // }
 
-      const components = manifestData.components!;
+      const components = manifestData?.components!;
       dispatch(setComponentStack([components[components.length - 1]]));
       close(true);
     } catch (err) {

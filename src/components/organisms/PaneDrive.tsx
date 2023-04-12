@@ -61,13 +61,7 @@ const PaneDrive = () => {
     droppedTransferItemList,
     setDroppedFileList,
     setDroppedTransferItemList,
-    privCidMap,
-    setPrivCidMap,
-  } = useManuscriptController([
-    "privCidMap",
-    "droppedFileList",
-    "droppedTransferItemList",
-  ]);
+  } = useManuscriptController(["droppedFileList", "droppedTransferItemList"]);
   const dispatch = useSetter();
   const { isDraggingFiles, currentObjectId } = useNodeReader();
 
