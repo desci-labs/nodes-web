@@ -48,9 +48,14 @@ function ComponentPreview({
   const target = findTarget(component);
   if (!target) return null;
   return (
-    <div className="flex gap-2 items-center bg-zinc-200 dark:bg-neutrals-black rounded-lg px-4 py-2 border border-black">
-      <target.icon wrapperClassName="w-[30px] h-[30px]" className="p-[4px]" />
-      <span>{target.title}</span>
+    <div className="flex gap-4 items-center bg-zinc-200 dark:bg-neutrals-black rounded-lg px-4 py-2 border border-black">
+      <target.icon
+        width={24}
+        height={24}
+        wrapperClassName="w-[30px] h-[30px]"
+        className="p-[3px]"
+      />
+      <span className="font-bold">{target.title}</span>
     </div>
   );
 }

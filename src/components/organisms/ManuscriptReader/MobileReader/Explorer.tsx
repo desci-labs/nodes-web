@@ -1,4 +1,3 @@
-import HistoryTab from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/History/HistoryTab";
 import SourceTab from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/SourceTab";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { ResearchTabs, setResearchPanelTab } from "@src/state/nodes/viewer";
@@ -9,6 +8,7 @@ import {
 import { useSetter } from "@src/store/accessors";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import ComponentsPreview from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/Components/ComponentsPreview";
+import HistoryPreview from "@src/components/organisms/SidePanel/ManuscriptSidePanel/Tabs/History/Preview";
 
 export default function Explorer() {
   const dispatch = useSetter();
@@ -42,7 +42,7 @@ export default function Explorer() {
             onClick={() => onSetResearchPanelTab(ResearchTabs.source)}
           >
             <p className="text-xs flex justify-center items-center h-full">
-              Source
+              Credit
             </p>
           </SwitchButton>
         </SwitchBar>
@@ -53,7 +53,9 @@ export default function Explorer() {
           {researchPanelTab === ResearchTabs.current ? (
             <ComponentsPreview />
           ) : null}
-          {researchPanelTab === ResearchTabs.history ? <HistoryTab /> : null}
+          {researchPanelTab === ResearchTabs.history ? (
+            <HistoryPreview />
+          ) : null}
           {researchPanelTab === ResearchTabs.source ? <SourceTab /> : null}
         </div>
       </PerfectScrollbar>

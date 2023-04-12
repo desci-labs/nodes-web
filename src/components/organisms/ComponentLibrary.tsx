@@ -50,13 +50,14 @@ const IconWrapper = ({
   Icon,
   className,
   wrapperClassName,
+  ...rest
 }: IconWrapperProps) => (
   <div
     className={`border-primary border-2 rounded-full p-1 h-[40px] w-[40px] flex justify-center items-center overflow-hidden ${
       wrapperClassName ?? ""
     }`}
   >
-    <Icon fill="white" width={24} height={24} className={className} />
+    <Icon fill="white" width={24} height={24} className={className} {...rest} />
   </div>
 );
 
