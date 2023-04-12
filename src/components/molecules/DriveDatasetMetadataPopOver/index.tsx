@@ -1,35 +1,31 @@
 import DefaultSpinner from "@components/atoms/DefaultSpinner";
 import PrimaryButton from "@components/atoms/PrimaryButton";
 import { EMPTY_FUNC } from "@components/utils";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-
-import { DataComponent, ResearchObjectV1 } from "@desci-labs/desci-models";
+import React, { useCallback, useRef, useState } from "react";
 
 import {
-  DatasetMetadataInfo,
-  MetaStaging,
-} from "@components/organisms/PaneDrive";
+  DataComponent,
+  ResearchObjectComponentType,
+  ResearchObjectV1Component,
+} from "@desci-labs/desci-models";
+
 import { DatasetMetadataForm } from "./DatasetMetadataForm";
 import { OverwriteMetadataForm } from "./OverwriteMetadataDialog";
-import {
-  findAndInheritSubMetadata,
-  rootComponentPaths,
-} from "@src/components/driveUtils";
 import { FileType } from "@src/components/organisms/Drive";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import { saveManifestDraft, updateComponent } from "@src/state/nodes/viewer";
+import {
+  addComponent,
+  saveManifestDraft,
+  updateComponent,
+} from "@src/state/nodes/viewer";
 import { useSetter } from "@src/store/accessors";
 import Modal from "../Modal/Modal";
 import { FormProvider, useForm } from "react-hook-form";
 import { DriveMetadata } from "@src/components/organisms/Drive/types";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { useDrive } from "@src/state/drive/hooks";
+import { v4 as uuidv4 } from "uuid";
+import { fetchTreeThunk } from "@src/state/drive/driveSlice";
 
 export const DATASET_METADATA_FORM_DEFAULTS = {
   title: "",
@@ -126,34 +122,45 @@ const DriveDatasetMetadataPopOver = (
       //     );
       //   });
       // }
-
-      const componentIndex = manifestDataClone.components!.findIndex(
-        (c) => c.payload.path === fileMetadataBeingEdited?.path!
-      );
-
-      const newPayload = {
-        ...data,
-      };
-      if (componentIndex !== -1) {
-        dispatch(
-          updateComponent({
-            index: componentIndex,
-            update: {
-              payload: newPayload,
-            },
-          })
-        );
-      }
-
       try {
-        // await saveManifest(manifestDataClone);
+        const componentIndex = manifestDataClone.components!.findIndex(
+          (c) => c.payload.path === fileMetadataBeingEdited?.path!
+        );
         setIsSaving(true);
+
+        const newPayload = {
+          ...data,
+        };
+        if (componentIndex !== -1) {
+          dispatch(
+            updateComponent({
+              index: componentIndex,
+              update: {
+                payload: newPayload,
+              },
+            })
+          );
+        } else {
+          const newComponent: ResearchObjectV1Component = {
+            id: uuidv4(),
+            name: fileMetadataBeingEdited!.name,
+            type: fileMetadataBeingEdited!
+              .componentType as ResearchObjectComponentType,
+            payload: {
+              ...newPayload,
+              path: fileMetadataBeingEdited!.path,
+              cid: fileMetadataBeingEdited!.cid,
+            },
+          };
+          dispatch(addComponent({ component: newComponent }));
+        }
         dispatch(
           saveManifestDraft({
             onError: () => {
               setIsSaving(false);
             },
             onSucess: () => {
+              dispatch(fetchTreeThunk());
               setIsSaving(false);
               setOverWrite(false);
               setShowOverwriteDialog(false);
