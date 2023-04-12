@@ -1,7 +1,6 @@
 import ButtonCopyLink from "@components/atoms/ButtonCopyLink";
 import TooltipIcon from "@components/atoms/TooltipIcon";
 import CollapsibleSection from "@components/organisms/CollapsibleSection";
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import {
   FlexColumn,
   FlexRowAligned,
@@ -104,7 +103,7 @@ const ReadOnlyComponent = (props: any) => {
               />
               <div className="bg-black rounded-lg py-1 px-2">
                 <p className="text-sm font-normal text-white">
-                  {props.component?.payload.licenseType}
+                  {props.file?.metadata?.licenseType}
                 </p>
               </div>
             </FlexRowSpaceBetween>
@@ -130,7 +129,7 @@ const ReadOnlyComponent = (props: any) => {
             <p className="text-xs font-bold">Keywords</p>
             <div className="my-1">
               <FlexRowAligned className="gap-2 w-full flex-wrap">
-                {props.component?.payload.keywords?.map((keyword: string) => {
+                {props.file?.metadata?.keywords?.map((keyword: string) => {
                   return (
                     <div className="py-[2px] px-2 bg-tint-primary rounded-md text-black">
                       <p className="text-sm">{keyword}</p>
@@ -142,11 +141,11 @@ const ReadOnlyComponent = (props: any) => {
           </EntryContainer>
           <EntryContainer>
             <p className="text-xs font-bold">Description</p>
-            {props.component?.payload.description}
+            {props.file?.metadata?.description}
           </EntryContainer>
           <EntryContainer>
             <p className="text-xs font-bold">License Type</p>
-            {props.component?.payload.licenseType}
+            {props.file?.metadata?.licenseType}
           </EntryContainer>
         </div>
       </CollapsibleSection>

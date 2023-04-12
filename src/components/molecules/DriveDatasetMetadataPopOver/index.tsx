@@ -94,7 +94,6 @@ const DriveDatasetMetadataPopOver = (
   const onSubmit = useCallback(
     async (data: DataComponent["payload"]) => {
       console.log("[DRIVE METADATA] ON SUBMIT HIT");
-      const manifestDataClone = { ...manifestData };
 
       try {
         if (overWrite) {
@@ -110,7 +109,7 @@ const DriveDatasetMetadataPopOver = (
           dispatch(removeComponentMetadata({ componentIndexes }));
         }
 
-        const componentIndex = manifestDataClone.components!.findIndex(
+        const componentIndex = manifestData!.components!.findIndex(
           (c) => c.payload.path === fileMetadataBeingEdited?.path!
         );
         setIsSaving(true);

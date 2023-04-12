@@ -7,10 +7,11 @@ interface ButtonCopyLinkProps {
   text: string;
   invert?: boolean;
   size?: number;
-  place: Place;
+  place?: Place;
 }
 
 const ButtonCopyLink = (props: PropsWithChildren<ButtonCopyLinkProps>) => {
+  const placement = props.place || "bottom";
   const { text } = props;
   const [isCopied, setIsCopied] = useState(false);
   const ref = useRef(null);
@@ -43,7 +44,7 @@ const ButtonCopyLink = (props: PropsWithChildren<ButtonCopyLinkProps>) => {
         } p-2 w-fit h-fit flex justify-center items-center rounded-lg`}
         onClick={handleClick}
         data-tip={isCopied ? "Copied" : "Copy Link"}
-        data-place="bottom"
+        data-place={placement}
         data-type="info"
         data-background-color="black"
       >
