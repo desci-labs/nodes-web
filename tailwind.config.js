@@ -16,6 +16,9 @@ module.exports = {
       crosshair: "crosshair",
     },
     extend: {
+      backgroundImage: {
+        "reader-header": "",
+      },
       animation: {
         scaleIn: "scaleIn 100ms ease-out",
         expandOut: "expandOut 350ms ease-out",
@@ -172,5 +175,9 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [require("@tailwindcss/forms"), require("flowbite/plugin")],
+  plugins: [
+    require("@tailwindcss/forms"),
+    require("flowbite/plugin"),
+    require("@tailwindcss/line-clamp"),
+  ],
 };

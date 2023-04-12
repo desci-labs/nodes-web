@@ -15,7 +15,7 @@ import { useAppPreferences } from "@src/state/preferences/hooks";
 import Placeholder from "@components/organisms/ManuscriptReader/Placeholder";
 
 const MobileWrapper = styled(FlexRow)`
-  background-color: #525659;
+  background-color: transparent;
   position: relative;
   height: calc(100vh);
   width: 100%;
