@@ -63,6 +63,7 @@ import {
   addItemsToUploadQueue,
   fetchTreeThunk,
   removeBatchFromUploadQueue,
+  setFileMetadataBeingEditted,
   setShowUploadPanel,
   updateBatchUploadProgress,
 } from "@src/state/drive/driveSlice";
@@ -120,7 +121,13 @@ const PaneDrive = () => {
     mode,
   } = useNodeReader();
 
-  const { nodeTree, status, currentDrive, uploadQueue } = useDrive();
+  const {
+    nodeTree,
+    status,
+    currentDrive,
+    uploadQueue,
+    fileMetadataBeingEdited,
+  } = useDrive();
 
   // const [directory, setDirectory] = useState<Array<DriveObject>>([]);
   // const [renameComponentId, setRenameComponentId] = useState<string | null>(
@@ -598,24 +605,15 @@ const PaneDrive = () => {
           </div>
         </PerfectScrollbar>
 
-        {/* {showEditMetadata && (
-            <DriveDatasetMetadataPopOver
-              currentObjectId={currentObjectId!}
-              manifestData={manifestData!}
-              mode={mode}
-              datasetMetadataInfoRef={datasetMetadataInfoRef}
-              metaStaging={metaStaging}
-              // componentId={component.id}
-              isVisible={showEditMetadata}
-              onClose={() => {
-                delete datasetMetadataInfoRef.current.rootCid;
-                delete datasetMetadataInfoRef.current.prepopulateFromName;
-                datasetMetadataInfoRef.current = datasetMetadataInfoRefDefaults;
-                setShowEditMetadata(false);
-              }}
-            />
-          )}
-          {!!OldComponentMetadata && (
+        {fileMetadataBeingEdited && (
+          <DriveDatasetMetadataPopOver
+            isVisible={!!fileMetadataBeingEdited}
+            onClose={() => {
+              dispatch(setFileMetadataBeingEditted(null));
+            }}
+          />
+        )}
+        {/* {!!OldComponentMetadata && (
             <ComponentMetadataPopover
               currentObjectId={currentObjectId!}
               manifestData={manifestData!}

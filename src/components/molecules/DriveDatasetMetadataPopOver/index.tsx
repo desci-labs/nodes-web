@@ -29,6 +29,7 @@ import Modal from "../Modal/Modal";
 import { FormProvider, useForm } from "react-hook-form";
 import { DriveMetadata } from "@src/components/organisms/Drive/types";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
+import { useDrive } from "@src/state/drive/hooks";
 
 export const DATASET_METADATA_FORM_DEFAULTS = {
   title: "",
@@ -40,12 +41,8 @@ export const DATASET_METADATA_FORM_DEFAULTS = {
 };
 
 interface DriveDatasetMetadataPopoverProps {
-  metaStaging: MetaStaging[];
-  currentObjectId: string;
-  manifestData: ResearchObjectV1;
   isVisible: boolean;
   onClose?: () => void;
-  datasetMetadataInfoRef: React.MutableRefObject<DatasetMetadataInfo>;
 }
 
 const defaultProps = {
@@ -56,23 +53,21 @@ const DriveDatasetMetadataPopOver = (
   props: DriveDatasetMetadataPopoverProps & typeof defaultProps
 ) => {
   const dispatch = useSetter();
-  const { publicView, mode } = useNodeReader();
+  const {
+    publicView,
+    mode,
+    currentObjectId,
+    manifest: manifestData,
+  } = useNodeReader();
   const [isSaving, setIsSaving] = useState(false);
   const formRef = useRef<HTMLFormElement | null>(null);
-  const [componentIndexes, setComponentIndexes] = useState<
-    number[] | undefined
-  >(undefined);
   const [showOverwriteDialog, setShowOverwriteDialog] =
     useState<boolean>(false);
   const [overWrite, setOverWrite] = useState<boolean>(false);
   const { dialogs, setDialogs } = useManuscriptController(["dialogs"]);
+  const { fileMetadataBeingEdited } = useDrive();
 
-  const manifestData = props.manifestData;
-  const currentObjectId = props.currentObjectId;
-
-  const rootCid = props.datasetMetadataInfoRef.current.rootCid;
-
-  const data = props.datasetMetadataInfoRef.current.prepopulateMetadata;
+  const data = fileMetadataBeingEdited?.metadata;
 
   const methods = useForm<DriveMetadata>({
     defaultValues: {
@@ -90,188 +85,90 @@ const DriveDatasetMetadataPopOver = (
     },
   });
 
-  const hasDirs = useMemo(() => {
-    return props.metaStaging.some(
-      (stagedObj) => stagedObj.file.contains && stagedObj.file.contains.length
-    );
-  }, [props.metaStaging]);
-
-  //find dataset ID
-  useEffect(() => {
-    if (manifestData && currentObjectId) {
-      //for component level objects
-      // debugger;
-      if (!rootCid) {
-        const stagingCids = props.metaStaging.map((obj) => obj.file.cid);
-        const cIndexes: number[] = [];
-
-        manifestData.components.forEach((c, i) => {
-          if (stagingCids.includes(c.payload.cid)) cIndexes.push(i);
-        });
-
-        setComponentIndexes(cIndexes);
-        // setComponent(_component);
-      }
-
-      //find component index in the manifest to edit subMetadata for
-      if (rootCid) {
-        // debugger;
-        const cIndex = manifestData.components.findIndex(
-          (c) => c.payload.cid === rootCid
-        );
-        setComponentIndexes([cIndex]);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentObjectId, manifestData, props.metaStaging]);
-
   const onSubmit = useCallback(
     async (data: DataComponent["payload"]) => {
       console.log("[DRIVE METADATA] ON SUBMIT HIT");
-      // debugger;
-      if (manifestData && componentIndexes?.length) {
-        if (props.metaStaging.length !== 1) delete data.title;
-        const manifestDataClone = { ...manifestData };
+      const manifestDataClone = { ...manifestData };
 
-        //handle overwriting, both normal metadata and submetadata
-        if (overWrite) {
-          componentIndexes.forEach((idx) => {
-            const payload = { ...manifestDataClone.components[idx].payload };
-            const meta: any = {};
-            props.metaStaging.forEach((file) => {
-              const subMeta =
-                manifestDataClone.components[idx].payload.subMetadata;
+      //handle overwriting, both normal metadata and submetadata
+      // if (overWrite) {
+      //   componentIndexes.forEach((idx) => {
+      //     const payload = { ...manifestDataClone.components[idx].payload };
+      //     const meta: any = {};
+      //     props.metaStaging.forEach((file) => {
+      //       const subMeta =
+      //         manifestDataClone.components[idx].payload.subMetadata;
 
-              const splitPath = file.file!.path!.split("/");
-              if (rootComponentPaths.some((p: string) => p === splitPath[0]))
-                splitPath.splice(0, 1);
-              const neutralPath = splitPath.join("/");
+      //       const splitPath = file.file!.path!.split("/");
+      //       if (rootComponentPaths.some((p: string) => p === splitPath[0]))
+      //         splitPath.splice(0, 1);
+      //       const neutralPath = splitPath.join("/");
 
-              // const removeMetaKeys = Object.keys(subMeta).filter((k) =>
-              //   k.includes(neutralPath)
-              // );
+      //       // const removeMetaKeys = Object.keys(subMeta).filter((k) =>
+      //       //   k.includes(neutralPath)
+      //       // );
 
-              Object.keys(subMeta).forEach((k) => {
-                if (!k.includes(neutralPath)) {
-                  meta[k] = subMeta[k];
-                }
-              });
-              // removeMetaKeys.forEach((k) => delete subMeta[k]);
-            });
-            dispatch(
-              updateComponent({
-                index: idx,
-                update: {
-                  ...manifestDataClone.components[idx],
-                  payload: { ...payload, subMetadata: meta },
-                },
-              })
-            );
-          });
-        }
+      //       Object.keys(subMeta).forEach((k) => {
+      //         if (!k.includes(neutralPath)) {
+      //           meta[k] = subMeta[k];
+      //         }
+      //       });
+      //       // removeMetaKeys.forEach((k) => delete subMeta[k]);
+      //     });
+      //     dispatch(
+      //       updateComponent({
+      //         index: idx,
+      //         update: {
+      //           ...manifestDataClone.components[idx],
+      //           payload: { ...payload, subMetadata: meta },
+      //         },
+      //       })
+      //     );
+      //   });
+      // }
 
-        //regular metadata
-        if (!rootCid) {
-          componentIndexes.forEach((cI) => {
-            const newPayload = {
-              ...manifestData?.components[cI].payload,
-              ...data,
-            };
-            // console.log("components", manifestDataClone.components[cI]);
-            // manifestDataClone.components[cI].payload = newPayload;
-            dispatch(
-              updateComponent({
-                index: cI,
-                update: {
-                  ...manifestDataClone.components[cI],
-                  payload: newPayload,
-                },
-              })
-            );
-          });
-        }
+      const componentIndex = manifestDataClone.components!.findIndex(
+        (c) => c.payload.path === fileMetadataBeingEdited?.path!
+      );
 
-        //subMetadata
-        if (rootCid) {
-          const idx = componentIndexes[0];
-          let payload = { ...manifestDataClone.components[idx].payload };
-          props.metaStaging.forEach((file) => {
-            if (file.file.path) {
-              const newSubMetadata = {
-                ...payload.subMetadata[file.file.path],
-                ...data,
-              };
+      const newPayload = {
+        ...data,
+      };
+      if (componentIndex !== -1) {
+        dispatch(
+          updateComponent({
+            index: componentIndex,
+            update: {
+              payload: newPayload,
+            },
+          })
+        );
+      }
 
-              payload = {
-                ...payload,
-                subMetadata: {
-                  ...payload.subMetadata,
-                  [file.file.path]: newSubMetadata,
-                },
-              };
-            }
-          });
-          dispatch(
-            updateComponent({
-              index: idx,
-              update: { ...manifestData.components[idx], payload },
-            })
-          );
-        }
-
-        try {
-          // await saveManifest(manifestDataClone);
-          setIsSaving(true);
-          dispatch(
-            saveManifestDraft({
-              onError: () => {
-                setIsSaving(false);
-              },
-              onSucess: () => {
-                setIsSaving(false);
-                if (hasDirs) {
-                  props.metaStaging.forEach((f) => {
-                    if (f.file.type === FileType.DIR)
-                      findAndInheritSubMetadata(manifestData, f.file);
-                  });
-                }
-
-                props.metaStaging.forEach((f) => {
-                  f.file.metadata = data;
-                });
-
-                setOverWrite(false);
-                setShowOverwriteDialog(false);
-                props.onClose();
-              },
-            })
-          );
-        } catch (e: any) {
-          alert(e.message);
-          setIsSaving(false);
-        }
+      try {
+        // await saveManifest(manifestDataClone);
+        setIsSaving(true);
+        dispatch(
+          saveManifestDraft({
+            onError: () => {
+              setIsSaving(false);
+            },
+            onSucess: () => {
+              setIsSaving(false);
+              setOverWrite(false);
+              setShowOverwriteDialog(false);
+              props.onClose();
+            },
+          })
+        );
+      } catch (e: any) {
+        alert(e.message);
+        setIsSaving(false);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      overWrite,
-      props.metaStaging,
-      manifestData,
-      rootCid,
-      componentIndexes,
-      hasDirs,
-      props,
-      currentObjectId,
-    ]
+    [overWrite, manifestData, props, currentObjectId]
   );
-
-  const isVirtualComponent =
-    componentIndexes === undefined || !componentIndexes.length;
-  if (isVirtualComponent) {
-    // console.log("[MD]virtual");
-    return <div></div>;
-    // return <div className="text-xs bg-red-500">component problem</div>;
-  }
 
   const onHandleDismiss = () => {
     setDialogs([
@@ -335,18 +232,13 @@ const DriveDatasetMetadataPopOver = (
                 {props.isVisible && mode === "editor" ? (
                   <DatasetMetadataForm
                     ref={formRef}
-                    prepopulate={
-                      props.datasetMetadataInfoRef.current.prepopulateMetadata
-                    }
-                    prepopulatingFrom={
-                      props.datasetMetadataInfoRef.current.prepopulateFromName
-                    }
+                    prepopulate={fileMetadataBeingEdited!.metadata}
+                    prepopulatingFrom={fileMetadataBeingEdited!.name}
                     currentObjectId={currentObjectId!}
                     onSubmit={onSubmit}
                     // setNewMetadata={setNewMetadata}
                     loading={isSaving}
-                    metaStaging={props.metaStaging}
-                    defaultLicense={props.manifestData.defaultLicense || ""}
+                    defaultLicense={manifestData!.defaultLicense || ""}
                   />
                 ) : // <ReadOnlyComponent component={component} />
                 null}
@@ -360,26 +252,28 @@ const DriveDatasetMetadataPopOver = (
                   // debugger;
                   if (publicView) {
                     props.onClose();
-                  } else {
-                    if (hasDirs) {
-                      setShowOverwriteDialog(true);
-                    } else {
-                      //overwriting not an option (file)
-                      formRef.current!.submit!();
-                    }
                   }
+                  // else {
+                  //   if (hasDirs) {
+                  //     setShowOverwriteDialog(true);
+                  //   } else {
+                  //overwriting not an option (file)
+                  formRef.current!.submit!();
+                  // }
+                  // }
                 }}
                 disabled={isSaving && !publicView}
               >
                 {isSaving ? (
                   <DefaultSpinner color="black" size={24} />
                 ) : mode === "editor" ? (
-                  hasDirs ? (
-                    "Next"
-                  ) : (
-                    "Save"
-                  )
+                  // hasDirs ? (
+                  //   "Next"
+                  // ) : (
+                  "Save"
                 ) : (
+                  // )
+                  // ) : (
                   "Done"
                 )}
               </PrimaryButton>

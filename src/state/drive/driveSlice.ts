@@ -69,6 +69,7 @@ interface DriveState {
   showUploadPanel: boolean;
   deprecated: boolean | undefined;
   componentTypeBeingAssignedTo: DrivePath | null;
+  fileMetadataBeingEdited: DriveObject | null;
 }
 
 const initialState: DriveState = {
@@ -82,6 +83,7 @@ const initialState: DriveState = {
   batchUploadProgress: {},
   showUploadPanel: false,
   componentTypeBeingAssignedTo: null,
+  fileMetadataBeingEdited: null,
 };
 
 export const driveSlice = createSlice({
@@ -169,6 +171,12 @@ export const driveSlice = createSlice({
       { payload }: PayloadAction<DrivePath | null>
     ) => {
       state.componentTypeBeingAssignedTo = payload;
+    },
+    setFileMetadataBeingEditted: (
+      state,
+      { payload }: PayloadAction<DriveObject | null>
+    ) => {
+      state.fileMetadataBeingEdited = payload;
     },
   },
   extraReducers: (builder) => {
@@ -277,6 +285,7 @@ export const {
   starComponent,
   assignComponentType,
   setComponentTypeBeingAssignedTo,
+  setFileMetadataBeingEditted,
 } = driveSlice.actions;
 
 export interface FetchTreeThunkParams {
