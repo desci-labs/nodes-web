@@ -1,7 +1,7 @@
 import DefaultSpinner from "@components/atoms/DefaultSpinner";
 import PrimaryButton from "@components/atoms/PrimaryButton";
 import { EMPTY_FUNC } from "@components/utils";
-import React, { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import {
   DataComponent,
@@ -11,10 +11,10 @@ import {
 
 import { DatasetMetadataForm } from "./DatasetMetadataForm";
 import { OverwriteMetadataForm } from "./OverwriteMetadataDialog";
-import { FileType } from "@src/components/organisms/Drive";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import {
   addComponent,
+  removeComponentMetadata,
   saveManifestDraft,
   updateComponent,
 } from "@src/state/nodes/viewer";
@@ -81,48 +81,35 @@ const DriveDatasetMetadataPopOver = (
     },
   });
 
+  const hasFilesWithMoreSpecificMetadata =
+    fileMetadataBeingEdited?.contains &&
+    fileMetadataBeingEdited?.contains.length &&
+    manifestData?.components.some((c) => {
+      return (
+        c.payload.path?.includes(fileMetadataBeingEdited?.path) &&
+        c.payload.path !== fileMetadataBeingEdited?.path
+      );
+    });
+
   const onSubmit = useCallback(
     async (data: DataComponent["payload"]) => {
       console.log("[DRIVE METADATA] ON SUBMIT HIT");
       const manifestDataClone = { ...manifestData };
 
-      //handle overwriting, both normal metadata and submetadata
-      // if (overWrite) {
-      //   componentIndexes.forEach((idx) => {
-      //     const payload = { ...manifestDataClone.components[idx].payload };
-      //     const meta: any = {};
-      //     props.metaStaging.forEach((file) => {
-      //       const subMeta =
-      //         manifestDataClone.components[idx].payload.subMetadata;
-
-      //       const splitPath = file.file!.path!.split("/");
-      //       if (rootComponentPaths.some((p: string) => p === splitPath[0]))
-      //         splitPath.splice(0, 1);
-      //       const neutralPath = splitPath.join("/");
-
-      //       // const removeMetaKeys = Object.keys(subMeta).filter((k) =>
-      //       //   k.includes(neutralPath)
-      //       // );
-
-      //       Object.keys(subMeta).forEach((k) => {
-      //         if (!k.includes(neutralPath)) {
-      //           meta[k] = subMeta[k];
-      //         }
-      //       });
-      //       // removeMetaKeys.forEach((k) => delete subMeta[k]);
-      //     });
-      //     dispatch(
-      //       updateComponent({
-      //         index: idx,
-      //         update: {
-      //           ...manifestDataClone.components[idx],
-      //           payload: { ...payload, subMetadata: meta },
-      //         },
-      //       })
-      //     );
-      //   });
-      // }
       try {
+        if (overWrite) {
+          const componentIndexes: number[] = [];
+          manifestData!.components.forEach((c, idx) => {
+            if (
+              c.payload.path?.includes(fileMetadataBeingEdited?.path!) &&
+              c.payload.path !== fileMetadataBeingEdited?.path!
+            ) {
+              componentIndexes.push(idx);
+            }
+          });
+          dispatch(removeComponentMetadata({ componentIndexes }));
+        }
+
         const componentIndex = manifestDataClone.components!.findIndex(
           (c) => c.payload.path === fileMetadataBeingEdited?.path!
         );
@@ -255,33 +242,27 @@ const DriveDatasetMetadataPopOver = (
             <div className="flex flex-row justify-end gap-4 items-center h-16 w-full dark:bg-[#272727] border-t border-t-[#81C3C8] rounded-b-lg p-4">
               <PrimaryButton
                 onClick={() => {
-                  console.log("submit");
-                  // debugger;
                   if (publicView) {
                     props.onClose();
+                  } else {
+                    if (hasFilesWithMoreSpecificMetadata) {
+                      setShowOverwriteDialog(true);
+                    } else {
+                      //Overwriting not an option (file)
+                      formRef.current!.submit!();
+                    }
                   }
-                  // else {
-                  //   if (hasDirs) {
-                  //     setShowOverwriteDialog(true);
-                  //   } else {
-                  //overwriting not an option (file)
-                  formRef.current!.submit!();
-                  // }
-                  // }
                 }}
                 disabled={isSaving && !publicView}
               >
                 {isSaving ? (
                   <DefaultSpinner color="black" size={24} />
-                ) : mode === "editor" ? (
-                  // hasDirs ? (
-                  //   "Next"
-                  // ) : (
-                  "Save"
-                ) : (
-                  // )
-                  // ) : (
+                ) : mode !== "editor" ? (
                   "Done"
+                ) : hasFilesWithMoreSpecificMetadata ? (
+                  "Next"
+                ) : (
+                  "Save"
                 )}
               </PrimaryButton>
             </div>

@@ -362,11 +362,24 @@ export const nodeReaderSlice = createSlice({
     ) => {
       state.recentlyAddedComponent = payload;
     },
-    removeRecentlyAddedComponent: (
-      state,
-      { payload }: PayloadAction<DrivePath>
-    ) => {
+    removeRecentlyAddedComponent: (state) => {
       state.recentlyAddedComponent = "";
+    },
+    removeComponentMetadata: (
+      state,
+      {
+        payload: { componentIndexes },
+      }: PayloadAction<{ componentIndexes: number[] }>
+    ) => {
+      componentIndexes.forEach((componentIndex) => {
+        delete state.manifest!.components[componentIndex].payload.title;
+        delete state.manifest!.components[componentIndex].payload.description;
+        delete state.manifest!.components[componentIndex].payload.keywords;
+        delete state.manifest!.components[componentIndex].payload.licenseType;
+        delete state.manifest!.components[componentIndex].payload.ontologyPurl;
+        delete state.manifest!.components[componentIndex].payload
+          .controlledVocabTerms;
+      });
     },
   },
   extraReducers(builder) {
@@ -460,4 +473,5 @@ export const {
   addComponent,
   addRecentlyAddedComponent,
   removeRecentlyAddedComponent,
+  removeComponentMetadata,
 } = nodeReaderSlice.actions;
