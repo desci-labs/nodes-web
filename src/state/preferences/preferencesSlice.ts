@@ -30,8 +30,8 @@ const slice = createSlice({
     toggleTheme: (state) => {
       state.theme = state.theme === "dark" ? "light" : "dark";
     },
-    toggleMobileView: (state) => {
-      state.isMobileView = state.isMobileView ? false : true;
+    setMobileView: (state, { payload }: PayloadAction<boolean>) => {
+      state.isMobileView = payload;
     },
     setOrcid: (state, { payload }: PayloadAction<Partial<Orcid>>) => {
       state.orcid = { ...state.orcid, ...payload };
@@ -81,6 +81,6 @@ export const {
   setFooterHidden,
   setHeaderHidden,
   setActiveToolbar,
-  toggleMobileView,
+  setMobileView,
   setShowReferralModal,
 } = slice.actions;

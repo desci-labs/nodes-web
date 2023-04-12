@@ -8,33 +8,18 @@ import {
   SwitchButton,
 } from "@src/components/atoms/SwitchBar/SwitchBar";
 import { useSetter } from "@src/store/accessors";
-import { useNodeReader, useNodeVersions } from "@src/state/nodes/hooks";
-import { useUser } from "@src/state/user/hooks";
-import { useState } from "react";
+import { useNodeReader } from "@src/state/nodes/hooks";
 
 export default function Explorer() {
   const dispatch = useSetter();
-  const {
-    manifest: manifestData,
-    publicView,
-    isCommitPanelOpen,
-    currentObjectId,
-    isResearchPanelOpen,
-    mode,
-    researchPanelTab,
-  } = useNodeReader();
-  const nodeVersions = useNodeVersions(currentObjectId);
+  const { researchPanelTab } = useNodeReader();
 
   const onSetResearchPanelTab = (tab: ResearchTabs) =>
     dispatch(setResearchPanelTab(tab));
-  const [doPad] = useState(false);
 
   return (
     <>
-      <div
-        className="px-4 text-white"
-        style={{ marginRight: doPad ? 15 : undefined }}
-      >
+      <div className="px-4 text-white">
         <SwitchBar style={{ margin: "1rem 0 1rem 0", height: 35 }}>
           <SwitchButton
             isSelected={researchPanelTab === ResearchTabs.current}
@@ -64,7 +49,7 @@ export default function Explorer() {
       </div>
 
       <PerfectScrollbar className="overflow-auto text-white">
-        <div className={`pl-4 ${doPad ? "pr-8" : "pr-4"}`}>
+        <div className="px-4">
           {researchPanelTab === ResearchTabs.current ? (
             <ManuscriptComponentsSection />
           ) : null}

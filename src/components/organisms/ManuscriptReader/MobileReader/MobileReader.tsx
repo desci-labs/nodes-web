@@ -8,8 +8,7 @@ import useManuscriptReader from "@components/organisms/ManuscriptReader/hooks/us
 import useReaderEffects from "@components/organisms/ManuscriptReader/hooks/useReaderEffects";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import Header from "./Header";
-import { isMobile } from "react-device-detect";
-import { toggleMobileView } from "@src/state/preferences/preferencesSlice";
+import { setMobileView } from "@src/state/preferences/preferencesSlice";
 import { useSetter } from "@src/store/accessors";
 import { useAppPreferences } from "@src/state/preferences/hooks";
 import Placeholder from "@components/organisms/ManuscriptReader/Placeholder";
@@ -58,11 +57,10 @@ const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
   }, [currentObjectId]);
 
   useEffect(() => {
-    console.log("toggle mobile view", isMobileView, isMobile);
-    dispatch(toggleMobileView());
+    dispatch(setMobileView(true));
+
     return () => {
-      console.log("reset mobile view", isMobileView, isMobile);
-      isMobileView && dispatch(toggleMobileView());
+      dispatch(setMobileView(false));
     };
   }, [dispatch, isMobileView]);
 

@@ -1,8 +1,8 @@
-import ManuscriptReader from "@src/components/organisms/ManuscriptReader";
-import PdfHeader from "@src/components/organisms/PdfHeader";
 import useScroll from "@src/hooks/useScroll";
-import { Popovers } from "./Providers/AppWrapper";
 import { isMobile } from "react-device-detect";
+import { Popovers } from "./Providers/AppWrapper";
+import PdfHeader from "@src/components/organisms/PdfHeader";
+import ManuscriptReader from "@src/components/organisms/ManuscriptReader";
 import MobileReader from "@src/components/organisms/ManuscriptReader/MobileReader/MobileReader";
 
 export default function PrivateViewer() {
