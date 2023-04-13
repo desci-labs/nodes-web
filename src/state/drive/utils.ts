@@ -226,6 +226,24 @@ export function driveBfsByPath(rootDrive: DriveObject, targetPath: string) {
   }
 }
 
+/* Matches on conditions met that DriveObject has, e.g. { cid: 123abc, componentType: PDF } */
+export function bfsDriveSearch(
+  rootDrive: DriveObject,
+  conditions: Partial<DriveObject>
+) {
+  const queue = [rootDrive];
+  while (queue.length) {
+    const node = queue.shift() as DriveObject;
+    if (
+      Object.entries(conditions).every(
+        ([key, value]) => node[key as keyof DriveObject] === value
+      )
+    )
+      return node;
+    if (node.contains && node.contains?.length) queue.push(...node.contains);
+  }
+}
+
 //Preferred over driveBfsByPath, but may not function if working with deprecated tree
 export function findDriveByPath(rootDrive: DriveObject, targetPath: string) {
   if (!targetPath || !rootDrive) return null;
@@ -257,6 +275,11 @@ export function urlOrCid(cid: string, type: ResearchObjectComponentType) {
     default:
       return { cid };
   }
+}
+
+export function getComponentCid(component: ResearchObjectV1Component) {
+  if (component.payload?.url) return component.payload.url;
+  return component.payload?.cid;
 }
 
 export function formatDbDate(date: string | Date | number) {
