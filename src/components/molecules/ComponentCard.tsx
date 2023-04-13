@@ -131,7 +131,6 @@ const ComponentCard = (props: ComponentCardProps) => {
     props;
   const [showComponentMetadata, setShowComponentMetadata] =
     useState<boolean>(false);
-  const { setDriveJumpDir } = useManuscriptController([]);
   const { recentlyAddedComponent } = useNodeReader();
   /***
    * Use local click tracking for fast click response

@@ -62,7 +62,6 @@ interface State {
   showCitationModal: boolean;
   // selectedHistory: HistoryEntryProps | null;
   showPublicationDetails: boolean;
-  driveJumpDir: DriveJumpingParams | null;
   showProfileUpdater: boolean;
   componentToCite: DriveObject | null;
   forceRefreshDrive: boolean;
@@ -116,7 +115,6 @@ export const initialState: State = {
   componentToCite: null,
   showCitationModal: false,
   showPublicationDetails: false,
-  driveJumpDir: null,
   showProfileUpdater: false,
   forceRefreshDrive: false,
   showAddNewNode: false,

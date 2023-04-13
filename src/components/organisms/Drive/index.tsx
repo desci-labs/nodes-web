@@ -49,19 +49,10 @@ interface DriveTableProps {
 }
 
 const DriveTable: React.FC<DriveTableProps> = ({ setLoading }) => {
-  const {
-    setIsAddingComponent,
-    driveJumpDir,
-    setDriveJumpDir,
-    setAddFilesWithoutContext,
-  } = useManuscriptController(["driveJumpDir"]);
+  const { setIsAddingComponent, setAddFilesWithoutContext } =
+    useManuscriptController([]);
 
-  const {
-    manifest: manifestData,
-    publicView,
-    currentObjectId,
-    mode,
-  } = useNodeReader();
+  const { publicView, mode } = useNodeReader();
 
   const { nodeTree, status, currentDrive, deprecated, breadCrumbs } =
     useDrive();
@@ -73,8 +64,6 @@ const DriveTable: React.FC<DriveTableProps> = ({ setLoading }) => {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const [jumpReady, setJumpReady] = useState<boolean>(false);
-
   function exploreDirectory(
     name: FileDir["name"] | DriveObject["name"],
     drive: DriveObject
@@ -85,25 +74,8 @@ const DriveTable: React.FC<DriveTableProps> = ({ setLoading }) => {
 
   function eatBreadCrumb(index: number) {
     dispatch(navigateToDriveByPath({ path: breadCrumbs[index].path! }));
-    // dispatch(removeBreadCrumbs({ index: index }));
     setSelected({});
   }
-
-  //*deprecated: to be removed* resume from previous dir when ready
-  useEffect(() => {
-    const lastDirUid = JSON.parse(
-      sessionStorage.getItem(SessionStorageKeys.lastDirUid)!
-    );
-    if (lastDirUid) {
-      console.log(
-        "[DRIVE RESUME] Recovered last directory location, jumping... ",
-        lastDirUid
-      );
-
-      if (jumpReady) setDriveJumpDir({ targetUid: lastDirUid });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [jumpReady]);
 
   function toggleSelected(
     index: number,
@@ -126,67 +98,6 @@ const DriveTable: React.FC<DriveTableProps> = ({ setLoading }) => {
   const canUse = useMemo(() => {
     return Object.keys(selected).length <= 1;
   }, [selected]);
-
-  //handles jumping to dirs (upload panel click for instance)
-  useEffect(() => {
-    if (!nodeTree) return;
-    if (driveJumpDir && jumpReady) {
-      // debugger;
-      setLoading(true);
-      if (driveJumpDir.targetUid || driveJumpDir.targetPath) {
-        console.log(
-          `[DRIVE JUMPING] drive jumping to ${
-            driveJumpDir.targetUid
-              ? driveJumpDir.targetUid
-              : driveJumpDir.targetPath
-          }`
-        );
-        //try find freshest via bfs
-        const latestByUid = driveBfsByUid(nodeTree!, driveJumpDir.targetUid!);
-
-        const latest = latestByUid
-          ? latestByUid
-          : driveBfsByPath(nodeTree!, driveJumpDir.targetPath!);
-        if (latest) {
-          navigateToDriveByPath({ path: latest.path! });
-          console.log(
-            `[DRIVE JUMPING] LATEST FOUND BY ${latestByUid ? "UID" : "PATH"}`
-          );
-        }
-
-        //select item
-        // debugger;
-        if (currentDrive!.contains) {
-          const containedIdxUid = currentDrive!.contains.findIndex(
-            (item: any) => item.uid === driveJumpDir.itemUid
-          );
-
-          const itemIdxFound = containedIdxUid
-            ? containedIdxUid
-            : currentDrive!.contains.findIndex((drv: DriveObject) =>
-                drv.path?.includes(driveJumpDir.itemPath!)
-              );
-
-          if (itemIdxFound !== -1) {
-            console.log(
-              `[DRIVE JUMPING] ITEM FOUND BY ${
-                containedIdxUid ? "UID" : "PATH"
-              }: ${
-                containedIdxUid ? driveJumpDir.itemUid : driveJumpDir.itemPath
-              }`
-            );
-            setSelected({
-              [itemIdxFound]:
-                currentDrive!.contains[itemIdxFound].componentType,
-            });
-          }
-        }
-      }
-      setLoading(false);
-      setDriveJumpDir(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [driveJumpDir, nodeTree, jumpReady]);
 
   return (
     <div className="w-full h-full">
