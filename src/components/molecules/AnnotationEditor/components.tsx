@@ -326,6 +326,7 @@ export const LinkComponent = (props: any) => {
 
 interface DirectoryLinkComponentProps {
   nodeRef: any;
+  setHref: (href: string) => void;
   href: string;
   fileName?: string;
   children: any;
@@ -334,12 +335,80 @@ interface DirectoryLinkComponentProps {
   element: CustomElement;
 }
 
+export interface AnnotationLinkConfig {
+  isExecutable?: boolean;
+  extraPath?: string;
+  lineNumber?: number;
+  url?: string;
+}
+
+export const parseAnnotationLink = (href: string): AnnotationLinkConfig => {
+  try {
+    let url;
+    if (href) {
+      url = href.split("?")[0];
+    }
+    if (!href || href.indexOf("?") < 0) {
+      return {
+        url,
+        isExecutable: undefined,
+        extraPath: undefined,
+        lineNumber: undefined,
+      };
+    }
+    const obj: any = href
+      .split("?")[1]
+      .split("&")
+      .reduce((acc, cur) => {
+        const [key, value] = cur.split("=");
+        acc[key] = value;
+        return acc;
+      }, {} as any);
+    const { isExecutable, extraPath, lineNumber } = obj;
+    return {
+      url,
+      isExecutable: isExecutable === "true",
+      extraPath: extraPath ? extraPath : undefined,
+      lineNumber: lineNumber ? parseInt(lineNumber) : undefined,
+    };
+  } catch (e) {
+    return {
+      url: undefined,
+      isExecutable: undefined,
+      extraPath: undefined,
+      lineNumber: undefined,
+    };
+  }
+};
+
 export const DirectoryLinkComponent = (props: DirectoryLinkComponentProps) => {
-  const { href, fileName, children, readOnly, attributes } = props;
+  const { href, setHref, fileName, children, readOnly, attributes } = props;
   const [showCopiedText, setShowCopiedText] = useState<boolean>(false);
 
   const [showEditSyntaxModal, setShowEditSyntaxModal] =
     useState<boolean>(false);
+
+  const [annotationLinkConfig, setAnnotationLinkConfig] =
+    useState<AnnotationLinkConfig>({});
+
+  useEffect(() => {
+    if (href) {
+      const { url, extraPath, isExecutable, lineNumber } =
+        parseAnnotationLink(href);
+      console.log("parse href", href, {
+        url,
+        extraPath,
+        isExecutable,
+        lineNumber,
+      });
+      setAnnotationLinkConfig({
+        url,
+        extraPath,
+        isExecutable,
+        lineNumber,
+      });
+    }
+  }, [href]);
 
   const selected = useSelected();
   const focused = useFocused();
@@ -359,12 +428,15 @@ export const DirectoryLinkComponent = (props: DirectoryLinkComponentProps) => {
     }
   }, [showCopiedText]);
 
-  const [isExecutable, setIsExecutable] = useState<boolean>(false);
+  const directoryLinkTooltipId = `directory-link-${btoa(href).replaceAll(
+    "=",
+    ""
+  )}`;
 
   return (
     <>
       <ReactTooltip
-        id="directoryLinkEditToolTip"
+        id={directoryLinkTooltipId}
         effect="solid"
         globalEventOff="click"
         backgroundColor="#000000"
@@ -374,7 +446,7 @@ export const DirectoryLinkComponent = (props: DirectoryLinkComponentProps) => {
         }}
         className="bg-black text-white rounded font-inter font-bold cursor-default p-0"
         overridePosition={({ left, top }) => {
-          top += 3;
+          top += 0;
           return { top, left };
         }}
         disable={readOnly}
@@ -424,15 +496,15 @@ export const DirectoryLinkComponent = (props: DirectoryLinkComponentProps) => {
         {...attributes}
         contentEditable={false}
         ref={linkRef}
-        className="relative"
+        className="relative inline-block"
         // style={{ userSelect: "none" }}
       >
         {/* only overlay the tooltip trigger when in editor (a.k.a !readOnly) */}
         {!readOnly ? (
           <span
-            className="absolute h-full w-full top-0 left-0"
+            className="absolute h-full w-full top-0 left-0 z-10 hover:bg-white hover:bg-opacity-30 cursor-pointer"
             data-tip
-            data-for="directoryLinkEditToolTip"
+            data-for={directoryLinkTooltipId}
             data-event="click focus"
           />
         ) : null}
@@ -441,10 +513,12 @@ export const DirectoryLinkComponent = (props: DirectoryLinkComponentProps) => {
       </span>
       <ModalEditAnnotationLink
         fileName={fileName || ""}
-        isExecutable={isExecutable}
-        setIsExecutable={setIsExecutable}
+        annotationLinkConfig={annotationLinkConfig}
+        setAnnotationLinkConfig={setAnnotationLinkConfig}
         setShowModal={setShowEditSyntaxModal}
         showModal={showEditSyntaxModal}
+        href={href}
+        setHref={setHref}
       />
     </>
   );

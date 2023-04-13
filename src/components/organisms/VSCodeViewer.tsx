@@ -26,7 +26,12 @@ const VSCodeViewer = () => {
   const { requestedCodeFile, setRequestedCodeFile } = useManuscriptController([
     "requestedCodeFile",
   ]);
-  const { manifest: manifestData, mode, componentStack } = useNodeReader();
+  const {
+    manifest: manifestData,
+    mode,
+    componentStack,
+    annotationLinkConfig,
+  } = useNodeReader();
 
   const [activeAnnotation, setActiveAnnotation] = useState(false);
   const [activeDraggable, setActiveDraggable] = useState(false);
@@ -58,62 +63,72 @@ const VSCodeViewer = () => {
       ?.payload?.externalUrl?.split("github.com/")[1]!;
   }
 
-  let anno;
-  let pdfComponent: PdfComponent = {
-    type: ResearchObjectComponentType.PDF,
-    payload: { url: "" },
-    id: "",
-    name: "",
-  };
-  let annotation: Annotation = {
-    startX: 0,
-    startY: 0,
-    endX: 0,
-    endY: 0,
-    id: "",
-    text: "",
-    title: "",
-  };
-  if (selectedAnnotationId) {
-    pdfComponent = componentStack.find(
-      (a) => a.type === ResearchObjectComponentType.PDF
-    )! as PdfComponent;
-    annotation = pdfComponent?.payload?.annotations?.find(
-      (a) => a.id == selectedAnnotationId
-    )!;
-  }
-  anno = (
-    <div
-      className={`handle fixed bottom-[28px] left-0 transition-all duration-200 ease-out ${
-        activeDraggable ? "cursor-move" : ""
-      } ${activeAnnotation ? "translate-x-2" : "-translate-x-96"}`}
-    >
-      <AnnotationExpanded
-        DURATION_BASE_MS={0}
-        annotationTitle={annotation?.title!}
-        annotationText={annotation?.text!}
-        annotation={annotation!}
-        mode={mode}
-      />
-    </div>
-  );
-  if (activeDraggable) {
-    anno = (
-      <Draggable
-        // axis="x"
-        handle=".handle"
-        defaultPosition={{ x: 8, y: 0 }}
-        position={undefined}
-        grid={[25, 25]}
-        scale={1}
-        onStart={eventLogger}
-        onDrag={eventLogger}
-        onStop={eventLogger}
+  const [tempAnnotation, setTempAnnotation] = useState(<></>);
+  useEffect(() => {
+    let pdfComponent: PdfComponent = {
+      type: ResearchObjectComponentType.PDF,
+      payload: { url: "" },
+      id: "",
+      name: "",
+    };
+    let annotation: Annotation = {
+      startX: 0,
+      startY: 0,
+      endX: 0,
+      endY: 0,
+      id: "",
+      text: "",
+      title: "",
+    };
+    if (selectedAnnotationId) {
+      pdfComponent = manifestData?.components.find(
+        (a: ResearchObjectV1Component) =>
+          a.type === ResearchObjectComponentType.PDF
+      )! as PdfComponent;
+      annotation = pdfComponent?.payload?.annotations?.find(
+        (a) => a.id == selectedAnnotationId
+      )!;
+    }
+    let anno = (
+      <div
+        className={`handle fixed bottom-[28px] left-0 transition-all duration-200 ease-out ${
+          activeDraggable ? "cursor-move" : ""
+        } ${activeAnnotation ? "translate-x-2" : "-translate-x-96"}`}
       >
-        {anno}
-      </Draggable>
+        <AnnotationExpanded
+          DURATION_BASE_MS={0}
+          annotationTitle={annotation?.title!}
+          annotationText={annotation?.text!}
+          annotation={annotation!}
+          hideHeader={true}
+        />
+      </div>
     );
-  }
+    if (activeDraggable) {
+      anno = (
+        <Draggable
+          // axis="x"
+          handle=".handle"
+          defaultPosition={{ x: 8, y: 0 }}
+          position={undefined}
+          grid={[25, 25]}
+          scale={1}
+          onStart={eventLogger}
+          onDrag={eventLogger}
+          onStop={eventLogger}
+        >
+          {anno}
+        </Draggable>
+      );
+    }
+    setTempAnnotation(anno);
+  }, [
+    selectedAnnotationId,
+    manifestData,
+    activeDraggable,
+    activeAnnotation,
+    annotationLinkConfig,
+  ]);
 
   const ref = useRef(null);
 
@@ -165,6 +180,30 @@ const VSCodeViewer = () => {
   //   }, 5000);
   // }, []);
 
+  const [codeBrowseSuffix, setCodeBrowseSuffix] = useState("");
+
+  useEffect(() => {
+    if (annotationLinkConfig && annotationLinkConfig.extraPath) {
+      setCodeBrowseSuffix(
+        `#file=${annotationLinkConfig.extraPath}${
+          annotationLinkConfig.lineNumber
+            ? `&line=${annotationLinkConfig.lineNumber}`
+            : ""
+        }`
+      );
+    }
+  }, [annotationLinkConfig]);
+  if (annotationLinkConfig && annotationLinkConfig.url) {
+    const targetId = annotationLinkConfig.url
+      .split("#/code/")
+      .filter((a) => a.length)[0];
+    let targetCodeComponent = manifestData?.components.find((c) => {
+      return c.id === targetId;
+    });
+    lastCode =
+      targetCodeComponent?.payload?.externalUrl?.split("github.com/")[1]!;
+  }
+
   if (codeComponent?.type !== "code") {
     return <></>;
   }
@@ -189,12 +228,14 @@ const VSCodeViewer = () => {
         <iframe
           ref={ref}
           title={"desci.dev"}
-          src={`${DEFAULT_CODE_SERVER_READ}/${lastCode || ""}`}
+          src={`${DEFAULT_CODE_SERVER_READ}/${lastCode || ""}${
+            codeBrowseSuffix || ""
+          }`}
           className="w-[calc(100vw-336px)] h-[calc(100vh-55px)] select-none"
         />
       )}
 
-      {anno}
+      {tempAnnotation}
     </div>
   );
 };

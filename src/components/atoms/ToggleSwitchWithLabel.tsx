@@ -1,4 +1,4 @@
-import { PropsWithChildren, ReactChildren } from "react";
+import { PropsWithChildren, ReactChildren, useCallback } from "react";
 import ToggleSwitch from "./ToggleSwitch";
 
 interface ToggleSwitchWithLabelProps {
@@ -11,18 +11,21 @@ const ToggleSwitchWithLabel = ({
   isEnabled,
   setEnabled,
 }: ToggleSwitchWithLabelProps & PropsWithChildren<any>) => {
-  const toggle = (e: any) => {
-    setEnabled(true);
-    e.preventDefault();
-    e.stopPropagation();
-  };
+  const toggle = useCallback(
+    (e: any) => {
+      setEnabled(!isEnabled);
+      e.preventDefault();
+      e.stopPropagation();
+    },
+    [setEnabled, isEnabled]
+  );
   return (
     <div
       onClick={toggle}
-      className="text-xs cursor-pointer text-white justify-around flex items-center"
+      className="text-xs select-none cursor-pointer text-white justify-end gap-2 flex items-center"
     >
-      <ToggleSwitch isEnabled={() => isEnabled} toggle={toggle} />
       <div>{children}</div>
+      <ToggleSwitch isEnabled={() => isEnabled} toggle={() => {}} />
     </div>
   );
 };

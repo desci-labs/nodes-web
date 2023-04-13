@@ -19,7 +19,7 @@ const ToggleSwitch = ({
   IconOn,
   isEnabled,
   toggle,
-  enabledBkgColorClass = "bg-gray-700",
+  enabledBkgColorClass = "bg-tint-primary",
 }: SwitchProps) => {
   let enabled = isEnabled();
 

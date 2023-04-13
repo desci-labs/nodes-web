@@ -6,23 +6,23 @@ import SlideDown from "react-slidedown";
 import EditAnnotationBody from "./EditAnnotationBody";
 import EditAnnotationFooter from "./EditAnnotationFooter";
 import ButtonCopyLink from "@components/atoms/ButtonCopyLink";
+import React, { useState } from "react";
+import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
+import { AnnotationUpdateProps } from "../molecules/Annotation";
 
 interface AnnotationFixedPositionProps {
   isEditingAnnotation: boolean;
   DURATION_BASE_MS: number;
   annotationTitle: string;
   annotationText: string;
-  setAnnotationText: (text: string) => void;
-  setAnnotationTitle: (text: string) => void;
   annotation: Annotation;
-  mode: string;
-  counter: number;
-  setCounter: (num: number) => void;
   isCode: boolean;
   handleCancel: () => void;
-  handleSave: () => void;
+  handleSave: (obj: AnnotationUpdateProps) => void;
   keepAnnotating: boolean;
   setKeepAnnotating: (val: boolean) => void;
+  setAnnotationText: (val: string) => void;
+  setAnnotationTitle: (val: string) => void;
 }
 
 const AnnotationFixedPosition = ({
@@ -33,16 +33,21 @@ const AnnotationFixedPosition = ({
   setAnnotationText,
   setAnnotationTitle,
   annotation,
-  mode,
-  counter,
-  setCounter,
   isCode,
   handleCancel,
   handleSave,
   keepAnnotating,
   setKeepAnnotating,
 }: AnnotationFixedPositionProps) => {
-  console.log("Fixed editor", isCode, isEditingAnnotation);
+  const { mode } = useNodeReader();
+
+  const [blockSlateChange, setBlockSlateChange] = useState(false);
+
+  console.log(
+    "<AnnotationFixedPosition render>",
+
+    annotationText
+  );
   console.log(
     "maxHeight",
     isCode ? 174 : isEditingAnnotation ? 200 : 0,
@@ -103,7 +108,7 @@ const AnnotationFixedPosition = ({
                     <div className="w-[365px]" />
                   )}
                 </>
-              ) : annotationTitle.length ? (
+              ) : annotationTitle?.length ? (
                 annotationTitle
               ) : (
                 <span className="font-normal">
@@ -150,8 +155,6 @@ const AnnotationFixedPosition = ({
               >
                 <EditAnnotationBody
                   annotationText={annotationText}
-                  counter={counter}
-                  setCounter={setCounter}
                   isCode={isCode}
                   setAnnotationText={setAnnotationText}
                   readOnly={!isEditingAnnotation}

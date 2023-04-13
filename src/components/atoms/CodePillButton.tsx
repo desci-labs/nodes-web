@@ -5,13 +5,15 @@ import {
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 import { IconPlay } from "@icons";
-import { PropsWithChildren, useState } from "react";
+import { PropsWithChildren, useCallback, useState } from "react";
 import { useSetter } from "@src/store/accessors";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import {
   popFromComponentStack,
   pushToComponentStack,
+  setAnnotationLinkConfig,
 } from "@src/state/nodes/viewer";
+import { parseAnnotationLink } from "../molecules/AnnotationEditor/components";
 let execCount = 1;
 const CodePillButton = ({
   children,
@@ -21,36 +23,56 @@ const CodePillButton = ({
   const { setCodeFileTabs, setRequestedCodeFile } = useManuscriptController([]);
 
   const dispatch = useSetter();
-  const { manifest: manifestData, componentStack } = useNodeReader();
+  const {
+    manifest: manifestData,
+    componentStack,
+    annotationLinkConfig,
+  } = useNodeReader();
 
-  const [flipped] = useState(
-    componentStack[componentStack.length - 1]?.type ===
-      ResearchObjectComponentType.CODE
-  );
+  const thisLinkConfig = parseAnnotationLink(href);
+
+  const getCodeComponent = useCallback(() => {
+    const targetId = thisLinkConfig.url?.split("#/code/")[1];
+    const codeComponent =
+      manifestData &&
+      manifestData.components.find(
+        (component: ResearchObjectV1Component) =>
+          component.type === ResearchObjectComponentType.CODE &&
+          component.id === targetId
+      );
+
+    return codeComponent;
+  }, [manifestData]);
+
+  const flipped =
+    annotationLinkConfig?.url == thisLinkConfig.url &&
+    annotationLinkConfig?.extraPath == thisLinkConfig?.extraPath;
+
   return (
     <button
       onClick={
         onClick
           ? onClick
           : () => {
-              const codeComponent =
-                manifestData &&
-                manifestData.components.find(
-                  (component: ResearchObjectV1Component) =>
-                    component.type === ResearchObjectComponentType.CODE
-                );
+              const codeComponent = getCodeComponent();
               if (codeComponent) {
-                if (
-                  componentStack[componentStack.length - 1].id ===
-                  codeComponent.id
-                ) {
+                if (flipped) {
                   // popFromComponentStack();
                   dispatch(popFromComponentStack());
+                  dispatch(setAnnotationLinkConfig(null));
                 } else {
+                  if (
+                    componentStack[componentStack.length - 1]?.type === "code"
+                  ) {
+                    dispatch(popFromComponentStack());
+                  }
                   dispatch(pushToComponentStack(codeComponent));
-                  // !!!HARDCODED
-
                   if (href) {
+                    const annotationLinkConfig = parseAnnotationLink(href);
+                    dispatch(setAnnotationLinkConfig(annotationLinkConfig));
+                  }
+
+                  if (href && href.indexOf("?") > 0) {
                     const [query, name, path, sha] = href
                       .split("?")[1]
                       .split(/&?[nusp]=/);
@@ -63,7 +85,6 @@ const CodePillButton = ({
                       },
                       {}
                     );
-                    debugger;
 
                     setRequestedCodeFile({
                       name,
@@ -90,7 +111,7 @@ const CodePillButton = ({
         flipped
           ? "bg-gray-300 text-black hover:text-white"
           : "bg-black text-white"
-      } hover:bg-zinc-700 leading-loose h-6 items-center focus:outline-none rounded-full pr-2 font-serif text-sm font-light inline-flex flex-row`}
+      } hover:bg-zinc-700 leading-loose h-6 items-center focus:outline-none rounded-full pr-2 font-serif text-sm font-light inline-flex flex-row group`}
     >
       <div
         className={`select-none ${
@@ -108,6 +129,15 @@ const CodePillButton = ({
       </div>
       {children}
       {flipped ? (
+        <>
+          <span className="text-[10px] font-mono group-hover:text-gray-400 text-gray-700 ml-1">
+            [viewing]
+          </span>{" "}
+        </>
+      ) : (
+        ""
+      )}
+      {/* {flipped ? (
         <div
           onClick={(e) => {
             if (href) {
@@ -126,7 +156,7 @@ const CodePillButton = ({
         >
           <IconPlay width={10} />
         </div>
-      ) : null}
+      ) : null} */}
     </button>
   );
 };

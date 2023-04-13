@@ -79,6 +79,7 @@ export const SlateEditor = (props: any) => {
     setMode,
     rawMarkdown,
     setRawMarkdown,
+    setBlockSlateChange,
   } = props;
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const [showLatexButton, setShowLatexButton] = useState(false);
@@ -146,28 +147,34 @@ export const SlateEditor = (props: any) => {
     }
   }, []);
 
-  const renderElement = useCallback((props) => {
-    const nodeRef = Array.from(
-      Editor.nodes(editor, {
-        match: (n) => {
-          return (
-            !Editor.isEditor(n) &&
-            SlateElement.isElement(n) &&
-            SlateElement.matches(props.element, n as CustomElement)
-          );
-        },
-      })
-    );
+  const renderElement = useCallback(
+    (props) => {
+      const nodeRef = Array.from(
+        Editor.nodes(editor, {
+          match: (n) => {
+            return (
+              !Editor.isEditor(n) &&
+              SlateElement.isElement(n) &&
+              SlateElement.matches(props.element, n as CustomElement)
+            );
+          },
+        })
+      );
 
-    return (
-      <Element
-        {...props}
-        nodeRef={nodeRef}
-        isSelected={!!nodeRef[0]}
-        readOnly={readOnly}
-      />
-    );
-  }, []);
+      return (
+        <Element
+          {...props}
+          nodeRef={nodeRef}
+          isSelected={!!nodeRef[0]}
+          readOnly={readOnly}
+          setRawMarkdown={setRawMarkdown}
+          rawMarkdown={rawMarkdown}
+          setBlockSlateChange={setBlockSlateChange}
+        />
+      );
+    },
+    [rawMarkdown]
+  );
   const renderLeaf = useCallback((props) => {
     return <Leaf {...props} />;
   }, []);
@@ -389,6 +396,7 @@ const AnnotationEditor = (props: AnnotationEditorProps) => {
 
   // const [rawMarkdown, setRawMarkdown] = useState<any>(sampleMarkdown)
   const [slateObject, setSlateObject] = useState<CustomElement[] | null>(null);
+  const [blockSlateChange, setBlockSlateChange] = useState(false);
 
   // console.log("slateObject", slateObject);
   // console.log("rawMarkdown", rawMarkdown);
@@ -413,6 +421,7 @@ const AnnotationEditor = (props: AnnotationEditorProps) => {
               <SlateEditor
                 slateObject={slateObject}
                 onChange={(obj: any) => {
+                  if (blockSlateChange) return;
                   if (setRawMarkdown) {
                     setRawMarkdown(convertSlateToMarkdown(obj));
                   }
@@ -422,6 +431,7 @@ const AnnotationEditor = (props: AnnotationEditorProps) => {
                 rawMarkdown={rawMarkdown}
                 setRawMarkdown={setRawMarkdown}
                 className="h-[100px]"
+                setBlockSlateChange={setBlockSlateChange}
               />
             </ErrorBoundary>
           ) : null
@@ -591,6 +601,9 @@ const Element = (params: {
   nodeRef: any;
   isSelected: boolean;
   readOnly: boolean;
+  rawMarkdown: string;
+  setRawMarkdown: (rawMarkdown: string) => void;
+  setBlockSlateChange: (blockSlateChange: boolean) => void;
 }) => {
   const {
     attributes,
@@ -599,6 +612,9 @@ const Element = (params: {
     nodeRef,
     isSelected,
     readOnly,
+    rawMarkdown,
+    setRawMarkdown,
+    setBlockSlateChange,
     ...rest
   } = params;
   const style = { textAlign: element["align" as keyof CustomElement] };
@@ -683,6 +699,18 @@ const Element = (params: {
       if (element.link.startsWith("#/")) {
         return (
           <DirectoryLinkComponent
+            setHref={(href: string) => {
+              if (setRawMarkdown === undefined) return;
+              const newMarkdown = rawMarkdown.replaceAll(element.link, href);
+              /**
+               *  important to avoid <Slate onChange> handler overwriting this
+               */
+              setBlockSlateChange(true);
+              setTimeout(() => {
+                setRawMarkdown(newMarkdown);
+                setBlockSlateChange(false);
+              }, 50);
+            }}
             attributes={attributes}
             href={element.link}
             fileName={element.fileName}
@@ -871,7 +899,7 @@ is an equation
 [To Google!](https://google.com)`;
 // console.log(sampleMarkdown)
 
-export default AnnotationEditor;
+export default React.memo(AnnotationEditor);
 
 class ErrorBoundary extends React.Component {
   constructor(props: any) {
