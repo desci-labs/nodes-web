@@ -51,6 +51,7 @@ const TYPE_MAP: { [Property in ResearchObjectComponentType]: string } = {
   data: "Data",
   link: "External Link",
   "data-bucket": "Data Bucket",
+  unknown: "Unknown",
 };
 
 interface ComponentTodoItemProps {

@@ -35,7 +35,9 @@ import { useNodeReader } from "@src/state/nodes/hooks";
 import {
   navigateToDriveByPath,
   setComponentTypeBeingAssignedTo,
+  setFileMetadataBeingEdited,
 } from "@src/state/drive/driveSlice";
+import { useDrive } from "@src/state/drive/hooks";
 
 const CardWrapper: StyledComponent<
   "div",
@@ -129,8 +131,8 @@ const ComponentCard = (props: ComponentCardProps) => {
   const dispatch = useSetter();
   const { component, componentStack, mode, currentObjectId, manifestData } =
     props;
-  const [showComponentMetadata, setShowComponentMetadata] =
-    useState<boolean>(false);
+  const { fileMetadataBeingEdited } = useDrive();
+
   const { recentlyAddedComponent } = useNodeReader();
   /***
    * Use local click tracking for fast click response
@@ -279,8 +281,7 @@ const ComponentCard = (props: ComponentCardProps) => {
                       component.payload.description
                     }
                     mode={mode}
-                    setShowComponentMetadata={setShowComponentMetadata}
-                    componentId={component.id}
+                    component={component}
                   />
                   <ButtonCopyLink text={copyLinkUrl} />
                 </div>
@@ -296,18 +297,6 @@ const ComponentCard = (props: ComponentCardProps) => {
           </div>
         </FlexRowSpaceBetween>
       </FlexColumn>
-      {/** If we keep this rendered everytime, it results in a performance problem when switching to "current" tab */}
-      {showComponentMetadata &&
-      component.type !== ResearchObjectComponentType.DATA ? (
-        <ComponentMetadataPopover
-          currentObjectId={currentObjectId}
-          manifestData={manifestData}
-          mode={mode}
-          componentId={component.id}
-          isVisible={showComponentMetadata}
-          onClose={() => setShowComponentMetadata(false)}
-        />
-      ) : null}
     </CardWrapper>
   );
 };

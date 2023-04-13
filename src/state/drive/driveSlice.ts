@@ -6,11 +6,7 @@ import {
 } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 import { getDatasetTree, updateDag } from "@src/api";
-import {
-  DriveNonComponentTypes,
-  DriveObject,
-  FileType,
-} from "@src/components/organisms/Drive";
+import { DriveObject, FileType } from "@src/components/organisms/Drive";
 import { RequestStatus, RootState } from "@src/store";
 import {
   CommonComponentPayload,
@@ -38,11 +34,14 @@ import {
   generateFlatPathDriveMap,
   generatePathSizeMap,
   constructBreadCrumbs,
+  bfsDriveSearch,
+  getComponentCid,
 } from "./utils";
 import {
   AddFilesToDrivePayload,
   AddItemsToUploadQueueAction,
   AssignTypeThunkPayload,
+  BreadCrumb,
   DrivePath,
   NavigateToDriveByPathAction,
   removeBatchFromUploadQueueAction,
@@ -59,8 +58,7 @@ import {
   setManifestCid,
   updateComponent,
 } from "../nodes/viewer";
-import { BreadCrumb } from "@src/components/molecules/DriveBreadCrumbs";
-import { dispatch } from "react-hot-toast/dist/core/store";
+
 interface DriveState {
   status: RequestStatus;
   error: null | undefined | string;
@@ -109,7 +107,7 @@ export const driveSlice = createSlice({
         const pathSplit = path.split("/");
         pathSplit.pop();
         const parentPath = pathSplit.join("/");
-        let driveFound = state.deprecated
+        driveFound = state.deprecated
           ? driveBfsByPath(state.nodeTree!, parentPath)
           : findDriveByPath(state.nodeTree!, parentPath);
       }
@@ -178,7 +176,7 @@ export const driveSlice = createSlice({
     ) => {
       state.componentTypeBeingAssignedTo = payload;
     },
-    setFileMetadataBeingEditted: (
+    setFileMetadataBeingEdited: (
       state,
       { payload }: PayloadAction<DriveObject | null>
     ) => {
@@ -192,6 +190,29 @@ export const driveSlice = createSlice({
       { payload }: PayloadAction<{ index: number }>
     ) => {
       state.breadCrumbs.splice(0, payload.index + 1);
+    },
+    /*Only use this if you don't have direct access to the DriveObject but have access to the component, otherwise favor setFileMetadataBeingEdited */
+    showMetadataForComponent: (
+      state,
+      { payload }: PayloadAction<ResearchObjectV1Component>
+    ) => {
+      const component = payload;
+      let driveFound;
+      if (!state.deprecated) {
+        driveFound = findDriveByPath(state.nodeTree!, component.payload.path);
+      } else {
+        driveFound = bfsDriveSearch(state.nodeTree!, {
+          cid: getComponentCid(component),
+          componentType: component.type,
+        });
+      }
+      if (!driveFound) {
+        console.error(
+          `[DRIVE SHOW METADATA] Error: Component: ${component} not found in drive tree: ${state.nodeTree}`
+        );
+        return;
+      }
+      state.fileMetadataBeingEdited = driveFound;
     },
   },
   extraReducers: (builder) => {
@@ -212,7 +233,7 @@ export const driveSlice = createSlice({
           state.nodeTree = tree as DriveObject;
           state.currentDrive = tree as DriveObject;
           state.breadCrumbs = [
-            { name: "Research Node", drive: state.nodeTree! },
+            { name: "Research Node", path: state.nodeTree.path! },
           ];
           return;
         }
@@ -264,7 +285,9 @@ export const driveSlice = createSlice({
         });
         if (externalLinks.contains?.length) root.contains?.push(externalLinks);
         state.nodeTree = root;
-        state.breadCrumbs = [{ name: "Research Node", drive: state.nodeTree }];
+        state.breadCrumbs = [
+          { name: "Research Node", path: state.nodeTree.path! },
+        ];
 
         const driveFound = state.deprecated
           ? driveBfsByPath(state.nodeTree!, state.currentDrive?.path!)
@@ -304,9 +327,10 @@ export const {
   starComponent,
   assignComponentType,
   setComponentTypeBeingAssignedTo,
-  setFileMetadataBeingEditted,
+  setFileMetadataBeingEdited,
   removeBreadCrumbs,
   addBreadCrumb,
+  showMetadataForComponent,
 } = driveSlice.actions;
 
 export interface FetchTreeThunkParams {

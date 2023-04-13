@@ -131,15 +131,6 @@ const UploadPanel: React.FC<UploadPanelProps> = ({ show }) => {
                     data-type="info"
                     data-background-color="black"
                     onClick={() => {
-                      // if (qI.driveObj.parent) {
-                      //   setDriveJumpDir({
-                      //     targetUid: qI.driveObj.parent.uid!,
-                      //     targetPath: removeCidsFromPath(
-                      //       qI.driveObj.parent.path!
-                      //     ),
-                      //     itemUid: qI.driveObj.uid,
-                      //     itemPath: removeCidsFromPath(qI.driveObj.path!),
-                      //   });
                       dispatch(navigateToDriveByPath({ path: qI.path }));
                       if (componentStack.length) {
                         sessionStorage.removeItem(

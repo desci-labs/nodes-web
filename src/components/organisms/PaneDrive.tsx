@@ -15,7 +15,6 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import DriveTable, { DriveObject } from "./Drive";
 import toast from "react-hot-toast";
-import { BreadCrumb } from "../molecules/DriveBreadCrumbs";
 import ComponentMetadataPopover from "./PopOver/ComponentMetadataPopover";
 import ContextMenuProvider from "./Drive/ContextMenu/provider";
 import LoaderDrive from "../molecules/LoaderDrive";
@@ -25,7 +24,7 @@ import { useDrive } from "@src/state/drive/hooks";
 import {
   addFilesToDrive,
   fetchTreeThunk,
-  setFileMetadataBeingEditted,
+  setFileMetadataBeingEdited,
 } from "@src/state/drive/driveSlice";
 import DriveDatasetMetadataPopOver from "../molecules/DriveDatasetMetadataPopOver";
 
@@ -184,29 +183,6 @@ const PaneDrive = () => {
             <DriveTable setLoading={setLoading} />
           </div>
         </PerfectScrollbar>
-
-        {fileMetadataBeingEdited &&
-          fileMetadataBeingEdited.componentType ===
-            ResearchObjectComponentType.DATA && (
-            <DriveDatasetMetadataPopOver
-              isVisible={!!fileMetadataBeingEdited}
-              onClose={() => {
-                dispatch(setFileMetadataBeingEditted(null));
-              }}
-            />
-          )}
-        {fileMetadataBeingEdited &&
-          (fileMetadataBeingEdited.componentType ===
-            ResearchObjectComponentType.PDF ||
-            fileMetadataBeingEdited.componentType ===
-              ResearchObjectComponentType.CODE) && (
-            <ComponentMetadataPopover
-              isVisible={!!fileMetadataBeingEdited}
-              onClose={() => {
-                dispatch(setFileMetadataBeingEditted(null));
-              }}
-            />
-          )}
         <SidePanelStorage />
       </div>
     </ContextMenuProvider>

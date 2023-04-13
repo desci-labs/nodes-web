@@ -16,7 +16,7 @@ import { useDriveContext } from "./Index";
 import { useSetter } from "@src/store/accessors";
 import {
   assignTypeThunk,
-  setFileMetadataBeingEditted,
+  setFileMetadataBeingEdited,
 } from "@src/state/drive/driveSlice";
 import { setComponentTypeBeingAssignedTo } from "@src/state/drive/driveSlice";
 import { useDrive } from "@src/state/drive/hooks";
@@ -131,7 +131,7 @@ export default function useActionHandler() {
   }
 
   async function editMetadata(file: DriveObject) {
-    dispatch(setFileMetadataBeingEditted(file));
+    dispatch(setFileMetadataBeingEdited(file));
   }
 
   const handler: Record<
