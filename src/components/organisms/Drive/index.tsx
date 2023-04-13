@@ -1,12 +1,8 @@
 import {
-  constructBreadCrumbs,
   driveBfsByPath,
   driveBfsByUid,
   SessionStorageKeys,
 } from "@components/driveUtils";
-import DriveBreadCrumbs, {
-  BreadCrumb,
-} from "@components/molecules/DriveBreadCrumbs";
 import PopOverUseMenu from "@components/molecules/PopOverUseMenu";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
@@ -19,9 +15,14 @@ import { IconCirclePlus, IconStar } from "@src/icons";
 import RenameDataModal from "./RenameDataModal";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useDrive } from "@src/state/drive/hooks";
-import { navigateToDriveByPath } from "@src/state/drive/driveSlice";
+import {
+  addBreadCrumb,
+  navigateToDriveByPath,
+  removeBreadCrumbs,
+} from "@src/state/drive/driveSlice";
 import { useSetter } from "@src/store/accessors";
 import "./styles.scss";
+import DriveBreadCrumbs from "@src/components/molecules/DriveBreadCrumbs";
 
 const Empty = () => {
   return <div className="p-5 text-xs">No files</div>;
@@ -42,18 +43,12 @@ enum ColWidths {
 }
 
 interface DriveTableProps {
-  setBreadCrumbs: React.Dispatch<React.SetStateAction<BreadCrumb[]>>;
-  breadCrumbs: BreadCrumb[];
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   // renameComponentId: string | null;
   // setRenameComponentId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const DriveTable: React.FC<DriveTableProps> = ({
-  breadCrumbs,
-  setBreadCrumbs,
-  setLoading,
-}) => {
+const DriveTable: React.FC<DriveTableProps> = ({ setLoading }) => {
   const {
     setIsAddingComponent,
     driveJumpDir,
@@ -68,7 +63,8 @@ const DriveTable: React.FC<DriveTableProps> = ({
     mode,
   } = useNodeReader();
 
-  const { nodeTree, status, currentDrive, deprecated } = useDrive();
+  const { nodeTree, status, currentDrive, deprecated, breadCrumbs } =
+    useDrive();
   const dispatch = useSetter();
 
   const [selected, setSelected] = useState<
@@ -85,13 +81,12 @@ const DriveTable: React.FC<DriveTableProps> = ({
   ) {
     dispatch(navigateToDriveByPath({ path: drive.path! }));
     setSelected({});
-    setBreadCrumbs([...breadCrumbs, { name: name, drive: drive }]);
   }
 
   function eatBreadCrumb(index: number) {
-    dispatch(navigateToDriveByPath({ path: breadCrumbs[index].drive.path! }));
+    dispatch(navigateToDriveByPath({ path: breadCrumbs[index].path! }));
+    // dispatch(removeBreadCrumbs({ index: index }));
     setSelected({});
-    setBreadCrumbs(breadCrumbs.slice(0, index + 1));
   }
 
   //*deprecated: to be removed* resume from previous dir when ready
@@ -109,24 +104,6 @@ const DriveTable: React.FC<DriveTableProps> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jumpReady]);
-
-  //*Almost deprecated, remove after breadcrumbs migrated* loads all dataset trees, and fills data sizes
-  useEffect(() => {
-    // debugger;
-    if (!nodeTree) return;
-    if (!manifestData?.components) {
-      setLoading(false);
-      return;
-    }
-
-    if (
-      (window as any).lastObjectId !== currentObjectId ||
-      !breadCrumbs.length
-    ) {
-      (window as any).lastObjectId = currentObjectId!;
-      setBreadCrumbs([{ name: "Research Node", drive: nodeTree! }]);
-    }
-  }, [nodeTree]);
 
   function toggleSelected(
     index: number,
@@ -204,12 +181,6 @@ const DriveTable: React.FC<DriveTableProps> = ({
             });
           }
         }
-
-        //update breadcrumbs
-        if (latest) {
-          const newCrumbs = constructBreadCrumbs(latest);
-          setBreadCrumbs(newCrumbs);
-        }
       }
       setLoading(false);
       setDriveJumpDir(null);
@@ -241,7 +212,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
           </div>
         </div>
       ) : null}
-      <DriveBreadCrumbs crumbs={breadCrumbs} eatBreadCrumb={eatBreadCrumb} />
+      <DriveBreadCrumbs eatBreadCrumb={eatBreadCrumb} />
       <div
         className="bg-neutrals-gray-1 h-full w-full rounded-xl outline-none"
         ref={containerRef}

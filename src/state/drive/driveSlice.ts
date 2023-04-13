@@ -37,6 +37,7 @@ import {
   findDriveByPath,
   generateFlatPathDriveMap,
   generatePathSizeMap,
+  constructBreadCrumbs,
 } from "./utils";
 import {
   AddFilesToDrivePayload,
@@ -58,6 +59,8 @@ import {
   setManifestCid,
   updateComponent,
 } from "../nodes/viewer";
+import { BreadCrumb } from "@src/components/molecules/DriveBreadCrumbs";
+import { dispatch } from "react-hot-toast/dist/core/store";
 interface DriveState {
   status: RequestStatus;
   error: null | undefined | string;
@@ -70,6 +73,7 @@ interface DriveState {
   deprecated: boolean | undefined;
   componentTypeBeingAssignedTo: DrivePath | null;
   fileMetadataBeingEdited: DriveObject | null;
+  breadCrumbs: BreadCrumb[];
 }
 
 const initialState: DriveState = {
@@ -84,6 +88,7 @@ const initialState: DriveState = {
   showUploadPanel: false,
   componentTypeBeingAssignedTo: null,
   fileMetadataBeingEdited: null,
+  breadCrumbs: [],
 };
 
 export const driveSlice = createSlice({
@@ -114,6 +119,7 @@ export const driveSlice = createSlice({
         );
         return;
       }
+      state.breadCrumbs = constructBreadCrumbs(driveFound.path!);
       state.currentDrive = driveFound;
     },
     setShowUploadPanel: (state, action: { payload: boolean }) => {
@@ -178,6 +184,15 @@ export const driveSlice = createSlice({
     ) => {
       state.fileMetadataBeingEdited = payload;
     },
+    addBreadCrumb: (state, { payload }: PayloadAction<BreadCrumb>) => {
+      state.breadCrumbs.push(payload);
+    },
+    removeBreadCrumbs: (
+      state,
+      { payload }: PayloadAction<{ index: number }>
+    ) => {
+      state.breadCrumbs.splice(0, payload.index + 1);
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -196,6 +211,9 @@ export const driveSlice = createSlice({
           state.deprecated = true;
           state.nodeTree = tree as DriveObject;
           state.currentDrive = tree as DriveObject;
+          state.breadCrumbs = [
+            { name: "Research Node", drive: state.nodeTree! },
+          ];
           return;
         }
         state.deprecated = false;
@@ -246,6 +264,7 @@ export const driveSlice = createSlice({
         });
         if (externalLinks.contains?.length) root.contains?.push(externalLinks);
         state.nodeTree = root;
+        state.breadCrumbs = [{ name: "Research Node", drive: state.nodeTree }];
 
         const driveFound = state.deprecated
           ? driveBfsByPath(state.nodeTree!, state.currentDrive?.path!)
@@ -286,6 +305,8 @@ export const {
   assignComponentType,
   setComponentTypeBeingAssignedTo,
   setFileMetadataBeingEditted,
+  removeBreadCrumbs,
+  addBreadCrumb,
 } = driveSlice.actions;
 
 export interface FetchTreeThunkParams {

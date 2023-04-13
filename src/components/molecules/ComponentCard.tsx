@@ -23,12 +23,19 @@ import {
   UiComponentDefinition,
 } from "../organisms/ComponentLibrary";
 import ButtonFair from "@components/atoms/ButtonFair";
-import { SessionStorageKeys } from "../driveUtils";
+import {
+  DRIVE_DATA_PATH,
+  DRIVE_NODE_ROOT_PATH,
+  SessionStorageKeys,
+} from "../driveUtils";
 import { useSetter } from "@src/store/accessors";
 import { setComponentStack } from "@src/state/nodes/viewer";
 import { updatePdfPreferences } from "@src/state/nodes/pdf";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import { setComponentTypeBeingAssignedTo } from "@src/state/drive/driveSlice";
+import {
+  navigateToDriveByPath,
+  setComponentTypeBeingAssignedTo,
+} from "@src/state/drive/driveSlice";
 
 const CardWrapper: StyledComponent<
   "div",
@@ -183,7 +190,11 @@ const ComponentCard = (props: ComponentCardProps) => {
         );
         if (component.type === ResearchObjectComponentType.DATA) {
           sessionStorage.removeItem(SessionStorageKeys.lastDirUid);
-          setDriveJumpDir({ targetPath: "Data" });
+          dispatch(
+            navigateToDriveByPath({
+              path: DRIVE_NODE_ROOT_PATH + "/" + DRIVE_DATA_PATH,
+            })
+          );
           dispatch(setComponentStack([]));
         } else {
           if (!isSelected) {

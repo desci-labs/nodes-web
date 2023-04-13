@@ -14,7 +14,7 @@ import {
 } from "@src/components/organisms/Drive";
 
 import { v4 as uuidv4 } from "uuid";
-import { DrivePath } from "./types";
+import { BreadCrumb, DrivePath } from "./types";
 
 export function neutralizePath(path: DrivePath) {
   return path.replace(/^[^/]+/, DRIVE_NODE_ROOT_PATH);
@@ -275,4 +275,16 @@ export function formatDbDate(date: string | Date | number) {
     .split(",")
     .join("")
     .toUpperCase();
+}
+
+export function constructBreadCrumbs(path: DrivePath): BreadCrumb[] {
+  const parts = path.split("/");
+  const result: BreadCrumb[] = [];
+
+  for (let i = 0; i < parts.length; i++) {
+    const joined = parts.slice(0, i + 1).join("/");
+    result.push({ name: i === 0 ? "Research Node" : parts[i], path: joined });
+  }
+
+  return result;
 }

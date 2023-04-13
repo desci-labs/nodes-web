@@ -652,18 +652,6 @@ export function removeFromUploadQueue(
   return queue.filter((qI) => qI.batchUid !== batchUid);
 }
 
-export function constructBreadCrumbs(drive: DriveObject): BreadCrumb[] {
-  const breadCrumbs: BreadCrumb[] = [];
-  breadCrumbs.unshift({ name: drive.name, drive: drive });
-  if (drive.parent)
-    return [
-      ...constructBreadCrumbs(drive.parent as DriveObject),
-      ...breadCrumbs,
-    ];
-
-  return breadCrumbs;
-}
-
 export function driveBfsByUid(rootDrive: DriveObject, targetUid: string) {
   if (!targetUid) return;
   const queue = [rootDrive];

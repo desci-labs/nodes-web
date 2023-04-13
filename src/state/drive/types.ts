@@ -58,3 +58,8 @@ export type ComponentId = string;
 //Path expected here is the same as regular file drop path, i.e. /hey.txt, or /folder/hey.txt
 type Path = string;
 export type ExternalCid = Record<Path, CidString>;
+
+export interface BreadCrumb {
+  name: string;
+  path: DrivePath;
+}

@@ -68,7 +68,6 @@ const PaneDrive = () => {
   const { nodeTree, status, currentDrive, fileMetadataBeingEdited } =
     useDrive();
 
-  const [breadCrumbs, setBreadCrumbs] = useState<BreadCrumb[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -182,11 +181,7 @@ const PaneDrive = () => {
           <h1 className="text-[28px] font-bold text-white">Node Drive</h1>
           <SpacerHorizontal />
           <div id="tableWrapper" className="mt-5 h-full">
-            <DriveTable
-              setLoading={setLoading}
-              breadCrumbs={breadCrumbs}
-              setBreadCrumbs={setBreadCrumbs}
-            />
+            <DriveTable setLoading={setLoading} />
           </div>
         </PerfectScrollbar>
 
