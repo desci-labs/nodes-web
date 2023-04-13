@@ -79,6 +79,7 @@ const ComponentStackView = (props: ComponentStackViewProps) => {
     if (forceRefreshDrive) setTimeout(() => setForceRefreshDrive(false));
   }, [forceRefreshDrive, setForceRefreshDrive]);
 
+  __log("ComponentStackView::render", componentStack);
   return (
     <ViewWrapper>
       {/**
