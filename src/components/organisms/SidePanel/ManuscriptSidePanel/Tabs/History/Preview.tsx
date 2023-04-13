@@ -37,8 +37,9 @@ export default function HistoryPreview() {
           <PreviewEntry
             key={index}
             data={data}
-            index={history.length - index}
             pending={false}
+            latest={index === 0}
+            index={history.length - index}
             selected={selectedId === `${history.length - index}`}
           />
         ))}

@@ -1,11 +1,10 @@
 import { ResearchNodeIcon } from "@src/components/Icons";
 import { IconShare } from "@src/icons";
-
-const TITLE = `Registered report: Transcriptional amplification in tumor cells with
-            amplification of the nasal tumor cells using radioactive catogens
-            and mento cynths`;
+import { useNodeReader } from "@src/state/nodes/hooks";
 
 export default function Header() {
+  const { manifest } = useNodeReader();
+
   return (
     <div className="h-[27%] w-full p-2 mobile-reader-header relative flex items-end overflow-hidden shrink-0">
       <IconShare width={30} color="white" className="absolute top-3 right-3" />
@@ -18,7 +17,7 @@ export default function Header() {
             Research Node
           </p>
           <span className="block text-sm font-bold w-full line-clamp-2 text-white leading-tight">
-            {TITLE.substring(0, 250)}...
+            {manifest?.title || ""}
           </span>
         </div>
       </div>

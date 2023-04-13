@@ -1,8 +1,10 @@
 import { TimelineBullet, TimelineGutterBulletLayer } from "./Timeline";
 import { HistoryEntryProps } from "@src/state/nodes/types";
 
-export default function PreviewEntry(historyEntry: HistoryEntryProps) {
-  const { index, data, selected } = historyEntry;
+export default function PreviewEntry(
+  historyEntry: HistoryEntryProps & { latest?: boolean }
+) {
+  const { index, data, selected, latest } = historyEntry;
 
   return (
     <div key={index} className="relative">
@@ -36,9 +38,9 @@ export default function PreviewEntry(historyEntry: HistoryEntryProps) {
               <span className="text-md font-inter font-bold inline-block">
                 Version {index}
               </span>
-              {selected && (
+              {latest && (
                 <span className="text-xs font-inter capitalize inline-block text-state-success">
-                  Current version
+                  Latest version
                 </span>
               )}
               {(data as any).date ? (
