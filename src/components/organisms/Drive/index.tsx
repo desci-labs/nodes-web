@@ -25,7 +25,7 @@ import "./styles.scss";
 import DriveBreadCrumbs from "@src/components/molecules/DriveBreadCrumbs";
 
 const Empty = () => {
-  return <div className="p-5 text-xs">No files</div>;
+  return <div className="p-5 text-xs col-span-7">No files</div>;
 };
 
 export const everyRow =

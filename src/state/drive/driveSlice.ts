@@ -320,8 +320,9 @@ export const fetchTreeThunk = createAsyncThunk(
     const state = getState() as RootState;
     const { manifest, currentObjectId, manifestCid, publicView, shareId } =
       state.nodes.nodeReader;
-    // debugger;
+
     //determines if it's a old or new manifest
+    // debugger;
     const hasDataBucket =
       manifest?.components[0].type === ResearchObjectComponentType.DATA_BUCKET
         ? manifest.components[0]
@@ -373,6 +374,7 @@ export const fetchTreeThunk = createAsyncThunk(
 export const addFilesToDrive = createAsyncThunk(
   "drive/addFiles",
   async (payload: AddFilesToDrivePayload, { getState, dispatch }) => {
+    // debugger;
     const state = getState() as RootState;
     const { manifest, currentObjectId } = state.nodes.nodeReader;
     const { nodeTree } = state.drive;
@@ -385,7 +387,6 @@ export const addFilesToDrive = createAsyncThunk(
       onSuccess,
     } = payload;
     if (!nodeTree || !manifest) return;
-    // debugger;
 
     //Transform files to usable data for displaying state (upload panel items, optimistic drives)
     const dirs: Record<string, string> = {};

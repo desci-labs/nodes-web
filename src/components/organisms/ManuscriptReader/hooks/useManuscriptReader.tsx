@@ -64,7 +64,7 @@ export default function useManuscriptReader(publicView: boolean = false) {
 
       dispatch(setIsNew(false));
       dispatch(setCurrentPdf(""));
-
+      dispatch(setManifest(parsedManuscript.manifest));
       dispatch(setCurrentObjectId(parsedManuscript.cid));
       dispatch(setResearchPanelTab(ResearchTabs.current));
 
@@ -74,7 +74,6 @@ export default function useManuscriptReader(publicView: boolean = false) {
       }
       dispatch(setIsAnnotating(false));
 
-      dispatch(setManifest(parsedManuscript.manifest));
       const manifestUrlCleaned = cleanupManifestUrl(
         parsedManuscript.manifestUrl
       );

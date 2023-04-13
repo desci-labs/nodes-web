@@ -13,13 +13,12 @@ const RadialLoader: React.FC<RadialLoaderProps> = ({
     <div className="relative flex justify-center items-center w-[27px] h-[27px] transition-all">
       <div
         id="backCircle"
-        className="w-[27px] h-[27px] rounded-full "
+        className="w-[27px] h-[27px] rounded-full"
         style={{
           background: `conic-gradient(
                 #272727 ${percent}%,
                 #ababab ${percent}.5%  
               )`,
-          clipPath: `circle(30% at 30% 30%)`,
         }}
       ></div>
       <div

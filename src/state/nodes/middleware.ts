@@ -14,10 +14,12 @@ nodeReaderMiddleware.startListening({
     const prevNodeUuid = selectNodeUuid(prevState);
     const newNodeUuid = selectNodeUuid(state);
 
-    if (prevNodeUuid !== newNodeUuid && prevNodeUuid !== "") {
+    // if (prevNodeUuid !== "") {
+    if (prevNodeUuid !== newNodeUuid || !state.drive.nodeTree) {
       await listenerApi.delay(500); //Appears neccessary so the manifest can update before the tree is fetched
       listenerApi.dispatch(reset());
       listenerApi.dispatch(fetchTreeThunk());
     }
+    // }
   },
 });

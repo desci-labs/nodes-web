@@ -101,7 +101,7 @@ const UploadPanel: React.FC<UploadPanelProps> = ({ show }) => {
           const viewingTargetNode = currentObjectId! === qI.nodeUuid;
           return (
             <li
-              className="flex justify-between p-3 h-12 animate-expandOut"
+              className="flex justify-between p-3 h-12"
               key={qI.batchUid + idx}
             >
               <div className="flex items-center gap-2">
@@ -125,7 +125,7 @@ const UploadPanel: React.FC<UploadPanelProps> = ({ show }) => {
                   <RadialLoader percent={batchUploadProgress[qI.batchUid]} />
                 ) : uploadTransitioned[qI.batchUid] && viewingTargetNode ? (
                   <IconDirectory
-                    className="w-[22px] h-[22px] animate-expandOut animate-fadeIn cursor-pointer fill-tint-primary"
+                    className="w-[22px] h-[22px] animate-expandOut cursor-pointer fill-tint-primary"
                     data-tip={"Show File Location"}
                     data-place="top"
                     data-type="info"

@@ -91,7 +91,8 @@ const ComponentStackView = (props: ComponentStackViewProps) => {
         componentStack.map(
           (component: ResearchObjectV1Component, index: number) => {
             const isDataComponent =
-              component.type === ResearchObjectComponentType.DATA;
+              component.type === ResearchObjectComponentType.DATA ||
+              component.type === ResearchObjectComponentType.DATA_BUCKET;
             return (
               <ComponentWrapper
                 key={`component_${component.id}`}
