@@ -94,9 +94,9 @@ const VSCodeViewer = () => {
     }
     let anno = (
       <div
-        className={`handle fixed bottom-[28px] left-0 transition-all duration-200 ease-out ${
-          activeDraggable ? "cursor-move" : ""
-        } ${activeAnnotation ? "translate-x-2" : "-translate-x-96"}`}
+        className={`handle fixed bottom-[28px] left-0 transition-all duration-200 ease-out cursor-move ${
+          activeAnnotation ? "translate-x-2" : "-translate-x-96"
+        }`}
         onClick={() => {
           setActiveDraggable(true);
         }}
