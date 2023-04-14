@@ -98,7 +98,7 @@ export const COMPONENT_LIBRARY: UiComponentDefinition[] = [
     componentType: ResearchObjectComponentType.DATA,
   },
 ];
-const EXTERNAL_COMPONENTS: UiComponentDefinition[] = [
+export const EXTERNAL_COMPONENTS: UiComponentDefinition[] = [
   {
     icon: <IconWrapper Icon={IconComponentDiscussions} className="p-0.5" />,
     title: "Community Discussions",

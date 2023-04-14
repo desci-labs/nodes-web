@@ -14,8 +14,8 @@ interface AnnotationExpandedProps {
   annotationTitle: string;
   annotationText: string;
   annotation: Annotation;
-  mode: string;
   darkMode?: boolean;
+  hideHeader?: boolean;
 }
 
 const AnnotationExpanded = ({
@@ -23,8 +23,8 @@ const AnnotationExpanded = ({
   annotationTitle,
   annotationText,
   annotation,
-  mode,
   darkMode,
+  hideHeader,
 }: AnnotationExpandedProps) => {
   const dispatch = useSetter();
 
@@ -32,6 +32,7 @@ const AnnotationExpanded = ({
     manifest: manifestData,
     currentObjectId,
     componentStack,
+    mode,
   } = useNodeReader();
   const { hoveredAnnotationId, selectedAnnotationId } = usePdfReader();
   const [copyLink, setCopyLink] = useState<string>("");
@@ -89,46 +90,55 @@ const AnnotationExpanded = ({
           transition: `opacity ease-in 250ms, width 0ms ease, border-bottom-right-radius 0s`,
         }}
       >
-        <header
-          className={`border-b ${
-            darkMode ? "border-neutrals-gray-2" : "border-neutrals-gray-7"
-          } border-dark flex items-center justify-between h-[40px]`}
-        >
-          <div className={`flex gap-1 -ml-[10px]`}>
-            <div
-              className={`cursor-pointer ${
-                darkMode
-                  ? "hover:bg-neutrals-gray-3 active:bg-black"
-                  : "hover:bg-neutrals-gray-7 text-black"
-              } flex justify-center items-center rounded-lg w-7 h-7`}
-              onClick={() => dispatch(setAnnotationSwitchCall("prev"))}
-            >
-              <IconLeftArrowThin
-                height={12}
-                stroke={darkMode ? "white" : "black"}
-              />
+        {!hideHeader ? (
+          <header
+            className={`border-b ${
+              darkMode ? "border-neutrals-gray-2" : "border-neutrals-gray-7"
+            } border-dark flex items-center justify-between h-[40px]`}
+          >
+            <div className={`flex gap-1 -ml-[10px]`}>
+              <div
+                className={`cursor-pointer ${
+                  darkMode
+                    ? "hover:bg-neutrals-gray-3 active:bg-black"
+                    : "hover:bg-neutrals-gray-7 text-black"
+                } flex justify-center items-center rounded-lg w-7 h-7`}
+                onClick={() => dispatch(setAnnotationSwitchCall("prev"))}
+              >
+                <IconLeftArrowThin
+                  height={12}
+                  stroke={darkMode ? "white" : "black"}
+                />
+              </div>
+              <div
+                className={`cursor-pointer ${
+                  darkMode
+                    ? "hover:bg-neutrals-gray-3 active:bg-black"
+                    : "hover:bg-neutrals-gray-7 text-black"
+                } flex justify-center items-center rounded-lg w-7 h-7`}
+                onClick={() => dispatch(setAnnotationSwitchCall("next"))}
+              >
+                <IconRightArrowThin
+                  height={12}
+                  stroke={darkMode ? "white" : "black"}
+                />
+              </div>
             </div>
-            <div
-              className={`cursor-pointer ${
-                darkMode
-                  ? "hover:bg-neutrals-gray-3 active:bg-black"
-                  : "hover:bg-neutrals-gray-7 text-black"
-              } flex justify-center items-center rounded-lg w-7 h-7`}
-              onClick={() => dispatch(setAnnotationSwitchCall("next"))}
-            >
-              <IconRightArrowThin
-                height={12}
-                stroke={darkMode ? "white" : "black"}
-              />
+            <div className={`flex items-center gap-1`}>
+              <ButtonCopyLink invert={!darkMode} size={20} text={copyLink} />
+              {mode === "editor" && (
+                <AnnotationContextMenu annotation={annotation} />
+              )}
+            </div>
+          </header>
+        ) : (
+          <div className="h-5 ">
+            <div className="text-xs font-mono bg-black text-white w-[calc(100%+32px)] -mx-4 rounded-t-lg px-2 overflow-hidden overflow-ellipsis h-4">
+              annotation from{" "}
+              <u>{componentStack[componentStack.length - 2].name}</u>
             </div>
           </div>
-          <div className={`flex items-center gap-1`}>
-            <ButtonCopyLink invert={!darkMode} size={20} text={copyLink} />
-            {mode === "editor" && (
-              <AnnotationContextMenu annotation={annotation} />
-            )}
-          </div>
-        </header>
+        )}
 
         <main
           className={`transition-opacity ease-out opacity-100 py-2`}

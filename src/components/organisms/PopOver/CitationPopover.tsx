@@ -165,13 +165,13 @@ const CitationComponent = () => {
     version,
   ]);
 
-  const canCite = (publicView || userProfile?.profile.name) && manifestData;
+  const canCite = !!manifestData && manifestData?.authors?.length;
   const formatter = useMemo(() => getFormatter(format.name), [format.name]);
+
   const { citation } = useMemo(
     () =>
       canCite
         ? formatter({
-            author: userProfile?.profile?.name,
             manifest: manifestData!,
             dpidLink: getComponentDpid(),
             year,
@@ -182,7 +182,6 @@ const CitationComponent = () => {
     [
       canCite,
       formatter,
-      userProfile?.profile?.name,
       manifestData,
       getComponentDpid,
       year,
@@ -225,19 +224,19 @@ const CitationComponent = () => {
             />
           </div>
         </Box>
-        {!publicView && !userProfile?.profile.name && (
+        {!publicView && !manifestData?.authors?.length && (
           <div>
             <div className="text-neutrals-gray-7 text-sm border-yellow-300 gap-2 bg-neutrals-gray-3 p-2 rounded-md flex flex-row items-center">
-              <IconWarning height={16} /> Complete your profile to cite this
-              component
+              <IconWarning height={16} /> Credit co-authors and collaborators
+              via the "Source" tab
             </div>
-            <PrimaryButton
+            {/* <PrimaryButton
               className="bg-transparent hover:bg-transparent text-tint-primary hover:text-white"
               onClick={() => setShowProfileUpdater(true)}
             >
               {" "}
               Complete Profile{" "}
-            </PrimaryButton>
+            </PrimaryButton> */}
           </div>
         )}
         {isDpidSupported && dpidLink && (

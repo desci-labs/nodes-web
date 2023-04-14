@@ -20,6 +20,16 @@ import ReactModal from "react-modal";
 import { FormatHyperlink, IconPen } from "@icons";
 import ReactTooltip from "react-tooltip";
 import { DriveObject } from "@components/organisms/Drive";
+import PopOver from "@src/components/organisms/PopOver";
+import PopOverBasic from "@src/components/atoms/PopOverBasic";
+import Modal from "../Modal/Modal";
+import InsetLabelInput from "../FormInputs/InsetLabelInput";
+import PrimaryButton from "@src/components/atoms/PrimaryButton";
+import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
+import { Switch } from "@headlessui/react";
+import ToggleSwitch from "@src/components/atoms/ToggleSwitch";
+import ToggleSwitchWithLabel from "@src/components/atoms/ToggleSwitchWithLabel";
+import ModalEditAnnotationLink from "../ModalEditAnnotationLink";
 
 interface BaseProps {
   className: string;
@@ -316,6 +326,7 @@ export const LinkComponent = (props: any) => {
 
 interface DirectoryLinkComponentProps {
   nodeRef: any;
+  setHref: (href: string) => void;
   href: string;
   fileName?: string;
   children: any;
@@ -324,9 +335,79 @@ interface DirectoryLinkComponentProps {
   element: CustomElement;
 }
 
+export interface AnnotationLinkConfig {
+  exec?: boolean;
+  path?: string;
+  line?: number;
+  url?: string;
+}
+
+export const parseAnnotationLink = (href: string): AnnotationLinkConfig => {
+  try {
+    let url;
+    if (href) {
+      url = href.split("?")[0];
+    }
+    if (!href || href.indexOf("?") < 0) {
+      return {
+        url,
+        exec: undefined,
+        path: undefined,
+        line: undefined,
+      };
+    }
+    const obj: any = href
+      .split("?")[1]
+      .split("&")
+      .reduce((acc, cur) => {
+        const [key, value] = cur.split("=");
+        acc[key] = value;
+        return acc;
+      }, {} as any);
+    const { exec, path, line } = obj;
+    return {
+      url,
+      exec: exec === "true",
+      path: path ? path : undefined,
+      line: line ? parseInt(line) : undefined,
+    };
+  } catch (e) {
+    return {
+      url: undefined,
+      exec: undefined,
+      path: undefined,
+      line: undefined,
+    };
+  }
+};
+
 export const DirectoryLinkComponent = (props: DirectoryLinkComponentProps) => {
-  const { href, fileName, children, readOnly, attributes } = props;
+  const { href, setHref, fileName, children, readOnly, attributes } = props;
   const [showCopiedText, setShowCopiedText] = useState<boolean>(false);
+
+  const [showEditSyntaxModal, setShowEditSyntaxModal] =
+    useState<boolean>(false);
+
+  const [annotationLinkConfig, setAnnotationLinkConfig] =
+    useState<AnnotationLinkConfig>({});
+
+  useEffect(() => {
+    if (href) {
+      const { url, path, exec, line } = parseAnnotationLink(href);
+      console.log("parse href", href, {
+        url,
+        path,
+        exec,
+        line,
+      });
+      setAnnotationLinkConfig({
+        url,
+        path,
+        exec,
+        line,
+      });
+    }
+  }, [href]);
 
   const selected = useSelected();
   const focused = useFocused();
@@ -346,10 +427,15 @@ export const DirectoryLinkComponent = (props: DirectoryLinkComponentProps) => {
     }
   }, [showCopiedText]);
 
+  const directoryLinkTooltipId = `directory-link-${btoa(href).replaceAll(
+    "=",
+    ""
+  )}`;
+
   return (
     <>
       <ReactTooltip
-        id="directoryLinkEditToolTip"
+        id={directoryLinkTooltipId}
         effect="solid"
         globalEventOff="click"
         backgroundColor="#000000"
@@ -359,7 +445,7 @@ export const DirectoryLinkComponent = (props: DirectoryLinkComponentProps) => {
         }}
         className="bg-black text-white rounded font-inter font-bold cursor-default p-0"
         overridePosition={({ left, top }) => {
-          top += 3;
+          top += 0;
           return { top, left };
         }}
         disable={readOnly}
@@ -385,20 +471,21 @@ export const DirectoryLinkComponent = (props: DirectoryLinkComponentProps) => {
                   />
                   <div>Copy Link</div>
                 </div>
-                {/* <div className='font-thin'>|</div>
-                  <div
-                    className='flex flex-row items-center m-1 gap-1 cursor-pointer'
-                  >
-                    <IconPen
-                      fill="white"
-                      width={12}
-                      height={12}
-                      strokeWidth={2}
-                    />
-                    <div>
-                      Edit Syntax
-                    </div>
-                  </div> */}
+                <div className="font-thin">|</div>
+                <div
+                  className="flex flex-row items-center m-1 gap-1 cursor-pointer"
+                  onClick={() => {
+                    setShowEditSyntaxModal(true);
+                  }}
+                >
+                  <IconPen
+                    fill="white"
+                    width={12}
+                    height={12}
+                    strokeWidth={2}
+                  />
+                  <div>Edit Syntax</div>
+                </div>
               </div>
             )}
           </div>
@@ -408,21 +495,30 @@ export const DirectoryLinkComponent = (props: DirectoryLinkComponentProps) => {
         {...attributes}
         contentEditable={false}
         ref={linkRef}
-        className="relative"
+        className="relative inline-block"
         // style={{ userSelect: "none" }}
       >
         {/* only overlay the tooltip trigger when in editor (a.k.a !readOnly) */}
         {!readOnly ? (
           <span
-            className="absolute h-full w-full top-0 left-0"
+            className="absolute h-full w-full top-0 left-0 z-10 hover:bg-white hover:bg-opacity-30 cursor-pointer"
             data-tip
-            data-for="directoryLinkEditToolTip"
+            data-for={directoryLinkTooltipId}
             data-event="click focus"
           />
         ) : null}
         {children}
         <CodePillButton href={href}>{fileName}</CodePillButton>
       </span>
+      <ModalEditAnnotationLink
+        fileName={fileName || ""}
+        annotationLinkConfig={annotationLinkConfig}
+        setAnnotationLinkConfig={setAnnotationLinkConfig}
+        setShowModal={setShowEditSyntaxModal}
+        showModal={showEditSyntaxModal}
+        href={href}
+        setHref={setHref}
+      />
     </>
   );
 };

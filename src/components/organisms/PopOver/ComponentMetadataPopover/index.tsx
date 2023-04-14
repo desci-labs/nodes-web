@@ -281,7 +281,6 @@ interface ComponentMetadataPopoverProps {
   currentObjectId: string;
   manifestData: ResearchObjectV1;
   isVisible: boolean;
-  // mode: string;
   onClose?: () => void;
 }
 
@@ -300,7 +299,6 @@ const ComponentMetadataPopover = (
   const { publicView, mode } = useNodeReader();
   const manifestData = props.manifestData;
   const currentObjectId = props.currentObjectId;
-  // const mode = props.mode;
 
   const componentIndex = manifestData.components.findIndex(
     (c) => c.id === props.componentId
