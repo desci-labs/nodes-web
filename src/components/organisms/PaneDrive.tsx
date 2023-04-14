@@ -74,12 +74,6 @@ const PaneDrive = () => {
     if (status === "succeeded") setLoading(false);
   }, [loading, status]);
 
-  useEffect(() => {
-    if (!nodeTree && status === "idle") {
-      dispatch(fetchTreeThunk());
-    }
-  }, [nodeTree]);
-
   const directoryRef = useRef<DriveObject[]>();
   useEffect(() => {
     directoryRef.current = currentDrive?.contains;

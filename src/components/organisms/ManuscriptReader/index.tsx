@@ -16,9 +16,12 @@ import { useNodeReader } from "@src/state/nodes/hooks";
 import { useDrive } from "@src/state/drive/hooks";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import ComponentMetadataPopover from "../PopOver/ComponentMetadataPopover";
-import { setFileMetadataBeingEdited } from "@src/state/drive/driveSlice";
-import { useDispatch } from "react-redux";
+import {
+  fetchTreeThunk,
+  setFileMetadataBeingEdited,
+} from "@src/state/drive/driveSlice";
 import DriveDatasetMetadataPopOver from "@src/components/molecules/DriveDatasetMetadataPopOver";
+import { useSetter } from "@src/store/accessors";
 
 const ManuscriptWrapper = styled(FlexRow)`
   background-color: #525659;
@@ -41,7 +44,7 @@ interface ManuscriptReaderProps {
 }
 const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
   console.log("Render manuscript reader");
-  const dispatch = useDispatch();
+  const dispatch = useSetter();
   const { currentObjectId } = useNodeReader();
   const { fileMetadataBeingEdited } = useDrive();
   const { isLoading } = useManuscriptReader(publicView);
