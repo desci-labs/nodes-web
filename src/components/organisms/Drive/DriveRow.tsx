@@ -150,8 +150,8 @@ export default function DriveRow({
         </span>
         <span className="truncate max-w-sm">{file.name}</span>
       </li>
-      <li className={`${everyRow}`}>{file.lastModified}</li>
-      <li className={`${everyRow}`}>{file.accessStatus}</li>
+      <li className={`${everyRow} col-last-modified`}>{file.lastModified}</li>
+      <li className={`${everyRow} col-status`}>{file.accessStatus}</li>
       <li
         onClick={() =>
           console.log(

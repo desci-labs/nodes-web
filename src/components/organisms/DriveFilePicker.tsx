@@ -5,7 +5,6 @@ import {
   getAllTrees,
   manifestToVirtualDrives,
 } from "@components/driveUtils";
-import { BreadCrumb } from "@components/molecules/DriveBreadCrumbs";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import {
@@ -23,6 +22,7 @@ import { useEffect, useState } from "react";
 import ReactTooltip from "react-tooltip";
 import { DriveNonComponentTypes, DriveObject, FileType } from "./Drive";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import { BreadCrumb } from "@src/state/drive/types";
 
 export interface FileDir {
   name: string;
@@ -69,7 +69,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
   ) {
     setDirectory(drive.contains!);
     setSelected(undefined);
-    setBreadCrumbs([...breadCrumbs, { name: name, drive: drive }]);
+    setBreadCrumbs([...breadCrumbs, { name: name, path: drive.path }]);
   }
 
   function eatBreadCrumb(index: number) {

@@ -45,3 +45,44 @@ $columns: 7;
     background: rgba(40, 169, 195, 0.75); //tint-primary
   }
 }
+
+.drive-row-container {
+  $STARRED: 50px;
+  $FILE_NAME: 2fr;
+  $LAST_MODIFIED: minmax(auto, 1fr);
+  $STATUS: minmax(auto, 1fr);
+  $FILE_SIZE: minmax(auto, 1fr);
+  $CITE: 50px;
+  $USE: 50px;
+
+  grid-template-columns: $STARRED $FILE_NAME $LAST_MODIFIED $STATUS $FILE_SIZE $CITE $USE;
+
+  &.deprecated {
+    grid-template-columns: $FILE_NAME $LAST_MODIFIED $STATUS $FILE_SIZE $CITE $USE;
+  }
+
+  // drop file date
+  @media (max-width: 1300px) {
+    .col-last-modified {
+      display: none;
+    }
+    grid-template-columns: $STARRED $FILE_NAME $STATUS $FILE_SIZE $CITE $USE;
+    &.deprecated {
+      grid-template-columns: $FILE_NAME $STATUS $FILE_SIZE $CITE $USE;
+    }
+  }
+
+  // drop status
+  @media (max-width: 1000px) {
+    .col-last-modified {
+      display: none;
+    }
+    .col-status {
+      display: none;
+    }
+    grid-template-columns: $STARRED $FILE_NAME $FILE_SIZE $CITE $USE;
+    &.deprecated {
+      grid-template-columns: $FILE_NAME $FILE_SIZE $CITE $USE;
+    }
+  }
+}

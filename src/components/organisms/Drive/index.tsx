@@ -35,15 +35,15 @@ export const everyRow =
   "flex items-center justify-center w-full px-3 border-b border-[#555659] h-12 driveRow";
 const headerRow = "!h-14 bg-black driveRowHeader";
 
-enum ColWidths {
-  STARRED = "50px",
-  FILE_NAME = "2fr",
-  LAST_MODIFIED = "minmax(auto, 1fr)",
-  STATUS = "minmax(auto, 1fr)",
-  FILE_SIZE = "minmax(auto, 1fr)",
-  CITE = "50px",
-  USE = "50px",
-}
+// enum ColWidths {
+//   STARRED = "50px",
+//   FILE_NAME = "2fr",
+//   LAST_MODIFIED = "minmax(auto, 1fr)",
+//   STATUS = "minmax(auto, 1fr)",
+//   FILE_SIZE = "minmax(auto, 1fr)",
+//   CITE = "50px",
+//   USE = "50px",
+// }
 
 interface DriveTableProps {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -166,14 +166,9 @@ const DriveTable: React.FC<DriveTableProps> = ({
         ref={containerRef}
       >
         <ul
-          className={`bg-neutrals-gray-1 grid list-none font-medium text-sm text-white select-none items-center rounded-t-xl rounded-b-xl h-full`}
-          style={{
-            gridTemplateColumns: `${deprecated ? "" : ColWidths.STARRED} ${
-              ColWidths.FILE_NAME
-            } ${ColWidths.LAST_MODIFIED} ${ColWidths.STATUS} ${
-              ColWidths.FILE_SIZE
-            } ${ColWidths.CITE} ${ColWidths.USE}`,
-          }}
+          className={`drive-row-container ${
+            deprecated ? "drive-deprecated" : ""
+          } bg-neutrals-gray-1 grid list-none font-medium text-sm text-white select-none items-center rounded-t-xl rounded-b-xl h-full`}
         >
           <li
             className={`${everyRow} ${headerRow} ${deprecated ? "hidden" : ""}`}
@@ -187,12 +182,14 @@ const DriveTable: React.FC<DriveTableProps> = ({
           <li className={`${everyRow} ${headerRow} !justify-start`}>
             File Name
           </li>
-          <li className={`${everyRow} ${headerRow}`}>Last Modified</li>
+          <li className={`${everyRow} ${headerRow} col-last-modified`}>
+            Last Modified
+          </li>
 
           <li
             data-tip={""}
             data-for="status"
-            className={`${everyRow} ${headerRow}`}
+            className={`${everyRow} ${headerRow} col-status`}
           >
             Status
           </li>
