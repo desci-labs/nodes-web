@@ -1,22 +1,24 @@
 import { ResearchNodeIcon } from "@src/components/Icons";
 import { IconShare } from "@src/icons";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import useComponentDpid from "@components/organisms/Drive/hooks/useComponentDpid";
 
 const BANNER_URL =
   "https://images.unsplash.com/photo-1679669693237-74d556d6b5ba?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2298&q=80";
 
 export default function Header() {
   const { manifest } = useNodeReader();
+  const { dpid } = useComponentDpid();
 
   const onHandleShare = async () => {
     try {
       await navigator.share({
-        text: "Have a look at this Research Node published with DeSci Nodes.",
+        text: `Have a look at this Research Node published with DeSci Nodes. ${dpid}`,
         title: manifest?.title,
-        url: BANNER_URL,
+        url: dpid || window.location.href,
       });
     } catch (e) {
-      console.log("Error: Unable to share", e);
+      console.log("Error: Unable to share", dpid, e);
     }
   };
 
