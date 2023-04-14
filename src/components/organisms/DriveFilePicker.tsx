@@ -175,25 +175,11 @@ const DriveTable: React.FC<DriveTableProps> = ({
         />
       </div>
       <div className="h-full w-full outline-none">
-        <ReactTooltip
-          id="status"
-          place="bottom"
-          backgroundColor="black"
-          // effect="solid"
-        >
-          <strong>Public:</strong> Published node component. Available publicly
-          on IPFS
-          <br />
-          <strong>Private:</strong> Unpublishd node component. Uploaded
-          privately on staging IPFS server <br />
-          <strong>Partial:</strong> Node or folder includes public and private
-          components
-        </ReactTooltip>
         {directory.length ? (
           directory.map((f: any, idx) => {
             return (
               <DriveRow
-                key={`drive_row_${f.cid || idx}`}
+                key={`drive_row_${f.cid || f.name}`}
                 file={f}
                 exploreDirectory={exploreDirectory}
                 index={idx}
@@ -210,9 +196,10 @@ const DriveTable: React.FC<DriveTableProps> = ({
       <div className="flex flex-row justify-end items-center p-3 border-t border-neutrals-gray-7">
         <PrimaryButton
           title="Insert"
-          onClick={() =>
-            selected !== undefined && onInsert(directory[selected])
-          }
+          onClick={() => {
+            setSelected(undefined);
+            selected !== undefined && onInsert(directory[selected]);
+          }}
           disabled={selected === undefined}
           className="py-1"
         >
@@ -274,7 +261,9 @@ function DriveRow({
         }`}
       onClick={(e) => {
         e.stopPropagation();
-        toggleSelected(index, file.componentType);
+        if (!file.contains) {
+          toggleSelected(index, file.componentType);
+        }
       }}
     >
       <li
