@@ -277,7 +277,8 @@ export const getNonDataComponentsFromManifest = (
     ? manifestData.components.filter(
         (a) =>
           a.type !== ResearchObjectComponentType.DATA &&
-          a.type !== ResearchObjectComponentType.DATA_BUCKET
+          a.type !== ResearchObjectComponentType.DATA_BUCKET &&
+          a.type !== ResearchObjectComponentType.UNKNOWN
       )
     : [];
   return nonDataComponents;

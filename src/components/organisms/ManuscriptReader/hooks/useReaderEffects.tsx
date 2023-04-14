@@ -129,7 +129,10 @@ export default function useReaderEffects(publicView: boolean = false) {
   useEffect(() => {
     const nonDataComponents = manifestData?.components
       ? manifestData.components.filter(
-          (a) => a.type !== ResearchObjectComponentType.DATA
+          (a) =>
+            a.type !== ResearchObjectComponentType.DATA &&
+            a.type !== ResearchObjectComponentType.DATA_BUCKET &&
+            a.type !== ResearchObjectComponentType.UNKNOWN
         )
       : [];
 

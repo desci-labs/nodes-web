@@ -70,8 +70,9 @@ const PaneDrive = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    if (loading) setLoading(false);
-  }, [loading]);
+    if (status !== "succeeded") setLoading(true);
+    if (status === "succeeded") setLoading(false);
+  }, [loading, status]);
 
   useEffect(() => {
     if (!nodeTree && status === "idle") {
