@@ -49,7 +49,7 @@ import {
   UpdateBatchUploadProgressAction,
   UploadQueueItem,
 } from "./types";
-import { __log } from "@src/components/utils";
+import { __log, extractCodeRepoName } from "@src/components/utils";
 import {
   addComponent,
   addRecentlyAddedComponent,
@@ -308,7 +308,6 @@ export const driveSlice = createSlice({
       })
       .addCase(addFilesToDrive.fulfilled, (state) => {
         state.uploadStatus = "succeeded";
-        //reset cwd
       })
       .addCase(addFilesToDrive.rejected, (state) => {
         state.uploadStatus = "failed";
@@ -398,7 +397,7 @@ export const fetchTreeThunk = createAsyncThunk(
 export const addFilesToDrive = createAsyncThunk(
   "drive/addFiles",
   async (payload: AddFilesToDrivePayload, { getState, dispatch }) => {
-    // debugger;
+    debugger;
     const state = getState() as RootState;
     const { manifest, currentObjectId } = state.nodes.nodeReader;
     const { nodeTree } = state.drive;
@@ -406,37 +405,60 @@ export const addFilesToDrive = createAsyncThunk(
       files,
       overwritePathContext,
       externalCids,
+      externalUrl,
       componentType,
       componentSubType,
       onSuccess,
     } = payload;
     if (!nodeTree || !manifest) return;
-
     //Transform files to usable data for displaying state (upload panel items, optimistic drives)
     const dirs: Record<string, string> = {};
-    const fileInfo = Array.prototype.filter
-      .call(files, (f) => {
-        if (!("fullPath" in f)) f.fullPath = "/" + f.name;
-        const split = f.fullPath.split("/");
-        if (split.length === 2) return split;
-        if (split.length === 3) {
-          dirs[split[1]] = "/" + split[1];
-        }
-        return false;
-      })
-      .map((f) => {
-        const path = overwritePathContext
-          ? overwritePathContext + f.fullPath
-          : state.drive.currentDrive!.path + f.fullPath;
-        return {
-          isDirectory: f.isDirectory,
-          name: f.name,
-          path: path,
-        };
-      });
-    Object.keys(dirs).forEach((key) =>
-      fileInfo.push({ isDirectory: true, name: key, path: dirs[key] })
-    );
+    let fileInfo;
+    if (files) {
+      fileInfo = Array.prototype.filter
+        .call(files, (f) => {
+          if (!("fullPath" in f)) f.fullPath = "/" + f.name;
+          const split = f.fullPath.split("/");
+          if (split.length === 2) return split;
+          if (split.length === 3) {
+            dirs[split[1]] = "/" + split[1];
+          }
+          return false;
+        })
+        .map((f) => {
+          const path = overwritePathContext
+            ? overwritePathContext + f.fullPath
+            : state.drive.currentDrive!.path + f.fullPath;
+          return {
+            isDirectory: f.isDirectory,
+            name: f.name,
+            path: path,
+          };
+        });
+      Object.keys(dirs).forEach((key) =>
+        fileInfo.push({ isDirectory: true, name: key, path: dirs[key] })
+      );
+    }
+    if (externalUrl?.path && externalUrl?.url) {
+      //IMPORTANT: Paths can't start with a '/'
+      let isDirectory = false;
+      const name = externalUrl.path.split("/").pop();
+      if (componentType === ResearchObjectComponentType.CODE) {
+        isDirectory = true;
+      }
+
+      fileInfo = [
+        {
+          isDirectory: isDirectory,
+          name: name,
+          path: overwritePathContext
+            ? overwritePathContext + "/" + externalUrl.path
+            : state.drive.currentDrive!.path + "/" + externalUrl.path,
+        },
+      ];
+    }
+
+    if (!fileInfo) return console.error("[AddFilesToDrive] fileInfo undefined");
 
     const batchUid = Date.now().toString();
     const uploadQueueItems = fileInfo.map((f) => ({
@@ -451,6 +473,7 @@ export const addFilesToDrive = createAsyncThunk(
     const contextPath = overwritePathContext || state.drive.currentDrive!.path!;
     const snapshotNodeUuid = currentObjectId!;
     try {
+      debugger;
       const {
         manifest: updatedManifest,
         rootDataCid,
@@ -463,6 +486,7 @@ export const addFilesToDrive = createAsyncThunk(
         manifest,
         contextPath,
         externalCids,
+        externalUrl,
         componentType,
         componentSubType,
         onProgress: (e) => {

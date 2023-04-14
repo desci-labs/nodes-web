@@ -14,6 +14,7 @@ export interface NavigateToDriveByPathAction {
 export interface AddFilesToDrivePayload {
   files?: FileList | FileSystemEntry[] | File[];
   externalCids?: ExternalCid[];
+  externalUrl?: ExternalUrl;
   overwritePathContext?: string;
   componentType?: ResearchObjectComponentType;
   componentSubType?: ResearchObjectComponentSubtypes;
@@ -58,6 +59,12 @@ export type ComponentId = string;
 //Path expected here is the same as regular file drop path, i.e. /hey.txt, or /folder/hey.txt
 type Path = string;
 export type ExternalCid = Record<Path, CidString>;
+
+//IMPORTANT: Paths can't start with a '/'
+export type ExternalUrl = {
+  url: string;
+  path: string;
+};
 
 export interface BreadCrumb {
   name: string;

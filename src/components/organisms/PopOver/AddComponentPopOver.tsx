@@ -1,7 +1,11 @@
 import { addComponentToDraft } from "@api/index";
 import PrimaryButton from "@components/atoms/PrimaryButton";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
-import { capitalize, cleanupManifestUrl } from "@components/utils";
+import {
+  capitalize,
+  cleanupManifestUrl,
+  extractCodeRepoName,
+} from "@components/utils";
 import {
   IconCodeBracket,
   IconDataSquare,
@@ -34,6 +38,7 @@ import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 import { useDispatch } from "react-redux";
 import { addFilesToDrive } from "@src/state/drive/driveSlice";
 import { useFileUpload } from "react-use-file-upload/dist/lib/useFileUpload";
+import { ExternalUrl } from "@src/state/drive/types";
 
 export const componentData = {
   [ResearchObjectComponentType.PDF]: {
@@ -130,18 +135,9 @@ const AddComponentPopOver = (
   }, [addComponentType]);
 
   const extractComponentTitle = (): string => {
-    if (
-      addComponentType === ResearchObjectComponentType.CODE &&
-      urlOrDoi &&
-      urlOrDoi.indexOf("github.com")
-    ) {
-      if (urlOrDoi.split("github.com/")[1].split("/").length > 1) {
-        const [, , repo] = urlOrDoi.match(
-          // eslint-disable-next-line no-useless-escape
-          /github.com[\/:]([^\/]+)\/([^\/^.]+)/
-        )!;
-        if (repo) return repo;
-      }
+    if (addComponentType === ResearchObjectComponentType.CODE && urlOrDoi) {
+      const repo = extractCodeRepoName(urlOrDoi);
+      if (repo) return repo;
       setError("Invalid Repo Link");
     }
 
@@ -226,9 +222,15 @@ const AddComponentPopOver = (
         componentSubtype: addComponentSubType || undefined,
       });
 
+      let externalUrl;
+      if (urlOrDoi?.length) {
+        const extractedName = extractCodeRepoName(urlOrDoi);
+        if (extractedName) externalUrl = { path: extractedName, url: urlOrDoi };
+      }
+
       dispatch(
         addFilesToDrive({
-          files: files,
+          ...(externalUrl ? { externalUrl } : { files }),
           componentType: addComponentType!,
           componentSubType: addComponentSubType || undefined,
           ...(addFilesWithoutContext ? { overwriteContext: "root" } : {}),
@@ -243,7 +245,7 @@ const AddComponentPopOver = (
         })
       );
 
-      //Maybe still neccessary
+      //Maybe still necessary
       // if (!currentObjectId) {
       //   /**
       //    * If adding this component triggers a new node creation, redirect to the new node

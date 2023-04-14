@@ -283,3 +283,16 @@ export const getNonDataComponentsFromManifest = (
     : [];
   return nonDataComponents;
 };
+
+export function extractCodeRepoName(url: string) {
+  if (
+    url.indexOf("github.com") &&
+    url.split("github.com/")[1].split("/").length > 1
+  ) {
+    const [, , repo] = url.match(
+      // eslint-disable-next-line no-useless-escape
+      /github.com[\/:]([^\/]+)\/([^\/^.]+)/
+    )!;
+    return repo;
+  }
+}
