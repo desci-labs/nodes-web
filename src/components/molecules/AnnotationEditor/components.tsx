@@ -336,9 +336,9 @@ interface DirectoryLinkComponentProps {
 }
 
 export interface AnnotationLinkConfig {
-  isExecutable?: boolean;
-  extraPath?: string;
-  lineNumber?: number;
+  exec?: boolean;
+  path?: string;
+  line?: number;
   url?: string;
 }
 
@@ -351,9 +351,9 @@ export const parseAnnotationLink = (href: string): AnnotationLinkConfig => {
     if (!href || href.indexOf("?") < 0) {
       return {
         url,
-        isExecutable: undefined,
-        extraPath: undefined,
-        lineNumber: undefined,
+        exec: undefined,
+        path: undefined,
+        line: undefined,
       };
     }
     const obj: any = href
@@ -364,19 +364,19 @@ export const parseAnnotationLink = (href: string): AnnotationLinkConfig => {
         acc[key] = value;
         return acc;
       }, {} as any);
-    const { isExecutable, extraPath, lineNumber } = obj;
+    const { exec, path, line } = obj;
     return {
       url,
-      isExecutable: isExecutable === "true",
-      extraPath: extraPath ? extraPath : undefined,
-      lineNumber: lineNumber ? parseInt(lineNumber) : undefined,
+      exec: exec === "true",
+      path: path ? path : undefined,
+      line: line ? parseInt(line) : undefined,
     };
   } catch (e) {
     return {
       url: undefined,
-      isExecutable: undefined,
-      extraPath: undefined,
-      lineNumber: undefined,
+      exec: undefined,
+      path: undefined,
+      line: undefined,
     };
   }
 };
@@ -393,19 +393,18 @@ export const DirectoryLinkComponent = (props: DirectoryLinkComponentProps) => {
 
   useEffect(() => {
     if (href) {
-      const { url, extraPath, isExecutable, lineNumber } =
-        parseAnnotationLink(href);
+      const { url, path, exec, line } = parseAnnotationLink(href);
       console.log("parse href", href, {
         url,
-        extraPath,
-        isExecutable,
-        lineNumber,
+        path,
+        exec,
+        line,
       });
       setAnnotationLinkConfig({
         url,
-        extraPath,
-        isExecutable,
-        lineNumber,
+        path,
+        exec,
+        line,
       });
     }
   }, [href]);

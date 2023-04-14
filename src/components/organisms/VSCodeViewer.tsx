@@ -7,7 +7,7 @@ import {
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Draggable from "react-draggable";
 import { useUser } from "@src/state/user/hooks";
 import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
@@ -49,10 +49,10 @@ const VSCodeViewer = () => {
     } else {
       setTimeout(() => {
         setActiveAnnotation(true);
-      }, 500);
-      setTimeout(() => {
-        setActiveDraggable(true);
-      }, 1000);
+      }, 0);
+      // setTimeout(() => {
+      //   setActiveDraggable(true);
+      // }, 5000);
     }
   }, [selectedAnnotationId, codeComponent]);
   if (codeComponent?.type === "code") {
@@ -65,6 +65,9 @@ const VSCodeViewer = () => {
 
   const [tempAnnotation, setTempAnnotation] = useState(<></>);
   useEffect(() => {
+    if (!annotationLinkConfig) {
+      setActiveDraggable(false);
+    }
     let pdfComponent: PdfComponent = {
       type: ResearchObjectComponentType.PDF,
       payload: { url: "" },
@@ -94,6 +97,9 @@ const VSCodeViewer = () => {
         className={`handle fixed bottom-[28px] left-0 transition-all duration-200 ease-out ${
           activeDraggable ? "cursor-move" : ""
         } ${activeAnnotation ? "translate-x-2" : "-translate-x-96"}`}
+        onClick={() => {
+          setActiveDraggable(true);
+        }}
       >
         <AnnotationExpanded
           DURATION_BASE_MS={0}
@@ -183,12 +189,10 @@ const VSCodeViewer = () => {
   const [codeBrowseSuffix, setCodeBrowseSuffix] = useState("");
 
   useEffect(() => {
-    if (annotationLinkConfig && annotationLinkConfig.extraPath) {
+    if (annotationLinkConfig && annotationLinkConfig.path) {
       setCodeBrowseSuffix(
-        `#file=${annotationLinkConfig.extraPath}${
-          annotationLinkConfig.lineNumber
-            ? `&line=${annotationLinkConfig.lineNumber}`
-            : ""
+        `#file=${annotationLinkConfig.path}${
+          annotationLinkConfig.line ? `&line=${annotationLinkConfig.line}` : ""
         }`
       );
     }
@@ -208,6 +212,7 @@ const VSCodeViewer = () => {
     return <></>;
   }
 
+  console.log("RENDER VSCODEVIEWER");
   return (
     <div
       className={`w-screen h-screen top-[55px] fixed left-0 bg-neutrals-gray-1 ${
@@ -240,4 +245,4 @@ const VSCodeViewer = () => {
   );
 };
 
-export default VSCodeViewer;
+export default React.memo(VSCodeViewer);

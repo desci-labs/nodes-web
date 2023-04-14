@@ -21,11 +21,11 @@ interface ModalEditAnnotationLinkProps {
 }
 
 const outputAnnotationLink = (config: AnnotationLinkConfig) => {
-  const { url, isExecutable, extraPath, lineNumber } = config;
+  const { url, exec, path, line } = config;
   const params = [
-    isExecutable ? `isExecutable=${isExecutable}` : undefined,
-    extraPath ? `extraPath=${extraPath}` : undefined,
-    lineNumber ? `lineNumber=${lineNumber}` : undefined,
+    exec ? `exec=${exec}` : undefined,
+    path ? `path=${path}` : undefined,
+    line ? `line=${line}` : undefined,
   ]
     .filter((x) => x)
     .join("&");
@@ -41,16 +41,16 @@ const ModalEditAnnotationLink = ({
   setHref,
   href,
 }: ModalEditAnnotationLinkProps) => {
-  const { url, extraPath, lineNumber, isExecutable } = annotationLinkConfig;
+  const { url, path, line, exec } = annotationLinkConfig;
   const [newConfig, setNewConfig] = useState<AnnotationLinkConfig>({
     url,
-    isExecutable,
-    extraPath,
-    lineNumber,
+    exec,
+    path,
+    line,
   });
   useEffect(() => {
-    setNewConfig({ url, isExecutable, extraPath, lineNumber });
-  }, [url, extraPath, lineNumber, isExecutable, annotationLinkConfig]);
+    setNewConfig({ url, exec, path, line });
+  }, [url, path, line, exec, annotationLinkConfig]);
 
   const save = () => {
     const link = outputAnnotationLink(newConfig);
@@ -63,7 +63,7 @@ const ModalEditAnnotationLink = ({
       isOpen={showModal}
       onDismiss={() => {
         setShowModal(false);
-        setNewConfig({ url, isExecutable, extraPath, lineNumber });
+        setNewConfig({ url, exec, path, line });
       }}
     >
       <div className="py-3 px-6 !min-h-[70px] min-w-[400px]">
@@ -80,22 +80,22 @@ const ModalEditAnnotationLink = ({
           </div>
           <InsetLabelInput
             label={`File Path`}
-            value={`${newConfig.extraPath || ""}`}
+            value={`${newConfig.path || ""}`}
             onChange={(e) => {
               setNewConfig({
                 ...newConfig,
-                extraPath: (e.target as any).value,
+                path: (e.target as any).value,
               });
             }}
             mandatory={false}
           />
           <InsetLabelInput
             label={`Line/Cell Number`}
-            value={`${newConfig.lineNumber || ""}`}
+            value={`${newConfig.line || ""}`}
             onChange={(e) => {
               setNewConfig({
                 ...newConfig,
-                lineNumber: parseInt((e.target as any).value),
+                line: parseInt((e.target as any).value),
               });
             }}
             mandatory={false}

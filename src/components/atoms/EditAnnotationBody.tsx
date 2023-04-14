@@ -1,6 +1,4 @@
-import AnnotationEditor, {
-  SlateEditor,
-} from "@components/molecules/AnnotationEditor";
+import AnnotationEditor from "@components/molecules/AnnotationEditor";
 import { ExternalLinkIcon } from "@heroicons/react/solid";
 import React, { useState } from "react";
 import PrimaryButton from "./PrimaryButton";
@@ -21,7 +19,7 @@ const EditAnnotationBody = ({
   const [annotationMode, setAnnotationMode] = useState<"editor" | "raw">(
     "editor"
   );
-  __log("<EditAnnotationBody render>", annotationText, annotationMode);
+  // __log("<EditAnnotationBody render>", annotationText, annotationMode);
   return (
     <>
       {annotationMode === "raw" ? (

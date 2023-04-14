@@ -235,7 +235,7 @@ const ManuscriptAnnotation = (props: ManuscriptAnnotationProps) => {
         : 99,
   };
 
-  __log("<ManuscriptAnnotation render>", annotationWithLayoutMeta.data.text);
+  // __log("<ManuscriptAnnotation render>", annotationWithLayoutMeta.data.text);
 
   return (
     <ManuscriptAnnotationContainer

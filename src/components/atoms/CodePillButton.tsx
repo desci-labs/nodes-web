@@ -46,8 +46,8 @@ const CodePillButton = ({
 
   const flipped =
     annotationLinkConfig?.url == thisLinkConfig.url &&
-    annotationLinkConfig?.extraPath == thisLinkConfig?.extraPath &&
-    annotationLinkConfig?.lineNumber == thisLinkConfig?.lineNumber;
+    annotationLinkConfig?.path == thisLinkConfig?.path &&
+    annotationLinkConfig?.line == thisLinkConfig?.line;
 
   return (
     <button

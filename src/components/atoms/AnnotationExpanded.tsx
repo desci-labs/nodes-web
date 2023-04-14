@@ -161,4 +161,4 @@ const AnnotationExpanded = ({
   );
 };
 
-export default AnnotationExpanded;
+export default React.memo(AnnotationExpanded);
