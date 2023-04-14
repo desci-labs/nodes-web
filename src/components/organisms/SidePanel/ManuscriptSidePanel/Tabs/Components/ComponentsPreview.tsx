@@ -1,4 +1,5 @@
 import {
+  CodeComponent,
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
@@ -58,8 +59,27 @@ function ComponentPreview({
   const target = findTarget(component);
   if (!target) return null;
 
+  const urlForComponent = (c: ResearchObjectV1Component) => {
+    switch (c.type) {
+      case ResearchObjectComponentType.PDF:
+        const url =
+          process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE +
+          "/" +
+          component.payload.url;
+        return url;
+
+      case ResearchObjectComponentType.CODE:
+        return (component as CodeComponent).payload.externalUrl;
+    }
+  };
+
   return (
-    <div className="flex gap-4 items-center bg-zinc-200 dark:bg-neutrals-black rounded-lg px-4 py-2 border border-black">
+    <div
+      className="flex gap-4 items-center bg-zinc-200 bg-neutrals-black active:bg-neutrals-gray-5 rounded-lg px-4 py-2 border border-black"
+      onClick={() => {
+        window.open(urlForComponent(component), "_blank");
+      }}
+    >
       <target.icon
         width={24}
         height={24}
