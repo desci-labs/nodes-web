@@ -38,19 +38,22 @@ export default function useComponentDpid(componentToUse: DriveObject) {
     fqi: string;
     license: string;
   } => {
-    if (!componentToUse) return DEFAULT_VALUE;
+    const umbrellaLicense =
+      manifestData?.defaultLicense || DEFAULT_VALUE.license;
+    const DEFAULT_WITH_LICENSE = {
+      ...DEFAULT_VALUE,
+      license: umbrellaLicense,
+    };
+    if (!componentToUse) return DEFAULT_WITH_LICENSE;
 
     const component =
       componentToUse.type === FileType.Dir
         ? componentToUse?.contains?.[0] ?? null
         : componentToUse;
 
-    if (!component) return DEFAULT_VALUE;
+    if (!component) return DEFAULT_WITH_LICENSE;
 
-    const license =
-      component.metadata.licenseType ||
-      manifestData?.defaultLicense ||
-      DEFAULT_VALUE.license;
+    const license = component.metadata.licenseType || umbrellaLicense;
 
     let componentParent: DriveObject | FileDir = component;
     while (

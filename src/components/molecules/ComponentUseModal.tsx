@@ -147,7 +147,7 @@ const ComponentUseModal = ({
           subTitle="You can use the granular dPID of the file you have selected interact with the associated data."
           onDismiss={close}
         />
-        <div className="w-full grid grid-cols-1 lg:grid-cols-2 place-content-center lg:justify-items-center gap-4 justify-items-center mt-8 overflow-hidden overflow-x-scroll">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-2 place-content-center lg:justify-items-center gap-4 justify-items-center mt-8 overflow-hidden overflow-x-auto">
           <section className="hidden lg:block w-full">
             <VideoAnimation />{" "}
           </section>
@@ -178,7 +178,7 @@ const ComponentUseModal = ({
                 </a>
               </span>
               <CopyBox
-                title="dPid"
+                title="dPID"
                 copyButtonText="Copy dPID"
                 className="my-6 w-full overflow-hidden pr-2"
                 copyText={dpid}
@@ -237,10 +237,10 @@ const ComponentUseModal = ({
             </div>
             {!isDpidSupported && (
               <div className="text-neutrals-gray-7 text-sm border-yellow-300 gap-4 bg-neutrals-gray-3 p-4 rounded-md flex flex-row items-center">
-                <IconWarning height={16} /> This node version has no dPID. A
+                <IconWarning height={16} /> This Node version has no dPID. A
                 dPID is assigned upon publishing.
                 <br />
-                Data will not be available until node is published.
+                Data will not be available until Node is published.
               </div>
             )}
           </section>
@@ -252,7 +252,7 @@ const ComponentUseModal = ({
             <div className="flex gap-2 items-center">
               <WarningSign width={25} />{" "}
               <span className="text-sm">
-                These content identifiers refer to the latest committed node
+                These content identifiers refer to the latest committed Node
                 state. Uncommitted files are not included.
               </span>
             </div>
@@ -278,6 +278,7 @@ const ComponentUseModal = ({
 const VideoAnimation = () => {
   const refVideo = useRef(null);
   const [loaded, setLoaded] = useState(false);
+  const borderRadius = "72%";
 
   return (
     <div
@@ -286,7 +287,7 @@ const VideoAnimation = () => {
       <div
         className="w-full h-full p-8 relative"
         style={{
-          borderRadius: "72%",
+          borderRadius,
           width: "400px",
           overflow: "hidden",
           border: "none",
@@ -297,7 +298,7 @@ const VideoAnimation = () => {
         <div
           className="absolute top-0 left-0 bg-transparent z-50"
           style={{
-            borderRadius: "72%",
+            borderRadius,
             width: "100%",
             height: "100%",
             boxShadow: "inset 0em 0em 40px 35px rgba(0, 0, 0, .3)",
@@ -313,7 +314,7 @@ const VideoAnimation = () => {
             position: "absolute",
             top: 0,
             left: 0,
-            borderRadius: "72%",
+            borderRadius,
             transform: "scale(1.5)",
             visibility: !loaded ? "visible" : "hidden",
           }}
@@ -332,7 +333,7 @@ const VideoAnimation = () => {
             width: "100%",
             height: "100%",
             objectFit: "cover",
-            borderRadius: "72%",
+            borderRadius,
             transform: "scale(1.5)",
             visibility: loaded ? "visible" : "hidden",
           }}
