@@ -224,7 +224,7 @@ const CitationComponent = () => {
             />
           </div>
         </Box>
-        {!publicView && !userProfile?.profile.name && (
+        {!publicView && !manifestData?.authors?.length && (
           <div>
             <div className="text-neutrals-gray-7 text-sm border-yellow-300 gap-2 bg-neutrals-gray-3 p-2 rounded-md flex flex-row items-center">
               <IconWarning height={16} /> Credit co-authors and collaborators
