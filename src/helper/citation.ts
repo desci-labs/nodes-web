@@ -21,26 +21,24 @@ const formatNames = (names: string[]) => {
     names.length > 0
       ? names.map((name) => {
           let params = name.split(" ");
-          let surname =
-            params[0]
-              .substring(0, 1)
-              .toUpperCase()
-              .concat(params[0].substring(1)) ?? "";
-          let firstName = params[1] ?? "";
+          let surname = params.slice(1).map(capitalize).join(" ");
+          let firstName = capitalize(params[0]) ?? "";
           let initials =
             params.length > 1
               ? params
-                  .slice(1)
+                  .slice(0, 1)
                   .map((namePart) => namePart[0].toUpperCase())
-                  .join(".")
-              : "";
+                  .join(".") + "."
+              : firstName;
 
           let key = `${surname.toLowerCase()}${initials.toLowerCase()}`;
 
           sunameInitial[key] = sunameInitial[key]
             ? sunameInitial[key].concat([firstName])
             : [firstName];
-          return `${surname}${initials ? ", " + initials : ""}`;
+          return `${surname}${
+            initials ? (surname ? ", " : "") + initials : ""
+          }`;
         })
       : [];
 
@@ -110,7 +108,6 @@ type FormatterResult = {
 };
 
 interface FormatterProps {
-  author: string;
   manifest: ResearchObjectV1;
   dpidLink: string;
   year?: number;
@@ -120,9 +117,7 @@ interface FormatterProps {
 
 const defaultFormatter = (props: FormatterProps): FormatterResult => {
   const authorNames = formatNames(
-    [props.author]
-      .concat(props.manifest?.authors?.map((c) => c.name) ?? [])
-      .filter(Boolean)
+    (props.manifest?.authors?.map((c) => c.name) ?? []).filter(Boolean)
   );
   const year = props?.year
     ? props.year.toString()
@@ -142,9 +137,7 @@ const defaultFormatter = (props: FormatterProps): FormatterResult => {
 
 const apaFormatter = (props: FormatterProps): FormatterResult => {
   let authorNames = formatNames(
-    [props.author]
-      .concat(props.manifest?.authors?.map((c) => c.name) ?? [])
-      .filter(Boolean)
+    (props.manifest?.authors?.map((c) => c.name) ?? []).filter(Boolean)
   );
 
   const year = props?.year
@@ -173,7 +166,12 @@ const formatBibTexAuthor = (authors: string[]) => {
           const middleName = parts[1];
           const lastName = parts[2] ?? middleName;
 
-          return `${capitalize(lastName[0])}. ${surname}`;
+          return `${capitalize(lastName)}, ${
+            [surname, parts.length > 2 ? middleName : null]
+              .filter(Boolean)
+              .map((c) => c?.substring(0, 1))
+              .join(". ") + "."
+          }`;
         })
         .join(" and ")
     : "";
@@ -239,8 +237,8 @@ const bibTexFormatter = (props: FormatterProps): FormatterResult => {
   const year = props?.year ? props.year.toString() : "";
 
   const type = getBibtexEntryKey(props.componentType!, props.isPublished);
-  const authorSurname = capitalize(props.author.split(" ")[0] ?? "");
-  const citeKey = authorSurname + year;
+
+  const citeKey = `${"pending-publish"}`;
   const citation = `
   @${type}{${citeKey},
     author    = {${authors}},
