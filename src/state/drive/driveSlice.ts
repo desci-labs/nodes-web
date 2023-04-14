@@ -1,5 +1,6 @@
 import {
   ActionCreatorWithPayload,
+  AsyncThunkAction,
   PayloadAction,
   createAsyncThunk,
   createSlice,
@@ -59,7 +60,7 @@ import {
   updateComponent,
 } from "../nodes/viewer";
 
-interface DriveState {
+export interface DriveState {
   status: RequestStatus;
   error: null | undefined | string;
   nodeTree: DriveObject | null;
@@ -72,6 +73,11 @@ interface DriveState {
   componentTypeBeingAssignedTo: DrivePath | null;
   fileMetadataBeingEdited: DriveObject | null;
   breadCrumbs: BreadCrumb[];
+
+  // drive picker state
+  currentDrivePicker: DriveObject | null;
+  breadCrumbsPicker: BreadCrumb[];
+  nodeTreePicker: DriveObject | null;
 }
 
 const initialState: DriveState = {
@@ -87,7 +93,44 @@ const initialState: DriveState = {
   componentTypeBeingAssignedTo: null,
   fileMetadataBeingEdited: null,
   breadCrumbs: [],
+  breadCrumbsPicker: [],
+  currentDrivePicker: null,
+  nodeTreePicker: null,
 };
+
+const navigateToDriveGeneric =
+  (key: "" | "Picker") =>
+  (state: DriveState, action: NavigateToDriveByPathAction) => {
+    const keyBreadcrumbs:
+      | "breadCrumbs"
+      | "breadCrumbsPicker" = `breadCrumbs${key}`;
+    const keyCurrentDrive:
+      | "currentDrive"
+      | "currentDrivePicker" = `currentDrive${key}`;
+    const keyTree: "nodeTree" | "nodeTreePicker" = `nodeTree${key}`;
+    if (state.status !== "succeeded" || !state[keyTree]) return;
+    const { path } = action.payload;
+
+    let driveFound = state.deprecated
+      ? driveBfsByPath(state[keyTree]!, path)
+      : findDriveByPath(state[keyTree]!, path);
+    if (driveFound && driveFound.type === FileType.FILE) {
+      const pathSplit = path.split("/");
+      pathSplit.pop();
+      const parentPath = pathSplit.join("/");
+      driveFound = state.deprecated
+        ? driveBfsByPath(state[keyTree]!, parentPath)
+        : findDriveByPath(state[keyTree]!, parentPath);
+    }
+    if (!driveFound) {
+      console.error(
+        `[DRIVE NAVIGATE] Error: Target Path: ${path} not found in drive tree: ${state[keyTree]}`
+      );
+      return;
+    }
+    state[keyBreadcrumbs] = constructBreadCrumbs(driveFound.path!);
+    state[keyCurrentDrive] = driveFound;
+  };
 
 export const driveSlice = createSlice({
   name: "drive",
@@ -96,30 +139,8 @@ export const driveSlice = createSlice({
     reset: () => {
       return initialState;
     },
-    navigateToDriveByPath: (state, action: NavigateToDriveByPathAction) => {
-      if (state.status !== "succeeded" || !state.nodeTree) return;
-      const { path } = action.payload;
-
-      let driveFound = state.deprecated
-        ? driveBfsByPath(state.nodeTree!, path)
-        : findDriveByPath(state.nodeTree!, path);
-      if (driveFound && driveFound.type === FileType.FILE) {
-        const pathSplit = path.split("/");
-        pathSplit.pop();
-        const parentPath = pathSplit.join("/");
-        driveFound = state.deprecated
-          ? driveBfsByPath(state.nodeTree!, parentPath)
-          : findDriveByPath(state.nodeTree!, parentPath);
-      }
-      if (!driveFound) {
-        console.error(
-          `[DRIVE NAVIGATE] Error: Target Path: ${path} not found in drive tree: ${state.nodeTree}`
-        );
-        return;
-      }
-      state.breadCrumbs = constructBreadCrumbs(driveFound.path!);
-      state.currentDrive = driveFound;
-    },
+    navigateToDriveByPath: navigateToDriveGeneric(""),
+    navigateToDrivePickerByPath: navigateToDriveGeneric("Picker"),
     setShowUploadPanel: (state, action: { payload: boolean }) => {
       state.showUploadPanel = action.payload;
     },
@@ -232,6 +253,13 @@ export const driveSlice = createSlice({
           state.deprecated = true;
           state.nodeTree = tree as DriveObject;
           state.currentDrive = tree as DriveObject;
+
+          state.nodeTreePicker = tree as DriveObject;
+          state.currentDrivePicker = tree as DriveObject;
+          state.breadCrumbsPicker = [
+            { name: "Research Node", path: state.nodeTreePicker.path! },
+          ];
+
           state.breadCrumbs = [
             { name: "Research Node", path: state.nodeTree.path! },
           ];
@@ -285,6 +313,10 @@ export const driveSlice = createSlice({
         });
         if (externalLinks.contains?.length) root.contains?.push(externalLinks);
         state.nodeTree = root;
+        state.nodeTreePicker = root;
+        state.breadCrumbsPicker = [
+          { name: "Research Node", path: state.nodeTree.path! },
+        ];
         state.breadCrumbs = [
           { name: "Research Node", path: state.nodeTree.path! },
         ];
@@ -294,9 +326,13 @@ export const driveSlice = createSlice({
           : findDriveByPath(state.nodeTree!, state.currentDrive?.path!);
         if (driveFound) {
           state.currentDrive = driveFound;
+          state.currentDrivePicker = driveFound;
         }
         if (!state.currentDrive) {
           state.currentDrive = root;
+        }
+        if (!state.currentDrivePicker) {
+          state.currentDrivePicker = root;
         }
       })
       .addCase(fetchTreeThunk.rejected, (state, action) => {
@@ -319,6 +355,7 @@ export const driveSlice = createSlice({
 export const {
   reset,
   navigateToDriveByPath,
+  navigateToDrivePickerByPath,
   addItemsToUploadQueue,
   updateBatchUploadProgress,
   cleanupUploadProgressMap,

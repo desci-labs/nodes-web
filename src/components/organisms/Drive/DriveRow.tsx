@@ -27,14 +27,20 @@ import { everyRow } from ".";
 import "./styles.scss";
 import { starComponentThunk } from "@src/state/drive/driveSlice";
 import { useSetter } from "@src/store/accessors";
-import { COMPONENT_LIBRARY, UiComponentDefinition } from "../ComponentLibrary";
+import {
+  COMPONENT_LIBRARY,
+  EXTERNAL_COMPONENTS,
+  UiComponentDefinition,
+} from "../ComponentLibrary";
 
 function renderComponentIcon(file: DriveObject) {
   const classes = "!w-[20px] !h-[20px]";
-  const foundEntry = COMPONENT_LIBRARY.find((target: UiComponentDefinition) => {
-    return target.componentType === file.componentType;
-  });
-  const { icon } = foundEntry!;
+  const foundEntry = COMPONENT_LIBRARY.concat(EXTERNAL_COMPONENTS).find(
+    (target: UiComponentDefinition) => {
+      return target.componentType === file.componentType;
+    }
+  );
+  const { icon } = foundEntry || { icon: <IconDirectory /> };
   const iconOverwrite = React.cloneElement(icon, {
     className: `${icon.props.className}`,
     ringClassName: `${classes}`,

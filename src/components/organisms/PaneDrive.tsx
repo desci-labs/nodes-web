@@ -73,7 +73,6 @@ const PaneDrive = () => {
 
   const [showEditMetadata, setShowEditMetadata] = useState<boolean>(false);
   const [metaStaging, setMetaStaging] = useState<MetaStaging[]>([]);
-  const [breadCrumbs, setBreadCrumbs] = useState<BreadCrumb[]>([]);
   const datasetMetadataInfoRef = useRef<DatasetMetadataInfo>(
     datasetMetadataInfoRefDefaults
   );
