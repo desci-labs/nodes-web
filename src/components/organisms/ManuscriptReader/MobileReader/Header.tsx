@@ -2,12 +2,41 @@ import { ResearchNodeIcon } from "@src/components/Icons";
 import { IconShare } from "@src/icons";
 import { useNodeReader } from "@src/state/nodes/hooks";
 
+const BANNER_URL =
+  "https://images.unsplash.com/photo-1679669693237-74d556d6b5ba?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2298&q=80";
+
 export default function Header() {
   const { manifest } = useNodeReader();
 
+  const onHandleShare = async () => {
+    try {
+      await navigator.share({
+        text: manifest?.title || "Research Node",
+        title: manifest?.title,
+        url: BANNER_URL,
+      });
+    } catch (e) {
+      console.log("Error: Unable to share", e);
+    }
+  };
+
   return (
-    <div className="h-[27%] w-full p-2 mobile-reader-header relative flex items-end overflow-hidden shrink-0">
-      <IconShare width={30} color="white" className="absolute top-3 right-3" />
+    <div
+      className="h-[27%] w-full p-2 mobile-reader-header relative flex items-end overflow-hidden shrink-0"
+      style={{
+        backgroundImage: `url(${BANNER_URL})`,
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
+        backgroundSize: "cover",
+        objectFit: "cover",
+      }}
+    >
+      <IconShare
+        width={30}
+        color="white"
+        className="absolute top-3 right-3"
+        onClick={onHandleShare}
+      />
       <div className="px-4 flex gap-3 items-center">
         <div className="shrink-0 w-fit">
           <ResearchNodeIcon width={40} className="" />
