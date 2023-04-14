@@ -1,42 +1,45 @@
 $columns: 7;
 
 .driveRowHeader {
-    --borderRadius: 8px;
-    &:first-of-type {
-        border-top-left-radius: var(--borderRadius);
-    }
-    &:nth-of-type(#{$columns}) {
-        border-top-right-radius: var(--borderRadius);
-
-    }
+  --borderRadius: 8px;
+  &:first-of-type {
+    border-top-left-radius: var(--borderRadius);
+  }
+  &:nth-of-type(#{$columns}) {
+    border-top-right-radius: var(--borderRadius);
+  }
 }
 
-
 .singleRow {
-    &:last-of-type {
-        border-bottom-right-radius: var(--borderRadius);
-        border-bottom-left-radius: var(--borderRadius);
-        &>li {
-            border-bottom: none;
-        }
+  --borderRadius: 8px;
+  &:last-of-type {
+    border-bottom-right-radius: var(--borderRadius);
+    border-bottom-left-radius: var(--borderRadius);
+
+    & > li {
+      border-bottom: none;
     }
     &:hover > li {
-        background: #333;
-        border-bottom-right-radius: var(--borderRadius)!important;
-        border-bottom-left-radius: var(--borderRadius)!important;
-    } 
+      border-bottom-right-radius: var(--borderRadius) !important;
+      border-bottom-left-radius: var(--borderRadius) !important;
+    }
+  }
+  &:hover > li {
+    background: #333;
+  }
 }
 
 .singleRowSelected {
-    &>li {
-        background: rgba(40, 169, 195, 0.5); //tint-primary
-        &:last-of-type {
-            border-bottom-right-radius: var(--borderRadius);
-            border-bottom-left-radius: var(--borderRadius);
-        }
+  --borderRadius: 8px;
+  & > li {
+    background: rgba(40, 169, 195, 0.5); //tint-primary
+    &:last-of-type {
+      border-bottom-right-radius: var(--borderRadius);
+      border-bottom-left-radius: var(--borderRadius);
     }
+  }
 
-    &:hover > li {
-        background: rgba(40, 169, 195, 0.75); //tint-primary
-    }
+  &:hover > li {
+    background: rgba(40, 169, 195, 0.75); //tint-primary
+  }
 }
