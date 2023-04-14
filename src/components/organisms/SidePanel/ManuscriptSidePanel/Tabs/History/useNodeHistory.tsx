@@ -67,13 +67,14 @@ export default function useNodeHistory() {
   }, [history, pendingHistory]);
 
   useEffect(() => {
+    let isMounted = true
     if (loadRef.current === false) {
       setLoadingChain(true);
     }
 
     if (currentObjectId) {
       const refresh = () => {
-        setIsFetching(true);
+        if (isMounted) setIsFetching(true);
 
         (async () => {
           try {
@@ -92,8 +93,8 @@ export default function useNodeHistory() {
           } catch (e) {
             console.log("ERROR", e);
           } finally {
-            setIsFetching(false);
-            setLoadingChain(false);
+            if (isMounted) setIsFetching(false);
+            if (isMounted) setLoadingChain(false);
           }
         })();
       };
@@ -124,6 +125,9 @@ export default function useNodeHistory() {
       loadRef.current = true;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => {
+      isMounted = false
+    }
   }, [currentObjectId]);
 
   return {
