@@ -11,7 +11,7 @@ export default function Header() {
   const onHandleShare = async () => {
     try {
       await navigator.share({
-        text: manifest?.title || "Research Node",
+        text: "Have a look at this Research Node published with DeSci Nodes.",
         title: manifest?.title,
         url: BANNER_URL,
       });
