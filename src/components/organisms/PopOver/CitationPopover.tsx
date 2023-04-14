@@ -165,8 +165,9 @@ const CitationComponent = () => {
     version,
   ]);
 
-  const canCite = (publicView || userProfile?.profile.name) && manifestData;
+  const canCite = !!manifestData && manifestData?.authors?.length;
   const formatter = useMemo(() => getFormatter(format.name), [format.name]);
+
   const { citation } = useMemo(
     () =>
       canCite
@@ -181,7 +182,6 @@ const CitationComponent = () => {
     [
       canCite,
       formatter,
-      userProfile?.profile?.name,
       manifestData,
       getComponentDpid,
       year,
