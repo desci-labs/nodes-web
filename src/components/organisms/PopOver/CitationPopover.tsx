@@ -165,8 +165,9 @@ const CitationComponent = () => {
     version,
   ]);
 
-  const canCite = (publicView || userProfile?.profile.name) && manifestData;
+  const canCite = !!manifestData && manifestData?.authors?.length;
   const formatter = useMemo(() => getFormatter(format.name), [format.name]);
+
   const { citation } = useMemo(
     () =>
       canCite
@@ -181,7 +182,6 @@ const CitationComponent = () => {
     [
       canCite,
       formatter,
-      userProfile?.profile?.name,
       manifestData,
       getComponentDpid,
       year,
@@ -224,7 +224,7 @@ const CitationComponent = () => {
             />
           </div>
         </Box>
-        {!publicView && !userProfile?.profile.name && (
+        {!publicView && !manifestData?.authors?.length && (
           <div>
             <div className="text-neutrals-gray-7 text-sm border-yellow-300 gap-2 bg-neutrals-gray-3 p-2 rounded-md flex flex-row items-center">
               <IconWarning height={16} /> Credit co-authors and collaborators

@@ -52,7 +52,6 @@ const formatNames = (names: string[]) => {
     let name = parsed[i];
     let key = name.replaceAll(/[,|\t\s]/gi, "").toLowerCase();
     let entry = sunameInitial[key];
-    console.log("key", key, name, entry, handledKeys);
 
     if (handledKeys.includes(key)) continue;
 
@@ -72,7 +71,6 @@ const formatNames = (names: string[]) => {
     }
   }
 
-  console.log("Parsed", results.join(", "), names);
   return results.join(", ");
 };
 
@@ -143,7 +141,6 @@ const apaFormatter = (props: FormatterProps): FormatterResult => {
   const year = props?.year
     ? props.year.toString()
     : DEFAULT_RESULT.publicationYear;
-  console.log("YRRR", year);
   const content = `${authorNames} ${"(" + year + "):"} ${
     props.manifest.title ?? ""
   }. ${props.dpidLink}`;
