@@ -41,7 +41,7 @@ const ButtonCopyLink = (props: PropsWithChildren<ButtonCopyLinkProps>) => {
           props.invert
             ? "bg-transparent hover:bg-neutrals-gray-7 active:bg-black text-black"
             : "bg-black hover:bg-neutrals-gray-3 active:bg-black text-white"
-        } p-2 w-fit h-fit flex justify-center items-center rounded-lg`}
+        } p-1.5 w-fit h-fit flex justify-center items-center rounded-lg`}
         onClick={handleClick}
         data-tip={isCopied ? "Copied" : "Copy Link"}
         data-place={placement}

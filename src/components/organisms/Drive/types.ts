@@ -73,6 +73,10 @@ export interface DriveRowProps {
   canEditMetadata: boolean;
   canUse: boolean;
   deprecated?: boolean;
+  setOldComponentMetadata: (
+    value: React.SetStateAction<oldComponentMetadata | null>
+  ) => void;
+  onHandleUse: () => void;
 }
 
 export interface DriveJumpingParams {

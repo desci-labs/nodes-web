@@ -13,7 +13,7 @@ import {
 } from "@desci-labs/desci-models";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import DriveTable, { DriveObject } from "./Drive";
+import DriveTable, { DriveObject, oldComponentMetadata } from "./Drive";
 import toast from "react-hot-toast";
 import ComponentMetadataPopover from "./PopOver/ComponentMetadataPopover";
 import ContextMenuProvider from "./Drive/ContextMenu/provider";
@@ -26,7 +26,10 @@ import {
   fetchTreeThunk,
   setFileMetadataBeingEdited,
 } from "@src/state/drive/driveSlice";
-import DriveDatasetMetadataPopOver from "../molecules/DriveDatasetMetadataPopOver";
+import DriveDatasetMetadataPopOver, {
+  DATASET_METADATA_FORM_DEFAULTS,
+} from "../molecules/DriveDatasetMetadataPopOver";
+import { BreadCrumb } from "@src/state/drive/types";
 
 export interface DatasetMetadataInfo {
   prepopulateFromName?: string;
@@ -53,6 +56,10 @@ export const nodeDriveSetContext = createContext<NodeDriveSetter>({
   setDirectory: () => {},
   setRenameComponentId: () => {},
 });
+const datasetMetadataInfoRefDefaults: DatasetMetadataInfo = {
+  prepopulateMetadata: DATASET_METADATA_FORM_DEFAULTS,
+  componentsSelected: [],
+};
 
 const PaneDrive = () => {
   const {
@@ -63,6 +70,16 @@ const PaneDrive = () => {
   } = useManuscriptController(["droppedFileList", "droppedTransferItemList"]);
   const dispatch = useSetter();
   const { isDraggingFiles, currentObjectId } = useNodeReader();
+
+  const [showEditMetadata, setShowEditMetadata] = useState<boolean>(false);
+  const [metaStaging, setMetaStaging] = useState<MetaStaging[]>([]);
+  const [breadCrumbs, setBreadCrumbs] = useState<BreadCrumb[]>([]);
+  const datasetMetadataInfoRef = useRef<DatasetMetadataInfo>(
+    datasetMetadataInfoRefDefaults
+  );
+
+  const [OldComponentMetadata, setOldComponentMetadata] =
+    useState<oldComponentMetadata | null>(null); //temporary fallback for old metadata used for documents and code
 
   const { nodeTree, status, currentDrive, fileMetadataBeingEdited } =
     useDrive();
@@ -180,7 +197,14 @@ const PaneDrive = () => {
           <h1 className="text-[28px] font-bold text-white">Node Drive</h1>
           <SpacerHorizontal />
           <div id="tableWrapper" className="mt-5 h-full">
-            <DriveTable setLoading={setLoading} />
+            <DriveTable
+              setShowEditMetadata={setShowEditMetadata}
+              datasetMetadataInfoRef={datasetMetadataInfoRef}
+              setOldComponentMetadata={setOldComponentMetadata}
+              setMetaStaging={setMetaStaging}
+              showEditMetadata={showEditMetadata}
+              setLoading={setLoading}
+            />
           </div>
         </PerfectScrollbar>
         <SidePanelStorage />

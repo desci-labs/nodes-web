@@ -19,9 +19,11 @@ $columns: 7;
     & > li {
       border-bottom: none;
     }
-    &:hover > li {
-      border-bottom-right-radius: var(--borderRadius) !important;
+    &:hover > li:first-child {
       border-bottom-left-radius: var(--borderRadius) !important;
+    }
+    &:hover > li:last-child {
+      border-bottom-right-radius: var(--borderRadius) !important;
     }
   }
   &:hover > li {

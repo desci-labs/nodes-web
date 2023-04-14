@@ -106,7 +106,7 @@ export const COMPONENT_LIBRARY: UiComponentDefinition[] = [
     doNotRender: true,
   },
 ];
-const EXTERNAL_COMPONENTS: UiComponentDefinition[] = [
+export const EXTERNAL_COMPONENTS: UiComponentDefinition[] = [
   {
     icon: <IconWrapper Icon={IconComponentDiscussions} className="p-0.5" />,
     title: "Community Discussions",

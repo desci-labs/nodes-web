@@ -53,14 +53,15 @@ export default function DriveRow({
   canEditMetadata,
   canUse,
   deprecated,
-}: // setOldComponentMetadata,
-DriveRowProps) {
+  onHandleUse,
+}: DriveRowProps) {
   const contextRef = useRef<HTMLDivElement>();
   const { init } = useDriveContext(file);
   const { handleDbClick } = useInteractionHandler();
-  const { setUseMenuCids, setShowCitationModal, setComponentToCite } =
-    useManuscriptController(["componentToCite"]);
-  const { manifestCid, mode } = useNodeReader();
+  const { setShowCitationModal, setComponentToCite } = useManuscriptController([
+    "componentToCite",
+  ]);
+  const { manifest: manifestData, publicView, mode } = useNodeReader();
 
   const dispatch = useSetter();
 
@@ -183,10 +184,7 @@ DriveRowProps) {
         <BlackGenericButton
           disabled={!canUse}
           className="p-0 min-w-[28px] h-7"
-          onClick={() => {
-            const cid = file.cid ? file.cid : manifestCid ? manifestCid : "";
-            setUseMenuCids([cid]);
-          }}
+          onClick={onHandleUse}
         >
           <IconPlayRounded className="p-0" />
         </BlackGenericButton>

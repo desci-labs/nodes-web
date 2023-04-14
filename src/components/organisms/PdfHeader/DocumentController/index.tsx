@@ -36,7 +36,7 @@ const ControllerDivider = styled.div.attrs({
 interface DocumentControllerProps {}
 
 const DocumentController = (props: DocumentControllerProps) => {
-  const { manifest: manifestData, mode } = useNodeReader();
+  const { manifest: manifestData, mode, componentStack } = useNodeReader();
   const dispatch = useSetter();
 
   const editButtonRef = useRef<HTMLButtonElement>(null);
@@ -70,7 +70,9 @@ const DocumentController = (props: DocumentControllerProps) => {
                 : "hover:fill-neutrals-gray-5"
             } mt-[1.5px]`}
             onClick={() => {
-              const selectedComponent = manifestData?.components[0];
+              const selectedComponent = manifestData?.components.find(
+                (a) => a.id === componentStack[componentStack.length - 1].id
+              );
               setIsDownloading(true);
               postUserAction(
                 AvailableUserActionLogTypes.btnDownloadManuscript,
@@ -96,7 +98,10 @@ const DocumentController = (props: DocumentControllerProps) => {
                     link.href = url2;
                     link.setAttribute(
                       "download",
-                      `nodes.desci.com__${
+                      `${selectedComponent.name.replaceAll(
+                        " ",
+                        "_"
+                      )}__nodes.desci.com__${
                         url.split("/")[url.split("/").length - 1]
                       }.pdf`
                     ); //or any other extension

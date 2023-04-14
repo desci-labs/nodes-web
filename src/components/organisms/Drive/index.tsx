@@ -1,14 +1,16 @@
-import {
-  driveBfsByPath,
-  driveBfsByUid,
-  SessionStorageKeys,
-} from "@components/driveUtils";
-import PopOverUseMenu from "@components/molecules/PopOverUseMenu";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+
+import { useClickAway } from "react-use";
+import { DatasetMetadataInfo, MetaStaging } from "../PaneDrive";
 import StatusInfo from "./StatusInfo";
-import { DriveNonComponentTypes, DriveObject, FileDir } from "./types";
+import {
+  DriveNonComponentTypes,
+  DriveObject,
+  FileDir,
+  oldComponentMetadata,
+} from "./types";
 import DriveRow from "./DriveRow";
 import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
 import { IconCirclePlus, IconStar } from "@src/icons";
@@ -23,6 +25,7 @@ import {
 import { useSetter } from "@src/store/accessors";
 import "./styles.scss";
 import DriveBreadCrumbs from "@src/components/molecules/DriveBreadCrumbs";
+import ComponentUseModal from "@src/components/molecules/ComponentUseModal";
 
 const Empty = () => {
   return <div className="p-5 text-xs col-span-7">No files</div>;
@@ -46,11 +49,44 @@ interface DriveTableProps {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   // renameComponentId: string | null;
   // setRenameComponentId: React.Dispatch<React.SetStateAction<string | null>>;
+
+  // directory: DriveObject[];
+  // setDirectory: React.Dispatch<React.SetStateAction<DriveObject[]>>;
+  // nodeDrived: DriveObject | null;
+  // setNodeDrived: React.Dispatch<React.SetStateAction<DriveObject | null>>;
+  setShowEditMetadata: React.Dispatch<React.SetStateAction<boolean>>;
+  datasetMetadataInfoRef: React.MutableRefObject<DatasetMetadataInfo>;
+  setMetaStaging: React.Dispatch<React.SetStateAction<MetaStaging[]>>;
+  showEditMetadata: boolean;
+  // setBreadCrumbs: React.Dispatch<React.SetStateAction<BreadCrumb[]>>;
+  // breadCrumbs: BreadCrumb[];
+  // setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setOldComponentMetadata: (
+    value: React.SetStateAction<oldComponentMetadata | null>
+  ) => void;
+  // renameComponentId: string | null;
+  // setRenameComponentId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const DriveTable: React.FC<DriveTableProps> = ({ setLoading }) => {
-  const { setIsAddingComponent, setAddFilesWithoutContext } =
-    useManuscriptController([]);
+const DriveTable: React.FC<DriveTableProps> = ({
+  setShowEditMetadata,
+  datasetMetadataInfoRef,
+  setMetaStaging,
+  // showEditMetadata,
+  // breadCrumbs,
+  // setBreadCrumbs,
+
+  setOldComponentMetadata,
+  // renameComponentId,
+  // setRenameComponentId,
+}) => {
+  const {
+    setIsAddingComponent,
+
+    componentToUse,
+    setComponentToUse,
+    setAddFilesWithoutContext,
+  } = useManuscriptController(["componentToUse"]);
 
   const { publicView, mode } = useNodeReader();
 
@@ -61,6 +97,7 @@ const DriveTable: React.FC<DriveTableProps> = ({ setLoading }) => {
   const [selected, setSelected] = useState<
     Record<number, ResearchObjectComponentType | DriveNonComponentTypes>
   >({});
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -178,6 +215,11 @@ const DriveTable: React.FC<DriveTableProps> = ({ setLoading }) => {
                   canEditMetadata={canEditMetadata}
                   canUse={canUse}
                   deprecated={deprecated}
+                  onHandleUse={() => {
+                    setComponentToUse(f);
+                    setSelectedIndex(idx);
+                  }}
+                  setOldComponentMetadata={setOldComponentMetadata}
                 />
               );
             })
@@ -187,7 +229,23 @@ const DriveTable: React.FC<DriveTableProps> = ({ setLoading }) => {
         </ul>
         <StatusInfo />
       </div>
-      <PopOverUseMenu />
+      {!!componentToUse && (
+        <ComponentUseModal
+          isOpen={true}
+          isMultiselecting={!!Object.keys(selected).length}
+          setMetaStaging={setMetaStaging}
+          setShowEditMetadata={setShowEditMetadata}
+          datasetMetadataInfoRef={datasetMetadataInfoRef}
+          setOldComponentMetadata={setOldComponentMetadata}
+          componentToUse={componentToUse!}
+          index={selectedIndex}
+          selectedFiles={selected}
+          onDismiss={() => {
+            setSelectedIndex(0);
+            setComponentToUse(null);
+          }}
+        />
+      )}
       {/* {renameComponentId && (
         <RenameDataModal
           renameComponentId={renameComponentId}

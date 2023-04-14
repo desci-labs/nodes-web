@@ -54,7 +54,6 @@ interface State {
   lastScrollTop: { [componentId: string]: number };
   isAddingComponent: boolean;
   isAddingSubcomponent: boolean;
-  useMenuCids: string[];
   droppedFileList: FileList | null;
   droppedTransferItemList: FileSystemEntry[] | null;
   addComponentType: ResearchObjectComponentType | null;
@@ -64,6 +63,8 @@ interface State {
   showPublicationDetails: boolean;
   showProfileUpdater: boolean;
   componentToCite: DriveObject | null;
+  componentToUse: DriveObject | null;
+  privCidMap: Record<string, boolean>;
   forceRefreshDrive: boolean;
   showAddNewNode: boolean;
   addFilesWithoutContext: boolean;
@@ -109,7 +110,7 @@ export const initialState: State = {
   changesToCommit: [],
   showShareMenu: false,
   pageMetadata: [],
-  useMenuCids: [],
+  componentToUse: null,
   addComponentType: null,
   addComponentSubType: null,
   componentToCite: null,
@@ -119,6 +120,7 @@ export const initialState: State = {
   forceRefreshDrive: false,
   showAddNewNode: false,
   addFilesWithoutContext: false,
+  privCidMap: {},
 };
 
 export interface IndexedNodeVersion {

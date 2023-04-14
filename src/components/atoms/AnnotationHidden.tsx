@@ -43,7 +43,7 @@ const AnnotationHidden = ({
                 maxWidth: "100%",
               }}
             >
-              {annotationTitle.length ? annotationTitle : null}
+              {annotationTitle?.length ? annotationTitle : null}
             </div>
 
             <div
