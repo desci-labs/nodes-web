@@ -98,16 +98,25 @@ DriveRowProps) {
         }
       }}
     >
-      <li className={`${everyRow} ${deprecated ? "hidden" : ""}`}>
+      <li
+        className={`${everyRow} ${
+          deprecated ? "hidden" : ""
+        } p-2 cursor-pointer group`}
+        onDoubleClick={(e) => {
+          e.stopPropagation();
+        }}
+        onClick={() => {
+          dispatch(starComponentThunk({ item: file }));
+        }}
+      >
         <IconStar
-          className={`cursor-pointer ${
+          className={` ${
             file.starred
-              ? "fill-tint-primary stroke-tint-primary hover:fill-tint-primary hover:stroke-neutrals-gray-5 hover:opacity-20"
-              : "stroke-neutrals-gray-5 hover:fill-tint-primary hover:stroke-tint-primary hover:opacity-70"
+              ? "fill-tint-primary stroke-tint-primary group-hover:fill-tint-primary group-hover:stroke-neutrals-gray-5 group-hover:opacity-40"
+              : "stroke-neutrals-gray-5 group-hover:fill-tint-primary group-hover:stroke-tint-primary group-hover:opacity-70"
           }`}
           width={18}
           height={18}
-          onClick={() => dispatch(starComponentThunk({ item: file }))}
         />
       </li>
       <li
