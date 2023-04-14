@@ -43,6 +43,7 @@ import {
   FormatQuote,
   FormatUnderlined,
   IconCreateFolder,
+  IconInfo,
   LatexLogo,
 } from "@icons";
 import useClickAway from "react-use/lib/useClickAway";
@@ -245,36 +246,36 @@ export const SlateEditor = (props: any) => {
                 />
               }
             />
-            <DirectoryButton
-              editor={editor}
-              format="link"
-              icon={
-                <IconCreateFolder
-                  fill="black"
-                  width={20}
-                  height={20}
-                  className="cursor-pointer"
-                />
-              }
-            />
 
             <Button
               onClick={() => {
                 setMode("raw");
                 if (showLatexButton) {
                   setShowLatexButton(false);
-                  toast.success("Switched to raw editor for LaTeX", {
-                    duration: 5000,
-                    position: "top-center",
-                    style: {
-                      marginTop: 0,
-                      borderRadius: "10px",
-                      background: "#111",
-                      color: "#fff",
-                    },
-                  });
+                  toast.success(
+                    <div className="flex flex-col gap-3 text-center">
+                      <div>Add LaTeX equations in Editor</div>
+                      <div>example</div>
+                      <div>
+                        <pre className="text-white bg-gray-600 text-sm p-2 rounded-lg">
+                          $$ f(x) = g(y) $$
+                        </pre>
+                      </div>
+                    </div>,
+                    {
+                      duration: 10000,
+                      position: "top-center",
+                      icon: <IconInfo fill="white" />,
+                      style: {
+                        marginTop: 0,
+                        borderRadius: "10px",
+                        background: "#111",
+                        color: "#fff",
+                      },
+                    }
+                  );
                   // add example latex to the end of the markdown to show user how to use it
-                  setRawMarkdown(rawMarkdown + `\n$$\nE = mc^2\n$$`);
+                  // setRawMarkdown(rawMarkdown + `\n$$\nE = mc^2\n$$`);
                 }
               }}
             >
@@ -285,7 +286,23 @@ export const SlateEditor = (props: any) => {
                 height={20}
               />
             </Button>
-
+            <div className="w-36 group flex items-end justify-end justify-self-end self-end  select-none">
+              <DirectoryButton
+                editor={editor}
+                format="link"
+                icon={
+                  <div className="flex flex-row gap-1 items-center justify-end pr-2 group-hover:bg-neutrals-gray-8">
+                    <IconCreateFolder
+                      fill="black"
+                      width={20}
+                      height={20}
+                      className="cursor-pointer"
+                    />
+                    <span className="text-xs font-bold">Node Drive</span>
+                  </div>
+                }
+              />
+            </div>
             {/* <LinkButton format="link" icon={
                 <FormatLink
                   fill="black"
@@ -618,7 +635,7 @@ const Element = (params: {
     ...rest
   } = params;
   const style = { textAlign: element["align" as keyof CustomElement] };
-
+  const editor = useSlate();
   switch (element.type) {
     case "block_quote":
       return (
@@ -717,6 +734,20 @@ const Element = (params: {
             nodeRef={nodeRef}
             element={element}
             readOnly={readOnly}
+            deleteLink={() => {
+              Transforms.removeNodes(editor, {
+                at: [],
+                match: (n) => {
+                  return (
+                    !Editor.isEditor(n) &&
+                    SlateElement.isElement(n) &&
+                    n.type === "link" &&
+                    n.link === element.link &&
+                    n == element
+                  );
+                },
+              });
+            }}
             {...{ children }}
           />
         );
@@ -810,7 +841,7 @@ const DirectoryButton = ({
       <Button onClick={() => setShowDirectory(!showDirectory)}>{icon}</Button>
       {showDirectory ? (
         <div
-          className="absolute top-[120%] left-[-50%] w-96 bg-white z-50 rounded-lg"
+          className="absolute top-[120%] left-[0%] w-96 bg-white z-50 rounded-lg"
           style={{ boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.8)" }}
         >
           <DriveTable
