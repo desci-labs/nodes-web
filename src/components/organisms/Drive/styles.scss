@@ -34,7 +34,7 @@ $columns: 7;
 .singleRowSelected {
   --borderRadius: 8px;
   & > li {
-    background: rgba(40, 169, 195, 0.5); //tint-primary
+    background: rgba(40, 169, 195, 0.5) !important; //tint-primary
     &:last-of-type {
       border-bottom-right-radius: var(--borderRadius);
       border-bottom-left-radius: var(--borderRadius);

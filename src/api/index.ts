@@ -409,6 +409,9 @@ export interface UpdateDag {
   onProgress?: (e: ProgressEvent) => void;
 }
 
+interface FileEntryBase extends FileSystemEntry {}
+interface FileEntry extends FileEntryBase, FileSystemFileEntry {}
+
 export const updateDag = async ({
   uuid,
   files,
@@ -432,12 +435,15 @@ export const updateDag = async ({
     formData.append("externalCid", JSON.stringify(externalCids));
   formData.append("contextPath", contextPath);
   if (files?.length) {
-    if (files[0] instanceof FileSystemEntry) {
-      const entryList = files as FileSystemEntry[];
+    if (
+      files[0].toString() === "[object FileEntry]" ||
+      files[0].toString() === "[object FileSystemFileEntry]"
+    ) {
+      const entryList = files as FileEntryBase[];
       for (let i = 0; i < entryList.length; i++) {
         const f = entryList[i];
         const p = new Promise<File>((res, rej) => {
-          (f as FileSystemFileEntry).file((v) => res(v), rej);
+          (f as FileEntry).file((v) => res(v), rej);
         });
         const tempFile = await p;
         const fileName = entryList[i].fullPath;

@@ -84,7 +84,6 @@ const VSCodeViewer = () => {
       title: "",
     };
     if (selectedAnnotationId) {
-      debugger;
       pdfComponent = manifestData?.components.find(
         (a: ResearchObjectV1Component) =>
           a.type === ResearchObjectComponentType.PDF
