@@ -314,12 +314,16 @@ export const driveSlice = createSlice({
         if (externalLinks.contains?.length) root.contains?.push(externalLinks);
         state.nodeTree = root;
         state.nodeTreePicker = root;
-        state.breadCrumbsPicker = [
-          { name: "Research Node", path: state.nodeTree.path! },
-        ];
-        state.breadCrumbs = [
-          { name: "Research Node", path: state.nodeTree.path! },
-        ];
+        if (!state.breadCrumbsPicker.length) {
+          state.breadCrumbsPicker = [
+            { name: "Research Node", path: state.nodeTreePicker.path! },
+          ];
+        }
+        if (!state.breadCrumbs.length) {
+          state.breadCrumbs = [
+            { name: "Research Node", path: state.nodeTree.path! },
+          ];
+        }
 
         const driveFound = state.deprecated
           ? driveBfsByPath(state.nodeTree!, state.currentDrive?.path!)
