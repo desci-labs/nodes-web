@@ -2,6 +2,7 @@ import { ResearchNodeIcon } from "@src/components/Icons";
 import { IconShare } from "@src/icons";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import useComponentDpid from "@components/organisms/Drive/hooks/useComponentDpid";
+import useNodeCover from "@components/organisms/ManuscriptReader/hooks/useNodeCover";
 
 const BANNER_URL =
   "https://images.unsplash.com/photo-1679669693237-74d556d6b5ba?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2298&q=80";
@@ -9,6 +10,7 @@ const BANNER_URL =
 export default function Header() {
   const { manifest } = useNodeReader();
   const { dpid } = useComponentDpid();
+  useNodeCover();
 
   const onHandleShare = async () => {
     try {
