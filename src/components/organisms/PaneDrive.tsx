@@ -70,7 +70,6 @@ const PaneDrive = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    if (status !== "succeeded") setLoading(true);
     if (status === "succeeded") setLoading(false);
   }, [loading, status]);
 
