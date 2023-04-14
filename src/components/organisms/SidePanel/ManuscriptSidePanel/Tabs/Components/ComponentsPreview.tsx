@@ -56,8 +56,8 @@ function ComponentPreview({
   component: ResearchObjectV1Component;
 }) {
   const target = findTarget(component);
-  console.log("target", target, component);
   if (!target) return null;
+
   return (
     <div className="flex gap-4 items-center bg-zinc-200 dark:bg-neutrals-black rounded-lg px-4 py-2 border border-black">
       <target.icon

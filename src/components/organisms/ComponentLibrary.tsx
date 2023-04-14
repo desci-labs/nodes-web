@@ -145,7 +145,7 @@ export const COMPONENT_LIBRARY: UiComponentDefinition[] = [
     componentType: ResearchObjectComponentType.DATA,
   },
 ];
-const EXTERNAL_COMPONENTS: UiComponentDefinition[] = [
+export const EXTERNAL_COMPONENTS: UiComponentDefinition[] = [
   {
     icon: (props) => (
       <IconWrapper

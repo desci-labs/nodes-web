@@ -240,7 +240,7 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
         delta,
         origin, // mouse coordinates in viewport (i.e. not larger than dimensions of screen)
       } = state;
-
+      console.log("pinch");
       setPinching(pinching);
 
       /**
