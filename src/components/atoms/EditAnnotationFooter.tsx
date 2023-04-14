@@ -1,3 +1,4 @@
+import { AnnotationUpdateProps } from "../molecules/Annotation";
 import PrimaryButton from "./PrimaryButton";
 import ToggleSwitch from "./ToggleSwitch";
 
@@ -5,7 +6,7 @@ interface EditAnnotationFooterProps {
   keepAnnotating: boolean;
   setKeepAnnotating: (val: boolean) => void;
   handleCancel: () => void;
-  handleSave: () => void;
+  handleSave: (obj: AnnotationUpdateProps) => void;
   annotationText: string;
 }
 
@@ -27,7 +28,7 @@ const EditAnnotationFooter = ({
       </div>
       <PrimaryButton
         disabled={!annotationText?.trim().length}
-        onClick={handleSave}
+        onClick={() => handleSave({ text: annotationText })}
         className="rounded-md bg-black hover:bg-gray-700 h-7 px-2 justify-center align-middle items-center flex text-white font-bold"
         tabIndex={3}
       >

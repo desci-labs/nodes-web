@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   APPROXIMATED_HEADER_HEIGHT,
   EMPTY_FUNC,
@@ -39,6 +39,11 @@ const DURATION_BASE_MS = 100;
 //   transition-timing-function: ease;
 // `;
 
+export interface AnnotationUpdateProps {
+  title?: string;
+  text: string;
+}
+
 export interface AnnotationProps {
   annotation: ResearchObjectComponentAnnotation;
   selected: boolean;
@@ -73,6 +78,7 @@ const AnnotationComponent = (props: AnnotationProps) => {
   const { mode, componentStack, manifest: manifestData } = useNodeReader();
 
   useClickAway(ref, (e: Event) => {
+    __log("annotation click away");
     const ev = e as MouseEvent;
     // do not click away when in code view
     const isCode =
@@ -131,11 +137,17 @@ const AnnotationComponent = (props: AnnotationProps) => {
     componentStack[componentStack.length - 1]?.type ===
     ResearchObjectComponentType.CODE;
 
-  const [counter, setCounter] = useState(0);
   const [annotationTitle, setAnnotationTitle] = useState(
     annotation.title || ""
   );
   const [annotationText, setAnnotationText] = useState(annotation.text || "");
+
+  __log(
+    "<Annotation render>",
+    annotation.text,
+    annotationTitle,
+    annotationText
+  );
 
   const handleCancel = () => {
     restoreScroll();
@@ -201,7 +213,9 @@ const AnnotationComponent = (props: AnnotationProps) => {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = (obj: AnnotationUpdateProps) => {
+    const annotationTitle = obj.title;
+    const annotationText = obj.text;
     restoreScroll();
     const selectedComponent = [...componentStack]
       .reverse()
@@ -281,7 +295,6 @@ const AnnotationComponent = (props: AnnotationProps) => {
       annotationTitle,
       JSON.stringify(annotation)
     );
-    setCounter(counter + 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [annotationTitle]);
 
@@ -322,17 +335,14 @@ const AnnotationComponent = (props: AnnotationProps) => {
           annotation={annotation}
           annotationText={annotationText}
           annotationTitle={annotationTitle}
-          counter={counter}
           handleCancel={handleCancel}
           handleSave={handleSave}
           isCode={isCode}
           isEditingAnnotation={isEditingAnnotation}
           keepAnnotating={keepAnnotating}
-          mode={mode}
+          setKeepAnnotating={(val: boolean) => dispatch(setKeepAnnotating(val))}
           setAnnotationText={setAnnotationText}
           setAnnotationTitle={setAnnotationTitle}
-          setCounter={setCounter}
-          setKeepAnnotating={(val: boolean) => dispatch(setKeepAnnotating(val))}
         />
       ) : null}
       {isExpanded ? (
@@ -341,7 +351,6 @@ const AnnotationComponent = (props: AnnotationProps) => {
           annotation={annotation}
           annotationText={annotationText}
           annotationTitle={annotationTitle}
-          mode={mode}
         />
       ) : !!selectedAnnotationId ? null : (
         <AnnotationHidden

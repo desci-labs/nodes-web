@@ -1,7 +1,7 @@
 import { AnnotationWithLayoutMeta } from "@components/organisms/Paper/PageAnnotations";
 import { __log } from "@components/utils";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
-import { CSSProperties, useEffect, useRef, useState } from "react";
+import React, { CSSProperties, useEffect, useRef, useState } from "react";
 import styled, { StyledComponent } from "styled-components";
 import AnnotationComponent, { AnnotationProps } from ".";
 import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
@@ -235,6 +235,8 @@ const ManuscriptAnnotation = (props: ManuscriptAnnotationProps) => {
         : 99,
   };
 
+  // __log("<ManuscriptAnnotation render>", annotationWithLayoutMeta.data.text);
+
   return (
     <ManuscriptAnnotationContainer
       isHidden={false}
@@ -276,6 +278,7 @@ const ManuscriptAnnotation = (props: ManuscriptAnnotationProps) => {
           selected={isSelected}
           hovered={false}
           onSelected={() =>
+            annotationWithLayoutMeta.data.id != selectedAnnotationId &&
             __log(
               "ManuscriptAnnotation::onSelected, selectedAnnotationId=",
               annotationWithLayoutMeta.data.id
@@ -284,20 +287,23 @@ const ManuscriptAnnotation = (props: ManuscriptAnnotationProps) => {
             dispatch(setSelectedAnnotationId(annotationWithLayoutMeta.data.id))
           }
           onMouseEnter={() => {
-            __log(
-              "ManuscriptAnnotation::onMouseEnter, hoveredAnnotationId=",
-              annotationWithLayoutMeta.data.id
-            ) &&
+            !isEditingAnnotation &&
+              __log(
+                "ManuscriptAnnotation::onMouseEnter, hoveredAnnotationId=",
+                annotationWithLayoutMeta.data.id
+              ) &&
               selectedAnnotationId != annotationWithLayoutMeta.data.id &&
               dispatch(
                 setHoveredAnnotationId(annotationWithLayoutMeta.data.id)
               );
           }}
           onMouseLeave={() => {
-            __log(
-              "ManuscriptAnnotation::onMouseLeave, hoveredAnnotationId=",
-              annotationWithLayoutMeta.data.id
-            ) && dispatch(setHoveredAnnotationId(""));
+            !isEditingAnnotation &&
+              __log(
+                "ManuscriptAnnotation::onMouseLeave, hoveredAnnotationId=",
+                annotationWithLayoutMeta.data.id
+              ) &&
+              dispatch(setHoveredAnnotationId(""));
           }}
           onClose={() =>
             __log(
@@ -312,4 +318,4 @@ const ManuscriptAnnotation = (props: ManuscriptAnnotationProps) => {
   );
 };
 
-export default ManuscriptAnnotation;
+export default React.memo(ManuscriptAnnotation);

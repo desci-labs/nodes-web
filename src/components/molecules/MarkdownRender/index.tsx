@@ -29,7 +29,13 @@ function MarkdownRender(props: any) {
       a: ({ node, inline, className, children, ...props }: any) => {
         // console.log("LINK!", node, inline, className, children, props);
         if (props.href.substring(0, 6) == "#/code") {
-          return <CodePillButton key={props.href} {...{ children }} href={props.href} />;
+          return (
+            <CodePillButton
+              key={props.href}
+              {...{ children }}
+              href={props.href}
+            />
+          );
         }
         return <a href={props.href}>{children}</a>;
       },

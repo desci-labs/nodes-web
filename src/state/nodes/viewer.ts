@@ -7,6 +7,7 @@ import {
 } from "@desci-labs/desci-models";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { updateDraft } from "@src/api";
+import { AnnotationLinkConfig } from "@src/components/molecules/AnnotationEditor/components";
 import { cleanupManifestUrl } from "@src/components/utils";
 import { RootState } from "@src/store";
 import axios from "axios";
@@ -32,7 +33,7 @@ export enum ManifestDataStatus {
   Fulfilled = "Fulfilled",
   Rejected = "Rejected",
 }
-interface NodeReaderPref {
+export interface NodeReaderPref {
   isNew: boolean;
   mode: ReaderMode;
   manifestCid: string;
@@ -49,6 +50,7 @@ interface NodeReaderPref {
   startedNewAnnotationViaButton: boolean;
   componentStack: ResearchObjectV1Component[];
   manifestStatus: ManifestDataStatus;
+  annotationLinkConfig?: AnnotationLinkConfig | null;
 }
 
 const initialState: NodeReaderPref = {
@@ -66,6 +68,7 @@ const initialState: NodeReaderPref = {
   researchPanelTab: ResearchTabs.history,
   startedNewAnnotationViaButton: false,
   manifestStatus: ManifestDataStatus.Idle,
+  annotationLinkConfig: null,
 };
 
 export const nodeReaderSlice = createSlice({
@@ -243,6 +246,12 @@ export const nodeReaderSlice = createSlice({
         state.manifest.components = components;
       }
     },
+    setAnnotationLinkConfig: (
+      state,
+      { payload }: PayloadAction<AnnotationLinkConfig | null>
+    ) => {
+      state.annotationLinkConfig = payload;
+    },
     setManifestCid: (state, { payload }: PayloadAction<string>) => {
       state.manifestCid = payload;
     },
@@ -305,6 +314,7 @@ export const nodeReaderSlice = createSlice({
           }
         }
       }
+      state.annotationLinkConfig = null;
       state.componentStack = payload;
     },
     pushToComponentStack: (
@@ -336,6 +346,7 @@ export const nodeReaderSlice = createSlice({
           [remainingLastValue.id]: 0,
         };
       }
+      state.annotationLinkConfig = null;
       return state;
     },
   },
@@ -405,6 +416,7 @@ export const {
   setEditNodeId,
   resetEditNode,
   setManifestCid,
+  setAnnotationLinkConfig,
   saveAnnotation,
   resetNodeViewer,
   deleteComponent,

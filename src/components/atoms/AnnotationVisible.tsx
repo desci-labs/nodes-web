@@ -41,7 +41,7 @@ const AnnotationVisible = ({
                 maxWidth: "100%",
               }}
             >
-              {annotationTitle.length ? (
+              {annotationTitle?.length ? (
                 annotationTitle
               ) : (
                 <MarkdownRender className="pointer-events-none">
