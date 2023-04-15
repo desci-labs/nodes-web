@@ -310,7 +310,14 @@ const ComponentCard = (props: ComponentCardProps) => {
                       onClick={(e) => {
                         e!.stopPropagation();
                         dispatch(navigateToDriveByPath(component.payload.path));
-                        dispatch(setComponentStack([component]));
+                        if (
+                          component.type === ResearchObjectComponentType.DATA ||
+                          component.type === ResearchObjectComponentType.UNKNOWN
+                        ) {
+                          dispatch(setComponentStack([component]));
+                        } else {
+                          dispatch(setComponentStack([]));
+                        }
                       }}
                     >
                       <IconDrive className="p-0 min-w-[28px] scale-[1.2]" />
