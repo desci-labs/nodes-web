@@ -1,137 +1,54 @@
 import CopyBox, { CodeBox } from "@components/atoms/CopyBox";
 import PrimaryButton from "@components/atoms/PrimaryButton";
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { IconWarning } from "@src/icons";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 import WarningSign from "@src/components/atoms/warning-sign";
 import DividerSimple from "@src/components/atoms/DividerSimple";
 import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
-import {
-  DriveNonComponentTypes,
-  DriveObject,
-  FileType,
-  oldComponentMetadata,
-} from "@src/components/organisms/Drive";
+import { DriveObject, FileType } from "@src/components/organisms/Drive";
 import useComponentDpid from "@src/components/organisms/Drive/hooks/useComponentDpid";
-import {
-  ResearchObjectComponentType,
-  ResearchObjectV1Component,
-} from "@desci-labs/desci-models";
+import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import useActionHandler from "@src/components/organisms/Drive/ContextMenu/useActionHandler";
 import { useRef, useState } from "react";
 import {
-  findRootComponentCid,
-  isRootComponentDrive,
-} from "@src/components/driveUtils";
-import {
-  DatasetMetadataInfo,
-  MetaStaging,
-} from "@components/organisms/PaneDrive";
-interface UseModalProps {
-  datasetMetadataInfoRef: React.MutableRefObject<DatasetMetadataInfo>;
-  setOldComponentMetadata: (
-    value: React.SetStateAction<oldComponentMetadata | null>
-  ) => void;
-  setMetaStaging: React.Dispatch<React.SetStateAction<MetaStaging[]>>;
-  isMultiselecting: boolean;
-  setShowEditMetadata: React.Dispatch<React.SetStateAction<boolean>>;
-  componentToUse: DriveObject;
-  index: number;
-  selectedFiles: Record<
-    number,
-    ResearchObjectComponentType | DriveNonComponentTypes
-  >;
+  setFileBeingUsed,
+  setFileMetadataBeingEdited,
+} from "@src/state/drive/driveSlice";
+import { useSetter } from "@src/store/accessors";
+
+interface ComponentUseModalProps {
+  file: DriveObject;
 }
 
 const ComponentUseModal = ({
-  index,
-  setOldComponentMetadata,
-  isMultiselecting,
-  datasetMetadataInfoRef,
-  setMetaStaging,
-  setShowEditMetadata,
-  componentToUse,
-  selectedFiles,
+  file,
   ...restProps
-}: ModalProps & UseModalProps) => {
-  const { setComponentToUse } = useManuscriptController(["componentToUse"]);
+}: ModalProps & ComponentUseModalProps) => {
   const { manifest: manifestData } = useNodeReader();
-  const { dpid, fqi, license } = useComponentDpid(componentToUse!);
+  const { dpid, fqi, license } = useComponentDpid(file);
   const handler = useActionHandler();
-
-  const file = componentToUse;
+  const dispatch = useSetter();
 
   const handleEditMetadata = () => {
-    // debugger;
-    if (!file) return;
-
-    if (file.componentType !== ResearchObjectComponentType.DATA) {
-      const component = manifestData?.components.find(
-        (c: ResearchObjectV1Component) => c.id === file.cid
-      );
-      if (!component) return;
-      setOldComponentMetadata({
-        componentId: component.id,
-        cb: () => {
-          const { keywords, description, licenseType } = component.payload;
-
-          const newMetadata = { keywords, description, licenseType };
-          file.metadata = newMetadata;
-        },
-      });
-    }
-
-    if (file.componentType === ResearchObjectComponentType.DATA) {
-      // debugger;
-      if (!isMultiselecting)
-        setMetaStaging([
-          {
-            file: file,
-            index: index,
-          },
-        ]);
-
-      if (isMultiselecting) {
-        datasetMetadataInfoRef.current.prepopulateFromName = file.name;
-        const staging = Object.keys(selectedFiles).map((fileIndex: string) => {
-          const parentDriveObj = file.parent;
-          const selectedFile = parentDriveObj?.contains![
-            parseInt(fileIndex)
-          ] as DriveObject;
-          return {
-            file: selectedFile!,
-          };
-        });
-        setMetaStaging(staging);
-      }
-
-      //dag file/dir (submetadata)
-      if (!isRootComponentDrive(file)) {
-        const rootCid = findRootComponentCid(file);
-        if (rootCid) datasetMetadataInfoRef.current.rootCid = rootCid;
-      }
-      datasetMetadataInfoRef.current.prepopulateMetadata = file.metadata;
-
-      if (setShowEditMetadata) setShowEditMetadata(true);
-    }
+    dispatch(setFileMetadataBeingEdited(file!));
   };
 
   function close() {
-    setComponentToUse(null);
+    dispatch(setFileBeingUsed(null));
     restProps?.onDismiss?.();
   }
 
   const isDpidSupported = !!manifestData?.dpid;
 
-  const pythonImport = componentToUse
-    ? `with desci.fetch([('${componentToUse.name}.py', '${componentToUse.name}')], "${fqi}"):`
+  const pythonImport = file
+    ? `with desci.fetch([('${file.name}.py', '${file.name}')], "${fqi}"):`
     : "";
 
   const canPreview =
-    componentToUse &&
+    file &&
     ResearchObjectComponentType.CODE ===
-      (componentToUse.componentType as ResearchObjectComponentType);
+      (file.componentType as ResearchObjectComponentType);
 
   return (
     <Modal
@@ -147,9 +64,10 @@ const ComponentUseModal = ({
           subTitle="You can use the granular dPID of the file you have selected interact with the associated data."
           onDismiss={close}
         />
-        <div className="w-full grid grid-cols-1 lg:grid-cols-2 place-content-center lg:justify-items-center gap-4 justify-items-center mt-8 overflow-hidden overflow-x-auto">
-          <section className="hidden lg:block w-full">
-            <VideoAnimation />{" "}
+        <div className="w-full grid grid-cols-1 lg:grid-cols-2 place-content-center gap-4 justify-items-center mt-8 overflow-hidden overflow-x-auto">
+          <section className="hidden max-h-[700px] lg:block max-w-[512px]">
+            {/* Max height should roughly match the right side of this modal */}
+            <VideoAnimation />
           </section>
           <section id="cid-use" className="max-w-[600px]">
             <div className="lg:hidden">
@@ -222,11 +140,9 @@ const ComponentUseModal = ({
                   className="mt-4 lg:w-full text-center"
                   onClick={() => {
                     const c =
-                      componentToUse?.type === FileType.File
-                        ? componentToUse
-                        : componentToUse?.contains?.find(
-                            (c) => c.type === FileType.File
-                          );
+                      file?.type === FileType.FILE
+                        ? file
+                        : file?.contains?.find((c) => c.type === FileType.FILE);
                     handler["PREVIEW"]?.(c!);
                     close();
                   }}
@@ -278,75 +194,52 @@ const ComponentUseModal = ({
 const VideoAnimation = () => {
   const refVideo = useRef(null);
   const [loaded, setLoaded] = useState(false);
-  const borderRadius = "72%";
 
   return (
     <div
-      className={`overflow-hidden relative min-w-[300px] h-full flex items-center justify-center`}
+      className={`overflow-hidden relative w-full h-full flex items-center justify-center`}
     >
       <div
-        className="w-full h-full p-8 relative"
+        className="absolute top-0 w-full h-full left-0 z-50"
         style={{
-          borderRadius,
-          width: "400px",
-          overflow: "hidden",
-          border: "none",
-          boxShadow: "0em 0em 3em 15px rgba(0, 0, 0, .5)",
-          maxHeight: "91%",
+          backgroundImage:
+            "radial-gradient(50.00% 50.77% at 50% 50%, rgba(0, 0, 0, 0) 59.77%, rgb(25, 27, 28) 100%)",
         }}
+      ></div>
+      {/* This cover image needs replacement, flip the loaded booleans around to test */}
+      <img
+        src="https://desci-labs-public.s3.amazonaws.com/node-front-preview.png"
+        alt="desci nodes use animation poster"
+        className="w-full h-full absolute top-0 left-0 object-cover scale-[1.285]"
+        style={{
+          objectFit: "cover",
+          // overflow: "hidden",
+          visibility: !loaded ? "visible" : "hidden",
+        }}
+      />
+      <video
+        loop
+        ref={refVideo}
+        onLoadedData={(e) => {
+          setLoaded(true);
+        }}
+        playsInline
+        autoPlay
+        key={`cube-panel`}
+        muted
+        className="object-cover max-w-none max-h-[900px]"
+        style={{
+          visibility: loaded ? "visible" : "hidden",
+        }}
+        src={`https://desci-labs-public.s3.amazonaws.com/node-front.mp4`}
+        preload="metadata"
+        poster="https://desci-labs-public.s3.amazonaws.com/node-front-preview.png"
       >
-        <div
-          className="absolute top-0 left-0 bg-transparent z-50"
-          style={{
-            borderRadius,
-            width: "100%",
-            height: "100%",
-            boxShadow: "inset 0em 0em 40px 35px rgba(0, 0, 0, .3)",
-          }}
-        ></div>
-        <img
-          src="https://desci-labs-public.s3.amazonaws.com/node-front-preview.png"
-          alt="desci nodes use animation poster"
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            position: "absolute",
-            top: 0,
-            left: 0,
-            borderRadius,
-            transform: "scale(1.5)",
-            visibility: !loaded ? "visible" : "hidden",
-          }}
+        <source
+          src="https://desci-labs-public.s3.amazonaws.com/node-front.mp4#t=0.1"
+          type="video/mp4"
         />
-        <video
-          loop
-          ref={refVideo}
-          onLoadedData={(e) => {
-            setLoaded(true);
-          }}
-          playsInline
-          autoPlay
-          key={`cube-panel`}
-          muted
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            borderRadius,
-            transform: "scale(1.5)",
-            visibility: loaded ? "visible" : "hidden",
-          }}
-          src={`https://desci-labs-public.s3.amazonaws.com/node-front.mp4`}
-          preload="metadata"
-          poster="https://desci-labs-public.s3.amazonaws.com/node-front-preview.png"
-        >
-          <source
-            src="https://desci-labs-public.s3.amazonaws.com/node-front.mp4#t=0.1"
-            type="video/mp4"
-          />
-        </video>
-      </div>
+      </video>
     </div>
   );
 };

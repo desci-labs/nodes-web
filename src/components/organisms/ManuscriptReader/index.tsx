@@ -13,6 +13,14 @@ import Reader from "./Reader";
 import Editor from "./Editor";
 import PublicationDetailsModal from "@src/components/molecules/NodeVersionDetails/PublicationDetailsModal";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import { useDrive } from "@src/state/drive/hooks";
+import { ResearchObjectComponentType } from "@desci-labs/desci-models";
+import ComponentMetadataPopover from "../PopOver/ComponentMetadataPopover";
+import { setFileMetadataBeingEdited } from "@src/state/drive/driveSlice";
+import DriveDatasetMetadataPopOver from "@src/components/molecules/DriveDatasetMetadataPopOver";
+import { useSetter } from "@src/store/accessors";
+import ComponentUseModal from "@src/components/molecules/ComponentUseModal";
+import CitationPopover from "../PopOver/CitationPopover";
 
 const ManuscriptWrapper = styled(FlexRow)`
   background-color: #525659;
@@ -34,8 +42,10 @@ interface ManuscriptReaderProps {
   publicView?: boolean;
 }
 const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
+  const dispatch = useSetter();
   __log("Render manuscript reader", publicView);
   const { currentObjectId } = useNodeReader();
+  const { fileMetadataBeingEdited, fileBeingUsed, fileBeingCited } = useDrive();
   const { isLoading } = useManuscriptReader(publicView);
 
   // trigger Reader side effects
@@ -63,6 +73,36 @@ const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
       {publicView && <Reader isLoading={isLoading} />}
       {!publicView && <Editor isLoading={isLoading} />}
       <PublicationDetailsModal />
+
+      {/*
+       ** Metadata modals used throughout the app
+       */}
+      {fileMetadataBeingEdited &&
+        (fileMetadataBeingEdited.componentType ===
+          ResearchObjectComponentType.PDF ||
+          fileMetadataBeingEdited.componentType ===
+            ResearchObjectComponentType.CODE) && (
+          <ComponentMetadataPopover
+            isVisible={!!fileMetadataBeingEdited}
+            onClose={() => {
+              dispatch(setFileMetadataBeingEdited(null));
+            }}
+          />
+        )}
+      {fileMetadataBeingEdited &&
+        fileMetadataBeingEdited.componentType ===
+          ResearchObjectComponentType.DATA && (
+          <DriveDatasetMetadataPopOver
+            isVisible={!!fileMetadataBeingEdited}
+            onClose={() => {
+              dispatch(setFileMetadataBeingEdited(null));
+            }}
+          />
+        )}
+      {fileBeingUsed && (
+        <ComponentUseModal isOpen={true} file={fileBeingUsed} />
+      )}
+      {fileBeingCited && <CitationPopover isOpen={true} />}
     </ManuscriptWrapper>
   );
 };

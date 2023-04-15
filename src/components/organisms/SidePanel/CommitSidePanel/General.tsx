@@ -19,13 +19,9 @@ const General = (props: GeneralProps) => {
     "showProfileUpdater",
   ]);
   const [openWalet, setOpenWallet] = useState(false);
-  const { currentObjectId, mode, manifest: manifestData } = useNodeReader();
   const userProfile = useUser();
   const { wallet, switchNetwork } = useConnectedWallet();
   const { connector } = useWeb3React();
-  const [selectedComponent, setSelectedComponent] =
-    useState<ResearchObjectV1Component | null>(null);
-
   // one entry for each component, one entry for wallet, one entry for network
   const count = 2;
   const isProfileComplete = useMemo(
@@ -86,13 +82,6 @@ const General = (props: GeneralProps) => {
         isOpen={openWalet}
         onDismiss={useCallback(() => setOpenWallet(false), [setOpenWallet])}
       />
-      {selectedComponent && (
-        <ComponentMetadataPopover
-          componentId={selectedComponent.id}
-          isVisible={!!selectedComponent}
-          onClose={() => setSelectedComponent(null)}
-        />
-      )}
     </div>
   );
 };

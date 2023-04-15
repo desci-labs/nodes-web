@@ -1,5 +1,4 @@
 import PrimaryButton from "@components/atoms/PrimaryButton";
-import { useManuscriptController } from "@components/organisms/ManuscriptReader/ManuscriptController";
 import { IconWarning } from "@icons";
 import {
   PropsWithChildren,
@@ -24,12 +23,13 @@ import {
 import { useNodeReader } from "@src/state/nodes/hooks";
 import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 import SelectList from "@src/components/molecules/FormInputs/SelectList";
+import { useDrive } from "@src/state/drive/hooks";
+import { setFileBeingCited } from "@src/state/drive/driveSlice";
+import { useSetter } from "@src/store/accessors";
 
 const CitationComponent = () => {
-  const { componentToCite } = useManuscriptController([
-    "componentToCite",
-    "showProfileUpdater",
-  ]);
+  const { fileBeingCited } = useDrive();
+  const componentToCite = fileBeingCited!;
   const {
     manifest: manifestData,
     currentObjectId,
@@ -91,7 +91,7 @@ const CitationComponent = () => {
     if (!componentToCite) return "";
 
     const component =
-      componentToCite.type === FileType.Dir
+      componentToCite.type === FileType.DIR
         ? componentToCite?.contains?.find(
             (file) => file.accessStatus === AccessStatus.PUBLIC
           ) ?? null
@@ -130,7 +130,7 @@ const CitationComponent = () => {
       if (splitPath && splitPath.length > 1) {
         let newPath = splitPath.slice(1);
         newPath.unshift(componentParent.name);
-        if (componentToCite.type === FileType.Dir) {
+        if (componentToCite.type === FileType.DIR) {
           newPath = [componentParent.name];
         }
         fqiDataSuffix = newPath.join("/");
@@ -285,17 +285,15 @@ function Box(props: PropsWithChildren<{}>) {
 }
 
 const CitationPopover = (props: ModalProps) => {
-  const { showCitationModal, setShowCitationModal } = useManuscriptController([
-    "showCitationModal",
-  ]);
+  const dispatch = useSetter();
   const close = () => {
     props?.onDismiss?.();
-    setShowCitationModal(false);
+    dispatch(setFileBeingCited(null));
   };
 
   return (
     <Modal
-      isOpen={showCitationModal}
+      isOpen={true}
       onDismiss={close}
       $maxWidth={650}
       $scrollOverlay={true}

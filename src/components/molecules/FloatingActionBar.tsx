@@ -12,9 +12,8 @@ const FloatingActionBar = () => {
   const dispatch = useSetter();
   const { isEditingAnnotation, isAnnotating } = usePdfReader();
   const { mode, componentStack } = useNodeReader();
-  const { setIsAddingComponent } = useManuscriptController([
-    "isAddingComponent",
-  ]);
+  const { setIsAddingComponent, setAddFilesWithoutContext } =
+    useManuscriptController(["isAddingComponent"]);
 
   const AnnotationButton = () => {
     return (
@@ -77,6 +76,7 @@ const FloatingActionBar = () => {
           className="bg-tint-primary hover:bg-tint-primary-dark cursor-pointer w-8 h-8 rounded-full flex items-center justify-center"
           onClick={() => {
             lockScroll();
+            setAddFilesWithoutContext(true);
             setIsAddingComponent(true);
           }}
         >

@@ -39,7 +39,6 @@ export default function Reader({ isLoading }: ReaderViewerProps) {
         <>
           <ComponentStackView />
           <Toolbar />
-          <CitationPopover isOpen={true} />
           {!isLoading && !!manifestData && (
             <ManuscriptSidePanel onClose={handleClose} />
           )}

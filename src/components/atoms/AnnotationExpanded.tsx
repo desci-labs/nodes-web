@@ -131,14 +131,14 @@ const AnnotationExpanded = ({
               )}
             </div>
           </header>
-        ) : (
+        ) : componentStack.length > 1 ? (
           <div className="h-5 ">
             <div className="text-xs font-mono bg-black text-white w-[calc(100%+32px)] -mx-4 rounded-t-lg px-2 overflow-hidden overflow-ellipsis h-4">
               annotation from{" "}
-              <u>{componentStack[componentStack.length - 2].name}</u>
+              <u>{componentStack[componentStack.length - 2]?.name}</u>
             </div>
           </div>
-        )}
+        ) : null}
 
         <main
           className={`transition-opacity ease-out opacity-100 py-2`}

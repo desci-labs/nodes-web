@@ -8,7 +8,6 @@ import { Controller, useFormContext } from "react-hook-form";
 import { PDF_LICENSE_TYPES } from "@components/organisms/PopOver/ComponentMetadataPopover";
 import InsetLabelSmallInput from "../FormInputs/InsetLabelSmallInput";
 import SpacerHorizontal from "@components/atoms/SpacerHorizontal";
-import { MetaStaging } from "@components/organisms/PaneDrive";
 import SelectList from "@src/components/molecules/FormInputs/SelectList";
 import { DriveMetadata } from "@src/components/organisms/Drive";
 
@@ -18,7 +17,6 @@ interface DatasetMetadataFormProps {
   currentObjectId: string;
   prepopulatingFrom?: string;
   prepopulate: DataComponentMetadata | undefined;
-  metaStaging: MetaStaging[];
   defaultLicense: string;
   // setNewMetadata: React.Dispatch<
   //   React.SetStateAction<(DataComponentPayload & DataComponentMetadata) | null>
@@ -53,46 +51,22 @@ export const DatasetMetadataForm = React.forwardRef(
 
     return (
       <div>
-        {props.metaStaging.length === 1 ? (
-          <div className="py-3 my-3">
-            <Controller
-              name="title"
-              control={control}
-              render={({ field, value, fieldState }: any) => (
-                <InsetLabelSmallInput
-                  label="Open Access Data Title"
-                  labelClassName="text-xs"
-                  value={value}
-                  field={field}
-                  fieldState={fieldState}
-                  mandatory={true}
-                />
-              )}
-            />
-          </div>
-        ) : (
-          <div className="py-3 my-3">
-            <div className="text-lg font-bold text-white mb-2">
-              Prepopulated from
-            </div>
-            <span className="bg-tint-primary text-black rounded-sm px-1 py-0.5 text-base inline-block">
-              {props.prepopulatingFrom}
-            </span>
-            <div className="text-lg font-bold text-white my-2">
-              Selected Files and Directories
-            </div>
-            <div className="flex gap-2 flex-wrap">
-              {props.metaStaging.map((f, i) => (
-                <span
-                  className="bg-tint-primary text-black rounded-sm px-1 py-0.5"
-                  key={i}
-                >
-                  {f.file.name}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
+        <div className="py-3 my-3">
+          <Controller
+            name="title"
+            control={control}
+            render={({ field, value, fieldState }: any) => (
+              <InsetLabelSmallInput
+                label="Open Access Data Title"
+                labelClassName="text-xs"
+                value={value}
+                field={field}
+                fieldState={fieldState}
+                mandatory={true}
+              />
+            )}
+          />
+        </div>
 
         <SpacerHorizontal />
         <div className="py-3 my-3">

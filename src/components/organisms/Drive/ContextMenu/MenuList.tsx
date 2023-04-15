@@ -6,12 +6,15 @@ import { AiOutlineDownload } from "react-icons/ai";
 import { VscLinkExternal } from "react-icons/vsc";
 import { SlPencil } from "react-icons/sl";
 import { BsTrash } from "react-icons/bs";
+import { IconAssignType } from "@src/icons";
 
 const menuListLabel: Record<Actions, string> = {
   RENAME: "Rename",
   PREVIEW: "Preview",
   DOWNLOAD: "Download",
   REMOVE: "Delete",
+  ASSIGN_TYPE: "Assign Type",
+  EDIT_METADATA: "Edit Metadata",
 };
 
 type IconType = React.FunctionComponent<
@@ -25,6 +28,8 @@ const ActionIcons: Record<Actions, IconType> = {
   RENAME: SlPencil,
   DOWNLOAD: AiOutlineDownload,
   REMOVE: BsTrash,
+  ASSIGN_TYPE: IconAssignType,
+  EDIT_METADATA: SlPencil,
 };
 
 function MenuList({ file }: { file: DriveObject }) {

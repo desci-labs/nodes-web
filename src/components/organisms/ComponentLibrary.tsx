@@ -13,6 +13,7 @@ import {
   IconComponentPresentation,
   IconComponentRestrictedData,
   IconComponentSupplementaryInformation,
+  IconComponentUnknown,
   IconExternalComponents,
   IconIpfs,
   IconPlay,
@@ -25,15 +26,17 @@ import {
   ResearchObjectComponentLinkSubtype,
   ResearchObjectV1Component,
   PdfComponent,
+  ExternalLinkComponent,
 } from "@desci-labs/desci-models";
 
 export interface UiComponentDefinition {
   icon: (
-    props: React.SVGProps<SVGSVGElement> & { wrapperClassName?: string }
+    props?: React.SVGProps<SVGSVGElement> & { wrapperClassName?: string }
   ) => JSX.Element;
   title: string;
   componentType: ResearchObjectComponentType;
   componentSubType?: ResearchObjectComponentSubtypes | undefined;
+  doNotRender?: boolean;
 }
 
 type IconWrapperProps = {
@@ -144,6 +147,12 @@ export const COMPONENT_LIBRARY: UiComponentDefinition[] = [
     title: "Open Access Data",
     componentType: ResearchObjectComponentType.DATA,
   },
+  {
+    icon: (props) => <IconWrapper Icon={IconComponentUnknown} {...props} />,
+    title: "Unknown",
+    componentType: ResearchObjectComponentType.UNKNOWN,
+    doNotRender: true,
+  },
 ];
 export const EXTERNAL_COMPONENTS: UiComponentDefinition[] = [
   {
@@ -198,18 +207,19 @@ export const EXTERNAL_COMPONENTS: UiComponentDefinition[] = [
   },
 ];
 
-const Title = () => {
+export const Title: React.FC<{ text: string; description: string }> = ({
+  text,
+  description,
+}) => {
   return (
     <div className="text-center mb-5">
-      <h1 className="text-[28px] font-bold">Add Component</h1>
-      <h3 className="text-neutrals-gray-5 text-base">
-        Choose the component you would like to add to your research node
-      </h3>
+      <h1 className="text-[28px] font-bold">{text}</h1>
+      <h3 className="text-neutrals-gray-5 text-base">{description}</h3>
     </div>
   );
 };
 
-const SectionHeading = ({ icon, title, subtitle }: any) => {
+export const SectionHeading = ({ icon, title, subtitle }: any) => {
   return (
     <div className="flex flex-col my-6 gap-6">
       <div className="flex flex-row gap-4">
@@ -259,7 +269,10 @@ const ComponentButton = ({
 const ComponentLibrary = () => {
   return (
     <div className="flex flex-col max-w-2xl mx-auto pb-10">
-      <Title />
+      <Title
+        text="Add Component"
+        description="Choose the component you would like to add to your research node"
+      />
       <SectionHeading
         icon={<IconIpfs width={40} height={46} />}
         title="Component Library"
@@ -271,7 +284,7 @@ const ComponentLibrary = () => {
           gridTemplateColumns: "repeat(auto-fill, 120px)",
         }}
       >
-        {COMPONENT_LIBRARY.map((c) => (
+        {COMPONENT_LIBRARY.filter((c) => !c.doNotRender).map((c) => (
           <ComponentButton
             key={c.title}
             icon={c.icon}
@@ -317,6 +330,12 @@ export const findTarget = (
           const documentPayload = component as PdfComponent;
           return (
             matchesType && documentPayload.subtype === target.componentSubType
+          );
+        case ResearchObjectComponentType.LINK:
+          const externalLinkPayload = component as ExternalLinkComponent;
+          return (
+            matchesType &&
+            externalLinkPayload.subtype === target.componentSubType
           );
         default:
           return matchesType;

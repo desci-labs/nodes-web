@@ -3,7 +3,6 @@ import {
   RESEARCH_OBJECT_NODES_PREFIX,
 } from "@desci-labs/desci-models";
 import {
-  getPublishStatus,
   getRecentPublishedManifest,
   getResearchObjectStub,
   resolvePrivateResearchObjectStub,
@@ -19,7 +18,6 @@ export type ManuscriptLoaderData =
   | {
       cid: string;
       manifestUrl: string;
-      privateCids: string[];
       manifest: ResearchObjectV1;
       mode: ReaderMode;
       params: Params<string>;
@@ -52,7 +50,6 @@ export const manuscriptLoader = async ({
       let researchObject = `${RESEARCH_OBJECT_NODES_PREFIX}${params.cid}`;
       const res: any = await getResearchObjectStub(researchObject);
       const cidUri = res.uri || res.manifestUrl;
-      const { privCids } = await getPublishStatus(cidUri, params.cid);
       const manifestUrl = cleanupManifestUrl(cidUri);
       let manifest = res.manifestData;
       if (!manifest) {
@@ -64,7 +61,6 @@ export const manuscriptLoader = async ({
         manifest,
         manifestUrl,
         params,
-        privateCids: privCids ?? [],
         mode: "editor",
       };
     } else if (params.shareId) {
@@ -85,7 +81,6 @@ export const manuscriptLoader = async ({
         shareId
       );
       const cidUri = res.uri || res.manifestUrl;
-      const { privCids } = await getPublishStatus(cidUri, cid);
       const manifestUrl = cleanupManifestUrl(cidUri);
       let manifest = res.manifestData;
       if (!manifest) {
@@ -99,7 +94,6 @@ export const manuscriptLoader = async ({
         params,
         mode: "reader",
         shareId,
-        privateCids: privCids ?? [],
       };
     } else if (splet) {
       const [uuid, version, componentIndex, annotationIndex] = splet.split("/");

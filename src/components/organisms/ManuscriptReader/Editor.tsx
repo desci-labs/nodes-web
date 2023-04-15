@@ -19,7 +19,10 @@ import VSCodeViewer from "../VSCodeViewer";
 import ComponentStackView from "./ComponentStackView";
 import { useManuscriptController } from "./ManuscriptController";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import { useDrive } from "@src/state/drive/hooks";
+import AssignTypePane from "../AssignTypePane";
 import { useCallback } from "react";
+import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 
 interface ReaderViewerProps {
   isLoading: boolean;
@@ -27,19 +30,19 @@ interface ReaderViewerProps {
 export default function Editor({ isLoading }: ReaderViewerProps) {
   const dispatch = useSetter();
   const { isDraggingFiles, componentStack } = useNodeReader();
+  const { componentTypeBeingAssignedTo } = useDrive();
   const { isToolbarVisible } = useGetter((state) => state.preferences);
+  const { showUploadPanel } = useDrive();
 
   const {
     isAddingComponent,
     isAddingSubcomponent,
     setIsAddingSubcomponent,
     setIsAddingComponent,
-    showUploadPanel,
   } = useManuscriptController([
     "scrollToPage$",
     "isAddingComponent",
     "isAddingSubcomponent",
-    "showUploadPanel",
   ]);
 
   return (
@@ -71,14 +74,21 @@ export default function Editor({ isLoading }: ReaderViewerProps) {
         <DialogViewer />
 
         <ButtonMysterious />
-        {componentStack.length > 0 ? <FloatingActionBar /> : null}
+        {componentStack.filter(
+          (a) =>
+            a.type != ResearchObjectComponentType.DATA &&
+            a.type != ResearchObjectComponentType.UNKNOWN &&
+            a.type != ResearchObjectComponentType.DATA_BUCKET
+        ).length > 0 ? (
+          <FloatingActionBar />
+        ) : null}
 
         <PopOverAlphaConsent />
 
-        <CitationPopover isOpen={true} />
         <PublicationDetailsModal />
 
         {(isAddingComponent || isAddingSubcomponent) && <ComponentAdd />}
+        {componentTypeBeingAssignedTo && <AssignTypePane />}
 
         <SavingIndicator />
       </>

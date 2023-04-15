@@ -11,6 +11,9 @@ import { AnnotationLinkConfig } from "@src/components/molecules/AnnotationEditor
 import { cleanupManifestUrl } from "@src/components/utils";
 import { RootState } from "@src/store";
 import axios from "axios";
+import { Path } from "react-router";
+import { DrivePath } from "../drive/types";
+import { update } from "react-spring";
 
 export type ReaderMode = "reader" | "editor";
 
@@ -50,6 +53,7 @@ export interface NodeReaderPref {
   startedNewAnnotationViaButton: boolean;
   componentStack: ResearchObjectV1Component[];
   manifestStatus: ManifestDataStatus;
+  recentlyAddedComponent: DrivePath;
   annotationLinkConfig?: AnnotationLinkConfig | null;
 }
 
@@ -68,6 +72,7 @@ const initialState: NodeReaderPref = {
   researchPanelTab: ResearchTabs.history,
   startedNewAnnotationViaButton: false,
   manifestStatus: ManifestDataStatus.Idle,
+  recentlyAddedComponent: "",
   annotationLinkConfig: null,
 };
 
@@ -141,22 +146,35 @@ export const nodeReaderSlice = createSlice({
         );
       }
     },
+    addComponent: (
+      state,
+      { payload }: PayloadAction<{ component: ResearchObjectV1Component }>
+    ) => {
+      if (state.manifest) {
+        state.manifest.components.push(payload.component);
+      }
+    },
     updateComponent: (
       state,
       {
         payload,
-      }: PayloadAction<{ index: number; update: ResearchObjectV1Component }>
+      }: PayloadAction<{
+        index: number;
+        update: Partial<ResearchObjectV1Component>;
+      }>
     ) => {
-      if (state.manifest) {
-        state.manifest.components = state.manifest.components.map(
-          (component, idx) => {
-            if (idx === payload.index) {
-              return payload.update;
-            }
-            return component;
-          }
-        );
+      if (!state.manifest) return;
+      if ("payload" in payload.update) {
+        // Prevent previous payload overwrite
+        payload.update.payload = {
+          ...state.manifest.components[payload.index].payload,
+          ...payload.update.payload,
+        };
       }
+      state.manifest.components[payload.index] = {
+        ...state.manifest.components[payload.index],
+        ...payload.update,
+      };
     },
     updatePendingAnnotations: (
       state,
@@ -352,6 +370,31 @@ export const nodeReaderSlice = createSlice({
       state.annotationLinkConfig = null;
       return state;
     },
+    addRecentlyAddedComponent: (
+      state,
+      { payload }: PayloadAction<DrivePath>
+    ) => {
+      state.recentlyAddedComponent = payload;
+    },
+    removeRecentlyAddedComponent: (state) => {
+      state.recentlyAddedComponent = "";
+    },
+    removeComponentMetadata: (
+      state,
+      {
+        payload: { componentIndexes },
+      }: PayloadAction<{ componentIndexes: number[] }>
+    ) => {
+      componentIndexes.forEach((componentIndex) => {
+        delete state.manifest!.components[componentIndex].payload.title;
+        delete state.manifest!.components[componentIndex].payload.description;
+        delete state.manifest!.components[componentIndex].payload.keywords;
+        delete state.manifest!.components[componentIndex].payload.licenseType;
+        delete state.manifest!.components[componentIndex].payload.ontologyPurl;
+        delete state.manifest!.components[componentIndex].payload
+          .controlledVocabTerms;
+      });
+    },
   },
   extraReducers(builder) {
     builder
@@ -407,6 +450,10 @@ export const saveManifestDraft = createAsyncThunk(
   }
 );
 
+export const selectNodeUuid = (state: {
+  nodes: { nodeReader: NodeReaderPref };
+}) => state.nodes.nodeReader.currentObjectId;
+
 export default nodeReaderSlice.reducer;
 
 export const {
@@ -438,4 +485,8 @@ export const {
   popFromComponentStack,
   updatePendingAnnotations,
   setStartedNewAnnotationViaButton,
+  addComponent,
+  addRecentlyAddedComponent,
+  removeRecentlyAddedComponent,
+  removeComponentMetadata,
 } = nodeReaderSlice.actions;

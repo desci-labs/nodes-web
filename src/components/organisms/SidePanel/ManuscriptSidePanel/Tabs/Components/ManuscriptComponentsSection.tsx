@@ -8,9 +8,15 @@ import {
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
-import { IconData, IconDeleteForever, IconInfo, IconPen } from "icons";
-import React, { useState } from "react";
-import ComponentRenamePopover from "@components/organisms/PopOver/ComponentRenamePopover";
+import {
+  IconData,
+  IconDeleteForever,
+  IconInfo,
+  IconPen,
+  IconStar,
+} from "icons";
+import React, { useMemo, useState } from "react";
+// import ComponentRenamePopover from "./PopOver/ComponentRenamePopover";
 // import useSaveManifest from "@src/hooks/useSaveManifest";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
@@ -19,6 +25,8 @@ import {
   popFromComponentStack,
   saveManifestDraft,
 } from "@src/state/nodes/viewer";
+import { useDrive } from "@src/state/drive/hooks";
+import ComponentRenamePopover from "@src/components/organisms/PopOver/ComponentRenamePopover";
 
 export enum EditorHistoryType {
   ADD_ANNOTATION,
@@ -49,7 +57,9 @@ const EditableHOC = (props: any) => {
     }
 
     if (manifestData) {
-      const index = manifestData.components.findIndex((c) => c.id === id);
+      const index = manifestData.components.findIndex(
+        (c: ResearchObjectV1Component) => c.id === id
+      );
       if (index > -1) {
         dispatch(deleteComponent({ componentId: id }));
         dispatch(saveManifestDraft({}));
@@ -148,39 +158,49 @@ const ManuscriptComponentsSection = () => {
   ]);
   const { mode, manifest: manifestData, currentObjectId } = useNodeReader();
   const [isEditable, setIsEditable] = useState<boolean>(false);
+  const { deprecated: deprecatedDrive } = useDrive();
 
   /**
    * Hide component section if we don't have components
    */
-  if (
-    mode !== "editor" &&
-    (!manifestData ||
-      !manifestData.components ||
-      !manifestData.components.length)
-  ) {
-    return null;
-  }
+  // if (
+  //   mode !== "editor" &&
+  //   (!manifestData ||
+  //     !manifestData.components ||
+  //     !manifestData.components.length)
+  //     ) {
+  //       return null;
+  //     }
 
-  const hasDataComponent =
-    manifestData &&
-    manifestData.components.filter(
-      (c) => c.type === ResearchObjectComponentType.DATA
-    ).length;
-  const components = manifestData && manifestData.components;
-  let componentsWithOneData = components;
-  if (hasDataComponent) {
-    componentsWithOneData = components?.filter(
-      (c) => c.type !== ResearchObjectComponentType.DATA
+  const cardComponents = useMemo(() => {
+    let components = manifestData && manifestData.components;
+    const hasDataComponent = manifestData?.components.some(
+      (c: ResearchObjectV1Component) =>
+        c.type === ResearchObjectComponentType.DATA
     );
+    if (deprecatedDrive) {
+      if (hasDataComponent) {
+        components = components?.filter(
+          (c: ResearchObjectV1Component) =>
+            c.type !== ResearchObjectComponentType.DATA
+        );
 
-    componentsWithOneData?.push({
-      name: "Node Data",
-      id: "__virtual_node_data",
-      payload: {},
-      type: ResearchObjectComponentType.DATA,
-      icon: IconData,
-    });
-  }
+        components?.push({
+          name: "Node Data",
+          id: "__virtual_node_data",
+          payload: {},
+          type: ResearchObjectComponentType.DATA,
+          icon: IconData,
+        });
+      }
+    } else {
+      //Unopinionated drive
+      components = components?.filter(
+        (c: ResearchObjectV1Component) => c.starred
+      );
+    }
+    return components;
+  }, [manifestData, deprecatedDrive]);
 
   return (
     <>
@@ -190,7 +210,7 @@ const ManuscriptComponentsSection = () => {
         title={
           <div className="flex w-full justify-between">
             <div className="flex items-end">
-              <span>Components</span>
+              <span>Navigate</span>
               {mode === "editor" ? (
                 <span
                   className="text-xs text-tint-primary hover:text-tint-primary-hover cursor-pointer ml-1 mb-0.5 font-bold"
@@ -232,8 +252,8 @@ const ManuscriptComponentsSection = () => {
         className="mb-4"
       >
         <div className="flex flex-col gap-3 py-2 px-0">
-          {componentsWithOneData &&
-            componentsWithOneData.map(
+          {cardComponents && cardComponents.length ? (
+            cardComponents.map(
               (component: ResearchObjectV1Component, index: number) => (
                 <EditableHOC
                   key={`editable_hoc_${currentObjectId}_${component.id}`}
@@ -244,7 +264,13 @@ const ManuscriptComponentsSection = () => {
                   <ComponentCard component={component} />
                 </EditableHOC>
               )
-            )}
+            )
+          ) : (
+            <div className="text-[10px] text-neutrals-gray-6 flex flex-row gap-1 items-center">
+              <IconStar width={12} className="fill-tint-primary-hover" />
+              Star a component in Drive to see it here
+            </div>
+          )}
         </div>
       </CollapsibleSection>
     </>

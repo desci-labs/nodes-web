@@ -94,6 +94,7 @@ import { ReactComponent as IconComponentDiscussions } from "@images/icons/compon
 import { ReactComponent as IconComponentExternalApi } from "@images/icons/component-external-api.svg";
 import { ReactComponent as IconComponentRestrictedData } from "@images/icons/component-restricted-data.svg";
 import { ReactComponent as IconComponentMisc } from "@images/icons/component-misc.svg";
+import { ReactComponent as IconComponentUnknown } from "@images/icons/component-unknown.svg";
 import { ReactComponent as IconLatex } from "@images/icons/a-icon-latex.svg";
 import { ReactComponent as IconAuthor } from "@images/icons/a-icon-author.svg";
 import { ReactComponent as IconNodeCollection } from "@images/icons/a-icon-node-collection.svg";
@@ -130,6 +131,11 @@ import { ReactComponent as IconGitbook } from "@images/gitbook.svg";
 import { ReactComponent as IconDesciNodes } from "@images/icons/a-desci-nodes-logo.svg";
 import { ReactComponent as IconHelpBase } from "@images/icons/icon-help.svg";
 import { ReactComponent as IconKebab } from "@images/icons/kebab.svg";
+import { ReactComponent as IconStar } from "@images/icons/star.svg";
+import { ReactComponent as IconQuotes } from "@images/icons/quotes.svg";
+import { ReactComponent as IconPlayRounded } from "@images/icons/play.svg";
+import { ReactComponent as IconAssignType } from "@images/icons/assign-type-icon.svg";
+import { ReactComponent as IconDrive } from "@images/icons/drive.svg";
 
 export type SvgIconProps = FC<
   React.SVGProps<SVGSVGElement> & {
@@ -142,6 +148,11 @@ const IconZoomIn = React.memo(IconZoomInBase);
 const IconZoomOut = React.memo(IconZoomOutBase);
 
 export {
+  IconDrive,
+  IconAssignType,
+  IconPlayRounded,
+  IconQuotes,
+  IconStar,
   IconKebab,
   IconHelp,
   IconDesciNodes,
@@ -159,6 +170,7 @@ export {
   IconAuthor,
   IconLatex,
   IconDirectory,
+  IconComponentUnknown,
   IconComponentMisc,
   IconComponentRestrictedData,
   IconComponentExternalApi,

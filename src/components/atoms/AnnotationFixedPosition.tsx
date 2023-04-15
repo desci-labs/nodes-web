@@ -54,6 +54,8 @@ const AnnotationFixedPosition = ({
     "minHeight",
     isEditingAnnotation ? 180 : isCode ? 160 : 0
   );
+
+  const { currentObjectId } = useNodeReader();
   return (
     <div
       className={`flex rounded-md ${
@@ -199,11 +201,7 @@ const AnnotationFixedPosition = ({
               />
             ) : (
               <ButtonCopyLink
-                text={
-                  `${localStorage.getItem("manifest-url")}?annotation=${
-                    annotation.id
-                  }` || ""
-                }
+                text={`${currentObjectId}?annotation=${annotation.id}` || ""}
               />
             )}
           </div>

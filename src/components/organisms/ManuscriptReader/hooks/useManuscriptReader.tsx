@@ -43,11 +43,10 @@ export default function useManuscriptReader(publicView: boolean = false) {
   const dispatch = useSetter();
   const { mode } = useNodeReader();
 
-  const { setPrivCidMap, scrollToPage$ } = useManuscriptController([
+  const { scrollToPage$ } = useManuscriptController([
     "scrollToPage$",
     "isAddingComponent",
     "isAddingSubcomponent",
-    "showUploadPanel",
   ]);
 
   console.log("Parsed Manusciprt", parsedManuscript);
@@ -66,7 +65,7 @@ export default function useManuscriptReader(publicView: boolean = false) {
 
       dispatch(setIsNew(false));
       dispatch(setCurrentPdf(""));
-
+      dispatch(setManifest(parsedManuscript.manifest));
       dispatch(setCurrentObjectId(parsedManuscript.cid));
       dispatch(setResearchPanelTab(ResearchTabs.current));
 
@@ -76,13 +75,6 @@ export default function useManuscriptReader(publicView: boolean = false) {
       }
       dispatch(setIsAnnotating(false));
 
-      if ("privateCids" in parsedManuscript) {
-        const cidMap: Record<string, boolean> = {};
-        parsedManuscript.privateCids.forEach((c: string) => (cidMap[c] = true));
-        setPrivCidMap(cidMap);
-      }
-
-      dispatch(setManifest(parsedManuscript.manifest));
       const manifestUrlCleaned = cleanupManifestUrl(
         parsedManuscript.manifestUrl
       );

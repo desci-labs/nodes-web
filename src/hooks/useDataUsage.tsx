@@ -1,5 +1,6 @@
 import { getDataUsage } from "@api/index";
 import { BytesToHumanFileSize } from "@components/utils";
+import { useNodeReader } from "@src/state/nodes/hooks";
 import { useEffect, useMemo, useState } from "react";
 
 export interface State {
@@ -12,12 +13,14 @@ export default function useDataUsage() {
   const [state, setState] = useState<State>({
     consumption: 0,
     limit: 5000000000,
-    loading: true
+    loading: true,
   });
+
+  const { manifest } = useNodeReader();
 
   async function getUsage() {
     const { data } = await getDataUsage();
-    const initState = {loading : false};
+    const initState = { loading: false };
     if (!data.consumption) {
       setState({
         ...initState,
@@ -42,7 +45,7 @@ export default function useDataUsage() {
 
   useEffect(() => {
     getUsage();
-  }, []);
+  }, [manifest]);
 
   const freeStorageText = useMemo(
     () => BytesToHumanFileSize(Math.max(state.limit - state.consumption, 0)),

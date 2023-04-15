@@ -1,7 +1,11 @@
 import { addComponentToDraft } from "@api/index";
 import PrimaryButton from "@components/atoms/PrimaryButton";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
-import { capitalize, cleanupManifestUrl } from "@components/utils";
+import {
+  capitalize,
+  cleanupManifestUrl,
+  extractCodeRepoName,
+} from "@components/utils";
 import {
   IconCodeBracket,
   IconDataSquare,
@@ -18,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 import {
   RESEARCH_OBJECT_NODES_PREFIX,
   ResearchObjectComponentType,
+  ResearchObjectV1,
 } from "@desci-labs/desci-models";
 import AddLinkComponent from "@components/molecules/AddComponentFlow/AddLinkComponent";
 import AddDataComponent from "@components/molecules/AddComponentFlow/AddDataComponent";
@@ -30,6 +35,10 @@ import {
   setManifest,
 } from "@src/state/nodes/viewer";
 import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
+import { useDispatch } from "react-redux";
+import { addFilesToDrive } from "@src/state/drive/driveSlice";
+import { useFileUpload } from "react-use-file-upload/dist/lib/useFileUpload";
+import { ExternalUrl } from "@src/state/drive/types";
 
 export const componentData = {
   [ResearchObjectComponentType.PDF]: {
@@ -79,18 +88,17 @@ const AddComponentPopOver = (
   props: ModalProps & { onClose: (force: boolean) => void }
 ) => {
   const {
-    privCidMap,
-    setPrivCidMap,
     addComponentType,
     addComponentSubType,
     setIsAddingComponent,
     setIsAddingSubcomponent,
     setAddComponentType,
     setAddComponentSubType,
+    addFilesWithoutContext,
   } = useManuscriptController([
-    "privCidMap",
     "addComponentType",
     "addComponentSubType",
+    "addFilesWithoutContext",
   ]);
 
   const dispatch = useSetter();
@@ -100,7 +108,8 @@ const AddComponentPopOver = (
   const [error, setError] = useState<string>();
   const [customSubtype, setCustomSubtype] = useState<string>("");
 
-  const [fileLink, setFileLink] = useState<string>();
+  // const [fileLink, setFileLink] = useState<string>();
+  const { files, clearAllFiles, setFiles } = useFileUpload();
 
   const navigate = useNavigate();
 
@@ -112,7 +121,7 @@ const AddComponentPopOver = (
     setAddComponentType(null);
     setAddComponentSubType(null);
     setLoading(false);
-    setFileLink(undefined);
+    // setFileLink(undefined);
     props.onClose(force);
   };
 
@@ -126,18 +135,9 @@ const AddComponentPopOver = (
   }, [addComponentType]);
 
   const extractComponentTitle = (): string => {
-    if (
-      addComponentType === ResearchObjectComponentType.CODE &&
-      urlOrDoi &&
-      urlOrDoi.indexOf("github.com")
-    ) {
-      if (urlOrDoi.split("github.com/")[1].split("/").length > 1) {
-        const [, , repo] = urlOrDoi.match(
-          // eslint-disable-next-line no-useless-escape
-          /github.com[\/:]([^\/]+)\/([^\/^.]+)/
-        )!;
-        if (repo) return repo;
-      }
+    if (addComponentType === ResearchObjectComponentType.CODE && urlOrDoi) {
+      const repo = extractCodeRepoName(urlOrDoi);
+      if (repo) return repo;
       setError("Invalid Repo Link");
     }
 
@@ -155,7 +155,10 @@ const AddComponentPopOver = (
             setSubType={setAddComponentSubType}
             customSubtype={customSubtype}
             setCustomSubtype={setCustomSubtype}
-            setFileLink={setFileLink}
+            files={files}
+            clearAllFiles={clearAllFiles}
+            setFiles={setFiles}
+            // setFileLink={setFileLink}
             urlOrDoi={urlOrDoi}
             setUrlOrDoi={setUrlOrDoi}
           />
@@ -190,7 +193,7 @@ const AddComponentPopOver = (
     if (!addComponentType) return true;
     switch (addComponentType) {
       case ResearchObjectComponentType.PDF:
-        return !(fileLink?.length || (urlOrDoi && urlOrDoi.length));
+        return !(files.length || (urlOrDoi && urlOrDoi.length));
       case ResearchObjectComponentType.CODE:
         return !(
           addComponentType === ResearchObjectComponentType.CODE &&
@@ -206,73 +209,44 @@ const AddComponentPopOver = (
     setLoading(true);
 
     try {
-      const componentTitle = extractComponentTitle();
+      const componentTitle =
+        addComponentType === ResearchObjectComponentType.CODE
+          ? extractComponentTitle()
+          : null;
       console.log("ADD DATA", manifestData, currentObjectId, {
         manifest: manifestData!,
         uuid: currentObjectId!,
-        componentUrl: urlOrDoi! || fileLink!,
-        title: componentTitle,
-        componentType: addComponentType!,
-        componentSubtype: addComponentSubType || undefined,
-      });
-      const res = await addComponentToDraft({
-        manifest: manifestData!,
-        uuid: currentObjectId!,
-        componentUrl: urlOrDoi! || fileLink!,
+        componentUrl: urlOrDoi! || files!,
         title: componentTitle,
         componentType: addComponentType!,
         componentSubtype: addComponentSubType || undefined,
       });
 
-      const manifestUrl = cleanupManifestUrl(res.uri || res.manifestUrl);
-      let localManifestData = null;
-      if (res.manifestData) {
-        dispatch(setManifest(res.manifestData));
-        localManifestData = res.manifestData;
-
-        //update priv cids
-        const latestComponent =
-          res.manifestData.components[res.manifestData.components.length - 1];
-        const latestCompCid = latestComponent.payload?.url
-          ? latestComponent.payload.url
-          : latestComponent.payload?.cid
-          ? latestComponent.payload.cid
-          : null;
-        if (latestCompCid) {
-          setPrivCidMap({ ...privCidMap, [latestCompCid]: true });
-        }
-      } else {
-        const { data } = await axios.get(manifestUrl);
-        dispatch(setManifest(data));
-        localManifestData = data;
-        // update priv cids
-        const latestComponent = data.components[data.components.length - 1];
-        const latestCompCid = latestComponent.payload?.url
-          ? latestComponent.payload.url
-          : latestComponent.payload?.cid
-          ? latestComponent.payload.cid
-          : null;
-        if (latestCompCid) {
-          setPrivCidMap({ ...privCidMap, [latestCompCid]: true });
-        }
-      }
-      localStorage.setItem("manifest-url", manifestUrl);
-      if (!currentObjectId) {
-        /**
-         * If adding this component triggers a new node creation, redirect to the new node
-         */
-
-        dispatch(setCurrentObjectId(res.node.uuid));
-        navigate(`/nodes/${RESEARCH_OBJECT_NODES_PREFIX}${res.node.uuid}`);
+      let externalUrl;
+      if (urlOrDoi?.length) {
+        const extractedName = extractCodeRepoName(urlOrDoi);
+        if (extractedName) externalUrl = { path: extractedName, url: urlOrDoi };
       }
 
-      /**
-       * Force newly added component to appear
-       */
+      dispatch(
+        addFilesToDrive({
+          ...(externalUrl ? { externalUrl } : { files }),
+          componentType: addComponentType!,
+          componentSubType: addComponentSubType || undefined,
+          ...(addFilesWithoutContext ? { overwriteContext: "root" } : {}),
+          onSuccess: (manifestData: ResearchObjectV1) => {
+            /**
+             * Force newly added component to appear
+             */
+            const components = manifestData.components!;
+            dispatch(setComponentStack([components[components.length - 1]]));
+            close(true);
+          },
+        })
+      );
 
-      const components = localManifestData.components!;
+      const components = manifestData?.components!;
       dispatch(setComponentStack([components[components.length - 1]]));
-
       close(true);
     } catch (err) {
       let resp = (err as any).response;

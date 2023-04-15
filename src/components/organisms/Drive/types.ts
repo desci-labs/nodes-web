@@ -3,11 +3,10 @@ import {
   DataComponentMetadata,
   ResearchObjectComponentType,
 } from "@desci-labs/desci-models";
-import { DatasetMetadataInfo, MetaStaging } from "../PaneDrive";
 
 export enum FileType {
-  Dir = "dir",
-  File = "file",
+  DIR = "dir",
+  FILE = "file",
 }
 export interface FileDir {
   name: string;
@@ -24,6 +23,7 @@ export interface FileDir {
 
 export enum DriveNonComponentTypes {
   MANIFEST = "manifest",
+  UNKNOWN = "unknown",
 }
 
 export type DriveMetadata = CommonComponentPayload & DataComponentMetadata;
@@ -41,6 +41,7 @@ export interface DriveObject {
   contains?: Array<DriveObject>;
   parent?: DriveObject | FileDir | null;
   path?: string;
+  starred?: boolean;
 }
 
 export enum AccessStatus {
@@ -64,19 +65,13 @@ export interface DriveRowProps {
     index: number,
     componentType: ResearchObjectComponentType | DriveNonComponentTypes
   ) => void;
-  setShowEditMetadata: React.Dispatch<React.SetStateAction<boolean>>;
-  datasetMetadataInfoRef: React.MutableRefObject<DatasetMetadataInfo>;
-  setMetaStaging: React.Dispatch<React.SetStateAction<MetaStaging[]>>;
   selectedFiles: Record<
     number,
     ResearchObjectComponentType | DriveNonComponentTypes
   >;
   canEditMetadata: boolean;
   canUse: boolean;
-  setOldComponentMetadata: (
-    value: React.SetStateAction<oldComponentMetadata | null>
-  ) => void;
-  onHandleUse: () => void;
+  deprecated?: boolean;
 }
 
 export interface DriveJumpingParams {

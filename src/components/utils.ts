@@ -239,7 +239,7 @@ export const lockScroll = () => {
     if (!el) {
       return;
     }
-    (el.style as any)[a.strategy] = `${scrollWidth}px`;
+    (el.style as any)[a.strategy] = `${scrollWidth + 1}px`;
   });
 };
 
@@ -275,8 +275,24 @@ export const getNonDataComponentsFromManifest = (
 ) => {
   const nonDataComponents = manifestData?.components
     ? manifestData.components.filter(
-        (a) => a.type !== ResearchObjectComponentType.DATA
+        (a) =>
+          a.type !== ResearchObjectComponentType.DATA &&
+          a.type !== ResearchObjectComponentType.DATA_BUCKET &&
+          a.type !== ResearchObjectComponentType.UNKNOWN
       )
     : [];
   return nonDataComponents;
 };
+
+export function extractCodeRepoName(url: string) {
+  if (
+    url.indexOf("github.com") &&
+    url.split("github.com/")[1].split("/").length > 1
+  ) {
+    const [, , repo] = url.match(
+      // eslint-disable-next-line no-useless-escape
+      /github.com[\/:]([^\/]+)\/([^\/^.]+)/
+    )!;
+    return repo;
+  }
+}

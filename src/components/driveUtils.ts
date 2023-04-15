@@ -15,9 +15,10 @@ import {
   FileDir,
   FileType,
 } from "./organisms/Drive";
-import { UploadQueueItem } from "./organisms/UploadPanel";
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "./molecules/AnnotationEditor/components";
+import { UploadQueueItem } from "@src/state/drive/types";
+import { formatDbDate, recursiveFlattenTree } from "@src/state/drive/utils";
 
 export const tempDate = "12/02/2022 7:00PM";
 
@@ -39,6 +40,8 @@ interface VirtualDriveArgs {
   parent?: DriveObject | FileDir | null;
   path?: string;
   uid?: string;
+  starred?: boolean;
+  type?: FileType;
 }
 export function createVirtualDrive({
   name,
@@ -52,6 +55,8 @@ export function createVirtualDrive({
   parent,
   path,
   uid,
+  starred,
+  type,
 }: VirtualDriveArgs): DriveObject {
   return {
     name: name,
@@ -62,10 +67,11 @@ export function createVirtualDrive({
     accessStatus: accessStatus || AccessStatus.PRIVATE,
     metadata: metadata || {},
     cid: cid || "",
-    type: FileType.Dir,
+    type: type || FileType.DIR,
     parent: parent || null,
     path: path || undefined,
     uid: uid || uuidv4(),
+    starred: starred || false,
   };
 }
 
@@ -78,8 +84,7 @@ export const DRIVE_CODE_PATH = "Code";
 
 export function manifestToVirtualDrives(
   manifest: ResearchObjectV1,
-  cid: string,
-  privCidMap: Record<string, boolean>
+  cid: string
 ): DriveObject {
   const virtualData = createVirtualDrive({
     name: "Data",
@@ -107,10 +112,10 @@ export function manifestToVirtualDrives(
     componentMetadata.licenseType = c.payload.licenseType;
     componentMetadata.title = c.payload.title || c.name;
     if (c.type === ResearchObjectComponentType.PDF) {
-      const accessState =
-        c.payload.url in privCidMap
-          ? AccessStatus.PRIVATE
-          : AccessStatus.PUBLIC;
+      const accessState = AccessStatus.PUBLIC;
+      // c.payload.url in privCidMap
+      //   ? AccessStatus.PRIVATE
+      //   : AccessStatus.PUBLIC;
       const driveObj: DriveObject = {
         name: c.name,
         cid: c.payload.url,
@@ -119,17 +124,17 @@ export function manifestToVirtualDrives(
         accessStatus: accessState,
         size: 0, //HARDCODED
         metadata: componentMetadata,
-        type: FileType.File,
+        type: FileType.FILE,
         path: `${DRIVE_RESEARCH_REPORT_PATH}/${c.id}`,
         uid: uuidv4(),
       };
       virtualPdfs.contains?.push(driveObj);
     }
     if (c.type === ResearchObjectComponentType.CODE) {
-      const accessState =
-        c.payload.url in privCidMap
-          ? AccessStatus.PRIVATE
-          : AccessStatus.PUBLIC;
+      const accessState = AccessStatus.PUBLIC;
+      // c.payload.url in privCidMap
+      //   ? AccessStatus.PRIVATE
+      //   : AccessStatus.PUBLIC;
       const driveObj: DriveObject = {
         name: c.name,
         cid: c.payload.url,
@@ -138,17 +143,17 @@ export function manifestToVirtualDrives(
         accessStatus: accessState,
         size: 0, //HARDCODED
         metadata: componentMetadata,
-        type: FileType.File,
+        type: FileType.FILE,
         path: `${DRIVE_CODE_PATH}/${c.id}`,
         uid: uuidv4(),
       };
       virtualCodeRepos.contains?.push(driveObj);
     }
     if (c.type === ResearchObjectComponentType.DATA) {
-      const accessState =
-        c.payload.cid in privCidMap
-          ? AccessStatus.PRIVATE
-          : AccessStatus.PUBLIC;
+      const accessState = AccessStatus.PUBLIC;
+      // c.payload.cid in privCidMap
+      //   ? AccessStatus.PRIVATE
+      //   : AccessStatus.PUBLIC;
       componentMetadata.ontologyPurl = c.payload.ontologyPurl;
       componentMetadata.controlledVocabTerms = c.payload.controlledVocabTerms;
       const driveObj: DriveObject = {
@@ -159,7 +164,7 @@ export function manifestToVirtualDrives(
         accessStatus: accessState,
         size: 0, //HARDCODED
         metadata: componentMetadata,
-        type: FileType.Dir,
+        type: FileType.DIR,
         path: `${DRIVE_DATA_PATH}/${c.payload.cid}`,
         uid: uuidv4(),
       };
@@ -174,7 +179,7 @@ export function manifestToVirtualDrives(
     size: 0, //to-fix HARDCODED
     metadata: {}, //TO ADD METADATA
     cid: cid,
-    type: FileType.Dir,
+    type: FileType.DIR,
     path: DRIVE_NODE_ROOT_PATH,
     contains: [virtualData, virtualPdfs, virtualCodeRepos],
     uid: uuidv4(),
@@ -187,25 +192,7 @@ export function manifestToVirtualDrives(
   return nodeDrived;
 }
 
-export const DRIVE_NODE_ROOT_PATH = "NodeRoot/";
-
-export function formatDbDate(date: string | Date | number) {
-  if (typeof date === "string") date = new Date(date);
-  return new Intl.DateTimeFormat("default", {
-    day: "numeric",
-    month: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    hour12: true,
-  })
-    .format(date)
-    .toString()
-    .replace(/\s+(AM|PM|am|pm)/, "$1")
-    .split(",")
-    .join("")
-    .toUpperCase();
-}
+export const DRIVE_NODE_ROOT_PATH = "root";
 
 interface GetAllTreesOptions {
   pathUidMap?: Record<string, string>;
@@ -324,7 +311,7 @@ export function fileDirToDriveObj(
       uid: fd.uid || uuidv4(),
     };
 
-    if (fd.type === FileType.Dir) ipfsTreeToDriveTree(fd, date, manifest);
+    if (fd.type === FileType.DIR) ipfsTreeToDriveTree(fd, date, manifest);
     fileDirObj.contains![idx] = driveObj;
   });
 
@@ -350,7 +337,7 @@ export function resetParents(driveObj: DriveObject) {
   if (driveObj.contains?.length) {
     driveObj.contains.forEach((c) => {
       c.parent = driveObj;
-      if (c.type === FileType.Dir) resetParents(c);
+      if (c.type === FileType.DIR) resetParents(c);
     });
   }
   return driveObj;
@@ -374,7 +361,7 @@ export function addPlaceholderDataset(dataDrive: DriveObject, name?: string) {
     metadata: {}, //TO ADD METADATA
     cid: DEFAULT_CID_PENDING,
     parent: dataDrive,
-    type: FileType.Dir,
+    type: FileType.DIR,
     uid: uuidv4(),
   };
 
@@ -489,7 +476,7 @@ export function inheritSubMetadata(
       fd.metadata = metaSrc.componentRootMeta;
     }
 
-    if (fd.type === FileType.Dir) inheritSubMetadata(fd, metaSrc);
+    if (fd.type === FileType.DIR) inheritSubMetadata(fd, metaSrc);
   });
 }
 
@@ -498,7 +485,7 @@ export function getVirtualDriveMetadataStatus(drive: DriveObject) {
   // if (!drive.metadata.licenseType) return ButtonState.ERROR;
   // FORCING green to not confuse users temporarily
   return ButtonState.SUCCESS;
-  if (drive.type === FileType.Dir && drive.contains) {
+  if (drive.type === FileType.DIR && drive.contains) {
     if (!noChildrenError(drive)) return ButtonState.ERROR;
     if (!noChildrenPending(drive)) return ButtonState.PENDING;
   }
@@ -511,7 +498,7 @@ export function getMetadataStatus(drive: DriveObject) {
   // FORCING green to not confuse users temporarily
   return ButtonState.SUCCESS;
 
-  if (drive.type === FileType.Dir) {
+  if (drive.type === FileType.DIR) {
     if (!noChildrenError(drive)) return ButtonState.ERROR;
     if (!noChildrenPending(drive)) return ButtonState.PENDING;
   }
@@ -540,7 +527,7 @@ export function noChildrenPending(drive: DriveObject): boolean {
   );
   if (!allFilled) return false;
 
-  if (drive.type === FileType.Dir && drive.contains?.length) {
+  if (drive.type === FileType.DIR && drive.contains?.length) {
     return Object.values(drive.contains).every((child) =>
       Object.entries(child.metadata).every((kv) => {
         if (
@@ -550,8 +537,8 @@ export function noChildrenPending(drive: DriveObject): boolean {
           kv[0] === "licenseType" ||
           (kv[1] && kv[1].length)
         ) {
-          if (child.type === FileType.File) return true;
-          if (child.type === FileType.Dir) return noChildrenPending(child);
+          if (child.type === FileType.FILE) return true;
+          if (child.type === FileType.DIR) return noChildrenPending(child);
         }
         return false;
       })
@@ -562,11 +549,11 @@ export function noChildrenPending(drive: DriveObject): boolean {
 
 export function noChildrenError(drive: DriveObject): boolean {
   if (!drive.metadata.licenseType && !isNodeRootDrive(drive)) return false;
-  if (drive.type === FileType.Dir && drive.contains?.length) {
+  if (drive.type === FileType.DIR && drive.contains?.length) {
     return Object.values(drive.contains).every((child) => {
       if (child.metadata.licenseType && child.metadata.licenseType?.length) {
-        if (child.type === FileType.File) return true;
-        if (child.type === FileType.Dir) return noChildrenError(child);
+        if (child.type === FileType.FILE) return true;
+        if (child.type === FileType.DIR) return noChildrenError(child);
       }
     });
   }
@@ -665,18 +652,6 @@ export function removeFromUploadQueue(
   return queue.filter((qI) => qI.batchUid !== batchUid);
 }
 
-export function constructBreadCrumbs(drive: DriveObject): BreadCrumb[] {
-  const breadCrumbs: BreadCrumb[] = [];
-  breadCrumbs.unshift({ name: drive.name, drive: drive });
-  if (drive.parent)
-    return [
-      ...constructBreadCrumbs(drive.parent as DriveObject),
-      ...breadCrumbs,
-    ];
-
-  return breadCrumbs;
-}
-
 export function driveBfsByUid(rootDrive: DriveObject, targetUid: string) {
   if (!targetUid) return;
   const queue = [rootDrive];
@@ -735,17 +710,6 @@ export function gracefullyAssignTreeUids(
     if (fd.contains && fd.contains.length)
       gracefullyAssignTreeUids(fd.contains as any, undefined, oldPathUidMap);
   });
-}
-
-export function recursiveFlattenTree(tree: FileDir[] | DriveObject[]) {
-  const contents: any = [];
-  tree.forEach((fd) => {
-    contents.push(fd);
-    if (fd.type === "dir" && fd.contains) {
-      contents.push(...recursiveFlattenTree(fd.contains! as any));
-    }
-  });
-  return contents;
 }
 
 export function generateFlatPathUidMap(drive: DriveObject) {
