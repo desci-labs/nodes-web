@@ -268,78 +268,90 @@ const ComponentCard = (props: ComponentCardProps) => {
             />
           </span>
         </HeaderWrapper>
-        <FlexRowSpaceBetween style={{ display: isSelected ? "" : "none" }}>
-          <div className="flex justify-between dark:bg-muted-700 px-3 py-2 w-full">
-            {component.type !== ResearchObjectComponentType.DATA ? (
-              <>
-                <AnnotationSwitcher
-                  annotations={sortedAnnotations}
-                  handleComponentClick={handleComponentClick}
-                />
-                <div className="flex gap-2 justify-between w-full">
-                  <div id="section-left">
-                    <ButtonFair
-                      isFair={false}
-                      component={component}
-                      text={
-                        drive?.metadata.licenseType ||
-                        component.payload?.licenseType ||
-                        "Unknown"
-                      } //Should only ever hit unknown for deprecated tree
-                      classname="w-auto bg-neutrals-gray-2 px-2 font-medium text-xs h-7"
+        <div
+          style={{
+            height: isSelected ? 45 : 0,
+            overflow: "hidden",
+            transition: "height 0.1s ease-in",
+          }}
+        >
+          <FlexRowSpaceBetween>
+            <div className="flex justify-between dark:bg-muted-700 px-3 py-2 w-full">
+              {component.type !== ResearchObjectComponentType.DATA ? (
+                <>
+                  <div style={{ display: "none" }}>
+                    <AnnotationSwitcher
+                      annotations={sortedAnnotations}
+                      handleComponentClick={handleComponentClick}
                     />
                   </div>
-                  <div id="section-right" className="flex gap-2">
-                    <BlackGenericButton
-                      dataTip={"Show File Location"}
-                      dataFor={`drive_${component.id}`}
-                      disabled={false}
-                      className="p-0"
-                      onClick={(e) => {
-                        e!.stopPropagation();
-                        dispatch(navigateToDriveByPath(component.payload.path));
-                        dispatch(setComponentStack([]));
-                      }}
-                    >
-                      <IconDrive className="p-0 min-w-[28px] scale-[1.2]" />
-                    </BlackGenericButton>
-                    <BlackGenericButton
-                      dataTip={"Cite"}
-                      dataFor={`cite_${component.id}`}
-                      className="w-7 h-7"
-                      disabled={!canCite}
-                      onClick={(e) => {
-                        e!.stopPropagation();
-                        dispatch(setFileBeingCited(drive));
-                      }}
-                    >
-                      <IconQuotes />
-                    </BlackGenericButton>
-                    <BlackGenericButton
-                      dataTip={"Methods"}
-                      dataFor={`use_${component.id}`}
-                      disabled={!drive}
-                      className="p-0 min-w-[28px] h-7"
-                      onClick={(e) => {
-                        e!.stopPropagation();
-                        dispatch(setFileBeingUsed(drive));
-                      }}
-                    >
-                      <IconPlayRounded className="p-0" />
-                    </BlackGenericButton>
+                  <div className="flex gap-2 justify-between w-full">
+                    <div id="section-left">
+                      <ButtonFair
+                        isFair={false}
+                        component={component}
+                        text={
+                          drive?.metadata.licenseType ||
+                          component.payload?.licenseType ||
+                          "Unknown"
+                        } //Should only ever hit unknown for deprecated tree
+                        classname="w-auto bg-neutrals-gray-2 px-2 font-medium text-xs h-7"
+                      />
+                    </div>
+                    <div id="section-right" className="flex gap-2">
+                      <BlackGenericButton
+                        dataTip={"Show File Location"}
+                        dataFor={`drive_${component.id}`}
+                        disabled={false}
+                        className="p-0"
+                        onClick={(e) => {
+                          e!.stopPropagation();
+                          dispatch(
+                            navigateToDriveByPath(component.payload.path)
+                          );
+                          dispatch(setComponentStack([]));
+                        }}
+                      >
+                        <IconDrive className="p-0 min-w-[28px] scale-[1.2]" />
+                      </BlackGenericButton>
+                      <BlackGenericButton
+                        dataTip={"Cite"}
+                        dataFor={`cite_${component.id}`}
+                        className="w-7 h-7"
+                        disabled={!canCite}
+                        onClick={(e) => {
+                          e!.stopPropagation();
+                          dispatch(setFileBeingCited(drive));
+                        }}
+                      >
+                        <IconQuotes />
+                      </BlackGenericButton>
+                      <BlackGenericButton
+                        dataTip={"Methods"}
+                        dataFor={`use_${component.id}`}
+                        disabled={!drive}
+                        className="p-0 min-w-[28px] h-7"
+                        onClick={(e) => {
+                          e!.stopPropagation();
+                          dispatch(setFileBeingUsed(drive));
+                        }}
+                      >
+                        <IconPlayRounded className="p-0" />
+                      </BlackGenericButton>
+                    </div>
                   </div>
+                </>
+              ) : (
+                <div
+                  className="text-[10px] text-neutrals-gray-4 text-right w-full"
+                  title="This component is pointing to a nested data structure"
+                >
+                  DeSci Node Drive
                 </div>
-              </>
-            ) : (
-              <div
-                className="text-[10px] text-neutrals-gray-4 text-right w-full"
-                title="This component is pointing to a nested data structure"
-              >
-                DeSci Node Drive
-              </div>
-            )}
-          </div>
-        </FlexRowSpaceBetween>
+              )}
+            </div>
+          </FlexRowSpaceBetween>
+        </div>
       </FlexColumn>
     </CardWrapper>
   );
