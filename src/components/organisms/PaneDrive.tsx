@@ -88,7 +88,7 @@ const PaneDrive = () => {
           </div>
         ) : null}
         {isDraggingFiles ? <DropTargetFullScreen /> : null}
-        <PerfectScrollbar className="w-full self-center flex flex-col gap-6 px-20 text-white h-full bg-neutrals-black pb-20 !pb-[300px]">
+        <PerfectScrollbar className="w-full self-center flex flex-col gap-6 px-6 md:px-20 text-white h-full bg-neutrals-black pb-20 !pb-[300px]">
           <h1 className="text-[28px] font-bold text-white">Node Drive</h1>
           <SpacerHorizontal />
           <div id="tableWrapper" className="mt-5 h-full">

@@ -75,12 +75,7 @@ export interface SectionCardProps {
 
 export interface ComponentCardProps extends SectionCardProps {
   component: ResearchObjectV1Component;
-  currentObjectId: string;
-  componentStack: ResearchObjectV1Component[];
-  mode: string;
-  manifestData: ResearchObjectV1;
 }
-
 const labelFor = (component: ResearchObjectV1Component): string => {
   const obj = findTarget(component);
   if (obj) {
@@ -102,9 +97,8 @@ const iconFor = (
 
 const ComponentCard = (props: ComponentCardProps) => {
   const dispatch = useSetter();
-  const { component, componentStack, mode, currentObjectId, manifestData } =
-    props;
-
+  const { component } = props;
+  const { mode, componentStack } = useNodeReader();
   const { recentlyAddedComponent } = useNodeReader();
   /***
    * Use local click tracking for fast click response
@@ -139,7 +133,7 @@ const ComponentCard = (props: ComponentCardProps) => {
   }, [component]);
 
   const isSelected =
-    componentStack[componentStack.length - 1]?.id === component.id;
+    componentStack[componentStack?.length - 1]?.id === component.id;
 
   const sortedAnnotations = [
     ...((component.payload as PdfComponentPayload).annotations || []),

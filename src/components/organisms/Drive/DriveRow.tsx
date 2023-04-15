@@ -37,18 +37,13 @@ import {
 } from "../ComponentLibrary";
 
 function renderComponentIcon(file: DriveObject) {
-  const classes = "!w-[20px] !h-[20px]";
   const foundEntry = COMPONENT_LIBRARY.concat(EXTERNAL_COMPONENTS).find(
     (target: UiComponentDefinition) => {
       return target.componentType === file.componentType;
     }
   );
-  const { icon } = foundEntry || { icon: <IconDirectory /> };
-  const iconOverwrite = React.cloneElement(icon, {
-    className: `${icon.props.className}`,
-    ringClassName: `${classes}`,
-  });
-  return iconOverwrite;
+  const { icon } = foundEntry || { icon: () => <IconDirectory /> };
+  return icon({ wrapperClassName: "scale-[0.85]" });
 }
 
 export default function DriveRow({
@@ -135,10 +130,12 @@ export default function DriveRow({
           if (file.contains) exploreDirectory(file.name, file);
         }}
       >
-        <span>
+        <div className="mr-1">
           {file.type === FileType.DIR ? (
             <IconDirectory
               fill="#28AAC4"
+              width={24}
+              height={24}
               className={`w-[34px] ${
                 file.componentType !== DriveNonComponentTypes.UNKNOWN
                   ? "fill-tint-primary"
@@ -146,11 +143,11 @@ export default function DriveRow({
               }`}
             />
           ) : (
-            <div className="scale-[65%] w-[34px]">
+            <div className="w-[34px] mr-1 -ml-1 ">
               {renderComponentIcon(file)}
             </div>
           )}
-        </span>
+        </div>
         <span className="truncate max-w-sm">{file.name}</span>
       </li>
       <li className={`${everyRow} col-last-modified`}>{file.lastModified}</li>

@@ -210,10 +210,10 @@ const VideoAnimation = () => {
       <img
         src="https://desci-labs-public.s3.amazonaws.com/node-front-preview.png"
         alt="desci nodes use animation poster"
-        className="w-[400px] h-full absolute top-0 left-0 object-cover"
+        className="w-full h-full absolute top-0 left-0 object-cover scale-[1.285]"
         style={{
           objectFit: "cover",
-          overflow: "hidden",
+          // overflow: "hidden",
           visibility: !loaded ? "visible" : "hidden",
         }}
       />
