@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
 import SidePanel from "@components/organisms/SidePanel";
-import HistoryTab from "./Tabs/HistoryTab";
-import SourceTab from "./Tabs/SourceTab";
+import HistoryTab from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/History/HistoryTab";
+import SourceTab from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/SourceTab";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import PanelCloseButton from "@components/atoms/PanelCloseButton";
-import ManuscriptAttributesSection from "@components/organisms/ManuscriptAttributesSection";
-import ManuscriptComponentsSection from "@components/organisms/ManuscriptComponentsSection";
+import ManuscriptAttributesSection from "@src/components/organisms/ManuscriptAttributesSection";
+import ManuscriptComponentsSection from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/Components/ManuscriptComponentsSection";
 import {
   convertUUIDToHex,
   isWindows,

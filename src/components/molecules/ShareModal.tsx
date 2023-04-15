@@ -78,29 +78,31 @@ export default function ShareModal(props: ModalProps) {
           title="Share Research Node"
           onDismiss={props?.onDismiss}
         />
-        {canSharePublished ? <div className="flex items-center justify-center w-full">
-          <SwitchBar
-            style={{ margin: "1rem 0 1rem 0", height: 35, maxWidth: 400 }}
-          >
-            <SwitchButton
-              isSelected={currentTab === ShareTabs.Public}
-              onClick={() => setCurrentTab(ShareTabs.Public)}
-              disabled={!canSharePublished}
+        {canSharePublished ? (
+          <div className="flex items-center justify-center w-full">
+            <SwitchBar
+              style={{ margin: "1rem 0 1rem 0", height: 35, maxWidth: 400 }}
             >
-              <p className="text-xs flex justify-center items-center h-full capitalize">
-                Share Published version
-              </p>
-            </SwitchButton>
-            <SwitchButton
-              isSelected={currentTab === ShareTabs.Invite}
-              onClick={() => setCurrentTab(ShareTabs.Invite)}
-            >
-              <p className="text-xs flex justify-center items-center h-full capitalize">
-                Invite Collaborator
-              </p>
-            </SwitchButton>
-          </SwitchBar>
-        </div> : null}
+              <SwitchButton
+                isSelected={currentTab === ShareTabs.Public}
+                onClick={() => setCurrentTab(ShareTabs.Public)}
+                disabled={!canSharePublished}
+              >
+                <p className="text-xs flex justify-center items-center h-full capitalize">
+                  Share Published version
+                </p>
+              </SwitchButton>
+              <SwitchButton
+                isSelected={currentTab === ShareTabs.Invite}
+                onClick={() => setCurrentTab(ShareTabs.Invite)}
+              >
+                <p className="text-xs flex justify-center items-center h-full capitalize">
+                  Invite Collaborator
+                </p>
+              </SwitchButton>
+            </SwitchBar>
+          </div>
+        ) : null}
         {currentTab === ShareTabs.Invite && <NodeInvite />}
         {currentTab === ShareTabs.Public && <SharePublished />}
       </div>
@@ -116,7 +118,9 @@ export default function ShareModal(props: ModalProps) {
                   <DefaultSpinner color="white" size={24} />
                 ) : (
                   <IconCopyLink
-                    className={`fill-white transition-colors ${isLoading || isCreated ? '' : 'group-hover:fill-black'}`}
+                    className={`fill-white transition-colors ${
+                      isLoading || isCreated ? "" : "group-hover:fill-black"
+                    }`}
                     width={20}
                     height={20}
                   />
@@ -126,9 +130,7 @@ export default function ShareModal(props: ModalProps) {
                 </span>
               </ButtonSecondary>
             )}
-            {shareId && (
-              <CopyShareLink link={`http://localhost:3000/share/${shareId}`} />
-            )}
+            {shareId && <CopyShareLink link={getShareLink(shareId)} />}
             {shareId && (
               <PrimaryButton
                 disabled={isRevoking}
@@ -155,6 +157,9 @@ export default function ShareModal(props: ModalProps) {
     </Modal>
   );
 }
+
+const getShareLink = (shareId: string) =>
+  `${window.location.origin}/share/${shareId}`;
 
 export function CopyShareLink(
   props: ButtonHTMLAttributes<HTMLButtonElement> & {

@@ -20,6 +20,7 @@ const CurrentPdfManager = () => {
     const selectedComponent =
       componentStack &&
       [...componentStack]
+        .filter(Boolean)
         .reverse()
         .filter((a) => a.type === ResearchObjectComponentType.PDF)[0];
     // console.log("[selectedComponent]::", selectedComponent);

@@ -9,12 +9,13 @@ export type Orcid = {
 
 export type AppPreferences = {
   theme: "light" | "dark";
+  orcid: Orcid;
   torusKey: any;
   hideHeader: boolean;
   hideFooter: boolean;
   checkingCode: boolean;
-  orcid: Orcid;
+  isMobileView: boolean;
   isToolbarVisible: boolean;
-  activeToolbar: TOOLBAR_ENTRY;
   showReferralModal: boolean;
+  activeToolbar: TOOLBAR_ENTRY;
 };

@@ -1,5 +1,5 @@
 import { SpinnerCircularFixed } from "spinners-react";
-import Section from "../Section";
+import Section from "@components/organisms/SidePanel/ManuscriptSidePanel/Section";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import ReactMarkdown from "react-markdown";
@@ -17,6 +17,7 @@ export default function HistoryEntry(historyEntry: HistoryEntryProps) {
   const dispatch = useSetter();
   const { index, data, pending, selected } = historyEntry;
   const { setShowPublicationDetails } = useManuscriptController([]);
+
   return (
     <div key={index} className="relative">
       <TimelineGutterBulletLayer>
@@ -55,7 +56,7 @@ export default function HistoryEntry(historyEntry: HistoryEntryProps) {
             </button>
           </div>
         )}
-        className=" history-section"
+        className="history-section"
         selected={selected}
         containerStyle={{
           boxSizing: "none",

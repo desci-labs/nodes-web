@@ -26,6 +26,9 @@ export const historySlice = createSlice({
     setPublishedNodes: (state, { payload }: PayloadAction<PublishedMap>) => {
       state.publishMap = { ...state.publishMap, ...payload };
     },
+    setCurrentVersion: (state, { payload }: PayloadAction<string>) => {
+      state.selectedHistoryId = payload;
+    },
     selectHistory: (
       state,
       { payload }: PayloadAction<{ id: string; history: HistoryEntryProps }>
@@ -63,4 +66,5 @@ export const {
   resetHistory,
   setPendingCommits,
   selectHistory,
+  setCurrentVersion,
 } = historySlice.actions;

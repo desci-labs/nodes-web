@@ -116,7 +116,6 @@ const PaneDrive = () => {
     manifest: manifestData,
     isDraggingFiles,
     currentObjectId,
-    mode,
   } = useNodeReader();
 
   const [directory, setDirectory] = useState<Array<DriveObject>>([]);
@@ -218,11 +217,11 @@ const PaneDrive = () => {
             placeHolder.lastModified = formattedDate;
           placeHolder.contains!.forEach(
             (fd, idx) =>
-            (placeHolder.contains![idx] = ipfsTreeToDriveTree(
-              fd,
-              formattedDate,
-              manifestData!
-            ))
+              (placeHolder.contains![idx] = ipfsTreeToDriveTree(
+                fd,
+                formattedDate,
+                manifestData!
+              ))
           );
           placeHolder.accessStatus = AccessStatus.PRIVATE;
         }
@@ -291,6 +290,7 @@ const PaneDrive = () => {
         throw e;
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [setDirectory, nodeDrived, currentObjectId, manifestData]
   );
 
@@ -452,11 +452,11 @@ const PaneDrive = () => {
               dataComp.path = newPath;
               dataComp.contains?.forEach(
                 (fd, idx) =>
-                (dataComp.contains![idx] = ipfsTreeToDriveTree(
-                  fd,
-                  formatDbDate(date),
-                  manifest
-                ))
+                  (dataComp.contains![idx] = ipfsTreeToDriveTree(
+                    fd,
+                    formatDbDate(date),
+                    manifest
+                  ))
               );
 
               old.forEach((item) => {
@@ -708,8 +708,6 @@ const PaneDrive = () => {
           )}
           {!!OldComponentMetadata && (
             <ComponentMetadataPopover
-              currentObjectId={currentObjectId!}
-              manifestData={manifestData!}
               componentId={OldComponentMetadata?.componentId!}
               isVisible={!!OldComponentMetadata}
               onClose={() => {

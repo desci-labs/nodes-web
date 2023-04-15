@@ -5,7 +5,7 @@ import CollapsibleSection from "@components/organisms/CollapsibleSection";
 import { IconInfo, IconOrcid } from "icons";
 import Section from "../../Section";
 import SectionHeader from "../../Section/SectionHeader";
-import { ResearchObjectV1Contributor } from "@desci-labs/desci-models";
+import { ResearchObjectV1Author } from "@desci-labs/desci-models";
 import ClickableAddIcon from "@components/atoms/ClickableIcon/ClickableAddIcon";
 import toast from "react-hot-toast";
 import { useNodeReader } from "@src/state/nodes/hooks";
@@ -17,9 +17,7 @@ const ContributorsSection = (props: ContributorsSectionProps) => {
 
   if (
     mode !== "editor" &&
-    (!manifestData ||
-      !manifestData.contributors ||
-      !manifestData.contributors.length)
+    (!manifestData || !manifestData.authors || !manifestData.authors.length)
   ) {
     return null;
   }
@@ -69,9 +67,9 @@ const ContributorsSection = (props: ContributorsSectionProps) => {
     >
       <div className="flex flex-col gap-3 ">
         {manifestData &&
-          manifestData.contributors &&
-          manifestData.contributors.map(
-            (contributor: ResearchObjectV1Contributor, index: number) => (
+          manifestData.authors &&
+          manifestData.authors.map(
+            (contributor: ResearchObjectV1Author, index: number) => (
               <Section
                 key={index}
                 header={() => (
@@ -79,23 +77,21 @@ const ContributorsSection = (props: ContributorsSectionProps) => {
                     title={() => (
                       <div className="flex flex-col">
                         <span className="text-sm font-bold">
-                          {contributor.author.name}
+                          {contributor.name}
                         </span>
                         <span className="text-xs text-gray-400">
-                          {contributor.title}
+                          {contributor.role}
                         </span>
                       </div>
                     )}
-                    action={() => (
-                      <Identicon string={contributor.author.name} />
-                    )}
+                    action={() => <Identicon string={contributor.name} />}
                     className="bg-zinc-100 dark:bg-muted-900"
                   />
                 )}
               >
                 <div className="flex flex-row px-4 py-2 justify-end gap-2 w-full">
                   <OpenLinkPillButton
-                    link={contributor.author.orcid || "https://orcid.com"}
+                    link={contributor.orcid || "https://orcid.com"}
                     leftIcon={() => <IconOrcid />}
                   />
                 </div>

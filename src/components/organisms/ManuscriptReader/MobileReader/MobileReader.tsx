@@ -3,40 +3,40 @@ import React, { useEffect } from "react";
 import "react-pdf/dist/umd/Page/AnnotationLayer.css";
 import styled from "styled-components";
 import { FlexRow } from "@components/styled";
-import { APPROXIMATED_HEADER_HEIGHT, __log } from "@components/utils";
 import { AvailableUserActionLogTypes, postUserAction } from "@api/index";
-import LoadProgressManager from "@components/molecules/LoadProgressManager";
-import CurrentPdfManager from "@components/atoms/CurrentPdfManager";
-import useManuscriptReader from "./hooks/useManuscriptReader";
-import useReaderEffects from "./hooks/useReaderEffects";
-import Reader from "./Reader";
-import Editor from "./Editor";
-import PublicationDetailsModal from "@src/components/molecules/NodeVersionDetails/PublicationDetailsModal";
+import useManuscriptReader from "@components/organisms/ManuscriptReader/hooks/useManuscriptReader";
+import useReaderEffects from "@components/organisms/ManuscriptReader/hooks/useReaderEffects";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import Header from "./Header";
+import { setMobileView } from "@src/state/preferences/preferencesSlice";
+import { useSetter } from "@src/store/accessors";
+import { useAppPreferences } from "@src/state/preferences/hooks";
+import Placeholder from "@components/organisms/ManuscriptReader/Placeholder";
+import Explorer from "./Explorer";
 
-const ManuscriptWrapper = styled(FlexRow)`
-  background-color: #525659;
+const MobileWrapper = styled(FlexRow)`
+  background-color: transparent;
   position: relative;
-  padding-top: ${APPROXIMATED_HEADER_HEIGHT}px;
   height: calc(100vh);
-  &::before {
-    content: " ";
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
-    background-color: #525659;
-    position: fixed;
-  }
+  width: 100%;
+  left: 0;
+  top: 0;
+  background-color: #1e1e1e;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 `;
 
 interface ManuscriptReaderProps {
   publicView?: boolean;
 }
 const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
-  __log("Render manuscript reader", publicView);
+  console.log("Render manuscript reader");
+  const dispatch = useSetter();
   const { currentObjectId } = useNodeReader();
   const { isLoading } = useManuscriptReader(publicView);
+  const { isMobileView } = useAppPreferences();
 
   // trigger Reader side effects
   useReaderEffects(publicView);
@@ -56,14 +56,20 @@ const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
     sendNodeViewedTracking();
   }, [currentObjectId]);
 
+  useEffect(() => {
+    dispatch(setMobileView(true));
+
+    return () => {
+      dispatch(setMobileView(false));
+    };
+  }, [dispatch, isMobileView]);
+
   return (
-    <ManuscriptWrapper>
-      <LoadProgressManager />
-      <CurrentPdfManager />
-      {publicView && <Reader isLoading={isLoading} />}
-      {!publicView && <Editor isLoading={isLoading} />}
-      <PublicationDetailsModal />
-    </ManuscriptWrapper>
+    <MobileWrapper>
+      <Header />
+      {isLoading && <Placeholder isLoading={true} fullHeight />}
+      <Explorer />
+    </MobileWrapper>
   );
 };
 
