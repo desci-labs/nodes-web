@@ -27,6 +27,7 @@ export const api = createApi({
   tagTypes: [
     tags.user,
     tags.nodes,
+    tags.mediaCover,
     tags.collection,
     tags.nodeVersions,
     tags.privateShare,
