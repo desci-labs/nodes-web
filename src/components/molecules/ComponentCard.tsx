@@ -251,6 +251,21 @@ const ComponentCard = (props: ComponentCardProps) => {
               effect="solid"
               id={`fair_${component.id}`}
             />
+            <ReactTooltip
+              backgroundColor="black"
+              effect="solid"
+              id={`drive_${component.id}`}
+            />
+            <ReactTooltip
+              backgroundColor="black"
+              effect="solid"
+              id={`cite_${component.id}`}
+            />
+            <ReactTooltip
+              backgroundColor="black"
+              effect="solid"
+              id={`use_${component.id}`}
+            />
           </span>
         </HeaderWrapper>
         <FlexRowSpaceBetween style={{ display: isSelected ? "" : "none" }}>
@@ -276,6 +291,8 @@ const ComponentCard = (props: ComponentCardProps) => {
                   </div>
                   <div id="section-right" className="flex gap-2">
                     <BlackGenericButton
+                      dataTip={"Show File Location"}
+                      dataFor={`drive_${component.id}`}
                       disabled={false}
                       className="p-0"
                       onClick={(e) => {
@@ -287,6 +304,8 @@ const ComponentCard = (props: ComponentCardProps) => {
                       <IconDrive className="p-0 min-w-[28px] scale-[1.2]" />
                     </BlackGenericButton>
                     <BlackGenericButton
+                      dataTip={"Cite"}
+                      dataFor={`cite_${component.id}`}
                       className="w-7 h-7"
                       disabled={canCite}
                       onClick={(e) => {
@@ -297,6 +316,8 @@ const ComponentCard = (props: ComponentCardProps) => {
                       <IconQuotes />
                     </BlackGenericButton>
                     <BlackGenericButton
+                      dataTip={"Methods"}
+                      dataFor={`use_${component.id}`}
                       disabled={!drive}
                       className="p-0 min-w-[28px] h-7"
                       onClick={(e) => {
