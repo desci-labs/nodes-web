@@ -5,11 +5,10 @@ import {
   ResearchObjectComponentType,
   ResearchObjectV1Validation,
 } from "@desci-labs/desci-models";
-import { EditorHistory } from "@components/organisms/ManuscriptComponentsSection";
 import { PageMetadata } from "@components/organisms/Paper/usePageMetadata";
-import { DriveJumpingParams, DriveObject } from "@components/organisms/Drive";
+import { DriveObject } from "@components/organisms/Drive";
 import { Wallet } from "@src/state/api/types";
-import { UploadQueueItem } from "@src/state/drive/types";
+import { EditorHistory } from "../SidePanel/ManuscriptSidePanel/Tabs/Components/ManuscriptComponentsSection";
 /* ########################### Customizable options ################################ */
 
 interface Dialog {
@@ -58,11 +57,9 @@ interface State {
   droppedTransferItemList: FileSystemEntry[] | null;
   addComponentType: ResearchObjectComponentType | null;
   addComponentSubType: ResearchObjectComponentSubtypes | null;
-  showCitationModal: boolean;
   // selectedHistory: HistoryEntryProps | null;
   showPublicationDetails: boolean;
   showProfileUpdater: boolean;
-  componentToCite: DriveObject | null;
   componentToUse: DriveObject | null;
   forceRefreshDrive: boolean;
   showAddNewNode: boolean;
@@ -112,8 +109,6 @@ export const initialState: State = {
   componentToUse: null,
   addComponentType: null,
   addComponentSubType: null,
-  componentToCite: null,
-  showCitationModal: false,
   showPublicationDetails: false,
   showProfileUpdater: false,
   forceRefreshDrive: false,
