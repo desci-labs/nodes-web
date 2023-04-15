@@ -8,7 +8,13 @@ import {
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
-import { IconData, IconDeleteForever, IconInfo, IconPen } from "icons";
+import {
+  IconData,
+  IconDeleteForever,
+  IconInfo,
+  IconPen,
+  IconStar,
+} from "icons";
 import React, { useMemo, useState } from "react";
 // import ComponentRenamePopover from "./PopOver/ComponentRenamePopover";
 // import useSaveManifest from "@src/hooks/useSaveManifest";
@@ -246,7 +252,7 @@ const ManuscriptComponentsSection = () => {
         className="mb-4"
       >
         <div className="flex flex-col gap-3 py-2 px-0">
-          {cardComponents &&
+          {cardComponents && cardComponents.length ? (
             cardComponents.map(
               (component: ResearchObjectV1Component, index: number) => (
                 <EditableHOC
@@ -258,7 +264,13 @@ const ManuscriptComponentsSection = () => {
                   <ComponentCard component={component} />
                 </EditableHOC>
               )
-            )}
+            )
+          ) : (
+            <div className="text-[10px] text-neutrals-gray-6 flex flex-row gap-1 items-center">
+              <IconStar width={12} className="fill-tint-primary-hover" />
+              Star a component in Drive to see it here
+            </div>
+          )}
         </div>
       </CollapsibleSection>
     </>

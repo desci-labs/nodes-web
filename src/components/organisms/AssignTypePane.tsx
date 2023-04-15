@@ -105,7 +105,7 @@ const AssignTypePane = () => {
                 {COMPONENT_LIBRARY.filter((c) => !c.doNotRender).map((c) => (
                   <ComponentButton
                     key={c.title}
-                    icon={c.icon}
+                    icon={c.icon()}
                     title={c.title}
                     componentType={c.componentType}
                     componentSubType={c.componentSubType}

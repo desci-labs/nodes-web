@@ -447,7 +447,7 @@ export const fetchTreeThunk = createAsyncThunk(
 export const addFilesToDrive = createAsyncThunk(
   "drive/addFiles",
   async (payload: AddFilesToDrivePayload, { getState, dispatch }) => {
-    debugger;
+    // debugger;
     const state = getState() as RootState;
     const { manifest, currentObjectId } = state.nodes.nodeReader;
     const { nodeTree } = state.drive;
@@ -523,7 +523,7 @@ export const addFilesToDrive = createAsyncThunk(
     const contextPath = overwritePathContext || state.drive.currentDrive!.path!;
     const snapshotNodeUuid = currentObjectId!;
     try {
-      debugger;
+      // debugger;
       const {
         manifest: updatedManifest,
         rootDataCid,
