@@ -47,14 +47,15 @@ const AnnotationEditCanvas: React.FC<
       return;
     }
     const el = divRef.current;
-    if (!divRef.current) {
-      alert(1);
-    }
     const handleAnnotationTrigger = (ev: MouseEvent) => {
       if (ev.altKey) {
-        dispatch(setIsAnnotating(true));
+        if (!isAnnotating) {
+          dispatch(setIsAnnotating(true));
+        }
       } else {
-        dispatch(setIsAnnotating(false));
+        if (isAnnotating) {
+          dispatch(setIsAnnotating(false));
+        }
       }
     };
     if (el) {
@@ -70,7 +71,7 @@ const AnnotationEditCanvas: React.FC<
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [divRef, startedNewAnnotationViaButton]);
+  }, [divRef, startedNewAnnotationViaButton, isAnnotating]);
 
   /**
    * This is the default size of the annotation rectangle when the user starts dragging
@@ -299,4 +300,4 @@ const AnnotationEditCanvas: React.FC<
   );
 };
 
-export default AnnotationEditCanvas;
+export default React.memo(AnnotationEditCanvas);

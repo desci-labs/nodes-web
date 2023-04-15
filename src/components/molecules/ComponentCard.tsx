@@ -7,7 +7,6 @@ import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
 import AnnotationSwitcher from "@components/atoms/AnnotationSwitcher";
 import {
   ExternalLinkComponent,
-  PdfComponent,
   PdfComponentPayload,
   ResearchObjectComponentType,
   ResearchObjectV1,
@@ -16,11 +15,7 @@ import {
 import { cleanupManifestUrl } from "@components/utils";
 import TooltipIcon from "@components/atoms/TooltipIcon";
 import ReactTooltip from "react-tooltip";
-import {
-  COMPONENT_LIBRARY,
-  EXTERNAL_COMPONENTS,
-  UiComponentDefinition,
-} from "@components/organisms/ComponentLibrary";
+import { findTarget } from "@components/organisms/ComponentLibrary";
 import ButtonFair from "@components/atoms/ButtonFair";
 import {
   DRIVE_DATA_PATH,
@@ -35,7 +30,6 @@ import {
   navigateToDriveByPath,
   setComponentTypeBeingAssignedTo,
 } from "@src/state/drive/driveSlice";
-import { useDrive } from "@src/state/drive/hooks";
 
 const CardWrapper: StyledComponent<
   "div",
@@ -86,33 +80,6 @@ export interface ComponentCardProps extends SectionCardProps {
   mode: string;
   manifestData: ResearchObjectV1;
 }
-
-export const findTarget = (
-  component: ResearchObjectV1Component
-): UiComponentDefinition | undefined => {
-  const foundEntry = COMPONENT_LIBRARY.concat(EXTERNAL_COMPONENTS).find(
-    (target) => {
-      const matchesType = target.componentType === component.type;
-      switch (target.componentType) {
-        case ResearchObjectComponentType.PDF:
-          const documentPayload = component as PdfComponent;
-          return (
-            matchesType && documentPayload.subtype === target.componentSubType
-          );
-        case ResearchObjectComponentType.LINK:
-          const externalLinkPayload = component as ExternalLinkComponent;
-          return (
-            matchesType &&
-            externalLinkPayload.subtype === target.componentSubType
-          );
-        default:
-          return matchesType;
-      }
-    }
-  );
-
-  return foundEntry;
-};
 
 const labelFor = (component: ResearchObjectV1Component): string => {
   const obj = findTarget(component);
@@ -222,6 +189,8 @@ const ComponentCard = (props: ComponentCardProps) => {
     copyLinkUrl = (component as ExternalLinkComponent).payload.url;
   }
 
+  const Icon = iconFor(component, false);
+
   return (
     <CardWrapper
       isSelected={isSelected}
@@ -252,7 +221,7 @@ const ComponentCard = (props: ComponentCardProps) => {
                 data-subtype={(component as any).subtype}
               >
                 <TooltipIcon
-                  icon={<>{iconFor(component, false)}</>}
+                  icon={Icon ? <Icon /> : <></>}
                   id={`icon_component_${component.id}`}
                   tooltip={labelFor(component)}
                   placement={"left"}
@@ -306,4 +275,4 @@ const ComponentCard = (props: ComponentCardProps) => {
   );
 };
 
-export default ComponentCard;
+export default React.memo(ComponentCard);

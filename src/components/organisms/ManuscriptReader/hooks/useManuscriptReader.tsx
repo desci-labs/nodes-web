@@ -33,6 +33,7 @@ import { useSetter } from "@src/store/accessors";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import useParseObjectID from "@src/components/organisms/ManuscriptReader/useParseObjectID";
 import { manuscriptLoader } from "@src/components/screens/Nodes";
+import { setCurrentVersion } from "@src/state/nodes/history";
 
 export default function useManuscriptReader(publicView: boolean = false) {
   const parsedManuscript = useLoaderData() as Awaited<
@@ -196,6 +197,9 @@ export default function useManuscriptReader(publicView: boolean = false) {
     } else {
       const parsedCid = "cid" in parsedManuscript ? parsedManuscript.cid : "";
       initPrivateReader(parsedCid ?? (cid as string));
+    }
+    if ("version" in parsedManuscript) {
+      dispatch(setCurrentVersion(parsedManuscript.version));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cid, parsedManuscript, publicView]);

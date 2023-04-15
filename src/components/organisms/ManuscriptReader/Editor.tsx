@@ -21,6 +21,7 @@ import { useManuscriptController } from "./ManuscriptController";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useDrive } from "@src/state/drive/hooks";
 import AssignTypePane from "../AssignTypePane";
+import { useCallback } from "react";
 
 interface ReaderViewerProps {
   isLoading: boolean;
@@ -62,9 +63,9 @@ export default function Editor({ isLoading }: ReaderViewerProps) {
       <ComponentStackView />
 
       <ManuscriptSidePanel
-        onClose={() => {
+        onClose={useCallback(() => {
           dispatch(setHeaderHidden(true));
-        }}
+        }, [dispatch, setHeaderHidden])}
       />
 
       <>

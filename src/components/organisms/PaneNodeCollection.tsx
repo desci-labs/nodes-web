@@ -2,7 +2,7 @@ import PrimaryButton from "@components/atoms/PrimaryButton";
 import NodeCard from "@components/molecules/NodeCard";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { IconNodeCollection } from "@icons";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useEffectOnce } from "react-use";
 import NodeCollectionEmptyState from "../atoms/NodeCollectionEmptyState";
 import NodeCardLoader from "../molecules/NodeCardLoader";
@@ -23,7 +23,7 @@ export interface EditNodeInfo {
   licenseType: any;
 }
 
-export default function PaneNodeCollection() {
+export default React.memo(function PaneNodeCollection() {
   const { setIsAddingComponent, setIsAddingSubcomponent, setShowAddNewNode } =
     useManuscriptController(["showAddNewNode"]);
   const [isOpen, setOpen] = useState(false);
@@ -128,4 +128,4 @@ export default function PaneNodeCollection() {
       </div>
     </div>
   );
-}
+});

@@ -21,14 +21,12 @@ import {
   DEFAULT_RESULT,
   getFormatter,
 } from "@src/helper/citation";
-import { useUser } from "@src/state/user/hooks";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 import SelectList from "@src/components/molecules/FormInputs/SelectList";
 
 const CitationComponent = () => {
-  const userProfile = useUser();
-  const { componentToCite, setShowProfileUpdater } = useManuscriptController([
+  const { componentToCite } = useManuscriptController([
     "componentToCite",
     "showProfileUpdater",
   ]);

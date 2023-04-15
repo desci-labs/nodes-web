@@ -6,7 +6,7 @@ import {
   PDFDocumentProxy,
   PDFPageProxy,
 } from "react-pdf/node_modules/pdfjs-dist/types/src/display/api";
-import { PDF_PAGE_SPACING, viewportTarget$ } from ".";
+import { DEFAULT_HEIGHT, PDF_PAGE_SPACING, viewportTarget$ } from ".";
 import { useManuscriptController } from "../ManuscriptReader/ManuscriptController";
 
 export interface PageMetadata {
@@ -87,7 +87,7 @@ const usePageMetadata = (
     viewportTarget: any,
     pageMetadata: PageMetadata
   ) => {
-    if (!pageMetadata) {
+    if (!pageMetadata || !viewportTarget) {
       return 0;
     }
     const pageDocumentOffset = getPageZoomedOffset(pageMetadata.pageIndex);
@@ -110,7 +110,7 @@ const usePageMetadata = (
 
   const onViewportChange = useCallback(
     (viewportTarget: any) => {
-      if (pageMetadata && pageMetadata.length) {
+      if (pageMetadata && pageMetadata.length && viewportTarget) {
         const searchRange = [0, pageMetadata.length - 1];
 
         // estimate what page index the viewport may be intersecting
@@ -149,7 +149,8 @@ const usePageMetadata = (
         ) {
           const pageScrollTop =
             pageMetadata[firstInViewIndex]?.documentOffset ?? 0;
-          const pageHeight = pageMetadata[firstInViewIndex].height;
+          const pageHeight =
+            pageMetadata[firstInViewIndex]?.height ?? DEFAULT_HEIGHT;
 
           // limit searchRange depending on which direction the viewport is
           if (

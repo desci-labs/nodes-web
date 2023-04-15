@@ -1,6 +1,4 @@
 import { ResearchObjectV1Component } from "@desci-labs/desci-models";
-import { useState } from "react";
-import ComponentMetadataPopover from "@components/organisms/PopOver/ComponentMetadataPopover";
 import CollapsibleSection from "@components/organisms/CollapsibleSection";
 import { useNodeValidator } from "@src/hooks/useNodeValidator";
 import { ComponentTodoItem } from "./TodoItem";

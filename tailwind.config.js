@@ -181,5 +181,9 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [require("@tailwindcss/forms"), require("flowbite/plugin")],
+  plugins: [
+    require("@tailwindcss/forms"),
+    require("flowbite/plugin"),
+    require("@tailwindcss/line-clamp"),
+  ],
 };

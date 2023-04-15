@@ -3,7 +3,7 @@ import SpacerHorizontal from "@components/atoms/SpacerHorizontal";
 import SidePanelStorage from "@components/molecules/SidePanelStorage";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { __log } from "@components/utils";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import DriveTable, { DriveObject } from "./Drive";
 import toast from "react-hot-toast";
@@ -22,9 +22,9 @@ const PaneDrive = () => {
     setDroppedTransferItemList,
   } = useManuscriptController(["droppedFileList", "droppedTransferItemList"]);
   const dispatch = useSetter();
-  const { isDraggingFiles, currentObjectId } = useNodeReader();
+  const { isDraggingFiles } = useNodeReader();
 
-  const { nodeTree, status, currentDrive } = useDrive();
+  const { status } = useDrive();
 
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -75,13 +75,6 @@ const PaneDrive = () => {
     directoryRef,
   ]);
 
-  const componentUnmounting = useRef<boolean>(false);
-  useEffect(() => {
-    return () => {
-      componentUnmounting.current = true;
-    };
-  }, []);
-
   return (
     <ContextMenuProvider>
       <div className="flex flex-col relative">
@@ -108,10 +101,3 @@ const PaneDrive = () => {
   );
 };
 export default PaneDrive;
-
-// export function useDriveUpdater() {
-//   const context = useContext(nodeDriveSetContext);
-//   if (!context)
-//     throw Error("Cannot access Drive Provider outside of <PaneDrive>");
-//   return context;
-// }

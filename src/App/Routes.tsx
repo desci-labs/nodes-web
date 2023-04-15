@@ -29,12 +29,15 @@ import AppWrapper from "@src/App/Providers/AppWrapper";
 import PaneNodeCollection from "@src/components/organisms/PaneNodeCollection";
 import ManuscriptReader from "@src/components/organisms/ManuscriptReader";
 import PrivateViewer from "./PrivateViewer";
+import { isMobile } from "react-device-detect";
+import MobileReader from "@src/components/organisms/ManuscriptReader/MobileReader/MobileReader";
 
 const Terms = lazy(() => import("@src/components/screens/Terms"));
 const Privacy = lazy(() => import("@src/components/screens/Privacy"));
 const App = lazy(() => import("@src/App/App"));
 const BetaWeb = lazy(() => import("@src/components/screens/Web/BetaWeb"));
 
+console.log("Is MOBILE", isMobile);
 export const appRouter = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -62,7 +65,7 @@ export const appRouter = createBrowserRouter(
             <Route
               path=":cid"
               loader={manuscriptLoader}
-              element={<ManuscriptReader />}
+              element={isMobile ? <MobileReader /> : <ManuscriptReader />}
             />
           </Route>
           <Route index element={<Navigate to="start" />} />
@@ -71,7 +74,6 @@ export const appRouter = createBrowserRouter(
         <Route path="updateEmail" element={<UpdateEmailScreen />} />
         <Route path="help" element={<PaneHelp />} />
         <Route path=":url*(/+)" element={<Navigate replace to="nodes/*" />} />
-        {/* <Route path="/*" element={<Nodes />} /> */}
       </Route>
       <Route
         path={`${site.web}/*`}

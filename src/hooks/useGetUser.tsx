@@ -12,7 +12,9 @@ export function useGetUser() {
     shouldRetryOnError: false,
     onSuccess(data) {
       setWallets(data.wallets);
-      dispatch(setUser(data));
+      if (JSON.stringify(userData) !== JSON.stringify(data)) {
+        dispatch(setUser(data));
+      }
     },
   });
 

@@ -12,7 +12,7 @@ import { useCallback, useMemo } from "react";
 
 const DEFAULT_VALUE = { dpid: "", fqi: "", license: "Not Specified" };
 
-export default function useComponentDpid(componentToUse: DriveObject) {
+export default function useComponentDpid(componentToUse?: DriveObject) {
   const versionIndex = useCurrentNodeVersion();
   const { currentObjectId, manifest: manifestData } = useNodeReader();
 
@@ -44,14 +44,14 @@ export default function useComponentDpid(componentToUse: DriveObject) {
       ...DEFAULT_VALUE,
       license: umbrellaLicense,
     };
-    if (!componentToUse) return DEFAULT_WITH_LICENSE;
+    if (!componentToUse) return { ...DEFAULT_WITH_LICENSE, dpid: dpidLink };
 
     const component =
       componentToUse.type === FileType.DIR
         ? componentToUse?.contains?.[0] ?? null
         : componentToUse;
 
-    if (!component) return DEFAULT_WITH_LICENSE;
+    if (!component) return { ...DEFAULT_WITH_LICENSE, dpid: dpidLink };
 
     const license = component.metadata.licenseType || umbrellaLicense;
 

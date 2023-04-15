@@ -9,7 +9,7 @@ import LoadProgressManager from "@components/molecules/LoadProgressManager";
 import CurrentPdfManager from "@components/atoms/CurrentPdfManager";
 import useManuscriptReader from "./hooks/useManuscriptReader";
 import useReaderEffects from "./hooks/useReaderEffects";
-import PublicViewer from "./PublicViewer";
+import Reader from "./Reader";
 import Editor from "./Editor";
 import PublicationDetailsModal from "@src/components/molecules/NodeVersionDetails/PublicationDetailsModal";
 import { useNodeReader } from "@src/state/nodes/hooks";
@@ -68,7 +68,7 @@ const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
     <ManuscriptWrapper>
       <LoadProgressManager />
       <CurrentPdfManager />
-      {publicView && <PublicViewer isLoading={isLoading} />}
+      {publicView && <Reader isLoading={isLoading} />}
       {!publicView && <Editor isLoading={isLoading} />}
       <PublicationDetailsModal />
 

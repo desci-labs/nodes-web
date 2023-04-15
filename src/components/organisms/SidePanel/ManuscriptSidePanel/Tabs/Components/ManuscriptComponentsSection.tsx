@@ -10,7 +10,7 @@ import {
 } from "@desci-labs/desci-models";
 import { IconData, IconDeleteForever, IconInfo, IconPen } from "icons";
 import React, { useMemo, useState } from "react";
-import ComponentRenamePopover from "./PopOver/ComponentRenamePopover";
+// import ComponentRenamePopover from "./PopOver/ComponentRenamePopover";
 // import useSaveManifest from "@src/hooks/useSaveManifest";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
@@ -20,6 +20,7 @@ import {
   saveManifestDraft,
 } from "@src/state/nodes/viewer";
 import { useDrive } from "@src/state/drive/hooks";
+import ComponentRenamePopover from "@src/components/organisms/PopOver/ComponentRenamePopover";
 
 export enum EditorHistoryType {
   ADD_ANNOTATION,
@@ -149,32 +150,9 @@ const ManuscriptComponentsSection = () => {
   const { setIsAddingComponent } = useManuscriptController([
     "isAddingComponent",
   ]);
-  const {
-    mode,
-    manifest: manifestData,
-    componentStack,
-    currentObjectId,
-  } = useNodeReader();
+  const { mode, manifest: manifestData, currentObjectId } = useNodeReader();
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const { deprecated: deprecatedDrive } = useDrive();
-
-  /**
-   * Commenting following section until understand what it does-- SI Jul-19-2022
-   */
-  // useEffect(() => {
-  //   if (
-  //     manifestData &&
-  //     manifestData.components &&
-  //     manifestData.components.length &&
-  //     (!componentStack || !componentStack.length)
-  //   ) {
-  //     setComponentStack([manifestData.components[0]]);
-  //     __log(
-  //       "ManuscriptComponentsSection::useEffect[manifestData, componentStack] Reset componentStack",
-  //       JSON.stringify(manifestData.components[0])
-  //     );
-  //   }
-  // }, [manifestData, componentStack]);
 
   /**
    * Hide component section if we don't have components
@@ -190,7 +168,7 @@ const ManuscriptComponentsSection = () => {
 
   const cardComponents = useMemo(() => {
     let components = manifestData && manifestData.components;
-    const hasDataComponent = manifestData.components.some(
+    const hasDataComponent = manifestData?.components.some(
       (c: ResearchObjectV1Component) =>
         c.type === ResearchObjectComponentType.DATA
     );
@@ -277,13 +255,7 @@ const ManuscriptComponentsSection = () => {
                   index={index}
                   isEditable={isEditable}
                 >
-                  <ComponentCard
-                    component={component}
-                    currentObjectId={currentObjectId!}
-                    componentStack={componentStack}
-                    manifestData={manifestData!}
-                    mode={mode}
-                  />
+                  <ComponentCard component={component} />
                 </EditableHOC>
               )
             )}
@@ -293,4 +265,4 @@ const ManuscriptComponentsSection = () => {
   );
 };
 
-export default ManuscriptComponentsSection;
+export default React.memo(ManuscriptComponentsSection);

@@ -124,10 +124,9 @@ export const CODE_LICENSE_TYPES = [
 interface ComponentMetadataFormProps {
   file: DriveObject;
   onSubmit: (data: CommonComponentPayload) => void;
-  loading?: boolean;
-  currentObjectId: string;
-  defaultLicense: string;
   manifest: ResearchObjectV1;
+  loading?: boolean;
+  defaultLicense: string;
 }
 
 const FORM_DEFAULTS = {
@@ -467,7 +466,6 @@ const ComponentMetadataPopover = (
                 ref={formRef}
                 file={fileMetadataBeingEdited!}
                 manifest={manifestData!}
-                currentObjectId={currentObjectId!}
                 onSubmit={onSubmit}
                 loading={isSaving}
                 defaultLicense={manifestData?.defaultLicense || ""}

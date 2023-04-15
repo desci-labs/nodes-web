@@ -1,4 +1,4 @@
-import { FC } from "react";
+import React, { FC } from "react";
 import { ReactComponent as IconAttributesOpenData } from "@images/icons/a-attributes-open-data.svg";
 import { ReactComponent as IconAddComment } from "@images/icons/a-icon-add-comment.svg";
 import { ReactComponent as IconRemoveComment } from "@images/icons/a-icon-remove-comment.svg";
@@ -50,8 +50,8 @@ import { ReactComponent as IconPlay } from "@images/icons/a-icon-play.svg";
 import { ReactComponent as IconX } from "@images/icons/a-icon-x.svg";
 import { ReactComponent as IconOpenInNew } from "@images/icons/a-icon-open-in-new.svg";
 import { ReactComponent as IconRemove } from "@images/icons/e-remove.svg";
-import { ReactComponent as IconZoomIn } from "@images/icons/g-icon-zoom-in.svg";
-import { ReactComponent as IconZoomOut } from "@images/icons/g-icon-zoom-out.svg";
+import { ReactComponent as IconZoomInBase } from "@images/icons/g-icon-zoom-in.svg";
+import { ReactComponent as IconZoomOutBase } from "@images/icons/g-icon-zoom-out.svg";
 import { ReactComponent as IconMiniChevronDown } from "@images/icons/mini-chevron-down.svg";
 import { ReactComponent as IconFish } from "@images/icons/fish.svg";
 import { ReactComponent as IconConferenceKey } from "@images/icons/a-icon-conference-key.svg";
@@ -129,7 +129,7 @@ import { ReactComponent as IconTwitter } from "@images/twitter.svg";
 import { ReactComponent as IconGithub } from "@images/github.svg";
 import { ReactComponent as IconGitbook } from "@images/gitbook.svg";
 import { ReactComponent as IconDesciNodes } from "@images/icons/a-desci-nodes-logo.svg";
-import { ReactComponent as IconHelp } from "@images/icons/icon-help.svg";
+import { ReactComponent as IconHelpBase } from "@images/icons/icon-help.svg";
 import { ReactComponent as IconKebab } from "@images/icons/kebab.svg";
 import { ReactComponent as IconStar } from "@images/icons/star.svg";
 import { ReactComponent as IconQuotes } from "@images/icons/quotes.svg";
@@ -141,6 +141,10 @@ export type SvgIconProps = FC<
     title?: string | undefined;
   }
 >;
+
+const IconHelp = React.memo(IconHelpBase);
+const IconZoomIn = React.memo(IconZoomInBase);
+const IconZoomOut = React.memo(IconZoomOutBase);
 
 export {
   IconAssignType,

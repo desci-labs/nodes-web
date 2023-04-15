@@ -7,7 +7,7 @@ import {
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
-import React, { useEffect, useRef, useState } from "react";
+import React, { Ref, useEffect, useRef, useState } from "react";
 import Draggable from "react-draggable";
 import { useUser } from "@src/state/user/hooks";
 import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
@@ -39,8 +39,6 @@ const VSCodeViewer = () => {
   const codeComponent = componentStack[
     componentStack.length - 1
   ] as CodeComponent;
-
-  const userProfile = useUser();
 
   useEffect(() => {
     if (!selectedAnnotationId || codeComponent?.type !== "code") {
@@ -140,10 +138,6 @@ const VSCodeViewer = () => {
 
   const DEFAULT_CODE_SERVER_READ =
     process.env.REACT_APP_CODE_SERVER || "https://desci.dev";
-  const DEFAULT_CODE_SERVER_EXEC =
-    process.env.REACT_APP_CODE_SERVER ||
-    `https://${userProfile.vscode}.desci.dev`;
-  const canExec = userProfile && userProfile.vscode;
 
   const [filePath, setFilePath] = useState("");
   useEffect(() => {
@@ -220,28 +214,49 @@ const VSCodeViewer = () => {
       }`}
     >
       {/**Forcing re-render of iframe if switching to exec */}
-      {canExec ? (
-        <iframe
-          ref={ref}
-          title={"code.desci.com"}
-          src={`${DEFAULT_CODE_SERVER_EXEC}?folder=/config/workspace/${
-            lastCode?.split("/").pop() || ""
-          }`}
-          className="w-[calc(100vw-336px)] h-[calc(100vh-55px)] select-none"
-        />
-      ) : (
-        <iframe
-          ref={ref}
-          title={"desci.dev"}
-          src={`${DEFAULT_CODE_SERVER_READ}/${lastCode || ""}${
-            codeBrowseSuffix || ""
-          }`}
-          className="w-[calc(100vw-336px)] h-[calc(100vh-55px)] select-none"
-        />
-      )}
+
+      <DisplayComputeEnabledVsCode ref={ref} />
+
+      <iframe
+        ref={ref}
+        title={"desci.dev"}
+        src={`${DEFAULT_CODE_SERVER_READ}/${lastCode || ""}${
+          codeBrowseSuffix || ""
+        }`}
+        className="w-[calc(100vw-336px)] h-[calc(100vh-55px)] select-none"
+      />
 
       {tempAnnotation}
     </div>
+  );
+};
+
+interface DisplayComputeEnabledVsCodeProps {
+  ref: Ref<any>;
+  lastCode?: string;
+}
+
+const DisplayComputeEnabledVsCode = ({
+  ref,
+  lastCode,
+}: DisplayComputeEnabledVsCodeProps) => {
+  const userProfile = useUser();
+  const canExec = userProfile && userProfile.vscode;
+  const DEFAULT_CODE_SERVER_EXEC =
+    process.env.REACT_APP_CODE_SERVER ||
+    `https://${userProfile.vscode}.desci.dev`;
+  if (!canExec) {
+    return null;
+  }
+  return (
+    <iframe
+      ref={ref}
+      title={"code.desci.com"}
+      src={`${DEFAULT_CODE_SERVER_EXEC}?folder=/config/workspace/${
+        lastCode?.split("/").pop() || ""
+      }`}
+      className="w-[calc(100vw-336px)] h-[calc(100vh-55px)] select-none"
+    />
   );
 };
 
