@@ -94,7 +94,7 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
     pinching
   );
 
-  const PAGE_BUFFER = 5;
+  const PAGE_BUFFER = 30;
   const intersectingPagesWithPadding = [...intersectingPages].sort(
     (a: number, b: number) => a - b
   );
@@ -441,12 +441,18 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
           }}
         >
           <Document
-            inputRef={(ref: HTMLDivElement) => (containerRef.current = ref)}
+            inputRef={useCallback(
+              (ref: HTMLDivElement) => (containerRef.current = ref),
+              [containerRef]
+            )}
             noData={<></>}
             file={currentPdf}
-            onItemClick={(pageNumber: any) => {
-              scrollToPage$.next(parseInt(pageNumber.pageNumber));
-            }}
+            onItemClick={useCallback(
+              (pageNumber: any) => {
+                scrollToPage$.next(parseInt(pageNumber.pageNumber));
+              },
+              [scrollToPage$]
+            )}
             onLoadProgress={useCallback(
               (data) => {
                 // setLoadError(false);
@@ -459,49 +465,52 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
                   debounceUpdate(pct);
                 }
               },
-              [dispatch, loadPercent, viewLoading, debounceUpdate]
+              [debounceUpdate, loadPercent, viewLoading, setLoadState]
             )}
-            onSourceSuccess={() => {
+            onSourceSuccess={useCallback(() => {
               dispatch(setViewLoading(true));
-            }}
-            onLoadSuccess={(document: PDFDocumentProxy) => {
-              const { numPages } = document;
-              documentRef.current = document;
-              // cachePageDimensions(document);
-              // console.log("REST", rest);
-              // setViewLoading(false);
-              dispatch(setViewLoading(false));
-              // setLoadProgressTaken(false);
-              dispatch(
-                setLoadState({
-                  loadProgressTaken: true,
-                })
-              );
+            }, [])}
+            onLoadSuccess={useCallback(
+              (document: PDFDocumentProxy) => {
+                const { numPages } = document;
+                documentRef.current = document;
+                // cachePageDimensions(document);
+                // console.log("REST", rest);
+                // setViewLoading(false);
+                dispatch(setViewLoading(false));
+                // setLoadProgressTaken(false);
+                dispatch(
+                  setLoadState({
+                    loadProgressTaken: true,
+                  })
+                );
 
-              debounceUpdate(0);
-              // setNumPages(numPages);
-              // setPdfTotalPages(numPages);
-              // resetPdfCurrentPage();
+                debounceUpdate(0);
+                // setNumPages(numPages);
+                // setPdfTotalPages(numPages);
+                // resetPdfCurrentPage();
 
-              dispatch(
-                updatePdfPreferences({
-                  pdfTotalPages: numPages,
-                  pdfCurrentPage: 0,
-                })
-              );
+                dispatch(
+                  updatePdfPreferences({
+                    pdfTotalPages: numPages,
+                    pdfCurrentPage: 0,
+                  })
+                );
 
-              const lastScroll =
-                lastScrollTop[componentStack[componentStack.length - 1].id];
-              if (lastScroll) {
-                const times = [50, 100, 500];
-                times.forEach((dur) => {
-                  setTimeout(() => {
-                    window.document.scrollingElement!.scrollTop = lastScroll;
-                  }, dur);
-                });
-              }
-            }}
-            onLoadError={() => {
+                const lastScroll =
+                  lastScrollTop[componentStack[componentStack.length - 1].id];
+                if (lastScroll) {
+                  const times = [50, 100, 500];
+                  times.forEach((dur) => {
+                    setTimeout(() => {
+                      window.document.scrollingElement!.scrollTop = lastScroll;
+                    }, dur);
+                  });
+                }
+              },
+              [debounceUpdate, updatePdfPreferences, componentStack]
+            )}
+            onLoadError={useCallback(() => {
               // setLoadProgressTaken(false);
               // setLoadError(true);
               dispatch(
@@ -512,7 +521,7 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
                 })
               );
               throw Error(`Document failed to load`);
-            }}
+            }, [])}
             options={{
               standardFontDataUrl: `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/standard_fonts/`,
               cMapUrl: `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/cmaps/`,
