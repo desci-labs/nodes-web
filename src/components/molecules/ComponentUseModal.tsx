@@ -7,114 +7,31 @@ import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 import WarningSign from "@src/components/atoms/warning-sign";
 import DividerSimple from "@src/components/atoms/DividerSimple";
 import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
-import {
-  DriveNonComponentTypes,
-  DriveObject,
-  FileType,
-  oldComponentMetadata,
-} from "@src/components/organisms/Drive";
+import { DriveObject, FileType } from "@src/components/organisms/Drive";
 import useComponentDpid from "@src/components/organisms/Drive/hooks/useComponentDpid";
-import {
-  ResearchObjectComponentType,
-  ResearchObjectV1Component,
-} from "@desci-labs/desci-models";
+import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import useActionHandler from "@src/components/organisms/Drive/ContextMenu/useActionHandler";
 import { useRef, useState } from "react";
-import {
-  findRootComponentCid,
-  isRootComponentDrive,
-} from "@src/components/driveUtils";
-import {
-  DatasetMetadataInfo,
-  MetaStaging,
-} from "@components/organisms/PaneDrive";
+import { setFileMetadataBeingEdited } from "@src/state/drive/driveSlice";
+import { useSetter } from "@src/store/accessors";
 interface UseModalProps {
-  datasetMetadataInfoRef: React.MutableRefObject<DatasetMetadataInfo>;
-  setOldComponentMetadata: (
-    value: React.SetStateAction<oldComponentMetadata | null>
-  ) => void;
-  setMetaStaging: React.Dispatch<React.SetStateAction<MetaStaging[]>>;
-  isMultiselecting: boolean;
-  setShowEditMetadata: React.Dispatch<React.SetStateAction<boolean>>;
-  componentToUse: DriveObject;
-  index: number;
-  selectedFiles: Record<
-    number,
-    ResearchObjectComponentType | DriveNonComponentTypes
-  >;
+  componentToUse?: DriveObject;
 }
 
 const ComponentUseModal = ({
-  index,
-  setOldComponentMetadata,
-  isMultiselecting,
-  datasetMetadataInfoRef,
-  setMetaStaging,
-  setShowEditMetadata,
   componentToUse,
-  selectedFiles,
   ...restProps
 }: ModalProps & UseModalProps) => {
   const { setComponentToUse } = useManuscriptController(["componentToUse"]);
   const { manifest: manifestData } = useNodeReader();
   const { dpid, fqi, license } = useComponentDpid(componentToUse!);
   const handler = useActionHandler();
+  const dispatch = useSetter();
 
   const file = componentToUse;
 
   const handleEditMetadata = () => {
-    // debugger;
-    if (!file) return;
-
-    if (file.componentType !== ResearchObjectComponentType.DATA) {
-      const component = manifestData?.components.find(
-        (c: ResearchObjectV1Component) => c.id === file.cid
-      );
-      if (!component) return;
-      setOldComponentMetadata({
-        componentId: component.id,
-        cb: () => {
-          const { keywords, description, licenseType } = component.payload;
-
-          const newMetadata = { keywords, description, licenseType };
-          file.metadata = newMetadata;
-        },
-      });
-    }
-
-    if (file.componentType === ResearchObjectComponentType.DATA) {
-      // debugger;
-      if (!isMultiselecting)
-        setMetaStaging([
-          {
-            file: file,
-            index: index,
-          },
-        ]);
-
-      if (isMultiselecting) {
-        datasetMetadataInfoRef.current.prepopulateFromName = file.name;
-        const staging = Object.keys(selectedFiles).map((fileIndex: string) => {
-          const parentDriveObj = file.parent;
-          const selectedFile = parentDriveObj?.contains![
-            parseInt(fileIndex)
-          ] as DriveObject;
-          return {
-            file: selectedFile!,
-          };
-        });
-        setMetaStaging(staging);
-      }
-
-      //dag file/dir (submetadata)
-      if (!isRootComponentDrive(file)) {
-        const rootCid = findRootComponentCid(file);
-        if (rootCid) datasetMetadataInfoRef.current.rootCid = rootCid;
-      }
-      datasetMetadataInfoRef.current.prepopulateMetadata = file.metadata;
-
-      if (setShowEditMetadata) setShowEditMetadata(true);
-    }
+    dispatch(setFileMetadataBeingEdited(file!));
   };
 
   function close() {
@@ -222,10 +139,10 @@ const ComponentUseModal = ({
                   className="mt-4 lg:w-full text-center"
                   onClick={() => {
                     const c =
-                      componentToUse?.type === FileType.File
+                      componentToUse?.type === FileType.FILE
                         ? componentToUse
                         : componentToUse?.contains?.find(
-                            (c) => c.type === FileType.File
+                            (c) => c.type === FileType.FILE
                           );
                     handler["PREVIEW"]?.(c!);
                     close();

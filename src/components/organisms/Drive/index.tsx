@@ -45,8 +45,7 @@ const DriveTable: React.FC<DriveTableProps> = ({ setLoading }) => {
 
   const { publicView, mode } = useNodeReader();
 
-  const { nodeTree, status, currentDrive, deprecated, breadCrumbs } =
-    useDrive();
+  const { currentDrive, deprecated, breadCrumbs } = useDrive();
   const dispatch = useSetter();
   const { componentToUse, setComponentToUse } = useManuscriptController([
     "componentToUse",
@@ -54,7 +53,6 @@ const DriveTable: React.FC<DriveTableProps> = ({ setLoading }) => {
   const [selected, setSelected] = useState<
     Record<number, ResearchObjectComponentType | DriveNonComponentTypes>
   >({});
-  const [selectedIndex, setSelectedIndex] = useState(0);
 
   const containerRef = useRef<HTMLDivElement>(null);
 

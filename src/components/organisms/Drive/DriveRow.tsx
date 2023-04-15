@@ -53,8 +53,7 @@ export default function DriveRow({
   canEditMetadata,
   canUse,
   deprecated,
-}: // onHandleUse,
-DriveRowProps) {
+}: DriveRowProps) {
   const contextRef = useRef<HTMLDivElement>();
   const { init } = useDriveContext(file);
   const { handleDbClick } = useInteractionHandler();

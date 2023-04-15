@@ -47,7 +47,7 @@ export default function useComponentDpid(componentToUse: DriveObject) {
     if (!componentToUse) return DEFAULT_WITH_LICENSE;
 
     const component =
-      componentToUse.type === FileType.Dir
+      componentToUse.type === FileType.DIR
         ? componentToUse?.contains?.[0] ?? null
         : componentToUse;
 
@@ -87,7 +87,7 @@ export default function useComponentDpid(componentToUse: DriveObject) {
       if (splitPath && splitPath.length > 1) {
         let newPath = splitPath.slice(1);
         newPath.unshift(componentParent.name);
-        if (componentToUse.type === FileType.Dir) {
+        if (componentToUse.type === FileType.DIR) {
           newPath = [componentParent.name];
         }
         fqiDataSuffix = newPath.join("/");

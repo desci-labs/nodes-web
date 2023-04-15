@@ -73,7 +73,6 @@ export interface DriveRowProps {
   canEditMetadata: boolean;
   canUse: boolean;
   deprecated?: boolean;
-  onHandleUse: () => void;
 }
 
 export interface DriveJumpingParams {
