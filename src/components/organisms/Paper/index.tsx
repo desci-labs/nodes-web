@@ -446,7 +446,7 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
         <div
           ref={gestureContainerRef}
           onClick={openLinkInNewTab}
-          className={`w-fit overflow-x-auto h-fit flex flex-row  ${
+          className={`w-fit overflow-x-auto overflow-y-hidden h-fit flex flex-row  ${
             // isResearchPanelOpen ? "w-[100%]" : "min-w-full"
             "min-w-full"
           } ${canPan ? "justify-start" : "justify-center"}`}
@@ -567,11 +567,12 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
                       // key={`PageComponentHOC_${currentPdf}_${index + 1}`}
                       style={{
                         position: "relative",
-                        width: pageWidth * zoom,
-                        height:
-                          pageWidth * (pageMetadataItem.ratio || 1) * zoom,
+                        width: Math.floor(pageWidth * zoom),
+                        height: Math.floor(
+                          pageWidth * (pageMetadataItem.ratio || 1) * zoom
+                        ),
                         marginBottom: PDF_PAGE_SPACING,
-                        backgroundColor: "transparent",
+                        backgroundColor: "white",
                       }}
                     >
                       {/* <PlaceholderImage
