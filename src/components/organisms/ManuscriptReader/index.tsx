@@ -16,10 +16,7 @@ import { useNodeReader } from "@src/state/nodes/hooks";
 import { useDrive } from "@src/state/drive/hooks";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import ComponentMetadataPopover from "../PopOver/ComponentMetadataPopover";
-import {
-  fetchTreeThunk,
-  setFileMetadataBeingEdited,
-} from "@src/state/drive/driveSlice";
+import { setFileMetadataBeingEdited } from "@src/state/drive/driveSlice";
 import DriveDatasetMetadataPopOver from "@src/components/molecules/DriveDatasetMetadataPopOver";
 import { useSetter } from "@src/store/accessors";
 

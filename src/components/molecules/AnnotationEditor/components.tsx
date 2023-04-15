@@ -17,7 +17,13 @@ import { Editor, Element as SlateElement, Path, Transforms } from "slate";
 import { CustomElement } from "./custom-types";
 import { useClickAway } from "react-use";
 import ReactModal from "react-modal";
-import { FormatHyperlink, IconPen } from "@icons";
+import {
+  FormatHyperlink,
+  IconDeleteForever,
+  IconPen,
+  IconRemove,
+  IconX,
+} from "@icons";
 import ReactTooltip from "react-tooltip";
 import { DriveObject } from "@components/organisms/Drive";
 import PopOver from "@src/components/organisms/PopOver";
@@ -208,9 +214,10 @@ export const Toolbar = React.forwardRef(
       className={cx(
         className,
         css`
-          width: 100%;
+          width: calc(100% + 24px);
           position: relative;
           padding: 1px 18px;
+          padding-right: 0px;
           margin: 0 -12px;
           border-bottom: 2px solid #eee;
           margin-bottom: 20px;
@@ -333,6 +340,7 @@ interface DirectoryLinkComponentProps {
   readOnly: boolean;
   attributes: any;
   element: CustomElement;
+  deleteLink: () => void;
 }
 
 export interface AnnotationLinkConfig {
@@ -382,7 +390,16 @@ export const parseAnnotationLink = (href: string): AnnotationLinkConfig => {
 };
 
 export const DirectoryLinkComponent = (props: DirectoryLinkComponentProps) => {
-  const { href, setHref, fileName, children, readOnly, attributes } = props;
+  const {
+    href,
+    setHref,
+    fileName,
+    children,
+    readOnly,
+    attributes,
+    element,
+    deleteLink,
+  } = props;
   const [showCopiedText, setShowCopiedText] = useState<boolean>(false);
 
   const [showEditSyntaxModal, setShowEditSyntaxModal] =
@@ -457,7 +474,7 @@ export const DirectoryLinkComponent = (props: DirectoryLinkComponentProps) => {
             ) : (
               <div className="flex flex-row justify-center items-center p-2 gap-3 h-8">
                 <div
-                  className="flex flex-row items-center m-1 gap-1 cursor-pointer"
+                  className="flex flex-row items-center m-1 gap-1 cursor-pointer  group hover:opacity-70"
                   onClick={() => {
                     setShowCopiedText(true);
                     navigator.clipboard.writeText(href);
@@ -469,11 +486,11 @@ export const DirectoryLinkComponent = (props: DirectoryLinkComponentProps) => {
                     height={12}
                     strokeWidth={2}
                   />
-                  <div>Copy Link</div>
+                  <div>Copy</div>
                 </div>
                 <div className="font-thin">|</div>
                 <div
-                  className="flex flex-row items-center m-1 gap-1 cursor-pointer"
+                  className="flex flex-row items-center m-1 gap-1 cursor-pointer group hover:opacity-70"
                   onClick={() => {
                     setShowEditSyntaxModal(true);
                   }}
@@ -484,7 +501,23 @@ export const DirectoryLinkComponent = (props: DirectoryLinkComponentProps) => {
                     height={12}
                     strokeWidth={2}
                   />
-                  <div>Edit Syntax</div>
+                  <div>Edit</div>
+                </div>
+                <div className="font-thin">|</div>
+
+                <div
+                  className="flex flex-row items-center m-1 gap-1 cursor-pointer group hover:opacity-70"
+                  onClick={() => {
+                    deleteLink();
+                  }}
+                >
+                  <IconDeleteForever
+                    stroke="#FF9999"
+                    width={12}
+                    height={12}
+                    strokeWidth={5}
+                  />
+                  <div className="text-[#FF9999]">Delete</div>
                 </div>
               </div>
             )}

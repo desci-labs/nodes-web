@@ -1,4 +1,9 @@
-import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import {
+  AsyncThunkAction,
+  PayloadAction,
+  createAsyncThunk,
+  createSlice,
+} from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 import { getDatasetTree, updateDag } from "@src/api";
 import { DriveObject, FileType } from "@src/components/organisms/Drive";
@@ -51,7 +56,7 @@ import {
   updateComponent,
 } from "../nodes/viewer";
 
-interface DriveState {
+export interface DriveState {
   status: RequestStatus;
   error: null | undefined | string;
   nodeTree: DriveObject | null;
@@ -65,6 +70,10 @@ interface DriveState {
   fileMetadataBeingEdited: DriveObject | null;
   fileBeingUsed: DriveObject | null;
   breadCrumbs: BreadCrumb[];
+
+  // drive picker state
+  currentDrivePicker: DriveObject | null;
+  breadCrumbsPicker: BreadCrumb[];
 }
 
 const initialState: DriveState = {
@@ -81,7 +90,43 @@ const initialState: DriveState = {
   fileMetadataBeingEdited: null,
   fileBeingUsed: null,
   breadCrumbs: [],
+  breadCrumbsPicker: [],
+  currentDrivePicker: null,
 };
+
+const navigateToDriveGeneric =
+  (key: "" | "Picker") =>
+  (state: DriveState, action: NavigateToDriveByPathAction) => {
+    const keyBreadcrumbs:
+      | "breadCrumbs"
+      | "breadCrumbsPicker" = `breadCrumbs${key}`;
+    const keyCurrentDrive:
+      | "currentDrive"
+      | "currentDrivePicker" = `currentDrive${key}`;
+
+    if (state.status !== "succeeded" || !state.nodeTree!) return;
+    const { path } = action.payload;
+
+    let driveFound = state.deprecated
+      ? driveBfsByPath(state.nodeTree!, path)
+      : findDriveByPath(state.nodeTree!!, path);
+    if (driveFound && driveFound.type === FileType.FILE) {
+      const pathSplit = path.split("/");
+      pathSplit.pop();
+      const parentPath = pathSplit.join("/");
+      driveFound = state.deprecated
+        ? driveBfsByPath(state.nodeTree!!, parentPath)
+        : findDriveByPath(state.nodeTree!!, parentPath);
+    }
+    if (!driveFound) {
+      console.error(
+        `[DRIVE NAVIGATE] Error: Target Path: ${path} not found in drive tree: ${state.nodeTree!}`
+      );
+      return;
+    }
+    state[keyBreadcrumbs] = constructBreadCrumbs(driveFound.path!);
+    state[keyCurrentDrive] = driveFound;
+  };
 
 export const driveSlice = createSlice({
   name: "drive",
@@ -90,30 +135,8 @@ export const driveSlice = createSlice({
     reset: () => {
       return initialState;
     },
-    navigateToDriveByPath: (state, action: NavigateToDriveByPathAction) => {
-      if (state.status !== "succeeded" || !state.nodeTree) return;
-      const { path } = action.payload;
-
-      let driveFound = state.deprecated
-        ? driveBfsByPath(state.nodeTree!, path)
-        : findDriveByPath(state.nodeTree!, path);
-      if (driveFound && driveFound.type === FileType.FILE) {
-        const pathSplit = path.split("/");
-        pathSplit.pop();
-        const parentPath = pathSplit.join("/");
-        driveFound = state.deprecated
-          ? driveBfsByPath(state.nodeTree!, parentPath)
-          : findDriveByPath(state.nodeTree!, parentPath);
-      }
-      if (!driveFound) {
-        console.error(
-          `[DRIVE NAVIGATE] Error: Target Path: ${path} not found in drive tree: ${state.nodeTree}`
-        );
-        return;
-      }
-      state.breadCrumbs = constructBreadCrumbs(driveFound.path!);
-      state.currentDrive = driveFound;
-    },
+    navigateToDriveByPath: navigateToDriveGeneric(""),
+    navigateToDrivePickerByPath: navigateToDriveGeneric("Picker"),
     setShowUploadPanel: (state, action: { payload: boolean }) => {
       state.showUploadPanel = action.payload;
     },
@@ -232,14 +255,24 @@ export const driveSlice = createSlice({
           state.deprecated = true;
           state.nodeTree = tree as DriveObject;
           state.currentDrive = tree as DriveObject;
-          state.breadCrumbs = [
-            { name: "Research Node", path: state.nodeTree.path! },
-          ];
+
+          state.currentDrivePicker = tree as DriveObject;
+
+          if (!state.breadCrumbsPicker.length) {
+            state.breadCrumbsPicker = [
+              { name: "Research Node", path: state.nodeTree.path! },
+            ];
+          }
+
+          if (!state.breadCrumbs.length) {
+            state.breadCrumbs = [
+              { name: "Research Node", path: state.nodeTree.path! },
+            ];
+          }
           return;
         }
-        state.deprecated = false;
 
-        const manifest = action.payload.manifest!;
+        const manifest: ResearchObjectV1 = action.payload.manifest!;
         //Process the IPFS tree into a DriveObject tree
         const root = createVirtualDrive({
           name: "Node Root",
@@ -285,18 +318,25 @@ export const driveSlice = createSlice({
         });
         if (externalLinks.contains?.length) root.contains?.push(externalLinks);
         state.nodeTree = root;
-        state.breadCrumbs = [
-          { name: "Research Node", path: state.nodeTree.path! },
-        ];
 
-        const driveFound = state.deprecated
-          ? driveBfsByPath(state.nodeTree!, state.currentDrive?.path!)
-          : findDriveByPath(state.nodeTree!, state.currentDrive?.path!);
-        if (driveFound) {
-          state.currentDrive = driveFound;
+        if (!state.breadCrumbsPicker.length) {
+          state.breadCrumbsPicker = [
+            { name: "Research Node", path: state.nodeTree.path! },
+          ];
         }
+
+        if (!state.breadCrumbs.length) {
+          state.breadCrumbs = [
+            { name: "Research Node", path: state.nodeTree.path! },
+          ];
+        }
+
         if (!state.currentDrive) {
           state.currentDrive = root;
+        }
+
+        if (!state.currentDrivePicker) {
+          state.currentDrivePicker = root;
         }
       })
       .addCase(fetchTreeThunk.rejected, (state, action) => {
@@ -318,6 +358,7 @@ export const driveSlice = createSlice({
 export const {
   reset,
   navigateToDriveByPath,
+  navigateToDrivePickerByPath,
   addItemsToUploadQueue,
   updateBatchUploadProgress,
   cleanupUploadProgressMap,

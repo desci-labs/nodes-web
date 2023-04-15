@@ -3,7 +3,6 @@ import {
   DataComponentMetadata,
   ResearchObjectComponentType,
 } from "@desci-labs/desci-models";
-import { DatasetMetadataInfo, MetaStaging } from "../PaneDrive";
 
 export enum FileType {
   DIR = "dir",

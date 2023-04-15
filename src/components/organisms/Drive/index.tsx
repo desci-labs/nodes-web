@@ -1,7 +1,5 @@
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import React, { useMemo, useRef, useState } from "react";
-import StatusInfo from "./StatusInfo";
 import { DriveNonComponentTypes, DriveObject, FileDir } from "./types";
 import DriveRow from "./DriveRow";
 import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
@@ -14,6 +12,7 @@ import { useSetter } from "@src/store/accessors";
 import "./styles.scss";
 import DriveBreadCrumbs from "@src/components/molecules/DriveBreadCrumbs";
 import ComponentUseModal from "@src/components/molecules/ComponentUseModal";
+import { useManuscriptController } from "../ManuscriptReader/ManuscriptController";
 
 const Empty = () => {
   return <div className="p-5 text-xs col-span-7">No files</div>;
@@ -23,30 +22,13 @@ export const everyRow =
   "flex items-center justify-center w-full px-3 border-b border-[#555659] h-12 driveRow";
 const headerRow = "!h-14 bg-black driveRowHeader";
 
-enum ColWidths {
-  STARRED = "50px",
-  FILE_NAME = "2fr",
-  LAST_MODIFIED = "minmax(auto, 1fr)",
-  STATUS = "minmax(auto, 1fr)",
-  FILE_SIZE = "minmax(auto, 1fr)",
-  CITE = "50px",
-  USE = "50px",
-}
-
-interface DriveTableProps {
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  // renameComponentId: string | null;
-  // setRenameComponentId: React.Dispatch<React.SetStateAction<string | null>>;
-}
-
-const DriveTable: React.FC<DriveTableProps> = ({ setLoading }) => {
-  const { setIsAddingComponent, setAddFilesWithoutContext } =
-    useManuscriptController([]);
-
+const DriveTable: React.FC = () => {
   const { publicView, mode } = useNodeReader();
-
+  const { setAddFilesWithoutContext, setIsAddingComponent } =
+    useManuscriptController();
   const { currentDrive, deprecated, breadCrumbs, fileBeingUsed } = useDrive();
   const dispatch = useSetter();
+
   const [selected, setSelected] = useState<
     Record<number, ResearchObjectComponentType | DriveNonComponentTypes>
   >({});
@@ -118,14 +100,9 @@ const DriveTable: React.FC<DriveTableProps> = ({ setLoading }) => {
         ref={containerRef}
       >
         <ul
-          className={`bg-neutrals-gray-1 grid list-none font-medium text-sm text-white select-none items-center rounded-t-xl rounded-b-xl h-full`}
-          style={{
-            gridTemplateColumns: `${deprecated ? "" : ColWidths.STARRED} ${
-              ColWidths.FILE_NAME
-            } ${ColWidths.LAST_MODIFIED} ${ColWidths.STATUS} ${
-              ColWidths.FILE_SIZE
-            } ${ColWidths.CITE} ${ColWidths.USE}`,
-          }}
+          className={`drive-row-container ${
+            deprecated ? "drive-deprecated" : ""
+          } bg-neutrals-gray-1 grid list-none font-medium text-sm text-white select-none items-center rounded-t-xl rounded-b-xl h-full`}
         >
           <li
             className={`${everyRow} ${headerRow} ${deprecated ? "hidden" : ""}`}
@@ -139,12 +116,14 @@ const DriveTable: React.FC<DriveTableProps> = ({ setLoading }) => {
           <li className={`${everyRow} ${headerRow} !justify-start`}>
             File Name
           </li>
-          <li className={`${everyRow} ${headerRow}`}>Last Modified</li>
+          <li className={`${everyRow} ${headerRow} col-last-modified`}>
+            Last Modified
+          </li>
 
           <li
             data-tip={""}
             data-for="status"
-            className={`${everyRow} ${headerRow}`}
+            className={`${everyRow} ${headerRow} col-status`}
           >
             Status
           </li>
@@ -174,7 +153,6 @@ const DriveTable: React.FC<DriveTableProps> = ({ setLoading }) => {
             <Empty />
           )}
         </ul>
-        <StatusInfo />
       </div>
       {fileBeingUsed && (
         <ComponentUseModal isOpen={true} file={fileBeingUsed} />

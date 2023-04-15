@@ -5,7 +5,6 @@ import {
   getAllTrees,
   manifestToVirtualDrives,
 } from "@components/driveUtils";
-import { BreadCrumb } from "@components/molecules/DriveBreadCrumbs";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import {
@@ -23,6 +22,14 @@ import { useEffect, useState } from "react";
 import ReactTooltip from "react-tooltip";
 import { DriveNonComponentTypes, DriveObject, FileType } from "./Drive";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import { BreadCrumb } from "@src/state/drive/types";
+import {
+  navigateToDriveByPath,
+  navigateToDrivePickerByPath,
+} from "@src/state/drive/driveSlice";
+import { Reducer } from "@reduxjs/toolkit";
+import { useDrive } from "@src/state/drive/hooks";
+import { useSetter } from "@src/store/accessors";
 
 export interface FileDir {
   name: string;
@@ -47,96 +54,35 @@ const DriveTable: React.FC<DriveTableProps> = ({
   onRequestClose,
   onInsert,
 }) => {
-  const [breadCrumbs, setBreadCrumbs] = useState<BreadCrumb[]>([]);
-  // const [fullDirectory, setFullDirectory] = useState<
-  //   Array<FileDir | DriveObject>
-  // >([]);
-  const [directory, setDirectory] = useState<DriveObject[]>([]);
-  const [, /* nodeDrived */ setNodeDrived] = useState<DriveObject | null>();
+  const dispatch = useSetter();
+  const { currentDrivePicker, breadCrumbsPicker } = useDrive();
 
-  const {
-    manifest: manifestData,
-    currentObjectId,
-    publicView,
-    manifestCid,
-  } = useNodeReader();
-
-  const [selected, setSelected] = useState<number | undefined>();
+  const [selected, setSelected] = useState<number | undefined>(undefined);
 
   function exploreDirectory(
     name: FileDir["name"] | DriveObject["name"],
     drive: DriveObject
   ) {
-    setDirectory(drive.contains!);
+    dispatch(navigateToDrivePickerByPath({ path: drive.path! }));
     setSelected(undefined);
-    setBreadCrumbs([...breadCrumbs, { name: name, drive: drive }]);
   }
 
   function eatBreadCrumb(index: number) {
-    if (index === 0) {
-      setDirectory(breadCrumbs[0].drive.contains!);
-      setSelected(undefined);
-      setBreadCrumbs(breadCrumbs.slice(0, 1));
-    }
-
-    if (index !== 0) {
-      setDirectory(breadCrumbs[index - 1].drive.contains!);
-      setSelected(undefined);
-      setBreadCrumbs(breadCrumbs.slice(0, index));
-    }
+    dispatch(
+      navigateToDrivePickerByPath({ path: breadCrumbsPicker[index - 1].path! })
+    );
+    setSelected(undefined);
   }
 
   useEffect(() => {
-    if (!manifestData?.components) return;
-    const localNodeDrived = manifestToVirtualDrives(manifestData, manifestCid!);
-    if (setNodeDrived) setNodeDrived(localNodeDrived);
-    // setFullDirectory(nodeDrived.contains!);
-
-    if (setNodeDrived)
-      setNodeDrived((nodeDrived) => {
-        console.log("does it run");
-        if (!nodeDrived) return nodeDrived;
-        setDirectory(nodeDrived.contains!);
-        setBreadCrumbs([{ name: "Research Node", drive: nodeDrived }]);
-
-        const fetchTrees = async () => {
-          // const newNodeDrived = await getAllTrees(nodeDrived);
-          //getAllTrees mutates nodeDrived
-          await getAllTrees(nodeDrived, currentObjectId!, manifestData, {
-            public: publicView,
-          });
-          // const { contains } =
-          // if (!contains) return;
-
-          // setDirectory(contains);
-          // if (breadCrumbs[0]?.directory) breadCrumbs[0].directory = contains;
-          // if (breadCrumbs[1]?.name === "Data") breadCrumbs[1].directory = contains;
-
-          //fill sizes
-          setDirectory((old: DriveObject[]) => {
-            const isNodeRoot = old.findIndex(
-              (fd) => fd.name === "Research Reports"
-            );
-            if (isNodeRoot === -1) return old;
-
-            const virtualData = createVirtualDrive({
-              name: "Data",
-              componentType: ResearchObjectComponentType.DATA,
-              contains: old,
-            });
-            const sizesFilledDrive = fillOuterSizes(virtualData);
-            const newDir = [...sizesFilledDrive.contains!];
-            return newDir;
-          });
-        };
-        fetchTrees();
-
-        return nodeDrived;
-      });
-  }, [currentObjectId, manifestCid, manifestData, publicView]);
-
-  useEffect(() => {
     ReactTooltip.rebuild();
+
+    // reset to root on close
+    return () => {
+      dispatch(
+        navigateToDrivePickerByPath({ path: breadCrumbsPicker[0].path! })
+      );
+    };
   }, []);
 
   function toggleSelected(
@@ -155,16 +101,16 @@ const DriveTable: React.FC<DriveTableProps> = ({
       {/* <DriveBreadCrumbs crumbs={breadCrumbs} eatBreadCrumb={eatBreadCrumb} /> */}
       <div className="p-4 border-b border-neutrals-gray-7 flex flex-row items-center justify-between">
         <span className="flex flex-row items-center">
-          {breadCrumbs.length > 1 ? (
+          {breadCrumbsPicker.length > 1 ? (
             <span
               className="pr-2 cursor-pointer"
-              onClick={() => eatBreadCrumb(breadCrumbs.length - 1)}
+              onClick={() => eatBreadCrumb(breadCrumbsPicker.length - 1)}
             >
               <IconChevronLeft height={14} stroke={"black"} className="mr-2" />
             </span>
           ) : null}
           <span className="font-bold">
-            {breadCrumbs[breadCrumbs.length - 1]?.name}
+            {breadCrumbsPicker[breadCrumbsPicker.length - 1]?.name}
           </span>
         </span>
         <IconX
@@ -175,25 +121,11 @@ const DriveTable: React.FC<DriveTableProps> = ({
         />
       </div>
       <div className="h-full w-full outline-none">
-        <ReactTooltip
-          id="status"
-          place="bottom"
-          backgroundColor="black"
-          // effect="solid"
-        >
-          <strong>Public:</strong> Published node component. Available publicly
-          on IPFS
-          <br />
-          <strong>Private:</strong> Unpublishd node component. Uploaded
-          privately on staging IPFS server <br />
-          <strong>Partial:</strong> Node or folder includes public and private
-          components
-        </ReactTooltip>
-        {directory.length ? (
-          directory.map((f: any, idx) => {
+        {currentDrivePicker?.contains?.length ? (
+          currentDrivePicker.contains.map((f: DriveObject, idx: number) => {
             return (
               <DriveRow
-                key={`drive_row_${f.cid || idx}`}
+                key={`drive_row_${f.cid || f.name}`}
                 file={f}
                 exploreDirectory={exploreDirectory}
                 index={idx}
@@ -210,9 +142,11 @@ const DriveTable: React.FC<DriveTableProps> = ({
       <div className="flex flex-row justify-end items-center p-3 border-t border-neutrals-gray-7">
         <PrimaryButton
           title="Insert"
-          onClick={() =>
-            selected !== undefined && onInsert(directory[selected])
-          }
+          onClick={() => {
+            setSelected(undefined);
+            selected !== undefined &&
+              onInsert(currentDrivePicker?.contains![selected]!);
+          }}
           disabled={selected === undefined}
           className="py-1"
         >
@@ -274,7 +208,9 @@ function DriveRow({
         }`}
       onClick={(e) => {
         e.stopPropagation();
-        toggleSelected(index, file.componentType);
+        if (!file.contains) {
+          toggleSelected(index, file.componentType);
+        }
       }}
     >
       <li

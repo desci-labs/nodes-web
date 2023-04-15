@@ -1,14 +1,9 @@
 import DropTargetFullScreen from "@components/atoms/DropTargetFullScreen";
 import SpacerHorizontal from "@components/atoms/SpacerHorizontal";
-import {
-  generateFlatPathUidMap,
-  SessionStorageKeys,
-} from "@components/driveUtils";
 import SidePanelStorage from "@components/molecules/SidePanelStorage";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { __log } from "@components/utils";
-import { DataComponentMetadata } from "@desci-labs/desci-models";
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import DriveTable, { DriveObject } from "./Drive";
 import toast from "react-hot-toast";
@@ -18,32 +13,6 @@ import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { useDrive } from "@src/state/drive/hooks";
 import { addFilesToDrive } from "@src/state/drive/driveSlice";
-
-export interface DatasetMetadataInfo {
-  prepopulateFromName?: string;
-  prepopulateMetadata?: DataComponentMetadata;
-  componentsSelected?: string[];
-  rootCid?: string;
-}
-
-export interface MetaStaging {
-  index?: number | string;
-  file: DriveObject;
-}
-
-export interface UpdateDataContext {
-  path: string;
-  rootCid: string;
-}
-
-export interface NodeDriveSetter {
-  setDirectory: React.Dispatch<React.SetStateAction<DriveObject[]>>; //(directory: DriveObject[]) => void;
-  setRenameComponentId: React.Dispatch<React.SetStateAction<string | null>>;
-}
-export const nodeDriveSetContext = createContext<NodeDriveSetter>({
-  setDirectory: () => {},
-  setRenameComponentId: () => {},
-});
 
 const PaneDrive = () => {
   const {
@@ -55,8 +24,7 @@ const PaneDrive = () => {
   const dispatch = useSetter();
   const { isDraggingFiles, currentObjectId } = useNodeReader();
 
-  const { nodeTree, status, currentDrive, fileMetadataBeingEdited } =
-    useDrive();
+  const { nodeTree, status, currentDrive } = useDrive();
 
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -65,9 +33,6 @@ const PaneDrive = () => {
   }, [loading, status]);
 
   const directoryRef = useRef<DriveObject[]>();
-  useEffect(() => {
-    directoryRef.current = currentDrive?.contains;
-  }, [currentDrive?.contains]);
 
   // handle file drop
   useEffect(() => {
@@ -117,37 +82,6 @@ const PaneDrive = () => {
     };
   }, []);
 
-  //Maybe neccessary for deprecated tree
-  useEffect(() => {
-    return () => {
-      //save pathUidMap
-      if (componentUnmounting) {
-        if (nodeTree) {
-          const pathUidMap = generateFlatPathUidMap(nodeTree);
-          sessionStorage.setItem(
-            "Drive::pathUidMap",
-            JSON.stringify(pathUidMap)
-          );
-        }
-        if (currentObjectId) {
-          sessionStorage.setItem(
-            SessionStorageKeys.lastNodeId,
-            JSON.stringify(currentObjectId!)
-          );
-        }
-        if (currentDrive?.contains?.length) {
-          const dirUid = currentDrive.uid;
-          if (dirUid)
-            sessionStorage.setItem(
-              SessionStorageKeys.lastDirUid,
-              JSON.stringify(dirUid)
-            );
-        }
-        componentUnmounting.current = false;
-      }
-    };
-  }, [nodeTree, currentObjectId]);
-
   return (
     <ContextMenuProvider>
       <div className="flex flex-col relative">
@@ -165,7 +99,7 @@ const PaneDrive = () => {
           <h1 className="text-[28px] font-bold text-white">Node Drive</h1>
           <SpacerHorizontal />
           <div id="tableWrapper" className="mt-5 h-full">
-            <DriveTable setLoading={setLoading} />
+            <DriveTable />
           </div>
         </PerfectScrollbar>
         <SidePanelStorage />
@@ -175,9 +109,9 @@ const PaneDrive = () => {
 };
 export default PaneDrive;
 
-export function useDriveUpdater() {
-  const context = useContext(nodeDriveSetContext);
-  if (!context)
-    throw Error("Cannot access Drive Provider outside of <PaneDrive>");
-  return context;
-}
+// export function useDriveUpdater() {
+//   const context = useContext(nodeDriveSetContext);
+//   if (!context)
+//     throw Error("Cannot access Drive Provider outside of <PaneDrive>");
+//   return context;
+// }

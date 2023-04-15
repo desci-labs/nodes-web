@@ -2,23 +2,15 @@ import { DriveObject, FileType } from "../types";
 import { Actions } from "./types";
 import {
   ResearchObjectComponentType,
-  ResearchObjectV1,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 import { isRootComponentDrive } from "@src/components/driveUtils";
-import { deleteDatasetComponent } from "@src/api";
-import { useDriveUpdater } from "../../PaneDrive";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useDispatch } from "react-redux";
 import { setComponentStack, setManifestData } from "@src/state/nodes/viewer";
-import { useDriveContext } from "./Index";
 import { useSetter } from "@src/store/accessors";
-import {
-  assignTypeThunk,
-  setFileMetadataBeingEdited,
-} from "@src/state/drive/driveSlice";
+import { setFileMetadataBeingEdited } from "@src/state/drive/driveSlice";
 import { setComponentTypeBeingAssignedTo } from "@src/state/drive/driveSlice";
-import { useDrive } from "@src/state/drive/hooks";
 
 const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
 
@@ -30,18 +22,11 @@ export const getActionState = (action: Actions, file: DriveObject) => {
       };
     case Actions.RENAME:
       return {
-        disabled:
-          !(
-            isRootComponentDrive(file)
-            // file.componentType === ResearchObjectComponentType.DATA
-          ),
+        disabled: true,
       };
     case Actions.REMOVE:
       return {
-        disabled: !(
-          isRootComponentDrive(file) &&
-          file.componentType === ResearchObjectComponentType.DATA
-        ),
+        disabled: true,
       };
     case Actions.ASSIGN_TYPE:
       return { disabled: false };
@@ -61,7 +46,6 @@ export const getActionState = (action: Actions, file: DriveObject) => {
 export default function useActionHandler() {
   const dispatch = useDispatch();
   const { manifest: manifestData, currentObjectId } = useNodeReader();
-  const { setDirectory, setRenameComponentId } = useDriveUpdater();
 
   async function preview(file: DriveObject) {
     if (
@@ -82,47 +66,46 @@ export default function useActionHandler() {
   }
 
   async function remove(file: DriveObject) {
-    try {
-      //optimistically remove
-      setDirectory((prev) => {
-        const driveIdx = prev.findIndex((drv) => drv.path === file.path);
-        const newDir = [...prev];
-        newDir.splice(driveIdx, 1);
-        prev.splice(driveIdx, 1);
-        return newDir;
-      });
-      const { manifestCid, manifest } = await deleteDatasetComponent(
-        currentObjectId!,
-        manifestData!,
-        file.cid
-      );
-      if (manifestCid && manifest) {
-        // setManifestData(manifest);
-        // setManifestCid(manifestCid);
-        dispatch(setManifestData({ cid: manifestCid, manifest }));
-      }
-    } catch (e) {
-      //re-add on failure
-      setDirectory((prev) => {
-        const newDir = [...prev, file];
-        return newDir;
-      });
-    }
+    //optimistically remove
+    //   setDirectory((prev) => {
+    //     const driveIdx = prev.findIndex((drv) => drv.path === file.path);
+    //     const newDir = [...prev];
+    //     newDir.splice(driveIdx, 1);
+    //     prev.splice(driveIdx, 1);
+    //     return newDir;
+    //   });
+    //   const { manifestCid, manifest } = await deleteDatasetComponent(
+    //     currentObjectId!,
+    //     manifestData!,
+    //     file.cid
+    //   );
+    //   if (manifestCid && manifest) {
+    //     // setManifestData(manifest);
+    //     // setManifestCid(manifestCid);
+    //     dispatch(setManifestData({ cid: manifestCid, manifest }));
+    //   }
+    // } catch (e) {
+    //   //re-add on failure
+    //   setDirectory((prev) => {
+    //     const newDir = [...prev, file];
+    //     return newDir;
+    //   });
+    // }
   }
 
   async function rename(file: DriveObject) {
     //TODO: in the future a similar action as below may be required for code components, or any component where cid !== id
-    if (
-      file.componentType === ResearchObjectComponentType.DATA &&
-      manifestData
-    ) {
-      const comp = manifestData.components.find(
-        (c: ResearchObjectV1Component) => c.payload.cid === file.cid
-      );
-      if (comp) setRenameComponentId(comp.id);
-      return;
-    }
-    setRenameComponentId(file.cid);
+    // if (
+    //   file.componentType === ResearchObjectComponentType.DATA &&
+    //   manifestData
+    // ) {
+    //   const comp = manifestData.components.find(
+    //     (c: ResearchObjectV1Component) => c.payload.cid === file.cid
+    //   );
+    //   if (comp) setRenameComponentId(comp.id);
+    //   return;
+    // }
+    // setRenameComponentId(file.cid);
   }
 
   async function assignType(file: DriveObject) {
