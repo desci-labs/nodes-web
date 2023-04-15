@@ -25,7 +25,10 @@ import { useInteractionHandler } from "./ContextMenu/useActionHandler";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { everyRow } from ".";
 import "./styles.scss";
-import { starComponentThunk } from "@src/state/drive/driveSlice";
+import {
+  setFileBeingUsed,
+  starComponentThunk,
+} from "@src/state/drive/driveSlice";
 import { useSetter } from "@src/store/accessors";
 import { COMPONENT_LIBRARY, UiComponentDefinition } from "../ComponentLibrary";
 
@@ -184,9 +187,7 @@ export default function DriveRow({
           disabled={!canUse}
           className="p-0 min-w-[28px] h-7"
           onClick={() => {
-            // const cid = file.cid ? file.cid : manifestCid ? manifestCid : "";
-            // setUseMenuCids([cid]);
-            // onHandleUse();
+            dispatch(setFileBeingUsed(file));
           }}
         >
           <IconPlayRounded className="p-0" />

@@ -1,25 +1,17 @@
-import {
-  ActionCreatorWithPayload,
-  PayloadAction,
-  createAsyncThunk,
-  createSlice,
-} from "@reduxjs/toolkit";
+import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 import { getDatasetTree, updateDag } from "@src/api";
 import { DriveObject, FileType } from "@src/components/organisms/Drive";
 import { RequestStatus, RootState } from "@src/store";
 import {
-  CommonComponentPayload,
   ResearchObjectComponentType,
   ResearchObjectV1,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 import {
   createVirtualDrive,
-  DEFAULT_CID_PENDING,
   DRIVE_NODE_ROOT_PATH,
   getAllTrees,
-  ipfsTreeToDriveTree,
   manifestToVirtualDrives,
   SessionStorageKeys,
 } from "@src/components/driveUtils";
@@ -49,7 +41,7 @@ import {
   UpdateBatchUploadProgressAction,
   UploadQueueItem,
 } from "./types";
-import { __log, extractCodeRepoName } from "@src/components/utils";
+import { __log } from "@src/components/utils";
 import {
   addComponent,
   addRecentlyAddedComponent,
@@ -71,6 +63,7 @@ interface DriveState {
   deprecated: boolean | undefined;
   componentTypeBeingAssignedTo: DrivePath | null;
   fileMetadataBeingEdited: DriveObject | null;
+  fileBeingUsed: DriveObject | null;
   breadCrumbs: BreadCrumb[];
 }
 
@@ -86,6 +79,7 @@ const initialState: DriveState = {
   showUploadPanel: false,
   componentTypeBeingAssignedTo: null,
   fileMetadataBeingEdited: null,
+  fileBeingUsed: null,
   breadCrumbs: [],
 };
 
@@ -181,6 +175,12 @@ export const driveSlice = createSlice({
       { payload }: PayloadAction<DriveObject | null>
     ) => {
       state.fileMetadataBeingEdited = payload;
+    },
+    setFileBeingUsed: (
+      state,
+      { payload }: PayloadAction<DriveObject | null>
+    ) => {
+      state.fileBeingUsed = payload;
     },
     addBreadCrumb: (state, { payload }: PayloadAction<BreadCrumb>) => {
       state.breadCrumbs.push(payload);
@@ -330,6 +330,7 @@ export const {
   removeBreadCrumbs,
   addBreadCrumb,
   showMetadataForComponent,
+  setFileBeingUsed,
 } = driveSlice.actions;
 
 export interface FetchTreeThunkParams {

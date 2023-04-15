@@ -1,6 +1,6 @@
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import StatusInfo from "./StatusInfo";
 import { DriveNonComponentTypes, DriveObject, FileDir } from "./types";
 import DriveRow from "./DriveRow";
@@ -45,11 +45,8 @@ const DriveTable: React.FC<DriveTableProps> = ({ setLoading }) => {
 
   const { publicView, mode } = useNodeReader();
 
-  const { currentDrive, deprecated, breadCrumbs } = useDrive();
+  const { currentDrive, deprecated, breadCrumbs, fileBeingUsed } = useDrive();
   const dispatch = useSetter();
-  const { componentToUse, setComponentToUse } = useManuscriptController([
-    "componentToUse",
-  ]);
   const [selected, setSelected] = useState<
     Record<number, ResearchObjectComponentType | DriveNonComponentTypes>
   >({});
@@ -179,7 +176,9 @@ const DriveTable: React.FC<DriveTableProps> = ({ setLoading }) => {
         </ul>
         <StatusInfo />
       </div>
-      <ComponentUseModal />
+      {fileBeingUsed && (
+        <ComponentUseModal isOpen={true} file={fileBeingUsed} />
+      )}
       {/* {renameComponentId && (
         <RenameDataModal
           renameComponentId={renameComponentId}

@@ -1,6 +1,5 @@
 import CopyBox, { CodeBox } from "@components/atoms/CopyBox";
 import PrimaryButton from "@components/atoms/PrimaryButton";
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { IconWarning } from "@src/icons";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
@@ -12,43 +11,44 @@ import useComponentDpid from "@src/components/organisms/Drive/hooks/useComponent
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import useActionHandler from "@src/components/organisms/Drive/ContextMenu/useActionHandler";
 import { useRef, useState } from "react";
-import { setFileMetadataBeingEdited } from "@src/state/drive/driveSlice";
+import {
+  setFileBeingUsed,
+  setFileMetadataBeingEdited,
+} from "@src/state/drive/driveSlice";
 import { useSetter } from "@src/store/accessors";
-interface UseModalProps {
-  componentToUse?: DriveObject;
+
+interface ComponentUseModalProps {
+  file: DriveObject;
 }
 
 const ComponentUseModal = ({
-  componentToUse,
+  file,
   ...restProps
-}: ModalProps & UseModalProps) => {
-  const { setComponentToUse } = useManuscriptController(["componentToUse"]);
+}: ModalProps & ComponentUseModalProps) => {
   const { manifest: manifestData } = useNodeReader();
-  const { dpid, fqi, license } = useComponentDpid(componentToUse!);
+  const { dpid, fqi, license } = useComponentDpid(file);
   const handler = useActionHandler();
   const dispatch = useSetter();
-
-  const file = componentToUse;
 
   const handleEditMetadata = () => {
     dispatch(setFileMetadataBeingEdited(file!));
   };
 
   function close() {
-    setComponentToUse(null);
+    dispatch(setFileBeingUsed(null));
     restProps?.onDismiss?.();
   }
 
   const isDpidSupported = !!manifestData?.dpid;
 
-  const pythonImport = componentToUse
-    ? `with desci.fetch([('${componentToUse.name}.py', '${componentToUse.name}')], "${fqi}"):`
+  const pythonImport = file
+    ? `with desci.fetch([('${file.name}.py', '${file.name}')], "${fqi}"):`
     : "";
 
   const canPreview =
-    componentToUse &&
+    file &&
     ResearchObjectComponentType.CODE ===
-      (componentToUse.componentType as ResearchObjectComponentType);
+      (file.componentType as ResearchObjectComponentType);
 
   return (
     <Modal
@@ -139,11 +139,9 @@ const ComponentUseModal = ({
                   className="mt-4 lg:w-full text-center"
                   onClick={() => {
                     const c =
-                      componentToUse?.type === FileType.FILE
-                        ? componentToUse
-                        : componentToUse?.contains?.find(
-                            (c) => c.type === FileType.FILE
-                          );
+                      file?.type === FileType.FILE
+                        ? file
+                        : file?.contains?.find((c) => c.type === FileType.FILE);
                     handler["PREVIEW"]?.(c!);
                     close();
                   }}

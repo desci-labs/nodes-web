@@ -245,16 +245,6 @@ const AddComponentPopOver = (
         })
       );
 
-      //Maybe still necessary
-      // if (!currentObjectId) {
-      //   /**
-      //    * If adding this component triggers a new node creation, redirect to the new node
-      //    */
-
-      //   dispatch(setCurrentObjectId(res.node.uuid));
-      //   navigate(`/nodes/${RESEARCH_OBJECT_NODES_PREFIX}${res.node.uuid}`);
-      // }
-
       const components = manifestData?.components!;
       dispatch(setComponentStack([components[components.length - 1]]));
       close(true);
