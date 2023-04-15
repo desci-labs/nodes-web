@@ -3,7 +3,7 @@ import React from "react";
 interface Props {
   disabled?: boolean;
   className?: string;
-  onClick?: () => void;
+  onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
   children: JSX.Element | string;
 }
 

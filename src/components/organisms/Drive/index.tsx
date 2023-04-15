@@ -154,9 +154,6 @@ const DriveTable: React.FC = () => {
           )}
         </ul>
       </div>
-      {fileBeingUsed && (
-        <ComponentUseModal isOpen={true} file={fileBeingUsed} />
-      )}
       {/* {renameComponentId && (
         <RenameDataModal
           renameComponentId={renameComponentId}

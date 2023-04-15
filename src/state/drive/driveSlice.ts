@@ -69,6 +69,7 @@ export interface DriveState {
   componentTypeBeingAssignedTo: DrivePath | null;
   fileMetadataBeingEdited: DriveObject | null;
   fileBeingUsed: DriveObject | null;
+  fileBeingCited: DriveObject | null;
   breadCrumbs: BreadCrumb[];
 
   // drive picker state
@@ -89,6 +90,7 @@ const initialState: DriveState = {
   componentTypeBeingAssignedTo: null,
   fileMetadataBeingEdited: null,
   fileBeingUsed: null,
+  fileBeingCited: null,
   breadCrumbs: [],
   breadCrumbsPicker: [],
   currentDrivePicker: null,
@@ -200,6 +202,12 @@ export const driveSlice = createSlice({
       state.fileMetadataBeingEdited = payload;
     },
     setFileBeingUsed: (
+      state,
+      { payload }: PayloadAction<DriveObject | null>
+    ) => {
+      state.fileBeingUsed = payload;
+    },
+    setFileBeingCited: (
       state,
       { payload }: PayloadAction<DriveObject | null>
     ) => {
@@ -380,6 +388,7 @@ export const {
   addBreadCrumb,
   showMetadataForComponent,
   setFileBeingUsed,
+  setFileBeingCited,
 } = driveSlice.actions;
 
 export interface FetchTreeThunkParams {

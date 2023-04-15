@@ -77,7 +77,6 @@ export default function Editor({ isLoading }: ReaderViewerProps) {
 
         <PopOverAlphaConsent />
 
-        <CitationPopover isOpen={true} />
         <PublicationDetailsModal />
 
         {(isAddingComponent || isAddingSubcomponent) && <ComponentAdd />}

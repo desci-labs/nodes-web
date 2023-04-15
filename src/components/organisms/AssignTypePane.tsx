@@ -29,8 +29,8 @@ const ComponentButton = ({
       className=""
       onClick={() => {
         const driveItem = findDriveByPath(
-          nodeTree,
-          componentTypeBeingAssignedTo
+          nodeTree!,
+          componentTypeBeingAssignedTo!
         );
         if (driveItem)
           dispatch(

@@ -19,6 +19,8 @@ import ComponentMetadataPopover from "../PopOver/ComponentMetadataPopover";
 import { setFileMetadataBeingEdited } from "@src/state/drive/driveSlice";
 import DriveDatasetMetadataPopOver from "@src/components/molecules/DriveDatasetMetadataPopOver";
 import { useSetter } from "@src/store/accessors";
+import ComponentUseModal from "@src/components/molecules/ComponentUseModal";
+import CitationPopover from "../PopOver/CitationPopover";
 
 const ManuscriptWrapper = styled(FlexRow)`
   background-color: #525659;
@@ -43,7 +45,7 @@ const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
   const dispatch = useSetter();
   __log("Render manuscript reader", publicView);
   const { currentObjectId } = useNodeReader();
-  const { fileMetadataBeingEdited } = useDrive();
+  const { fileMetadataBeingEdited, fileBeingUsed, fileBeingCited } = useDrive();
   const { isLoading } = useManuscriptReader(publicView);
 
   // trigger Reader side effects
@@ -97,6 +99,10 @@ const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
             }}
           />
         )}
+      {fileBeingUsed && (
+        <ComponentUseModal isOpen={true} file={fileBeingUsed} />
+      )}
+      {fileBeingCited && <CitationPopover isOpen={true} />}
     </ManuscriptWrapper>
   );
 };

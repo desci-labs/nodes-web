@@ -26,6 +26,7 @@ import { useNodeReader } from "@src/state/nodes/hooks";
 import { everyRow } from ".";
 import "./styles.scss";
 import {
+  setFileBeingCited,
   setFileBeingUsed,
   starComponentThunk,
 } from "@src/state/drive/driveSlice";
@@ -61,9 +62,6 @@ export default function DriveRow({
   const contextRef = useRef<HTMLDivElement>();
   const { init } = useDriveContext(file);
   const { handleDbClick } = useInteractionHandler();
-  const { setShowCitationModal, setComponentToCite } = useManuscriptController([
-    "componentToCite",
-  ]);
   const { manifestCid, mode } = useNodeReader();
 
   const dispatch = useSetter();
@@ -173,8 +171,7 @@ export default function DriveRow({
             )
           }
           onClick={() => {
-            setComponentToCite(file);
-            setShowCitationModal(true);
+            dispatch(setFileBeingCited(file));
           }}
         >
           <IconQuotes />

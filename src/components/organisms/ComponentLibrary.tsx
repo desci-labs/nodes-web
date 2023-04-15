@@ -31,7 +31,7 @@ import {
 
 export interface UiComponentDefinition {
   icon: (
-    props: React.SVGProps<SVGSVGElement> & { wrapperClassName?: string }
+    props?: React.SVGProps<SVGSVGElement> & { wrapperClassName?: string }
   ) => JSX.Element;
   title: string;
   componentType: ResearchObjectComponentType;

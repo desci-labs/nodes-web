@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styled, { StyledComponent } from "styled-components";
 import ButtonCopyLink from "@components/atoms/ButtonCopyLink";
 import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
@@ -29,7 +29,14 @@ import { useNodeReader } from "@src/state/nodes/hooks";
 import {
   navigateToDriveByPath,
   setComponentTypeBeingAssignedTo,
+  setFileBeingCited,
+  setFileBeingUsed,
 } from "@src/state/drive/driveSlice";
+import BlackGenericButton from "../atoms/BlackGenericButton";
+import { IconDrive, IconPlayRounded, IconQuotes } from "@src/icons";
+import { findDriveByPath } from "@src/state/drive/utils";
+import { useDrive } from "@src/state/drive/hooks";
+import { AccessStatus } from "../organisms/Drive";
 
 const CardWrapper: StyledComponent<
   "div",
@@ -99,6 +106,7 @@ const ComponentCard = (props: ComponentCardProps) => {
   const { component } = props;
   const { mode, componentStack } = useNodeReader();
   const { recentlyAddedComponent } = useNodeReader();
+  const { nodeTree } = useDrive();
   /***
    * Use local click tracking for fast click response
    * */
@@ -137,6 +145,13 @@ const ComponentCard = (props: ComponentCardProps) => {
   const sortedAnnotations = [
     ...((component.payload as PdfComponentPayload).annotations || []),
   ].sort((b, a) => (b.pageIndex! - a.pageIndex!) * 10 + (b.startY - a.startY));
+
+  const drive = useMemo(() => {
+    if (nodeTree && isSelected) {
+      return findDriveByPath(nodeTree, component.payload.path);
+    }
+    return null;
+  }, [component.payload.path, nodeTree, isSelected]);
 
   const handleComponentClick = () => {
     setClicked(true);
@@ -183,6 +198,11 @@ const ComponentCard = (props: ComponentCardProps) => {
   }
 
   const Icon = iconFor(component, false);
+
+  const canCite =
+    drive?.accessStatus &&
+    (drive.accessStatus === AccessStatus.PUBLIC ||
+      drive.accessStatus === AccessStatus.PARTIAL);
 
   return (
     <CardWrapper
@@ -241,16 +261,52 @@ const ComponentCard = (props: ComponentCardProps) => {
                   annotations={sortedAnnotations}
                   handleComponentClick={handleComponentClick}
                 />
-                <div className="flex gap-2">
-                  <ButtonFair
-                    isFair={
-                      component.payload.licenseType &&
-                      component.payload.description
-                    }
-                    mode={mode}
-                    component={component}
-                  />
-                  <ButtonCopyLink text={copyLinkUrl} />
+                <div className="flex gap-2 justify-between w-full">
+                  <div id="section-left">
+                    <ButtonFair
+                      isFair={false}
+                      component={component}
+                      text={
+                        drive?.metadata.licenseType ||
+                        component.payload?.licenseType ||
+                        "Unknown"
+                      } //Should only ever hit unknown for deprecated tree
+                      classname="w-auto bg-neutrals-gray-2 px-2 font-medium text-xs h-7"
+                    />
+                  </div>
+                  <div id="section-right" className="flex gap-2">
+                    <BlackGenericButton
+                      disabled={false}
+                      className="p-0"
+                      onClick={(e) => {
+                        e!.stopPropagation();
+                        dispatch(navigateToDriveByPath(component.payload.path));
+                        dispatch(setComponentStack([]));
+                      }}
+                    >
+                      <IconDrive className="p-0 min-w-[28px] scale-[1.2]" />
+                    </BlackGenericButton>
+                    <BlackGenericButton
+                      className="w-7 h-7"
+                      disabled={canCite}
+                      onClick={(e) => {
+                        e!.stopPropagation();
+                        dispatch(setFileBeingCited(drive));
+                      }}
+                    >
+                      <IconQuotes />
+                    </BlackGenericButton>
+                    <BlackGenericButton
+                      disabled={!drive}
+                      className="p-0 min-w-[28px] h-7"
+                      onClick={(e) => {
+                        e!.stopPropagation();
+                        dispatch(setFileBeingUsed(drive));
+                      }}
+                    >
+                      <IconPlayRounded className="p-0" />
+                    </BlackGenericButton>
+                  </div>
                 </div>
               </>
             ) : (
