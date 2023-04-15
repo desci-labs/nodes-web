@@ -56,8 +56,7 @@ const CardWrapper: StyledComponent<
     isHalfSelected ? "border-color: #888 !important; " : ""}
 `;
 const HeaderWrapper = styled(FlexRowSpaceBetween).attrs({
-  className:
-    "border-b-[1px] bg-zinc-200 dark:bg-muted-900 border-muted-300 dark:border-teal",
+  className: "bg-zinc-200 dark:bg-muted-900 border-muted-300 dark:border-teal",
 })`
   align-items: flex-start;
   padding: 0.75rem;
@@ -234,7 +233,7 @@ const ComponentCard = (props: ComponentCardProps) => {
             />
           </span>
         </HeaderWrapper>
-        <FlexRowSpaceBetween>
+        {/* <FlexRowSpaceBetween>
           <div className="flex justify-between dark:bg-muted-700 px-3 py-2 w-full">
             {component.type !== ResearchObjectComponentType.DATA ? (
               <>
@@ -263,7 +262,7 @@ const ComponentCard = (props: ComponentCardProps) => {
               </div>
             )}
           </div>
-        </FlexRowSpaceBetween>
+        </FlexRowSpaceBetween> */}
       </FlexColumn>
     </CardWrapper>
   );
