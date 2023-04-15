@@ -1,4 +1,7 @@
-import { ResearchObjectV1Component } from "@desci-labs/desci-models";
+import {
+  ResearchObjectComponentType,
+  ResearchObjectV1Component,
+} from "@desci-labs/desci-models";
 import CollapsibleSection from "@components/organisms/CollapsibleSection";
 import { useNodeValidator } from "@src/hooks/useNodeValidator";
 import { ComponentTodoItem } from "./TodoItem";
@@ -35,8 +38,9 @@ const NodeMetadata = (props: NodeMetadataProps) => {
       >
         <div>
           {manifestData &&
-            manifestData?.components.map(
-              (component: ResearchObjectV1Component, idx) => (
+            manifestData?.components
+              .filter((a) => a.type != ResearchObjectComponentType.DATA_BUCKET)
+              .map((component: ResearchObjectV1Component, idx) => (
                 <ComponentTodoItem
                   onHandleSelect={() =>
                     dispatch(showMetadataForComponent(component))
@@ -48,8 +52,7 @@ const NodeMetadata = (props: NodeMetadataProps) => {
                   component={component}
                   completed={validationObj.components[component.id]}
                 />
-              )
-            )}
+              ))}
         </div>
       </CollapsibleSection>
     </div>
