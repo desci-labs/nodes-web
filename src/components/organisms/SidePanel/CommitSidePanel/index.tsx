@@ -89,6 +89,11 @@ const CommitSidePanel = (props: CommitSidePanelProps) => {
     }
   }, [isCommitPanelOpen]);
 
+  const closePane = useCallback(
+    () => dispatch(toggleCommitPanel(false)),
+    [dispatch, toggleCommitPanel]
+  );
+
   if (!isCommitPanelOpen) {
     return (
       <Wrapper
@@ -126,10 +131,7 @@ const CommitSidePanel = (props: CommitSidePanelProps) => {
                   <PanelCloseButton
                     panelOrientation={panelOrientation}
                     visible={isCommitPanelOpen}
-                    onClick={
-                      (() => dispatch(toggleCommitPanel(false)),
-                      [dispatch, toggleCommitPanel])
-                    }
+                    onClick={closePane}
                   />
                   <ContentWrapper>
                     <div className="p-4">
