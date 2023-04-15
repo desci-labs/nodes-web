@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { IconZoomIn, IconZoomOut } from "@icons";
 import styled from "styled-components";
 import Control from ".";
@@ -46,7 +46,7 @@ const ZoomControl = (props: ZoomControlProps) => {
           width="20px"
           fill="rgb(241, 241, 241)"
           className="cursor-pointer select-none pl-[1.5px] pr-[3px] hover:fill-neutrals-gray-5"
-          onClick={() => dispatch(zoomOut())}
+          onClick={useCallback(() => dispatch(zoomOut()), [dispatch, zoomOut])}
         />
         <input
           key="zoom-control-box"
@@ -75,7 +75,7 @@ const ZoomControl = (props: ZoomControlProps) => {
           width="20px"
           fill="rgb(241, 241, 241)"
           className="cursor-pointer select-none hover:fill-neutrals-gray-5"
-          onClick={() => dispatch(zoomIn())}
+          onClick={useCallback(() => dispatch(zoomIn()), [dispatch, zoomIn])}
         />
       </Wrapper>
     </Control>

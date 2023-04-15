@@ -1,4 +1,5 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { __log } from "@src/components/utils";
 import adminAnalyticsReducer from "@src/state/analytics/analyticsSlice";
 import { api } from "@src/state/api";
 import { nodesReducer } from "@src/state/nodes/root";
@@ -63,7 +64,7 @@ const persistedReducer = persistReducer(
 export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({serializableCheck: false}).concat([api.middleware]),
+    getDefaultMiddleware({ serializableCheck: false }).concat([api.middleware]),
 });
 
 export const persistor = persistStore(store);
@@ -73,3 +74,11 @@ export type RootState = ReturnType<typeof store.getState>;
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch;
 export type RequestStatus = "idle" | "loading" | "succeeded" | "failed";
+
+const next = store.dispatch;
+store.dispatch = function dispatchAndLog(action: any) {
+  __log("dispatching", action);
+  let result = next(action);
+  __log("next state", store.getState());
+  return result;
+};

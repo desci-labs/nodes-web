@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 
 import cx from "classnames";
@@ -78,7 +78,7 @@ const DigitalSignature = () => {
       </div>
       <WalletManagerModal
         isOpen={openWalet}
-        onDismiss={() => setOpenWallet(false)}
+        onDismiss={useCallback(() => setOpenWallet(false), [setOpenWallet])}
       />
     </div>
   );

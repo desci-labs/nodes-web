@@ -2,7 +2,7 @@ import { LOCALSTORAGE_ORCID_JWT } from "@src/lib/orcIdLib";
 import { clearCookies, clearLocalStorage, isWindows } from "@components/utils";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/solid";
 import jsonwebtoken from "jsonwebtoken";
-import { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import SwirlingUniverse from "@images/swirling-universe.png";
 import "./style.scss";
 import { useWeb3React } from "@web3-react/core";
@@ -33,6 +33,20 @@ interface Props {
   name: string;
   address?: string;
 }
+
+const FlippedChevron = React.memo(({ open }: { open: boolean }) => {
+  return open ? (
+    <ChevronUpIcon
+      className="-mr-1 ml-1 h-5 w-5 text-gray-100 mt-0.5"
+      aria-hidden="true"
+    />
+  ) : (
+    <ChevronDownIcon
+      className="-mr-1 ml-1 h-5 w-5text-gray-100 mt-0.5"
+      aria-hidden="true"
+    />
+  );
+});
 
 const UserMenu = (props: Props) => {
   const dispatch = useSetter();
@@ -92,6 +106,10 @@ const UserMenu = (props: Props) => {
 
   const menuRef = useRef<HTMLDivElement>();
 
+  const handleReferralButtonClick = useCallback(() => {
+    setOpen((opened) => true);
+  }, [setOpen]);
+
   return (
     <div
       ref={(el) => {
@@ -146,17 +164,7 @@ const UserMenu = (props: Props) => {
               My Account
             </div>
             <div>
-              {open ? (
-                <ChevronUpIcon
-                  className="-mr-1 ml-1 h-5 w-5 text-gray-100 mt-0.5"
-                  aria-hidden="true"
-                />
-              ) : (
-                <ChevronDownIcon
-                  className="-mr-1 ml-1 h-5 w-5text-gray-100 mt-0.5"
-                  aria-hidden="true"
-                />
-              )}
+              <FlippedChevron open={open} />
             </div>
           </button>
         </div>
@@ -262,20 +270,16 @@ const UserMenu = (props: Props) => {
               </button>
               <WalletManagerModal
                 isOpen={openWalet}
-                onDismiss={() => {
+                onDismiss={useCallback(() => {
                   setOpen((opened) => !opened);
                   setOpenWallet(false);
-                }}
+                }, [setOpen, setOpenWallet])}
               />
             </div>
           </div>
 
           {process.env.REACT_APP_ENABLE_FRIEND_REFERRAL ? (
-            <FriendReferralButton
-              onHandleClick={() => {
-                setOpen((opened) => true);
-              }}
-            />
+            <FriendReferralButton onHandleClick={handleReferralButtonClick} />
           ) : null}
           <div className="py-0">
             <NavLink
@@ -330,13 +334,13 @@ const UserMenu = (props: Props) => {
         </div>
       </>
       <ReferAFriendModal
-        onClose={() => {
+        onClose={useCallback(() => {
           dispatch(setShowReferralModal(false));
           setOpen((opened) => !opened);
-        }}
+        }, [setOpen, dispatch, setShowReferralModal])}
       />
     </div>
   );
 };
 
-export default UserMenu;
+export default React.memo(UserMenu);

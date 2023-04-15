@@ -1,5 +1,5 @@
 import WalletManager from "@components/organisms/WalletManager";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 
 const WalletManagerModal = (props: ModalProps) => {
@@ -44,4 +44,4 @@ const WalletManagerModal = (props: ModalProps) => {
   );
 };
 
-export default WalletManagerModal;
+export default React.memo(WalletManagerModal);

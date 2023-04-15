@@ -263,4 +263,4 @@ const ComponentCard = (props: ComponentCardProps) => {
   );
 };
 
-export default ComponentCard;
+export default React.memo(ComponentCard);
