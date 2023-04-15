@@ -2,7 +2,7 @@ import ButtonMysterious from "@src/components/atoms/ButtonMysterious";
 import FloatingActionBar from "@src/components/molecules/FloatingActionBar";
 import { useSetter } from "@src/store/accessors";
 import { setHeaderHidden } from "@src/state/preferences/preferencesSlice";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import CitationPopover from "@src/components/organisms/PopOver/CitationPopover";
 import ManuscriptSidePanel from "@src/components/organisms/SidePanel/ManuscriptSidePanel";
 import Toolbar from "@src/components/organisms/Toolbar";
@@ -27,6 +27,10 @@ export default function Reader({ isLoading }: ReaderViewerProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleClose = useCallback(() => {
+    dispatch(setHeaderHidden(true));
+  }, [dispatch, setHeaderHidden]);
+
   return (
     <>
       {isLoading && <Placeholder isLoading />}
@@ -37,11 +41,7 @@ export default function Reader({ isLoading }: ReaderViewerProps) {
           <Toolbar />
           <CitationPopover isOpen={true} />
           {!isLoading && !!manifestData && (
-            <ManuscriptSidePanel
-              onClose={() => {
-                dispatch(setHeaderHidden(true));
-              }}
-            />
+            <ManuscriptSidePanel onClose={handleClose} />
           )}
           {!isLoading && <ButtonMysterious />}
           {componentStack.length > 0 ? <FloatingActionBar /> : null}

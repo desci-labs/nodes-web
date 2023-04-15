@@ -1,6 +1,6 @@
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { ResearchObjectV1Component } from "@desci-labs/desci-models";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 import ComponentMetadataPopover from "@components/organisms/PopOver/ComponentMetadataPopover";
 import CollapsibleSection from "@components/organisms/CollapsibleSection";
@@ -84,7 +84,7 @@ const General = (props: GeneralProps) => {
       {/* {showProfileUpdater && <ProfilePopOver onClose={() => {}} />} */}
       <WalletManagerModal
         isOpen={openWalet}
-        onDismiss={() => setOpenWallet(false)}
+        onDismiss={useCallback(() => setOpenWallet(false), [setOpenWallet])}
       />
       {selectedComponent && (
         <ComponentMetadataPopover

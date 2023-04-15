@@ -57,4 +57,4 @@ const ManifestUpdater = ({
   return null;
 };
 
-export default ManifestUpdater;
+export default React.memo(ManifestUpdater);

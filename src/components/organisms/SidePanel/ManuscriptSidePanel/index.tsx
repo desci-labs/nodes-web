@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
 import SidePanel from "@components/organisms/SidePanel";
@@ -161,175 +161,181 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
   const isResearchPanelReallyOpen =
     isResearchPanelOpen || componentStack.length < 1;
 
-    const canShowDrive = !publicView && userProfile.userId > 0;
-    return (
-      <ManuscriptSidePanelContainer
-        id="manuscript-side-panel"
-        orientation="right"
-        isOpen={isResearchPanelReallyOpen}
-        width={320}
-      >
-        <ContentWrapper>
-          {showCloseButton ? (
-            <PanelCloseButton
-              visible={isResearchPanelReallyOpen}
-              onClick={() => {
-                if (componentStack.length > 1 && isCodeActive) {
-                  dispatch(popFromComponentStack());
-                } else {
-                  dispatch(toggleResearchPanel(false));
-                  onClose();
+  const canShowDrive = !publicView && userProfile.userId > 0;
+
+  const handlePanelClose = useCallback(() => {
+    if (componentStack.length > 1 && isCodeActive) {
+      dispatch(popFromComponentStack());
+    } else {
+      dispatch(toggleResearchPanel(false));
+      onClose();
+    }
+  }, [
+    dispatch,
+    popFromComponentStack,
+    componentStack,
+    toggleResearchPanel,
+    onClose,
+    isCodeActive,
+  ]);
+
+  return (
+    <ManuscriptSidePanelContainer
+      id="manuscript-side-panel"
+      orientation="right"
+      isOpen={isResearchPanelReallyOpen}
+      width={320}
+    >
+      <ContentWrapper>
+        {showCloseButton ? (
+          <PanelCloseButton
+            visible={isResearchPanelReallyOpen}
+            onClick={handlePanelClose}
+          />
+        ) : null}
+
+        <ManuscriptHeader>
+          <ManuscriptTitle>
+            {mode === "editor" ? <>Edit Node</> : "Research Node Navigator"}
+          </ManuscriptTitle>
+          {/* <IconResearchObject /> */}
+        </ManuscriptHeader>
+        <div
+          className={` relative overflow-hidden z-[-1]`}
+          style={{ height: 276 }}
+        >
+          <div
+            className={`overflow-hidden relative w-[420px] h-[260px]`}
+            key={`cube-wrapper-${mode}-${shouldBeBlue}`}
+            style={{
+              filter: `${
+                mode === "reader" || shouldBeBlue
+                  ? null
+                  : "sepia(1.0) saturate(0)"
+              }`,
+            }}
+          >
+            <video
+              loop
+              ref={refVideo}
+              playsInline
+              autoPlay
+              key={`cube-panel`}
+              muted
+              onTimeUpdate={() => {
+                if (refVideo.current) {
+                  playTime = (refVideo.current! as HTMLVideoElement)
+                    .currentTime;
                 }
               }}
+              src={`https://d3ibh1pfr1vlpk.cloudfront.net/two.mp4`}
+              className="absolute"
+              style={{
+                left: "-50px",
+                height: 260,
+                top: -35,
+              }}
+            ></video>
+          </div>
+        </div>
+        <PrimaryButton
+          disabled={isCommitPanelOpen}
+          className={`${
+            mode === "reader"
+              ? "opacity-0 h-0 !mx-0 !py-0 overflow-hidden"
+              : "opacity-100 mt-4 mx-4 py-1 shadow-md hover:shadow-none"
+          } block transition-all duration-200 text-sm font-medium`}
+          // disabled={!changesToCommit.length} // uncomment when this func is implemented
+          onClick={() => {
+            dispatch(toggleCommitPanel(true));
+          }}
+          style={{ marginRight: doPad ? 35 : undefined }}
+        >
+          {isCommitPanelOpen ? "Finish in Commit Panel (Left)" : "Publish Node"}
+        </PrimaryButton>
+        <div className="px-4" style={{ marginRight: doPad ? 15 : undefined }}>
+          <SwitchBar style={{ margin: "1rem 0 1rem 0", height: 28 }}>
+            <SwitchButton
+              isSelected={researchPanelTab === ResearchTabs.current}
+              onClick={() => onSetResearchPanelTab(ResearchTabs.current)}
+            >
+              <p className="text-xs flex justify-center items-center h-full">
+                Current
+              </p>
+            </SwitchButton>
+            <SwitchButton
+              isSelected={researchPanelTab === ResearchTabs.history}
+              onClick={() => onSetResearchPanelTab(ResearchTabs.history)}
+            >
+              <p className="text-xs flex justify-center items-center h-full">
+                History
+              </p>
+            </SwitchButton>
+            <SwitchButton
+              isSelected={researchPanelTab === ResearchTabs.source}
+              onClick={() => onSetResearchPanelTab(ResearchTabs.source)}
+            >
+              <p className="text-xs flex justify-center items-center h-full">
+                Source
+              </p>
+            </SwitchButton>
+          </SwitchBar>
+        </div>
+
+        <PerfectScrollbar className="overflow-auto">
+          {canShowDrive && researchPanelTab === ResearchTabs.current ? (
+            <NodeDrive
+              className={`mb-4 ${doPad ? "w-[calc(100%-16px)]" : "w-full"}`}
             />
           ) : null}
-
-          <ManuscriptHeader>
-            <ManuscriptTitle>
-              {mode === "editor" ? <>Edit Node</> : "Research Node Navigator"}
-            </ManuscriptTitle>
-            {/* <IconResearchObject /> */}
-          </ManuscriptHeader>
-          <div
-            className={` relative overflow-hidden z-[-1]`}
-            style={{ height: 276 }}
-          >
-            <div
-              className={`overflow-hidden relative w-[420px] h-[260px]`}
-              key={`cube-wrapper-${mode}-${shouldBeBlue}`}
-              style={{
-                filter: `${
-                  mode === "reader" || shouldBeBlue
-                    ? null
-                    : "sepia(1.0) saturate(0)"
-                }`,
-              }}
-            >
-              <video
-                loop
-                ref={refVideo}
-                playsInline
-                autoPlay
-                key={`cube-panel`}
-                muted
-                onTimeUpdate={() => {
-                  if (refVideo.current) {
-                    playTime = (refVideo.current! as HTMLVideoElement)
-                      .currentTime;
-                  }
-                }}
-                src={`https://d3ibh1pfr1vlpk.cloudfront.net/two.mp4`}
-                className="absolute"
-                style={{
-                  left: "-50px",
-                  height: 260,
-                  top: -35,
-                }}
-              ></video>
-            </div>
-          </div>
-          <PrimaryButton
-            disabled={isCommitPanelOpen}
-            className={`${
-              mode === "reader"
-                ? "opacity-0 h-0 !mx-0 !py-0 overflow-hidden"
-                : "opacity-100 mt-4 mx-4 py-1 shadow-md hover:shadow-none"
-            } block transition-all duration-200 text-sm font-medium`}
-            // disabled={!changesToCommit.length} // uncomment when this func is implemented
-            onClick={() => {
-              dispatch(toggleCommitPanel(true));
-            }}
-            style={{ marginRight: doPad ? 35 : undefined }}
-          >
-            {isCommitPanelOpen
-              ? "Finish in Commit Panel (Left)"
-              : "Publish Node"}
-          </PrimaryButton>
-          <div className="px-4" style={{ marginRight: doPad ? 15 : undefined }}>
-            <SwitchBar style={{ margin: "1rem 0 1rem 0", height: 28 }}>
-              <SwitchButton
-                isSelected={researchPanelTab === ResearchTabs.current}
-                onClick={() => onSetResearchPanelTab(ResearchTabs.current)}
-              >
-                <p className="text-xs flex justify-center items-center h-full">
-                  Current
-                </p>
-              </SwitchButton>
-              <SwitchButton
-                isSelected={researchPanelTab === ResearchTabs.history}
-                onClick={() => onSetResearchPanelTab(ResearchTabs.history)}
-              >
-                <p className="text-xs flex justify-center items-center h-full">
-                  History
-                </p>
-              </SwitchButton>
-              <SwitchButton
-                isSelected={researchPanelTab === ResearchTabs.source}
-                onClick={() => onSetResearchPanelTab(ResearchTabs.source)}
-              >
-                <p className="text-xs flex justify-center items-center h-full">
-                  Source
-                </p>
-              </SwitchButton>
-            </SwitchBar>
-          </div>
-
-          <PerfectScrollbar className="overflow-auto">
-            {canShowDrive && researchPanelTab === ResearchTabs.current ? (
-              <NodeDrive
-                className={`mb-4 ${doPad ? "w-[calc(100%-16px)]" : "w-full"}`}
-              />
+          <div className={`pl-4 ${doPad ? "pr-8" : "pr-4"}`}>
+            {researchPanelTab === ResearchTabs.current ? (
+              <>
+                <ManuscriptAttributesSection />
+                {/* <ManuscriptValidationSection /> */}
+                <ManuscriptComponentsSection />
+              </>
             ) : null}
-            <div className={`pl-4 ${doPad ? "pr-8" : "pr-4"}`}>
-              {researchPanelTab === ResearchTabs.current ? (
-                <>
-                  <ManuscriptAttributesSection />
-                  {/* <ManuscriptValidationSection /> */}
-                  <ManuscriptComponentsSection />
-                </>
-              ) : null}
-              {researchPanelTab === ResearchTabs.history ? (
-                <HistoryTab />
-              ) : null}
-              {researchPanelTab === ResearchTabs.source ? <SourceTab /> : null}
-              {isAdmin ? (
-                <>
-                  <div
-                    className="text-xs text-gray-500 cursor-pointer text-right fixed bottom-1 right-4 z-0 w-20"
-                    onClick={() => setShowManifest(!showManifest)}
-                  >
-                    debug
+            {researchPanelTab === ResearchTabs.history ? <HistoryTab /> : null}
+            {researchPanelTab === ResearchTabs.source ? <SourceTab /> : null}
+            {isAdmin ? (
+              <>
+                <div
+                  className="text-xs text-gray-500 cursor-pointer text-right fixed bottom-1 right-4 z-0 w-20"
+                  onClick={() => setShowManifest(!showManifest)}
+                >
+                  debug
+                </div>
+                {showManifest ? (
+                  <div className="relative">
+                    <span className="text-[9px]">
+                      tokenId: {convertUUIDToHex(currentObjectId!)}
+                    </span>
+                    <textarea
+                      className="text-black text-xs"
+                      onChange={(e: any) =>
+                        setTempManifestData(JSON.parse(e.target.value))
+                      }
+                    >
+                      {JSON.stringify(tempManifestData)}
+                    </textarea>
+                    <button
+                      onClick={async () => {
+                        await saveManifest(tempManifestData!);
+                        setShowManifest(false);
+                      }}
+                    >
+                      save
+                    </button>
                   </div>
-                  {showManifest ? (
-                    <div className="relative">
-                      <span className="text-[9px]">
-                        tokenId: {convertUUIDToHex(currentObjectId!)}
-                      </span>
-                      <textarea
-                        className="text-black text-xs"
-                        onChange={(e: any) =>
-                          setTempManifestData(JSON.parse(e.target.value))
-                        }
-                      >
-                        {JSON.stringify(tempManifestData)}
-                      </textarea>
-                      <button
-                        onClick={async () => {
-                          await saveManifest(tempManifestData!);
-                          setShowManifest(false);
-                        }}
-                      >
-                        save
-                      </button>
-                    </div>
-                  ) : null}
-                </>
-              ) : null}
-            </div>
-          </PerfectScrollbar>
-        </ContentWrapper>
-      </ManuscriptSidePanelContainer>
-    );
+                ) : null}
+              </>
+            ) : null}
+          </div>
+        </PerfectScrollbar>
+      </ContentWrapper>
+    </ManuscriptSidePanelContainer>
+  );
 };
 
 export default ManuscriptSidePanel;

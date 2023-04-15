@@ -22,6 +22,7 @@ import { IconAddComment } from "@icons";
 import toast from "react-hot-toast";
 import { PageMetadata } from "../usePageMetadata";
 import { HighlightCallbackProps } from "@components/textSelectUtils";
+import { useNodeReader } from "@src/state/nodes/hooks";
 
 const pulse = keyframes`
 0%{
@@ -84,7 +85,7 @@ const PageComponent = React.memo((props: any) => {
       pageNumber={pageNumber}
       // @ts-ignore
       enhanceTextSelection={isRendered}
-      className={`relative bg-transparent bg-white duration-300 ease-out ${props.className}`}
+      className={`relative bg-transparent ${props.className}`}
       onLoadSuccess={onLoadSuccess}
       onRenderSuccess={useCallback(() => {
         setIsRendered(true);
@@ -119,6 +120,10 @@ interface PageComponentHOCProps {
   // setPageMetadata: (pm: PageMetadata) => void;
 }
 
+const imageCache: { [key: string]: string } = {};
+
+console.log("IMAGE CACHE", imageCache);
+
 const PageComponentHOC = React.memo(
   ({
     width: pageWidth,
@@ -143,8 +148,15 @@ const PageComponentHOC = React.memo(
     const pageRef = useRef<any>(null);
     const canvasRef = useRef<any>(null);
     const overlayRef = useRef<any>(null);
-    const [opacity, setOpacity] = useState<number>(1);
-    const [image, setImage] = useState<string | undefined>();
+    const [opacity, setOpacity] = useState<number>(0);
+    const { currentObjectId } = useNodeReader();
+
+    const imageCacheKey = (pageNumber: number) =>
+      `${pageNumber}_${currentObjectId}`;
+    const cacheKey: string = imageCacheKey(pageNumber);
+    const [image, setImage] = useState<string | undefined>(
+      imageCache[cacheKey]
+    );
 
     // const dimData = cachedPageDimensions.get(pageNumber) || [1, 1];
     const ratio = pageMetadata.ratio;
@@ -244,6 +256,7 @@ const PageComponentHOC = React.memo(
     const onRenderSuccess = useCallback(() => {
       if (!image) {
         const blob = canvasRef.current.toDataURL();
+        imageCache[cacheKey] = blob;
         setImage(blob);
       }
       setOpacity(1);
@@ -257,7 +270,7 @@ const PageComponentHOC = React.memo(
             position: "relative",
             width: pageWidth * zoom,
             height: pageWidth * (ratio || 1) * zoom,
-            opacity,
+
             marginBottom: PDF_PAGE_SPACING,
             cursor: isAnnotating ? "crosshair" : undefined,
           }}
@@ -267,124 +280,140 @@ const PageComponentHOC = React.memo(
           )}
           onClick={onPageClick}
         >
-          <Desktop>
-            <PageAnnotations
-              annotations={thisPageAnnotations}
-              pageHeight={pageWidth * ratio * zoom}
-              pageWidth={pageWidth}
-              isActiveComponent={isActiveComponent}
-            />
-          </Desktop>
+          {isIntersecting && thisPageAnnotations.length ? (
+            <Desktop>
+              <PageAnnotations
+                annotations={thisPageAnnotations}
+                pageHeight={pageWidth * ratio * zoom}
+                pageWidth={pageWidth}
+                isActiveComponent={isActiveComponent}
+              />
+            </Desktop>
+          ) : null}
           {/* {
             Math.abs(pdfCurrentPage - pageNumber) < PAGE_RENDER_DISTANCE ? ( */}
           <img
             src={image}
+            key={`img_${cacheKey}`}
             alt=""
             className={`absolute top-0 left-0 right-0 bottom-0 ${
-              under ? "" : "z-10"
-            } w-full h-full`}
+              under ? "" : "z-[60]"
+            } w-full h-full pointer-events-none ${
+              image
+                ? !isIntersecting
+                  ? "opacity-100 "
+                  : "opacity-0"
+                : "opacity-0"
+            } !z-[60] transition-all duration-[1s] delay-1000 ease-in`}
           />
-          <AnnotationEditCanvas
-            pageIndex={pageNumber - 1}
-            setAnnotations={setPageAnnotations}
-            annotations={pageAnnotations}
-            className={`relative ${under ? "" : "z-50"} w-full h-full`}
-          >
-            {showCanvas || !image ? (
-              <PageComponent
-                pageNumber={pageNumber}
-                canvasRef={canvasRef}
-                pageWidth={pageWidth}
-                isActiveComponent={isActiveComponent}
-                zoom={zoom}
-                ratio={ratio}
-                isScrolling={isScrolling}
-                isPinching={isPinching}
-                onRenderSuccess={onRenderSuccess}
-              />
-            ) : null}
-            <div
-              className={`bg-red-200 z-50 absolute ${
-                highlightPrompt ? "opacity-100" : "opacity-0"
-              }`}
-              style={
-                highlightPrompt
-                  ? {
-                      top: highlightPrompt.boundingRect.top,
-                      left: highlightPrompt.rects[0].left - 22 + 3,
-                      height: 0,
-                      width: 44,
-                    }
-                  : {}
-              }
-            >
-              <div
-                className="-mt-12 flex justify-center cursor-pointer group"
-                onMouseDown={() => {
-                  if (highlightPrompt) {
-                    toast.error("Coming soon", {
-                      duration: 2000,
-                      position: "top-center",
-                      style: {
-                        marginTop: 60,
-                        borderRadius: "10px",
-                        background: "#111",
-                        color: "#fff",
-                      },
-                    });
-                  }
-                }}
+          {isIntersecting ? (
+            <>
+              <AnnotationEditCanvas
+                pageIndex={pageNumber - 1}
+                setAnnotations={setPageAnnotations}
+                annotations={pageAnnotations}
+                className={`relative ${under ? "" : "z-50"} w-full h-full`}
               >
-                <div className="bg-neutrals-black w-[44px] h-[37px] flex items-center justify-center rounded-md shadow-xl drop-shadow-lg group-hover:bg-neutrals-gray-1">
-                  <IconAddComment fill="#28AAC4" width={20} />
-                </div>
-                <div className="bg-neutrals-black w-[12px] h-[12px] absolute bottom-2 rotate-45 rounded-sm shadow-xl drop-shadow-lg group-hover:bg-neutrals-gray-1"></div>
-              </div>
-            </div>
+                {showCanvas || !image ? (
+                  <PageComponent
+                    pageNumber={pageNumber}
+                    canvasRef={canvasRef}
+                    pageWidth={pageWidth}
+                    isActiveComponent={isActiveComponent}
+                    zoom={zoom}
+                    ratio={ratio}
+                    isScrolling={isScrolling}
+                    isPinching={isPinching}
+                    onRenderSuccess={onRenderSuccess}
+                  />
+                ) : null}
 
-            <AnnotationLayer
-              thisPageAnnotations={thisPageAnnotations}
-              under={under}
-              isScrolling={isScrolling}
-              isPinching={isPinching}
-              pageRef={pageRef}
-            />
-
-            {/*  Used as a cover on top of the page to capture gestures because the text on the
-          pdf stops event propagation so zooming can't occur when pinching on top of the text */}
-            {
-              // !hasMouse ? (
-              !isDesktop ? (
                 <div
-                  ref={overlayRef}
-                  className={`absolute top-0 left-0 right-0 bottom-0 z-11 touch-pan-x touch-pan-y`}
-                  onClick={(e: React.MouseEvent) => {
-                    /**
-                     * Find the next element underneath this one at this coordinate and trigger a click event
-                     */
-                    const elements: Element[] = document.elementsFromPoint(
-                      e.nativeEvent.pageX,
-                      e.nativeEvent.pageY
-                    );
-                    // @ts-ignore
-                    if (elements[1] && elements[1].click) {
-                      // @ts-ignore
-                      elements[1].click();
-                    }
+                  className={`bg-red-200 z-50 absolute ${
+                    highlightPrompt ? "opacity-100" : "opacity-0"
+                  }`}
+                  style={
+                    highlightPrompt
+                      ? {
+                          top: highlightPrompt.boundingRect.top,
+                          left: highlightPrompt.rects[0].left - 22 + 3,
+                          height: 0,
+                          width: 44,
+                        }
+                      : {}
+                  }
+                >
+                  <div
+                    className="-mt-12 flex justify-center cursor-pointer group"
+                    onMouseDown={() => {
+                      if (highlightPrompt) {
+                        toast.error("Coming soon", {
+                          duration: 2000,
+                          position: "top-center",
+                          style: {
+                            marginTop: 60,
+                            borderRadius: "10px",
+                            background: "#111",
+                            color: "#fff",
+                          },
+                        });
+                      }
+                    }}
+                  >
+                    <div className="bg-neutrals-black w-[44px] h-[37px] flex items-center justify-center rounded-md shadow-xl drop-shadow-lg group-hover:bg-neutrals-gray-1">
+                      <IconAddComment fill="#28AAC4" width={20} />
+                    </div>
+                    <div className="bg-neutrals-black w-[12px] h-[12px] absolute bottom-2 rotate-45 rounded-sm shadow-xl drop-shadow-lg group-hover:bg-neutrals-gray-1"></div>
+                  </div>
+                </div>
+
+                {thisPageAnnotations.length > 0 ? (
+                  <AnnotationLayer
+                    thisPageAnnotations={thisPageAnnotations}
+                    under={under}
+                    isScrolling={isScrolling}
+                    isPinching={isPinching}
+                    pageRef={pageRef}
+                  />
+                ) : null}
+
+                {/*  Used as a cover on top of the page to capture gestures because the text on the
+          pdf stops event propagation so zooming can't occur when pinching on top of the text */}
+                {
+                  // !hasMouse ? (
+                  !isDesktop ? (
+                    <div
+                      ref={overlayRef}
+                      className={`absolute top-0 left-0 right-0 bottom-0 z-11 touch-pan-x touch-pan-y`}
+                      onClick={(e: React.MouseEvent) => {
+                        /**
+                         * Find the next element underneath this one at this coordinate and trigger a click event
+                         */
+                        const elements: Element[] = document.elementsFromPoint(
+                          e.nativeEvent.pageX,
+                          e.nativeEvent.pageY
+                        );
+                        // @ts-ignore
+                        if (elements[1] && elements[1].click) {
+                          // @ts-ignore
+                          elements[1].click();
+                        }
+                      }}
+                    />
+                  ) : null
+                }
+              </AnnotationEditCanvas>
+
+              {!image ? (
+                <PaperLoader
+                  className={`absolute top-0 left-0 right-0 bottom-0 shadow-2xl z-10`}
+                  style={{
+                    width: pageWidth * zoom,
+                    height: pageWidth * ratio * zoom,
                   }}
                 />
-              ) : null
-            }
-          </AnnotationEditCanvas>
-
-          {!image ? (
-            <PaperLoader
-              className={`absolute top-0 left-0 right-0 bottom-0 shadow-2xl z-10`}
-              style={{
-                width: pageWidth * zoom,
-                height: pageWidth * ratio * zoom,
-              }}
-            />
+              ) : null}
+            </>
           ) : null}
         </PageWrapper>
       </>

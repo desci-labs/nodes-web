@@ -6,6 +6,7 @@ import { getNonDataComponentsFromManifest } from "../utils";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { setComponentStack } from "@src/state/nodes/viewer";
+import React from "react";
 
 const NodeDrive = ({ className }: ClassNameProp) => {
   const { setIsAddingComponent } = useManuscriptController();
@@ -54,4 +55,4 @@ const NodeDrive = ({ className }: ClassNameProp) => {
   );
 };
 
-export default NodeDrive;
+export default React.memo(NodeDrive);

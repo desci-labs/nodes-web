@@ -124,4 +124,4 @@ const AnnotationLayer = React.memo((props: any) => {
   );
 });
 
-export default AnnotationLayer;
+export default React.memo(AnnotationLayer);

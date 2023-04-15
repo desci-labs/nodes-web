@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PresentationChartBarIcon } from "@heroicons/react/outline";
 import { lockScroll, restoreScroll } from "@components/utils";
 import { IconAuthor, IconHelp, IconNodeCollection } from "@icons";
@@ -172,4 +172,4 @@ const Toolbar = () => {
   );
 };
 
-export default Toolbar;
+export default React.memo(Toolbar);

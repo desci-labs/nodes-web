@@ -251,4 +251,4 @@ const ManuscriptComponentsSection = () => {
   );
 };
 
-export default ManuscriptComponentsSection;
+export default React.memo(ManuscriptComponentsSection);

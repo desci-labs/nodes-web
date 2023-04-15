@@ -369,7 +369,7 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
       </Modal>
       <WalletManagerModal
         isOpen={openWalet}
-        onDismiss={() => setOpenWallet(false)}
+        onDismiss={useCallback(() => setOpenWallet(false), [setOpenWallet])}
       />
     </>
   );

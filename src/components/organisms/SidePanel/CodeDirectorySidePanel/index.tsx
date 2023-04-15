@@ -2,7 +2,7 @@ import PanelCloseButton from "@components/atoms/PanelCloseButton";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
 import { IconPlay } from "@icons";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import styled, { StyledComponent } from "styled-components";
 import SidePanel from "..";
 // Windows fix
@@ -150,6 +150,22 @@ const CodeDirectorySidePanel = (props: CodeDirectorySidePanelProps) => {
     }
   }, []);
 
+  const handleClose = useCallback(() => {
+    if (componentStack.length > 1 && isCodeActive) {
+      dispatch(popFromComponentStack());
+    } else {
+      setIsVisible(false);
+    }
+    // setIsPanelOpen(false);
+    // onClose();
+  }, [
+    componentStack,
+    dispatch,
+    popFromComponentStack,
+    setIsVisible,
+    isCodeActive,
+  ]);
+
   return (
     <Wrapper
       orientation={panelOrientation}
@@ -165,15 +181,7 @@ const CodeDirectorySidePanel = (props: CodeDirectorySidePanelProps) => {
             panelOrientation={panelOrientation}
             className={`right-0 left-[unset]`}
             visible={isVisible}
-            onClick={() => {
-              if (componentStack.length > 1 && isCodeActive) {
-                dispatch(popFromComponentStack());
-              } else {
-                setIsVisible(false);
-              }
-              // setIsPanelOpen(false);
-              // onClose();
-            }}
+            onClick={handleClose}
           />
         )}
         <div className="flex flex-col h-full">

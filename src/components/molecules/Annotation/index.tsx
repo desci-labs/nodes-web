@@ -370,4 +370,4 @@ const AnnotationComponent = (props: AnnotationProps) => {
   );
 };
 
-export default AnnotationComponent;
+export default React.memo(AnnotationComponent);
