@@ -97,7 +97,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
   }
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full  pb-14">
       {/* <DriveBreadCrumbs crumbs={breadCrumbs} eatBreadCrumb={eatBreadCrumb} /> */}
       <div className="p-4 border-b border-neutrals-gray-7 flex flex-row items-center justify-between">
         <span className="flex flex-row items-center">
@@ -120,7 +120,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
           onClick={onRequestClose}
         />
       </div>
-      <div className="h-full w-full outline-none">
+      <div className="h-[calc(100%-156px)]  max-h-[calc(50vh-80px)] overflow-hidden overflow-y-auto w-full outline-none">
         {currentDrivePicker?.contains?.length ? (
           currentDrivePicker.contains.map((f: DriveObject, idx: number) => {
             return (
@@ -139,7 +139,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
           <Empty />
         )}
       </div>
-      <div className="flex flex-row justify-end items-center p-3 border-t border-neutrals-gray-7">
+      <div className="flex flex-row justify-end items-center p-3 border-t border-neutrals-gray-7 absolute w-full bg-white bottom-0 rounded-b-lg">
         <PrimaryButton
           title="Insert"
           onClick={() => {

@@ -239,7 +239,7 @@ export const lockScroll = () => {
     if (!el) {
       return;
     }
-    (el.style as any)[a.strategy] = `${scrollWidth}px`;
+    (el.style as any)[a.strategy] = `${scrollWidth + 1}px`;
   });
 };
 
