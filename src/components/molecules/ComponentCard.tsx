@@ -2,7 +2,6 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import styled, { StyledComponent } from "styled-components";
 import ButtonCopyLink from "@components/atoms/ButtonCopyLink";
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
 
 import AnnotationSwitcher from "@components/atoms/AnnotationSwitcher";
@@ -15,7 +14,6 @@ import {
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 import { cleanupManifestUrl } from "@components/utils";
-import ComponentMetadataPopover from "@components/organisms/PopOver/ComponentMetadataPopover";
 import TooltipIcon from "@components/atoms/TooltipIcon";
 import ReactTooltip from "react-tooltip";
 import {
@@ -36,7 +34,6 @@ import { useNodeReader } from "@src/state/nodes/hooks";
 import {
   navigateToDriveByPath,
   setComponentTypeBeingAssignedTo,
-  setFileMetadataBeingEdited,
 } from "@src/state/drive/driveSlice";
 import { useDrive } from "@src/state/drive/hooks";
 
@@ -140,7 +137,6 @@ const ComponentCard = (props: ComponentCardProps) => {
   const dispatch = useSetter();
   const { component, componentStack, mode, currentObjectId, manifestData } =
     props;
-  const { fileMetadataBeingEdited } = useDrive();
 
   const { recentlyAddedComponent } = useNodeReader();
   /***
