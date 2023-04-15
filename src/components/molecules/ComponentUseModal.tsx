@@ -64,9 +64,10 @@ const ComponentUseModal = ({
           subTitle="You can use the granular dPID of the file you have selected interact with the associated data."
           onDismiss={close}
         />
-        <div className="w-full grid grid-cols-1 lg:grid-cols-2 place-content-center lg:justify-items-center gap-4 justify-items-center mt-8 overflow-hidden overflow-x-auto">
-          <section className="hidden lg:block w-full">
-            <VideoAnimation />{" "}
+        <div className="w-full grid grid-cols-1 lg:grid-cols-2 place-content-center gap-4 justify-items-center mt-8 overflow-hidden overflow-x-auto">
+          <section className="hidden max-h-[700px] lg:block max-w-[512px]">
+            {/* Max height should roughly match the right side of this modal */}
+            <VideoAnimation />
           </section>
           <section id="cid-use" className="max-w-[600px]">
             <div className="lg:hidden">
@@ -193,75 +194,52 @@ const ComponentUseModal = ({
 const VideoAnimation = () => {
   const refVideo = useRef(null);
   const [loaded, setLoaded] = useState(false);
-  const borderRadius = "72%";
 
   return (
     <div
-      className={`overflow-hidden relative min-w-[300px] h-full flex items-center justify-center`}
+      className={`overflow-hidden relative w-full h-full flex items-center justify-center`}
     >
       <div
-        className="w-full h-full p-8 relative"
+        className="absolute top-0 w-full h-full left-0 z-50"
         style={{
-          borderRadius,
-          width: "400px",
-          overflow: "hidden",
-          border: "none",
-          boxShadow: "0em 0em 3em 15px rgba(0, 0, 0, .5)",
-          maxHeight: "91%",
+          backgroundImage:
+            "radial-gradient(50.00% 50.77% at 50% 50%, rgba(0, 0, 0, 0) 59.77%, rgb(25, 27, 28) 100%)",
         }}
+      ></div>
+      {/* This cover image needs replacement, flip the loaded booleans around to test */}
+      <img
+        src="https://desci-labs-public.s3.amazonaws.com/node-front-preview.png"
+        alt="desci nodes use animation poster"
+        className="w-[400px] h-full absolute top-0 left-0 object-cover"
+        style={{
+          objectFit: "cover",
+          overflow: "hidden",
+          visibility: !loaded ? "visible" : "hidden",
+        }}
+      />
+      <video
+        loop
+        ref={refVideo}
+        onLoadedData={(e) => {
+          setLoaded(true);
+        }}
+        playsInline
+        autoPlay
+        key={`cube-panel`}
+        muted
+        className="object-cover max-w-none max-h-[900px]"
+        style={{
+          visibility: loaded ? "visible" : "hidden",
+        }}
+        src={`https://desci-labs-public.s3.amazonaws.com/node-front.mp4`}
+        preload="metadata"
+        poster="https://desci-labs-public.s3.amazonaws.com/node-front-preview.png"
       >
-        <div
-          className="absolute top-0 left-0 bg-transparent z-50"
-          style={{
-            borderRadius,
-            width: "100%",
-            height: "100%",
-            boxShadow: "inset 0em 0em 40px 35px rgba(0, 0, 0, .3)",
-          }}
-        ></div>
-        <img
-          src="https://desci-labs-public.s3.amazonaws.com/node-front-preview.png"
-          alt="desci nodes use animation poster"
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            position: "absolute",
-            top: 0,
-            left: 0,
-            borderRadius,
-            transform: "scale(1.5)",
-            visibility: !loaded ? "visible" : "hidden",
-          }}
+        <source
+          src="https://desci-labs-public.s3.amazonaws.com/node-front.mp4#t=0.1"
+          type="video/mp4"
         />
-        <video
-          loop
-          ref={refVideo}
-          onLoadedData={(e) => {
-            setLoaded(true);
-          }}
-          playsInline
-          autoPlay
-          key={`cube-panel`}
-          muted
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            borderRadius,
-            transform: "scale(1.5)",
-            visibility: loaded ? "visible" : "hidden",
-          }}
-          src={`https://desci-labs-public.s3.amazonaws.com/node-front.mp4`}
-          preload="metadata"
-          poster="https://desci-labs-public.s3.amazonaws.com/node-front-preview.png"
-        >
-          <source
-            src="https://desci-labs-public.s3.amazonaws.com/node-front.mp4#t=0.1"
-            type="video/mp4"
-          />
-        </video>
-      </div>
+      </video>
     </div>
   );
 };
