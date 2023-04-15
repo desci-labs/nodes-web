@@ -331,6 +331,14 @@ export const driveSlice = createSlice({
           ];
         }
 
+        //Reset current non stale drive
+        const driveFound = state.deprecated
+          ? driveBfsByPath(state.nodeTree!, state.currentDrive?.path!)
+          : findDriveByPath(state.nodeTree!, state.currentDrive?.path!);
+        if (driveFound) {
+          state.currentDrive = driveFound;
+        }
+
         if (!state.currentDrive) {
           state.currentDrive = root;
         }
