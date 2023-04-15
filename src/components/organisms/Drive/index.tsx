@@ -26,7 +26,7 @@ const DriveTable: React.FC = () => {
   const { publicView, mode } = useNodeReader();
   const { setAddFilesWithoutContext, setIsAddingComponent } =
     useManuscriptController();
-  const { currentDrive, deprecated, breadCrumbs, fileBeingUsed } = useDrive();
+  const { currentDrive, deprecated, breadCrumbs } = useDrive();
   const dispatch = useSetter();
 
   const [selected, setSelected] = useState<

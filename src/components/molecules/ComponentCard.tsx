@@ -307,7 +307,7 @@ const ComponentCard = (props: ComponentCardProps) => {
                       dataTip={"Cite"}
                       dataFor={`cite_${component.id}`}
                       className="w-7 h-7"
-                      disabled={canCite}
+                      disabled={!canCite}
                       onClick={(e) => {
                         e!.stopPropagation();
                         dispatch(setFileBeingCited(drive));

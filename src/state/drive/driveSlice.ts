@@ -211,7 +211,7 @@ export const driveSlice = createSlice({
       state,
       { payload }: PayloadAction<DriveObject | null>
     ) => {
-      state.fileBeingUsed = payload;
+      state.fileBeingCited = payload;
     },
     addBreadCrumb: (state, { payload }: PayloadAction<BreadCrumb>) => {
       state.breadCrumbs.push(payload);
