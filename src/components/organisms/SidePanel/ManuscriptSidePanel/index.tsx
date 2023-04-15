@@ -157,9 +157,21 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
   }, [userProfile]);
 
   const showCloseButton =
-    componentStack.length > 0 && (!isCodeActive || selectedAnnotationId);
+    componentStack.filter(
+      (a) =>
+        a.type != ResearchObjectComponentType.DATA &&
+        a.type != ResearchObjectComponentType.UNKNOWN &&
+        a.type != ResearchObjectComponentType.DATA_BUCKET
+    ).length > 0 &&
+    (!isCodeActive || selectedAnnotationId);
   const isResearchPanelReallyOpen =
-    isResearchPanelOpen || componentStack.length < 1;
+    isResearchPanelOpen ||
+    componentStack.filter(
+      (a) =>
+        a.type != ResearchObjectComponentType.DATA &&
+        a.type != ResearchObjectComponentType.UNKNOWN &&
+        a.type != ResearchObjectComponentType.DATA_BUCKET
+    ).length < 1;
 
   const canShowDrive = !publicView && userProfile.userId > 0;
 

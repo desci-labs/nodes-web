@@ -107,7 +107,10 @@ const navigateToDriveGeneric =
       | "currentDrivePicker" = `currentDrive${key}`;
 
     if (state.status !== "succeeded" || !state.nodeTree!) return;
-    const { path } = action.payload;
+    let path: any = action.payload;
+    if (path.path) {
+      path = path.path;
+    }
 
     let driveFound = state.deprecated
       ? driveBfsByPath(state.nodeTree!, path)

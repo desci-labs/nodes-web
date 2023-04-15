@@ -104,8 +104,8 @@ const iconFor = (
 const ComponentCard = (props: ComponentCardProps) => {
   const dispatch = useSetter();
   const { component } = props;
-  const { mode, componentStack } = useNodeReader();
-  const { recentlyAddedComponent } = useNodeReader();
+  const { mode, componentStack, recentlyAddedComponent, manifest } =
+    useNodeReader();
   const { nodeTree } = useDrive();
   /***
    * Use local click tracking for fast click response
@@ -169,22 +169,26 @@ const ComponentCard = (props: ComponentCardProps) => {
             selectedAnnotationId: "",
           })
         );
-        if (component.type === ResearchObjectComponentType.DATA) {
+        if (
+          component.type === ResearchObjectComponentType.DATA ||
+          component.type === ResearchObjectComponentType.UNKNOWN
+        ) {
           sessionStorage.removeItem(SessionStorageKeys.lastDirUid);
-          dispatch(
-            navigateToDriveByPath({
-              path: DRIVE_NODE_ROOT_PATH + "/" + DRIVE_DATA_PATH,
-            })
-          );
-          dispatch(setComponentStack([]));
+          // dispatch(
+          //   navigateToDriveByPath({
+          //     path: DRIVE_NODE_ROOT_PATH + "/" + DRIVE_DATA_PATH,
+          //   })
+          // );
+          dispatch(navigateToDriveByPath(component.payload.path));
+          dispatch(setComponentStack([component]));
         } else {
           if (!isSelected) {
             dispatch(setComponentStack([component]));
           }
         }
-        if (component.type === ResearchObjectComponentType.UNKNOWN) {
-          dispatch(setComponentTypeBeingAssignedTo(component.payload.path));
-        }
+        // if (component.type === ResearchObjectComponentType.UNKNOWN) {
+        //   dispatch(setComponentTypeBeingAssignedTo(component.payload.path));
+        // }
       }
     }, 50);
   };
@@ -277,78 +281,67 @@ const ComponentCard = (props: ComponentCardProps) => {
         >
           <FlexRowSpaceBetween>
             <div className="flex justify-between dark:bg-muted-700 px-3 py-2 w-full">
-              {component.type !== ResearchObjectComponentType.DATA ? (
-                <>
-                  <div style={{ display: "none" }}>
-                    <AnnotationSwitcher
-                      annotations={sortedAnnotations}
-                      handleComponentClick={handleComponentClick}
+              <>
+                <div style={{ display: "none" }}>
+                  <AnnotationSwitcher
+                    annotations={sortedAnnotations}
+                    handleComponentClick={handleComponentClick}
+                  />
+                </div>
+                <div className="flex gap-2 justify-between w-full">
+                  <div id="section-left">
+                    <ButtonFair
+                      isFair={false}
+                      component={component}
+                      text={
+                        drive?.metadata.licenseType ||
+                        component.payload?.licenseType ||
+                        manifest?.defaultLicense
+                      } //Should only ever hit unknown for deprecated tree
+                      classname="w-auto bg-neutrals-gray-2 px-2 font-medium text-xs h-7"
                     />
                   </div>
-                  <div className="flex gap-2 justify-between w-full">
-                    <div id="section-left">
-                      <ButtonFair
-                        isFair={false}
-                        component={component}
-                        text={
-                          drive?.metadata.licenseType ||
-                          component.payload?.licenseType ||
-                          "Unknown"
-                        } //Should only ever hit unknown for deprecated tree
-                        classname="w-auto bg-neutrals-gray-2 px-2 font-medium text-xs h-7"
-                      />
-                    </div>
-                    <div id="section-right" className="flex gap-2">
-                      <BlackGenericButton
-                        dataTip={"Show File Location"}
-                        dataFor={`drive_${component.id}`}
-                        disabled={false}
-                        className="p-0"
-                        onClick={(e) => {
-                          e!.stopPropagation();
-                          dispatch(
-                            navigateToDriveByPath(component.payload.path)
-                          );
-                          dispatch(setComponentStack([]));
-                        }}
-                      >
-                        <IconDrive className="p-0 min-w-[28px] scale-[1.2]" />
-                      </BlackGenericButton>
-                      <BlackGenericButton
-                        dataTip={"Cite"}
-                        dataFor={`cite_${component.id}`}
-                        className="w-7 h-7"
-                        disabled={!canCite}
-                        onClick={(e) => {
-                          e!.stopPropagation();
-                          dispatch(setFileBeingCited(drive));
-                        }}
-                      >
-                        <IconQuotes />
-                      </BlackGenericButton>
-                      <BlackGenericButton
-                        dataTip={"Methods"}
-                        dataFor={`use_${component.id}`}
-                        disabled={!drive}
-                        className="p-0 min-w-[28px] h-7"
-                        onClick={(e) => {
-                          e!.stopPropagation();
-                          dispatch(setFileBeingUsed(drive));
-                        }}
-                      >
-                        <IconPlayRounded className="p-0" />
-                      </BlackGenericButton>
-                    </div>
+                  <div id="section-right" className="flex gap-2">
+                    <BlackGenericButton
+                      dataTip={"Show File Location"}
+                      dataFor={`drive_${component.id}`}
+                      disabled={false}
+                      className="p-0"
+                      onClick={(e) => {
+                        e!.stopPropagation();
+                        dispatch(navigateToDriveByPath(component.payload.path));
+                        dispatch(setComponentStack([component]));
+                      }}
+                    >
+                      <IconDrive className="p-0 min-w-[28px] scale-[1.2]" />
+                    </BlackGenericButton>
+                    <BlackGenericButton
+                      dataTip={"Cite"}
+                      dataFor={`cite_${component.id}`}
+                      className="w-7 h-7"
+                      disabled={!canCite}
+                      onClick={(e) => {
+                        e!.stopPropagation();
+                        dispatch(setFileBeingCited(drive));
+                      }}
+                    >
+                      <IconQuotes />
+                    </BlackGenericButton>
+                    <BlackGenericButton
+                      dataTip={"Methods"}
+                      dataFor={`use_${component.id}`}
+                      disabled={!drive}
+                      className="p-0 min-w-[28px] h-7"
+                      onClick={(e) => {
+                        e!.stopPropagation();
+                        dispatch(setFileBeingUsed(drive));
+                      }}
+                    >
+                      <IconPlayRounded className="p-0" />
+                    </BlackGenericButton>
                   </div>
-                </>
-              ) : (
-                <div
-                  className="text-[10px] text-neutrals-gray-4 text-right w-full"
-                  title="This component is pointing to a nested data structure"
-                >
-                  DeSci Node Drive
                 </div>
-              )}
+              </>
             </div>
           </FlexRowSpaceBetween>
         </div>

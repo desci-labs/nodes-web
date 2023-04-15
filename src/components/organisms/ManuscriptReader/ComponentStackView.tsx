@@ -86,7 +86,14 @@ const ComponentStackView = (props: ComponentStackViewProps) => {
        * When no components, show the drive
        */}
       {!componentStack ||
-      (componentStack.length < 1 && !forceRefreshDrive && manifestData) ? (
+      (componentStack.filter(
+        (a) =>
+          a.type != ResearchObjectComponentType.DATA &&
+          a.type != ResearchObjectComponentType.UNKNOWN &&
+          a.type != ResearchObjectComponentType.DATA_BUCKET
+      ).length < 1 &&
+        !forceRefreshDrive &&
+        manifestData) ? (
         <RenderedDrive />
       ) : (
         componentStack
