@@ -37,6 +37,7 @@ import { IconDrive, IconPlayRounded, IconQuotes } from "@src/icons";
 import { findDriveByPath } from "@src/state/drive/utils";
 import { useDrive } from "@src/state/drive/hooks";
 import { AccessStatus } from "../organisms/Drive";
+import { getLicenseShortName } from "../organisms/PopOver/ComponentMetadataPopover";
 
 const CardWrapper: StyledComponent<
   "div",
@@ -293,11 +294,11 @@ const ComponentCard = (props: ComponentCardProps) => {
                     <ButtonFair
                       isFair={false}
                       component={component}
-                      text={
+                      text={getLicenseShortName(
                         drive?.metadata.licenseType ||
-                        component.payload?.licenseType ||
-                        manifest?.defaultLicense
-                      } //Should only ever hit unknown for deprecated tree
+                          component.payload?.licenseType ||
+                          manifest?.defaultLicense
+                      )} //Should only ever hit unknown for deprecated tree
                       classname="w-auto bg-neutrals-gray-2 px-2 font-medium text-xs h-7"
                     />
                   </div>

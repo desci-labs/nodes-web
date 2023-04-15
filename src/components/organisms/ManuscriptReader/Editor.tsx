@@ -76,6 +76,7 @@ export default function Editor({ isLoading }: ReaderViewerProps) {
         <ButtonMysterious />
         {componentStack.filter(
           (a) =>
+            a &&
             a.type != ResearchObjectComponentType.DATA &&
             a.type != ResearchObjectComponentType.UNKNOWN &&
             a.type != ResearchObjectComponentType.DATA_BUCKET

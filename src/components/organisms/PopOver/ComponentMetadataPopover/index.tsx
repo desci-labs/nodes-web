@@ -40,83 +40,105 @@ import { fetchTreeThunk } from "@src/state/drive/driveSlice";
 import { DriveObject } from "../../Drive";
 
 export const PDF_LICENSE_TYPES = [
-  { id: 0, name: "CC0" },
-  { id: 1, name: "CC BY" },
-  { id: 2, name: "CC BY-SA" },
-  { id: 3, name: "CC BY-NC" },
-  { id: 4, name: "CC BY-NC-SA" },
-  { id: 5, name: "CC BY-ND" },
-  { id: 6, name: "CC BY-NC-ND" },
+  { id: 0, name: "CC0", shortName: "CC0" },
+  { id: 1, name: "CC BY", shortName: "CC BY" },
+  { id: 2, name: "CC BY-SA", shortName: "CC BY-SA" },
+  { id: 3, name: "CC BY-NC", shortName: "CC BY-NC" },
+  { id: 4, name: "CC BY-NC-SA", shortName: "CC BY-NC-SA" },
+  { id: 5, name: "CC BY-ND", shortName: "CC BY-ND" },
+  { id: 6, name: "CC BY-NC-ND", shortName: "CC BY-NC-ND" },
 ];
+
+const getLicenseTypes = () => {
+  return PDF_LICENSE_TYPES.concat(CODE_LICENSE_TYPES);
+};
+
+export const getLicenseShortName = (license: string) => {
+  const licenseType = getLicenseTypes().find((l) => l.name === license);
+  return licenseType ? licenseType.shortName : "";
+};
 
 export const CODE_LICENSE_TYPES = [
   {
     id: 10,
     name: "MIT License",
+    shortName: "MIT",
     link: "https://choosealicense.com/licenses/mit/",
   },
   {
     id: 1,
     name: "Apache License 2.0",
+    shortName: "Apache 2.0",
     link: "https://choosealicense.com/licenses/apache-2.0/",
   },
   {
     id: 11,
     name: "Mozilla Public License 2.0",
+    shortName: "MPL 2.0",
     link: "https://choosealicense.com/licenses/mpl-2.0/",
   },
   {
     id: 7,
     name: "GNU General Public License v2.0",
+    shortName: "GPL 2.0",
     link: "https://choosealicense.com/licenses/gpl-2.0/",
   },
   {
     id: 8,
     name: "GNU General Public License v3.0",
+    shortName: "GPL 3.0",
     link: "https://choosealicense.com/licenses/gpl-3.0/",
   },
   {
     id: 9,
     name: "GNU Lesser General Public License v2.1",
+    shortName: "LGPL 2.1",
     link: "https://choosealicense.com/licenses/lgpl-2.1/",
   },
 
   {
     id: 5,
     name: "Creative Commons Zero v1.0 Universal",
+    shortName: "CC0",
     link: "https://choosealicense.com/licenses/cc0-1.0/",
   },
   {
     id: 2,
     name: 'BSD 2-Clause "Simplified" License',
+    shortName: "BSD 2-Clause",
     link: "https://choosealicense.com/licenses/bsd-2-clause/",
   },
 
   {
     id: 3,
     name: 'BSD 3-Clause "New" or "Revised" License',
+    shortName: "BSD 3-Clause",
     link: "https://choosealicense.com/licenses/bsd-3-clause/",
   },
   {
     id: 0,
     name: "GNU Affero General Public License v3.0",
+    shortName: "AGPL 3.0",
     link: "https://choosealicense.com/licenses/agpl-3.0/",
   },
   {
     id: 4,
     name: "Boost Software License 1.0",
+    shortName: "BSL 1.0",
     link: "https://choosealicense.com/licenses/bsl-1.0/",
   },
 
   {
     id: 6,
     name: "Eclipse Public License 2.0",
+    shortName: "EPL 2.0",
     link: "https://choosealicense.com/licenses/epl-2.0/",
   },
 
   {
     id: 12,
     name: "The Unlicense",
+    shortName: "Unlicense",
     link: "https://choosealicense.com/licenses/unlicense/",
   },
 ];
@@ -246,13 +268,14 @@ const ComponentMetadataForm = React.forwardRef(
             control={control}
             defaultValue={defaultLicense?.name}
             render={({ field }: any) => {
-              const val = PDF_LICENSE_TYPES.find((l) => l.name === field.value);
+              const licenses = getLicenseTypes();
+              const val = licenses.find((l) => l.name === field.value);
               return (
                 <SelectList
                   label="License Type"
                   className="mt-2"
                   mandatory={true}
-                  data={PDF_LICENSE_TYPES}
+                  data={licenses}
                   defaultValue={defaultLicense}
                   field={{
                     ...field,
