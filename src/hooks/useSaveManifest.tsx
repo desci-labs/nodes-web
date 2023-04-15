@@ -14,7 +14,6 @@ export default function useSaveManifest(uuid?: string) {
   const [isSaving, setIsSaving] = useState(false);
   const { setShowSavingIndicator } = useManuscriptController([]);
 
-
   const saveManifest = async (
     manifestData: ResearchObjectV1,
     onSaveCallback?: () => void

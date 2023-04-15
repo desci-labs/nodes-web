@@ -7,26 +7,17 @@ import {
 import SidePanelStorage from "@components/molecules/SidePanelStorage";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { __log } from "@components/utils";
-import {
-  DataComponentMetadata,
-  ResearchObjectComponentType,
-} from "@desci-labs/desci-models";
+import { DataComponentMetadata } from "@desci-labs/desci-models";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import DriveTable, { DriveObject } from "./Drive";
 import toast from "react-hot-toast";
-import ComponentMetadataPopover from "./PopOver/ComponentMetadataPopover";
 import ContextMenuProvider from "./Drive/ContextMenu/provider";
 import LoaderDrive from "../molecules/LoaderDrive";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { useDrive } from "@src/state/drive/hooks";
-import {
-  addFilesToDrive,
-  fetchTreeThunk,
-  setFileMetadataBeingEdited,
-} from "@src/state/drive/driveSlice";
-import DriveDatasetMetadataPopOver from "../molecules/DriveDatasetMetadataPopOver";
+import { addFilesToDrive } from "@src/state/drive/driveSlice";
 
 export interface DatasetMetadataInfo {
   prepopulateFromName?: string;

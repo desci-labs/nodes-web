@@ -1,4 +1,3 @@
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { DriveObject, FileType } from "../types";
 import { Actions } from "./types";
 import {

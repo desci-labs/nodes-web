@@ -6,6 +6,7 @@ export default function useScroll() {
   const { setScrollRef } = useManuscriptController(["scrollRef"]);
 
   const scrollContainerRef = useRef<any>(document.documentElement);
+  document.documentElement.style.touchAction = "none";
   const onScroll = useCallback((e: MouseEvent) => {
     viewportTarget$.next(document.scrollingElement);
   }, []);

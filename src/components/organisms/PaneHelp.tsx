@@ -53,8 +53,8 @@ const PaneHelp = () => {
       >
         <h1 className="text-2xl font-bold mb-10 pt-20">Help</h1>
         <div className="flex flex-col gap-5 h-full mb-20">
-          {HELP_ITEMS.map((a) => (
-            <HelpCard {...a} />
+          {HELP_ITEMS.map((a, i) => (
+            <HelpCard key={i} {...a} />
           ))}
         </div>
       </div>

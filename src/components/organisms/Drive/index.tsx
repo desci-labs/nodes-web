@@ -1,9 +1,3 @@
-import {
-  driveBfsByPath,
-  driveBfsByUid,
-  SessionStorageKeys,
-} from "@components/driveUtils";
-import PopOverUseMenu from "@components/molecules/PopOverUseMenu";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -15,14 +9,11 @@ import { IconCirclePlus, IconStar } from "@src/icons";
 import RenameDataModal from "./RenameDataModal";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useDrive } from "@src/state/drive/hooks";
-import {
-  addBreadCrumb,
-  navigateToDriveByPath,
-  removeBreadCrumbs,
-} from "@src/state/drive/driveSlice";
+import { navigateToDriveByPath } from "@src/state/drive/driveSlice";
 import { useSetter } from "@src/store/accessors";
 import "./styles.scss";
 import DriveBreadCrumbs from "@src/components/molecules/DriveBreadCrumbs";
+import ComponentUseModal from "@src/components/molecules/ComponentUseModal";
 
 const Empty = () => {
   return <div className="p-5 text-xs col-span-7">No files</div>;
@@ -57,10 +48,13 @@ const DriveTable: React.FC<DriveTableProps> = ({ setLoading }) => {
   const { nodeTree, status, currentDrive, deprecated, breadCrumbs } =
     useDrive();
   const dispatch = useSetter();
-
+  const { componentToUse, setComponentToUse } = useManuscriptController([
+    "componentToUse",
+  ]);
   const [selected, setSelected] = useState<
     Record<number, ResearchObjectComponentType | DriveNonComponentTypes>
   >({});
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -187,7 +181,7 @@ const DriveTable: React.FC<DriveTableProps> = ({ setLoading }) => {
         </ul>
         <StatusInfo />
       </div>
-      <PopOverUseMenu />
+      <ComponentUseModal />
       {/* {renameComponentId && (
         <RenameDataModal
           renameComponentId={renameComponentId}
