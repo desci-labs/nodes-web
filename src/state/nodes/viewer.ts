@@ -305,7 +305,10 @@ export const nodeReaderSlice = createSlice({
           };
         }
 
-        if (lastComponent.type === ResearchObjectComponentType.PDF) {
+        if (
+          lastStackComponent &&
+          lastComponent.type === ResearchObjectComponentType.PDF
+        ) {
           const lastScrollTop = state.lastScrollTop[lastComponent.id];
           if (lastScrollTop) {
             setTimeout(() => {

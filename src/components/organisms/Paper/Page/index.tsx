@@ -1,4 +1,9 @@
-import React, { MouseEvent, MouseEventHandler, useCallback, useRef } from "react";
+import React, {
+  MouseEvent,
+  MouseEventHandler,
+  useCallback,
+  useRef,
+} from "react";
 import { useEffect, useState } from "react";
 import { Page } from "react-pdf/dist/esm/entry.webpack";
 import "react-pdf/dist/umd/Page/AnnotationLayer.css";
@@ -57,13 +62,12 @@ const PageWrapper = styled.div.attrs({
   transition: opacity ease-in 10ms;
 `;
 
-const PageComponent = (props: any) => {
+const PageComponent = React.memo((props: any) => {
   const {
     pageNumber,
     renderMode = "canvas",
     canvasRef,
     pageWidth,
-    isActiveComponent,
     zoom,
     onRenderSuccess = EMPTY_FUNC,
     onLoadSuccess = EMPTY_FUNC,
@@ -79,23 +83,20 @@ const PageComponent = (props: any) => {
       width={pageWidth}
       pageNumber={pageNumber}
       // @ts-ignore
-      enhanceTextSelection={true}
-      className={`relative bg-transparent ${
-        !isActiveComponent ? "bg-white" : "bg-transparent"
-      } ${
-        !isRendered ? "opacity-0" : "opacity-100"
-      } transition-opacity duration-300 ease-out ${props.className}`}
+      enhanceTextSelection={isRendered}
+      className={`relative bg-transparent bg-white duration-300 ease-out ${props.className}`}
       onLoadSuccess={onLoadSuccess}
-      onRenderSuccess={() => {
+      onRenderSuccess={useCallback(() => {
         setIsRendered(true);
         onRenderSuccess();
-      }}
+      }, [onRenderSuccess, setIsRendered])}
+      renderTextLayer={isRendered}
       scale={zoom}
     ></Page>
   );
-};
+});
 
-export const PAGE_RENDER_DISTANCE = 5;
+export const PAGE_RENDER_DISTANCE = 30;
 
 interface PageComponentHOCProps {
   width: number;
@@ -134,13 +135,15 @@ const PageComponentHOC = React.memo(
     // cachedPageDimensions,
     pageMetadata,
     isIntersecting,
-    zoom, selectedAnnotationId, isAnnotating
+    zoom,
+    selectedAnnotationId,
+    isAnnotating,
   }: // setPageMetadata,
   PageComponentHOCProps) => {
     const pageRef = useRef<any>(null);
     const canvasRef = useRef<any>(null);
     const overlayRef = useRef<any>(null);
-    const [opacity, setOpacity] = useState<number>(0);
+    const [opacity, setOpacity] = useState<number>(1);
     const [image, setImage] = useState<string | undefined>();
 
     // const dimData = cachedPageDimensions.get(pageNumber) || [1, 1];
@@ -238,6 +241,14 @@ const PageComponentHOC = React.memo(
       [setHighlightPrompt]
     );
 
+    const onRenderSuccess = useCallback(() => {
+      if (!image) {
+        const blob = canvasRef.current.toDataURL();
+        setImage(blob);
+      }
+      setOpacity(1);
+    }, [image, setImage, setOpacity, canvasRef]);
+
     return (
       <>
         <PageWrapper
@@ -250,7 +261,10 @@ const PageComponentHOC = React.memo(
             marginBottom: PDF_PAGE_SPACING,
             cursor: isAnnotating ? "crosshair" : undefined,
           }}
-          onLoad={() => __log(`Page ${pageNumber} loaded`)}
+          onLoad={useCallback(
+            () => __log(`<PageWrapper> ${pageNumber} loaded`),
+            [pageNumber]
+          )}
           onClick={onPageClick}
         >
           <Desktop>
@@ -286,13 +300,7 @@ const PageComponentHOC = React.memo(
                 ratio={ratio}
                 isScrolling={isScrolling}
                 isPinching={isPinching}
-                onRenderSuccess={() => {
-                  if (!image) {
-                    const blob = canvasRef.current.toDataURL();
-                    setImage(blob);
-                  }
-                  setOpacity(1);
-                }}
+                onRenderSuccess={onRenderSuccess}
               />
             ) : null}
             <div

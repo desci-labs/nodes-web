@@ -84,11 +84,13 @@ const ComponentStackView = (props: ComponentStackViewProps) => {
       {/**
        * When no components, show the drive
        */}
-      {componentStack.length < 1 && !forceRefreshDrive && manifestData ? (
+      {!componentStack ||
+      (componentStack.length < 1 && !forceRefreshDrive && manifestData) ? (
         <RenderedDrive />
       ) : (
-        componentStack.map(
-          (component: ResearchObjectV1Component, index: number) => {
+        componentStack
+          .filter(Boolean)
+          .map((component: ResearchObjectV1Component, index: number) => {
             const isDataComponent =
               component.type === ResearchObjectComponentType.DATA;
             return (
@@ -100,8 +102,7 @@ const ComponentStackView = (props: ComponentStackViewProps) => {
                 {renderComponent(component)}
               </ComponentWrapper>
             );
-          }
-        )
+          })
       )}
 
       {/* <PaperLoader
