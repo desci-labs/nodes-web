@@ -2,6 +2,9 @@ import React, { useRef, useState } from "react";
 import { useResponsive } from "hooks";
 import { ResearchObjectComponentAnnotation } from "@desci-labs/desci-models";
 import { usePdfReader } from "@src/state/nodes/hooks";
+import { useUpdateEffect } from "react-use";
+import { setSelectedAnnotationId } from "@src/state/nodes/pdf";
+import { useSetter } from "@src/store/accessors";
 
 const AnnotationBox = (props: any) => {
   const {
@@ -11,15 +14,21 @@ const AnnotationBox = (props: any) => {
     hoveredAnnotationId,
     annotationsVisible,
   } = props;
+  const { zoom } = usePdfReader();
+  const dispatch = useSetter();
   const { isDesktop } = useResponsive();
   const annotationRef = useRef<any>(null);
+
+  const showAnnotationTip = !isDesktop || zoom > 2;
 
   return (
     <div
       key={`annotation_layer_${annotation.id}`}
       ref={annotationRef}
       data-annotation-target="should-skip"
-      className={`annotation-bubble flex justify-center items-center ${
+      className={`${
+        showAnnotationTip ? "" : "annotation-bubble"
+      } flex justify-center items-center ${
         isAnnotating ? "pointer-events-none" : ""
       }`}
       style={{
@@ -31,26 +40,26 @@ const AnnotationBox = (props: any) => {
         height: `${(annotation.endY - annotation.startY) * 100}%`,
         minHeight: 5,
         opacity:
-          (!isDesktop && !selectedAnnotationId) ||
+          (showAnnotationTip && !selectedAnnotationId) ||
           hoveredAnnotationId === annotation.id ||
           selectedAnnotationId === annotation.id ||
-          (isDesktop && annotation.__client?.move) // annotation.__client is deleted if saved to server, meaning if __client is present this annotation hasn't been saved to server yet
+          (isDesktop && zoom < 2 && annotation.__client?.move) // annotation.__client is deleted if saved to server, meaning if __client is present this annotation hasn't been saved to server yet
             ? 1
             : 0,
         transition: "opacity 0.5s ease-out",
       }}
     >
-      {!isDesktop ? (
+      {showAnnotationTip ? (
         <div
-          className={`p-4`}
+          className={`p-4 cursor-pointer hover:opacity-75`}
           onClick={() => {
             if (annotationsVisible) {
-              alert("clicked!");
+              dispatch(setSelectedAnnotationId(annotation.id));
             }
           }}
         >
-          <div className="flex justify-center items-center w-6 h-6 rounded-full bg-white border-blue-600 border-2">
-            <div className="w-3 h-3 rounded-full bg-blue-600 animate-pulse"></div>
+          <div className="flex justify-center items-center w-6 h-6 rounded-full bg-white border-tint-primary border-2">
+            <div className="w-3 h-3 rounded-full bg-tint-primary animate-pulse"></div>
           </div>
         </div>
       ) : null}
@@ -62,8 +71,9 @@ const AnnotationLayer = React.memo((props: any) => {
   const { thisPageAnnotations, under, isScrolling, isPinching, pageRef } =
     props;
   const { isDesktop } = useResponsive();
-  const [annotationsVisible] = useState<boolean>(isDesktop);
-  const { hoveredAnnotationId, selectedAnnotationId, isAnnotating } =
+  const [annotationsVisible, setAnnotationsVisible] =
+    useState<boolean>(isDesktop);
+  const { hoveredAnnotationId, selectedAnnotationId, isAnnotating, zoom } =
     usePdfReader();
 
   /**
@@ -71,18 +81,18 @@ const AnnotationLayer = React.memo((props: any) => {
    * Then, only when both events are stopped set a timer to hide annotations
    * If the user starts scrolling or pinching before the timer is up, cancel it
    */
-  // useUpdateEffect(() => {
-  //   if (!isDesktop) {
-  //     if (isScrolling || isPinching) {
-  //       setAnnotationsVisible(true);
-  //     } else {
-  //       const timeoutID = setTimeout(() => setAnnotationsVisible(false), 3000);
-  //       return () => clearTimeout(timeoutID);
-  //     }
-  //   } else if (!annotationsVisible) {
-  //     setAnnotationsVisible(true);
-  //   }
-  // }, [isDesktop, isScrolling, isPinching]);
+  useUpdateEffect(() => {
+    if (!isDesktop || zoom > 2) {
+      if (isScrolling || isPinching) {
+        setAnnotationsVisible(true);
+      } else {
+        const timeoutID = setTimeout(() => setAnnotationsVisible(false), 3000);
+        return () => clearTimeout(timeoutID);
+      }
+    } else if (!annotationsVisible) {
+      setAnnotationsVisible(true);
+    }
+  }, [isDesktop, isScrolling, isPinching]);
 
   // (
   //   `AnnotationLayer::render, annotationsVisible=${annotationsVisible}, selectedAnnotationId=${selectedAnnotationId}, hoveredAnnotationId=${hoveredAnnotationId}, isDesktop=${isDesktop}`
@@ -94,13 +104,15 @@ const AnnotationLayer = React.memo((props: any) => {
         absolute
         top-0 left-0 right-0 bottom-0
         w-full h-full
-        annotation-display
+        annotation-display-old
         ${annotationsVisible ? "opacity-100" : "opacity-0"}
         transition-opacity duration-500 ease-out
       `}
       style={{
         zIndex:
-          isDesktop && !(selectedAnnotationId || hoveredAnnotationId)
+          isDesktop &&
+          zoom < 2 &&
+          !(selectedAnnotationId || hoveredAnnotationId)
             ? -1
             : undefined,
       }}

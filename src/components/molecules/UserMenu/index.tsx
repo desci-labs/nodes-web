@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import SwirlingUniverse from "@images/swirling-universe.png";
 import "./style.scss";
 import { useWeb3React } from "@web3-react/core";
-import { useEffectOnce } from "react-use";
+import { useClickAway, useEffectOnce } from "react-use";
 import FriendReferralButton from "../../organisms/FriendReferral/FriendReferralButton";
 import { useNavigate } from "react-router-dom";
 import { app, site } from "@src/constants/routes";
@@ -104,8 +104,10 @@ const UserMenu = (props: Props) => {
 
   const [minWidth] = useState(140);
 
-  const menuRef = useRef<HTMLDivElement>();
-
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  useClickAway(menuRef, () => {
+    setOpen(false);
+  });
   const handleReferralButtonClick = useCallback(() => {
     setOpen((opened) => true);
   }, [setOpen]);

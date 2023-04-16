@@ -1,4 +1,9 @@
-import { ButtonHTMLAttributes, useEffect, useMemo, useState } from "react";
+import React, {
+  ButtonHTMLAttributes,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 import { useNodeReader, useNodeVersions } from "@src/state/nodes/hooks";
 import {
@@ -28,7 +33,7 @@ enum ShareTabs {
   Public = "Public",
 }
 
-export default function ShareModal(props: ModalProps) {
+const ShareModal = React.memo((props: ModalProps) => {
   const user = useUser();
   const dispatch = useSetter();
   const { data: nodes } = useGetNodesQuery();
@@ -156,7 +161,8 @@ export default function ShareModal(props: ModalProps) {
       )}
     </Modal>
   );
-}
+});
+export default ShareModal;
 
 const getShareLink = (shareId: string) =>
   `${window.location.origin}/share/${shareId}`;
@@ -175,12 +181,17 @@ export function CopyShareLink(
       disabled={copied}
     >
       <IconCopyLink
-        className={`transition-colors ${copied ? "fill-neutrals-gray-7" : "fill-white group-hover:text-black group-hover:fill-black"
-          } `}
+        className={`transition-colors ${
+          copied
+            ? "fill-neutrals-gray-7"
+            : "fill-white group-hover:text-black group-hover:fill-black"
+        } `}
         width={20}
         height={20}
       />
-      <span className="w-36 block">{copied ? "Link copied" : "Copy Read-Only link"}</span>
+      <span className="w-36 block">
+        {copied ? "Link copied" : "Copy Read-Only link"}
+      </span>
     </ButtonSecondary>
   );
 }

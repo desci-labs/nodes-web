@@ -12,7 +12,7 @@ import {
   IconFile,
   IconNetwork,
 } from "@icons";
-import {
+import React, {
   ButtonHTMLAttributes,
   PropsWithChildren,
   useEffect,
@@ -65,7 +65,7 @@ function LinkCopier(
   );
 }
 
-export default function SharePublished() {
+const SharePublished = React.memo(() => {
   const {
     manifest: manifestData,
     currentObjectId,
@@ -269,4 +269,6 @@ export default function SharePublished() {
   }
 
   return body;
-}
+});
+
+export default SharePublished;

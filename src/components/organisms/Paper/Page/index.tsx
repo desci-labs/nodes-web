@@ -72,6 +72,7 @@ const PageComponent = React.memo((props: any) => {
     zoom,
     onRenderSuccess = EMPTY_FUNC,
     onLoadSuccess = EMPTY_FUNC,
+    visible,
   } = props;
 
   const [isRendered, setIsRendered] = useState<boolean>(true);
@@ -85,7 +86,9 @@ const PageComponent = React.memo((props: any) => {
       pageNumber={pageNumber}
       // @ts-ignore
       enhanceTextSelection={isRendered}
-      className={`relative bg-transparent ${props.className}`}
+      className={`relative ${visible ? "" : "invisible"} bg-transparent ${
+        props.className
+      }`}
       onLoadSuccess={onLoadSuccess}
       onRenderSuccess={useCallback(() => {
         setIsRendered(true);
@@ -93,11 +96,17 @@ const PageComponent = React.memo((props: any) => {
       }, [onRenderSuccess, setIsRendered])}
       renderTextLayer={isRendered}
       scale={zoom}
+      loading={useCallback(
+        () => (
+          <></>
+        ),
+        []
+      )}
     ></Page>
   );
 });
 
-export const PAGE_RENDER_DISTANCE = 30;
+export const PAGE_RENDER_DISTANCE = 5;
 
 interface PageComponentHOCProps {
   width: number;
@@ -114,7 +123,7 @@ interface PageComponentHOCProps {
   // cachedPageDimensions: Map<number, number[]>;
   zoom: number;
   selectedAnnotationId: string | undefined;
-  isAnnotating: boolean;
+  pdfUrl: string;
   pageMetadata: PageMetadata;
   isIntersecting: boolean;
   // setPageMetadata: (pm: PageMetadata) => void;
@@ -142,17 +151,15 @@ const PageComponentHOC = React.memo(
     isIntersecting,
     zoom,
     selectedAnnotationId,
-    isAnnotating,
+    pdfUrl,
   }: // setPageMetadata,
   PageComponentHOCProps) => {
     const pageRef = useRef<any>(null);
     const canvasRef = useRef<any>(null);
     const overlayRef = useRef<any>(null);
     const [opacity, setOpacity] = useState<number>(0);
-    const { currentObjectId } = useNodeReader();
 
-    const imageCacheKey = (pageNumber: number) =>
-      `${pageNumber}_${currentObjectId}`;
+    const imageCacheKey = (pageNumber: number) => `${pageNumber}_${pdfUrl}`;
     const cacheKey: string = imageCacheKey(pageNumber);
     const [image, setImage] = useState<string | undefined>(
       imageCache[cacheKey]
@@ -179,8 +186,7 @@ const PageComponentHOC = React.memo(
       }
     }, [isIntersecting, isScrolling]);
 
-    const showCanvas =
-      isIntersectingAfterScroll && !isPinching && !isAnnotating;
+    const showCanvas = isIntersectingAfterScroll && !isPinching;
 
     // TODO: UNCOMMENT FOR SCROLL AWAY CODE
     // useEffect(() => {
@@ -255,7 +261,9 @@ const PageComponentHOC = React.memo(
 
     const onRenderSuccess = useCallback(() => {
       if (!image) {
-        const blob = canvasRef.current.toDataURL();
+        //FIXME add {willReadFrequently: true}
+        // https://github.com/fserb/canvas2D/blob/master/spec/will-read-frequently.md
+        const blob = canvasRef.current?.toDataURL();
         imageCache[cacheKey] = blob;
         setImage(blob);
       }
@@ -272,7 +280,6 @@ const PageComponentHOC = React.memo(
             height: pageWidth * (ratio || 1) * zoom,
 
             marginBottom: PDF_PAGE_SPACING,
-            cursor: isAnnotating ? "crosshair" : undefined,
           }}
           onLoad={useCallback(
             () => __log(`<PageWrapper> ${pageNumber} loaded`),
@@ -292,20 +299,7 @@ const PageComponentHOC = React.memo(
           ) : null}
           {/* {
             Math.abs(pdfCurrentPage - pageNumber) < PAGE_RENDER_DISTANCE ? ( */}
-          <img
-            src={image}
-            key={`img_${cacheKey}`}
-            alt=""
-            className={`absolute top-0 left-0 right-0 bottom-0 ${
-              under ? "" : "z-[60]"
-            } w-full h-full pointer-events-none ${
-              image
-                ? !isIntersecting
-                  ? "opacity-100 "
-                  : "opacity-0"
-                : "opacity-0"
-            } !z-[60] transition-all duration-[1s] delay-1000 ease-in`}
-          />
+
           {isIntersecting ? (
             <>
               <AnnotationEditCanvas
@@ -314,7 +308,18 @@ const PageComponentHOC = React.memo(
                 annotations={pageAnnotations}
                 className={`relative ${under ? "" : "z-50"} w-full h-full`}
               >
-                {showCanvas || !image ? (
+                <img
+                  src={image}
+                  key={`img_${cacheKey}`}
+                  alt=""
+                  className={`pointer-events-none absolute top-0 left-0 right-0 bottom-0 ${
+                    under ? "" : "z-[50]"
+                  } w-full h-full ${
+                    image ? "opacity-100" : "opacity-0"
+                  } transition-all z-[-10] duration-[0.2s]  ease-in`}
+                />
+
+                <div className={`z-back-on-annotate h-fit w-fit`}>
                   <PageComponent
                     pageNumber={pageNumber}
                     canvasRef={canvasRef}
@@ -325,11 +330,11 @@ const PageComponentHOC = React.memo(
                     isScrolling={isScrolling}
                     isPinching={isPinching}
                     onRenderSuccess={onRenderSuccess}
+                    visible={!image || showCanvas}
                   />
-                ) : null}
-
+                </div>
                 <div
-                  className={`bg-red-200 z-50 absolute ${
+                  className={` z-50 absolute ${
                     highlightPrompt ? "opacity-100" : "opacity-0"
                   }`}
                   style={
