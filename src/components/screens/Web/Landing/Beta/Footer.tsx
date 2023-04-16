@@ -4,7 +4,7 @@ import { IconDiscord, IconGitbook, IconGithub, IconTwitter } from "@src/icons";
 
 export default function Footer() {
   return (
-    <footer className="bg-black w-full py-12 xs:px-0 px-4 lg:px-0">
+    <footer className="bg-black w-full py-12 xs:px-0 px-10 lg:px-0">
       <div className="container mx-auto max-w-5xl grid md:grid-cols-2 place-content-center md:place-content-between text-white py-5">
         <section className="flex items-center my-2 flex-wrap order-1 md:order-0 gap-1 md:gap-4">
           <div className="mx-2 my-2">
@@ -50,7 +50,7 @@ export default function Footer() {
             </div>
           </div>
         </section>
-        <section className="place-self-center md:mb-5 md:place-self-end flex order-0 md:order-1">
+        <section className="place-self-center mb-12 md:mb-5 md:place-self-end flex order-0 md:order-1">
           <a
             href="https://github.com/desci-labs"
             target="_blank"

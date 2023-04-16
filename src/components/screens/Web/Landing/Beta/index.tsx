@@ -20,7 +20,7 @@ export default function BetaLanding() {
   return (
     <>
       <Header />
-      <div className="px-4 lg:px-0">
+      <div className="px-10 lg:px-0">
         <Banner />
         <IntroCards />
         <Terminologies />
@@ -144,8 +144,8 @@ export const Banner = () => {
   return (
     <section className="container mx-auto max-w-5xl flex flex-col gap-10 md:gap-0 md:flex-row items-center justify-between mt-24 md:mt-36 relative">
       <div className="flex flex-col items-start justify-start text-white gap-5">
-        <h1 className="text-6xl md:text-6xl max-w-3xl !leading-tight">
-          Next-generation scientific publishing
+        <h1 className="text-4xl md:text-6xl max-w-3xl !leading-tight">
+          An experimental platform for next-generation scientific publishing
         </h1>
         <span className="text-2xl mb-2">
           Publish composable research objects stored open state
