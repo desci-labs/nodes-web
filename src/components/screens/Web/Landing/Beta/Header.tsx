@@ -7,7 +7,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { TextLink } from "./Footer";
 import { useMobileMenu, useSetMobileMenu } from "./useAppMenu";
 const LINK_STYLE =
-  "text-white hover:border-tint-primary border-transparent border-b-2 !no-underline transition-all";
+  "text-white hover:border-tint-primary border-transparent border-b-4 !no-underline transition-all";
 export const BetaLogo = ({
   textClassName,
   className,
@@ -101,7 +101,7 @@ function MenuTrigger() {
       >
         <IconHamburger
           color="white"
-          stroke="#000"
+          stroke="transparent"
           fill="#fff"
           width={40}
           height={20}
@@ -117,8 +117,8 @@ function MobileMenu() {
 
   return (
     <div
-      className={`z-50 pointer-none opacity-0 md:hidden fixed left-0 right-0 top-0 min-h-[50px] p-4 backdrop-blur-2xl overflow-hidden w-full ${
-        opened ? "pointer-click opacity-100 animate-slideFromTop" : "h-0"
+      className={`pointer-none opacity-0 z-[-1] md:hidden fixed left-0 right-0 top-0 min-h-[50px] p-4 backdrop-blur-2xl overflow-hidden w-full ${
+        opened ? "!z-50 pointer-click opacity-100 animate-slideFromTop" : "h-0"
       }`}
     >
       <div className="flex items-center">

@@ -109,7 +109,7 @@ function TermItem(
 const IntroCards = () => (
   <>
     <div id="intro-cards" />
-    <div className="container mx-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 place-content-between mt-36 w-full gap-10">
+    <div className="container mx-auto max-w-4xl grid grid-cols-1 md:grid-cols-2 place-content-between mt-36 w-full gap-8">
       <IntroCard
         title="Elevate your research"
         caption="Use FAIR-enabling technology for your preprints and Green Open Access
@@ -180,8 +180,8 @@ function IntroCard(props: {
   Icon: SvgIconProps;
 }) {
   return (
-    <div className="p-[1px] border border-neutrals-gray-5 bg-transparent from-[#00E3FF] to-[#0A697C] text-white rounded-md box-border group">
-      <div className="p-10 py-16 text-white rounded-md box-border h-full w-full flex flex-col items-start justify-center md:min-w-[330px] min-h-[360px]">
+    <div className="p-[1px]  border-neutrals-gray-3 border-2 bg-transparent from-[#00E3FF] to-[#0A697C] text-white rounded-md box-border group">
+      <div className="px-12 py-12 text-white rounded-md box-border h-full w-full flex flex-col items-start justify-center">
         <div className="flex flex-col gap-1 items-start">
           <props.Icon width={35} className="mb-1" />
           <h2 className="text-2xl font-bold">{props.title}</h2>
