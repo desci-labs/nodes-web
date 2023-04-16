@@ -136,21 +136,21 @@ export function inheritMetadata(
 
 export const DRIVE_EXTERNAL_LINKS_PATH = "externallinks";
 
-export function inheritComponentType(
+export function getAncestorComponent(
   drive: DriveObject,
   pathToCompMap: Record<DrivePath, ResearchObjectV1Component>
-) {
+): ResearchObjectV1Component | null {
   const pathSplit = drive.path!.split("/");
-  if (pathSplit.length < 3) return ResearchObjectComponentType.UNKNOWN;
+  if (pathSplit.length < 3) return null;
   while (pathSplit.length > 1) {
     pathSplit.pop();
     const parentPath = pathSplit.join("/");
     const parent = pathToCompMap[parentPath];
     if (parent && parent.type !== ResearchObjectComponentType.UNKNOWN) {
-      return parent.type;
+      return parent;
     }
   }
-  return ResearchObjectComponentType.UNKNOWN;
+  return null;
 }
 
 export function hasPublic(tree: DriveObject): boolean {
@@ -173,8 +173,15 @@ export function convertIpfsTreeToDriveObjectTree(
     const neutralPath = neutralizePath(branch.path!);
     branch.path = neutralPath;
     const component = pathToCompMap[branch.path!];
+    const ancestorComponent: ResearchObjectV1Component | null =
+      getAncestorComponent(branch, pathToCompMap);
     branch.componentType =
-      component?.type || inheritComponentType(branch, pathToCompMap);
+      component?.type ||
+      ancestorComponent?.type ||
+      ResearchObjectComponentType.UNKNOWN;
+
+    // useful for annotation insert on file tree under a code component for example (refer to component id later)
+    branch.componentId = component?.id || ancestorComponent?.id;
     branch.accessStatus = fileDirBranch.published
       ? AccessStatus.PUBLIC
       : AccessStatus.PRIVATE;
