@@ -444,7 +444,7 @@ export const updateDag = async ({
   if (componentType) formData.append("componentType", componentType);
   if (componentSubType) formData.append("componentSubType", componentSubType);
   if (externalCids?.length)
-    formData.append("externalCid", JSON.stringify(externalCids));
+    formData.append("externalCids", JSON.stringify(externalCids));
   formData.append("contextPath", contextPath);
   // debugger;
   if (externalUrl?.path?.length && externalUrl?.url?.length)

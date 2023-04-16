@@ -30,7 +30,7 @@ export function getIconForUploadType(type: UploadTypes) {
     case UploadTypes.DIR:
       return <IconFolderStroke />;
     case UploadTypes.CID:
-      return <IconIpfs />;
+      return <IconIpfs width={18} />;
     case UploadTypes.FILE:
     default:
       return <IconFile width={18} height={18} />;

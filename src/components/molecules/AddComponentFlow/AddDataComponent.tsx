@@ -55,11 +55,12 @@ export const ButtonAddData = ({ close }: Props) => {
     if (!externalCidName.length || !externalCid.length) return;
     dispatch(
       addFilesToDrive({
-        externalCids: [{ [externalCidName]: externalCid }],
+        externalCids: [{ name: externalCidName, cid: externalCid }],
         componentType: ResearchObjectComponentType.DATA,
       })
     );
     close();
+    setIsAddingComponent(false);
   };
 
   useEffect(() => {
