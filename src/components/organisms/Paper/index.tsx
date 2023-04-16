@@ -603,7 +603,7 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
                 const pageMetadataItem = pageMetadata[index];
                 return (
                   <div
-                    key={`intersecting_page_${pageNum}`}
+                    key={`intersecting_page_${currentPdf}_${pageNum}`}
                     style={{
                       position: "absolute",
                       width: pageWidth * zoom,
@@ -649,9 +649,9 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
                             ? highlightPrompt
                             : undefined
                         }
+                        pdfUrl={currentPdf}
                         zoom={zoom}
                         selectedAnnotationId={selectedAnnotationId}
-                        isAnnotating={isAnnotating}
                         pageMetadata={pageMetadataItem}
                         isIntersecting={visible}
                       />

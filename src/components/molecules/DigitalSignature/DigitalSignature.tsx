@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 
 import cx from "classnames";
@@ -84,4 +84,4 @@ const DigitalSignature = () => {
   );
 };
 
-export default DigitalSignature;
+export default React.memo(DigitalSignature);

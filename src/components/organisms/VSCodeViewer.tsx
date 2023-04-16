@@ -236,28 +236,27 @@ interface DisplayComputeEnabledVsCodeProps {
   lastCode?: string;
 }
 
-const DisplayComputeEnabledVsCode = ({
-  ref,
-  lastCode,
-}: DisplayComputeEnabledVsCodeProps) => {
-  const userProfile = useUser();
-  const canExec = userProfile && userProfile.vscode;
-  const DEFAULT_CODE_SERVER_EXEC =
-    process.env.REACT_APP_CODE_SERVER ||
-    `https://${userProfile.vscode}.desci.dev`;
-  if (!canExec) {
-    return null;
+const DisplayComputeEnabledVsCode = React.memo(
+  ({ ref, lastCode }: DisplayComputeEnabledVsCodeProps) => {
+    const userProfile = useUser();
+    const canExec = userProfile && userProfile.vscode;
+    const DEFAULT_CODE_SERVER_EXEC =
+      process.env.REACT_APP_CODE_SERVER ||
+      `https://${userProfile.vscode}.desci.dev`;
+    if (!canExec) {
+      return null;
+    }
+    return (
+      <iframe
+        ref={ref}
+        title={"code.desci.com"}
+        src={`${DEFAULT_CODE_SERVER_EXEC}?folder=/config/workspace/${
+          lastCode?.split("/").pop() || ""
+        }`}
+        className="w-[calc(100vw-336px)] h-[calc(100vh-55px)] select-none"
+      />
+    );
   }
-  return (
-    <iframe
-      ref={ref}
-      title={"code.desci.com"}
-      src={`${DEFAULT_CODE_SERVER_EXEC}?folder=/config/workspace/${
-        lastCode?.split("/").pop() || ""
-      }`}
-      className="w-[calc(100vw-336px)] h-[calc(100vh-55px)] select-none"
-    />
-  );
-};
+);
 
 export default React.memo(VSCodeViewer);

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import UserMenu from "@components/molecules/UserMenu";
 import {
   APPROXIMATED_HEADER_HEIGHT,
@@ -248,4 +248,4 @@ const PdfHeader = () => {
   );
 };
 
-export default PdfHeader;
+export default React.memo(PdfHeader);
