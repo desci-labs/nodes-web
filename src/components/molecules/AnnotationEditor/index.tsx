@@ -55,7 +55,9 @@ import {
 } from "./utils";
 import toast from "react-hot-toast";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
-import { usePdfReader } from "@src/state/nodes/hooks";
+import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
+import { useDrive } from "@src/state/drive/hooks";
+import { bfsDriveSearch } from "@src/state/drive/utils";
 
 const HOTKEYS: any = {
   "mod+b": "bold",
@@ -831,6 +833,8 @@ const DirectoryButton = ({
   // const editor = useSlate();
   const directoryRef = useRef(null);
   const [showDirectory, setShowDirectory] = useState<boolean>(false);
+  const { manifest } = useNodeReader();
+  const { nodeTree, currentDrive } = useDrive();
 
   useClickAway(directoryRef, (e) => {
     setShowDirectory(false);
@@ -847,10 +851,31 @@ const DirectoryButton = ({
           <DriveTable
             onRequestClose={() => setShowDirectory(false)}
             onInsert={(file) => {
+              const ancestorComponent = manifest?.components.find(
+                (c) => c.id === file.componentId
+              );
+              const ancestorComponentId = ancestorComponent?.id;
+
+              let ancestorComponentPath = ancestorComponent?.payload?.path;
+              if (ancestorComponentPath) {
+                // remove ancestor path from file.path
+                ancestorComponentPath = file?.path
+                  ?.replace(ancestorComponentPath, "")
+                  .substring(1);
+              }
+
               const linkElem: any = {
                 type: "link",
-                link: `#/${file.componentType}/${file.cid}`,
-                fileName: file.name,
+                link: `#/${file.componentType}/${
+                  ancestorComponentId || file.cid
+                }${
+                  ancestorComponentPath
+                    ? `?path=${ancestorComponentPath}`
+                    : `/${file.path}`
+                }`,
+                fileName: `${
+                  ancestorComponent ? `${ancestorComponent.name}: ` : ""
+                }${file.name}`,
                 children: [{ text: "" }],
               };
               Transforms.insertNodes(editor, linkElem);
