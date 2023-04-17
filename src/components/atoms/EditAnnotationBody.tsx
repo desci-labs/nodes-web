@@ -26,7 +26,7 @@ const EditAnnotationBody = ({
         <div className="flex flex-row text-xs gap-2 justify-between h-12 font-mono p-4 bg-gray-200 -mx-3 w-[calc(100%+12px)]">
           Raw Annotation{" "}
           <a
-            href="https://en.wikipedia.org/wiki/Markdown"
+            href="https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax"
             target="blank"
             rel="noreferrer noopener"
           >
