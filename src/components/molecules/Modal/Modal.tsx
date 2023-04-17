@@ -96,6 +96,17 @@ export default function Modal({
     leave: { opacity: 0 },
   });
 
+  useEffect(() => {
+    if (isOpen) {
+      lockScroll(true);
+    } else {
+      restoreScroll(true);
+    }
+    return () => {
+      restoreScroll(true);
+    };
+  }, []);
+
   return (
     <>
       {fadeTransition(

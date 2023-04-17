@@ -134,8 +134,12 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
     setMounted(true);
     const panelEl = document.getElementById("manuscript-side-panel");
     if (panelEl) {
-      panelEl.onmouseover = lockScroll;
-      panelEl.onmouseout = restoreScroll;
+      panelEl.onmouseover = () => {
+        lockScroll();
+      };
+      panelEl.onmouseout = () => {
+        restoreScroll();
+      };
     }
   });
 
