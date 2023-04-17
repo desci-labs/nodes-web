@@ -18,16 +18,16 @@ export default function HistoryPreview() {
     <div className="flex flex-row">
       <TimelineGutter style={{ height: height }}></TimelineGutter>
       <div className="flex-1 flex flex-col gap-5 py-0.5">
-        <div className="text-[10px] -mb-5 -ml-6 flex gap-2 rounded-md text-center text-gray-400 w-full justify-center">
-          {loadingChain && !history.length ? (
+        {loadingChain && !history.length ? (
+          <div className="text-[10px] -mb-5 -ml-6 flex gap-2 rounded-md text-center text-gray-400 w-full justify-center">
             <div>
               <LoaderHistoryEntry selected={true} />
               <LoaderHistoryEntry selected={false} />
             </div>
-          ) : (
-            <>&nbsp;</>
-          )}
-        </div>
+          </div>
+        ) : (
+          <></>
+        )}
         {!loadingChain && !history.length && (
           <div className="text-xs italic text-gray-500 w-[85%] text-center">
             Node is not yet published
