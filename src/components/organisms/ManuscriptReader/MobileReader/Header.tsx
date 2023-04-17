@@ -8,7 +8,6 @@ export default function Header() {
   const { manifest } = useNodeReader();
   const { dpid } = useComponentDpid();
   const { cover } = useNodeCover();
-
   const onHandleShare = async () => {
     try {
       await navigator.share({
@@ -31,7 +30,7 @@ export default function Header() {
           rgba(0, 0, 0, 0.8618040966386554) 100%
         ), url(${cover})`,
         backgroundRepeat: "no-repeat",
-        backgroundPosition: "top",
+        backgroundPosition: "center",
         backgroundSize: "cover",
         objectFit: "cover",
       }}
