@@ -562,7 +562,6 @@ export const addFilesToDrive = createAsyncThunk(
     const contextPath = overwritePathContext || state.drive.currentDrive!.path!;
     const snapshotNodeUuid = currentObjectId!;
     try {
-      // debugger;
       const {
         manifest: updatedManifest,
         rootDataCid,

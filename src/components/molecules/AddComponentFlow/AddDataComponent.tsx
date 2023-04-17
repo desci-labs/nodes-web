@@ -55,12 +55,12 @@ export const ButtonAddData = ({ close }: Props) => {
     if (!externalCidName.length || !externalCid.length) return;
     dispatch(
       addFilesToDrive({
-        externalCids: [{ name: externalCidName, cid: externalCid }],
         componentType: ResearchObjectComponentType.DATA,
+        externalCids: [{ name: externalCidName, cid: externalCid }],
       })
     );
-    close();
-    setIsAddingComponent(false);
+    // close();
+    // setIsAddingComponent(false);
   };
 
   useEffect(() => {
@@ -78,9 +78,12 @@ export const ButtonAddData = ({ close }: Props) => {
           autoUpload={true}
           customReq={(files) => {
             setTimeout(() => {
-              setIsAddingComponent(false);
-              setDroppedFileList(files);
-              setIsAddingComponent(false);
+              dispatch(
+                addFilesToDrive({
+                  componentType: ResearchObjectComponentType.DATA,
+                  files,
+                })
+              );
             }, 500);
             setTimeout(() => {
               close();
