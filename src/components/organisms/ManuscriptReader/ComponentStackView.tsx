@@ -88,6 +88,7 @@ const ComponentStackView = (props: ComponentStackViewProps) => {
       {!componentStack ||
       (componentStack.filter(
         (a) =>
+          a &&
           a.type != ResearchObjectComponentType.DATA &&
           a.type != ResearchObjectComponentType.UNKNOWN &&
           a.type != ResearchObjectComponentType.DATA_BUCKET

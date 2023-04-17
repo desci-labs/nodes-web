@@ -163,6 +163,7 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
   const showCloseButton =
     componentStack.filter(
       (a) =>
+        a &&
         a.type != ResearchObjectComponentType.DATA &&
         a.type != ResearchObjectComponentType.UNKNOWN &&
         a.type != ResearchObjectComponentType.DATA_BUCKET
@@ -172,6 +173,7 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
     isResearchPanelOpen ||
     componentStack.filter(
       (a) =>
+        a &&
         a.type != ResearchObjectComponentType.DATA &&
         a.type != ResearchObjectComponentType.UNKNOWN &&
         a.type != ResearchObjectComponentType.DATA_BUCKET
