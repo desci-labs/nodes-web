@@ -1,9 +1,9 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { __log } from "@src/components/utils";
 import adminAnalyticsReducer from "@src/state/analytics/analyticsSlice";
-import { api } from "@src/state/api";
 import driveReducer from "@src/state/drive/driveSlice";
 import { nodeReaderMiddleware } from "@src/state/nodes/middleware";
+import { api, media_api } from "@src/state/api";
 import { nodesReducer } from "@src/state/nodes/root";
 import preferenceSlice from "@src/state/preferences/preferencesSlice";
 import userSlice from "@src/state/user/userSlice";
@@ -21,6 +21,7 @@ const rootReducer = combineReducers({
   preferences: preferenceSlice,
   adminAnalytics: adminAnalyticsReducer,
   [api.reducerPath]: api.reducer,
+  [media_api.reducerPath]: media_api.reducer,
   nodes: nodesReducer,
   drive: driveReducer,
 });
@@ -55,6 +56,7 @@ const persistConfig = {
     "nodeViewer",
     "adminAnalytics",
     api.reducerPath,
+    media_api.reducerPath,
   ],
   transforms: [nestedBlacklist],
 };
@@ -68,8 +70,11 @@ export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false })
-      .prepend(nodeReaderMiddleware.middleware)
-      .concat([api.middleware]),
+    .prepend(nodeReaderMiddleware.middleware)
+    .concat([
+      api.middleware,
+      media_api.middleware,
+    ]),
 });
 
 export const persistor = persistStore(store);
