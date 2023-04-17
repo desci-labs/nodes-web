@@ -134,8 +134,12 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
     setMounted(true);
     const panelEl = document.getElementById("manuscript-side-panel");
     if (panelEl) {
-      panelEl.onmouseover = lockScroll;
-      panelEl.onmouseout = restoreScroll;
+      panelEl.onmouseover = () => {
+        lockScroll();
+      };
+      panelEl.onmouseout = () => {
+        restoreScroll();
+      };
     }
   });
 
@@ -159,6 +163,7 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
   const showCloseButton =
     componentStack.filter(
       (a) =>
+        a &&
         a.type != ResearchObjectComponentType.DATA &&
         a.type != ResearchObjectComponentType.UNKNOWN &&
         a.type != ResearchObjectComponentType.DATA_BUCKET
@@ -168,6 +173,7 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
     isResearchPanelOpen ||
     componentStack.filter(
       (a) =>
+        a &&
         a.type != ResearchObjectComponentType.DATA &&
         a.type != ResearchObjectComponentType.UNKNOWN &&
         a.type != ResearchObjectComponentType.DATA_BUCKET

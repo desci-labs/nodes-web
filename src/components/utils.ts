@@ -215,32 +215,40 @@ export const capitalize = (str: string) => {
  * The problem with this is the width of the scrollbar causes a layout shift when it disappears, so we adjust FIXED_ELEMENTS above according to the width of the scrollbar
  */
 
-export const restoreScroll = () => {
+export const restoreScroll = (nudgeForWindows?: boolean) => {
   // debugger;
-  FIXED_ELEMENTS.forEach((a) => {
-    const el = document.querySelector(a.selector) as HTMLElement;
-    if (!el) {
-      return;
-    }
-    (el.style as any)[a.strategy] = "0px";
-  });
+  if (nudgeForWindows === true) {
+    FIXED_ELEMENTS.forEach((a) => {
+      const el = document.querySelector(a.selector) as HTMLElement;
+      if (!el) {
+        return;
+      }
+      (el.style as any)[a.strategy] = "0px";
+    });
+  } else {
+    document.getElementsByTagName("html")[0].style.overflowY = "inherit";
+  }
   document.body.style.overflowY = "scroll";
 };
 
-export const lockScroll = () => {
+export const lockScroll = (nudgeForWindows?: boolean) => {
   // debugger;
   const appEl = document.body;
   const scrollWidth = appEl.scrollWidth - appEl.clientWidth;
 
   document.body.style.overflowY = "hidden";
 
-  FIXED_ELEMENTS.forEach((a) => {
-    const el = document.querySelector(a.selector) as HTMLElement;
-    if (!el) {
-      return;
-    }
-    (el.style as any)[a.strategy] = `${scrollWidth}px`;
-  });
+  if (nudgeForWindows === true) {
+    FIXED_ELEMENTS.forEach((a) => {
+      const el = document.querySelector(a.selector) as HTMLElement;
+      if (!el) {
+        return;
+      }
+      (el.style as any)[a.strategy] = `${scrollWidth}px`;
+    });
+  } else {
+    document.getElementsByTagName("html")[0].style.overflowY = "scroll";
+  }
 };
 
 export const getChainInfo = () => {
