@@ -3,11 +3,16 @@ import { IconShare } from "@src/icons";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import useComponentDpid from "@components/organisms/Drive/hooks/useComponentDpid";
 import useNodeCover from "@components/organisms/ManuscriptReader/hooks/useNodeCover";
+import React, { useCallback, useRef } from "react";
+import { ResearchObjectComponentType } from "@desci-labs/desci-models";
+
+const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
 
 export default function Header() {
   const { manifest } = useNodeReader();
   const { dpid } = useComponentDpid();
   const { cover } = useNodeCover();
+  const headerRef = useRef<HTMLDivElement>();
   const onHandleShare = async () => {
     try {
       await navigator.share({
@@ -19,6 +24,20 @@ export default function Header() {
       console.log("Error: Unable to share", dpid, e);
     }
   };
+
+  const onHandleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    if (headerRef.current === e.target) {
+      const pdf = manifest?.components.find(
+        (c) => c.type === ResearchObjectComponentType.PDF
+      );
+      pdf && window.open(`${IPFS_URL}/${pdf.payload.url}`, "_blank");
+    }
+  };
+
+  const handleRef = useCallback((node: HTMLDivElement) => {
+    headerRef.current = node;
+  }, []);
 
   return (
     <div
@@ -34,6 +53,8 @@ export default function Header() {
         backgroundSize: "cover",
         objectFit: "cover",
       }}
+      ref={handleRef}
+      onClick={onHandleClick}
     >
       <IconShare
         width={30}
