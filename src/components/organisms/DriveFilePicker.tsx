@@ -57,6 +57,10 @@ const DriveTable: React.FC<DriveTableProps> = ({
   const dispatch = useSetter();
   const { currentDrivePicker, breadCrumbsPicker } = useDrive();
 
+  useEffect(() => {
+    dispatch(navigateToDrivePickerByPath({ path: breadCrumbsPicker[0].path! }));
+  }, [currentDrivePicker]);
+
   const [selected, setSelected] = useState<number | undefined>(undefined);
 
   function exploreDirectory(

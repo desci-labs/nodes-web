@@ -1,4 +1,5 @@
 import {
+  PdfComponent,
   ResearchObjectComponentAnnotation,
   ResearchObjectComponentType,
   ResearchObjectV1,
@@ -55,6 +56,7 @@ export interface NodeReaderPref {
   manifestStatus: ManifestDataStatus;
   recentlyAddedComponent: DrivePath;
   annotationLinkConfig?: AnnotationLinkConfig | null;
+  pdfScrollOffsetTop?: number;
 }
 
 const initialState: NodeReaderPref = {
@@ -74,6 +76,7 @@ const initialState: NodeReaderPref = {
   manifestStatus: ManifestDataStatus.Idle,
   recentlyAddedComponent: "",
   annotationLinkConfig: null,
+  pdfScrollOffsetTop: 0,
 };
 
 export const nodeReaderSlice = createSlice({
@@ -308,10 +311,11 @@ export const nodeReaderSlice = createSlice({
       { payload }: PayloadAction<ResearchObjectV1Component[]>
     ) => {
       if (payload.length) {
-        const lastComponent = payload[payload.length - 1];
+        const newComponent = payload[payload.length - 1];
 
         const lastStack = state.componentStack;
         const lastStackComponent = lastStack[lastStack.length - 1];
+
         if (
           lastStackComponent &&
           lastStackComponent.type === ResearchObjectComponentType.PDF
@@ -319,20 +323,21 @@ export const nodeReaderSlice = createSlice({
           const lastScrollTop = document.scrollingElement?.scrollTop ?? 0;
           state.lastScrollTop = {
             ...state.lastScrollTop,
-            [lastComponent.id]: lastScrollTop,
+            [(lastStackComponent as PdfComponent).payload.url]: lastScrollTop,
           };
         }
 
         if (
-          lastStackComponent &&
-          lastComponent.type === ResearchObjectComponentType.PDF
+          newComponent &&
+          newComponent.type === ResearchObjectComponentType.PDF
         ) {
-          const lastScrollTop = state.lastScrollTop[lastComponent.id];
-          if (lastScrollTop) {
-            setTimeout(() => {
-              document.scrollingElement!.scrollTop = lastScrollTop!;
-            });
-          }
+          const lastScrollTop = state.lastScrollTop[newComponent.payload.url];
+          state.pdfScrollOffsetTop = lastScrollTop;
+          // if (lastScrollTop) {
+          //   setTimeout(() => {
+          //     document.scrollingElement!.scrollTop = lastScrollTop!;
+          //   }, 500);
+          // }
         }
       }
       state.annotationLinkConfig = null;
@@ -348,7 +353,7 @@ export const nodeReaderSlice = createSlice({
         const lastScrollTop = document.scrollingElement?.scrollTop ?? 0;
         state.lastScrollTop = {
           ...state.lastScrollTop,
-          [lastComponent.id]: lastScrollTop,
+          [lastComponent.payload.url]: lastScrollTop,
         };
       }
       state.componentStack.push(payload);
@@ -357,14 +362,18 @@ export const nodeReaderSlice = createSlice({
       const value = state.componentStack;
       value.pop();
       const remainingLastValue = value[value.length - 1];
-      if (remainingLastValue) {
-        let lastScrollTop = state.lastScrollTop[remainingLastValue.id];
-        setTimeout(() => {
-          document.scrollingElement!.scrollTop = lastScrollTop!;
-        });
+      if (
+        remainingLastValue &&
+        remainingLastValue.type == ResearchObjectComponentType.PDF
+      ) {
+        let lastScrollTop = state.lastScrollTop[remainingLastValue.payload.url];
+        state.pdfScrollOffsetTop = lastScrollTop;
+        // setTimeout(() => {
+        //   // document.scrollingElement!.scrollTop = lastScrollTop!;
+        // });
         state.lastScrollTop = {
           ...state.lastScrollTop,
-          [remainingLastValue.id]: 0,
+          [remainingLastValue.payload.url]: 0,
         };
       }
       state.annotationLinkConfig = null;
