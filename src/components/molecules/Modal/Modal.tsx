@@ -116,6 +116,7 @@ export default function Modal({
               isOpen={isOpen}
               onDismiss={onDismiss}
               initialFocusRef={initialFocusRef}
+              dangerouslyBypassFocusLock={true}
               style={{
                 opacity: opacity.to({ range: [0.0, 1.0], output: [0, 1] }),
               }}
