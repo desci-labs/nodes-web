@@ -15,9 +15,16 @@ import tw from "tailwind-styled-components";
 import PaneDrive from "@components/organisms/PaneDrive";
 import ExternalLinkViewer from "@components/molecules/ExternalLinkViewer";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import { isMobile } from "react-device-detect";
 
 const RenderedDrive = () => (
-  <div className="w-[calc(100%-320px)] h-[calc(100vh-56px)] pt-10 bg-neutrals-black absolute left-0">
+  <div
+    className={`pt-10 ${
+      isMobile
+        ? "w-full h-full "
+        : "w-[calc(100%-320px)] h-[calc(100vh-56px)] bg-neutrals-black absolute left-0"
+    }`}
+  >
     <PaneDrive />
   </div>
 );

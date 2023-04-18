@@ -3,7 +3,6 @@ import FloatingActionBar from "@src/components/molecules/FloatingActionBar";
 import { useSetter } from "@src/store/accessors";
 import { setHeaderHidden } from "@src/state/preferences/preferencesSlice";
 import { useCallback, useEffect } from "react";
-import CitationPopover from "@src/components/organisms/PopOver/CitationPopover";
 import ManuscriptSidePanel from "@src/components/organisms/SidePanel/ManuscriptSidePanel";
 import Toolbar from "@src/components/organisms/Toolbar";
 import VSCodeViewer from "@src/components/organisms/VSCodeViewer";
@@ -29,7 +28,7 @@ export default function Reader({ isLoading }: ReaderViewerProps) {
 
   const handleClose = useCallback(() => {
     dispatch(setHeaderHidden(true));
-  }, [dispatch, setHeaderHidden]);
+  }, [dispatch]);
 
   return (
     <>

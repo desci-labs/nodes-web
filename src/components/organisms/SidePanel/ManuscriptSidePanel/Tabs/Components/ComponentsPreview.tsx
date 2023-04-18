@@ -6,8 +6,10 @@ import {
 import EmptyPreview from "@src/components/molecules/EmptyPreview";
 import { findTarget } from "@src/components/organisms/ComponentLibrary";
 import { IconData } from "@src/icons";
-import { useDrive } from "@src/state/drive/hooks";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import { setComponentStack, toggleMode } from "@src/state/nodes/viewer";
+import { setShowComponentStack } from "@src/state/preferences/preferencesSlice";
+import { useSetter } from "@src/store/accessors";
 import { useMemo } from "react";
 
 const ROOT_COMPONENTS_PATHS = [
@@ -73,6 +75,8 @@ function ComponentPreview({
   component: ResearchObjectV1Component;
 }) {
   const target = findTarget(component);
+  const dispatch = useSetter();
+  const { mode } = useNodeReader();
 
   if (!target) return null;
 
@@ -90,16 +94,29 @@ function ComponentPreview({
     }
   };
 
-  // const onHandleClick = () => {
+  const onHandleClick = () => {
+    if (
+      [
+        ResearchObjectComponentType.DATA,
+        ResearchObjectComponentType.DATA_BUCKET,
+      ].includes(component.type)
+    ) {
+      // dispatch(navigateToDriveByPath(component.payload.path));
+      dispatch(setComponentStack([component]));
+      dispatch(setShowComponentStack(true));
+      mode === "editor" && dispatch(toggleMode());
+    } else {
+      const link = urlForComponent(component);
 
-  // }
+      if (link) return window.open(link, "_blank");
+      // TODO: show toast asking users to view node in desktop
+    }
+  };
 
   return (
     <div
       className="flex gap-4 items-center bg-zinc-200 bg-neutrals-black active:bg-neutrals-gray-5 rounded-lg px-4 py-2 border border-black"
-      onClick={() => {
-        window.open(urlForComponent(component), "_blank");
-      }}
+      onClick={onHandleClick}
     >
       <target.icon
         width={24}
