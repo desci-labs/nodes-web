@@ -217,17 +217,15 @@ export const capitalize = (str: string) => {
 
 export const restoreScroll = (nudgeForWindows?: boolean) => {
   // debugger;
-  if (nudgeForWindows === true) {
-    FIXED_ELEMENTS.forEach((a) => {
-      const el = document.querySelector(a.selector) as HTMLElement;
-      if (!el) {
-        return;
-      }
-      (el.style as any)[a.strategy] = "0px";
-    });
-  } else {
-    document.getElementsByTagName("html")[0].style.overflowY = "inherit";
-  }
+
+  FIXED_ELEMENTS.forEach((a) => {
+    const el = document.querySelector(a.selector) as HTMLElement;
+    if (!el) {
+      return;
+    }
+    (el.style as any)[a.strategy] = "0px";
+  });
+
   document.body.style.overflowY = "scroll";
 };
 
@@ -238,17 +236,13 @@ export const lockScroll = (nudgeForWindows?: boolean) => {
 
   document.body.style.overflowY = "hidden";
 
-  if (nudgeForWindows === true) {
-    FIXED_ELEMENTS.forEach((a) => {
-      const el = document.querySelector(a.selector) as HTMLElement;
-      if (!el) {
-        return;
-      }
-      (el.style as any)[a.strategy] = `${scrollWidth}px`;
-    });
-  } else {
-    document.getElementsByTagName("html")[0].style.overflowY = "scroll";
-  }
+  FIXED_ELEMENTS.forEach((a) => {
+    const el = document.querySelector(a.selector) as HTMLElement;
+    if (!el) {
+      return;
+    }
+    (el.style as any)[a.strategy] = `${scrollWidth}px`;
+  });
 };
 
 export const getChainInfo = () => {
