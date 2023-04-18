@@ -234,17 +234,17 @@ const ComponentButtonChit = ({
       componentType={componentType}
       componentSubType={componentSubType}
       >
-        <div
+    <div
       onMouseEnter={handleShowTitle}
       onMouseLeave={handleShowTitle}
-        >
-        { showTitle && (
+      className="rounded-3xl hover:bg-neutrals-gray-3"
+      > { showTitle && (
           <div
             className="
-              absolute translate-y-[-28px] py-[1px] px-2
-              bg-[#191B1C] rounded-3xl shadow-sm 
+              absolute translate-y-[-28px] py-[1px] px-2 bg-[#191B1C]
+              border border-[#3C3C3C] rounded-3xl shadow-lg
               text-white text-xs font-medium w-max whitespace-normal break-words
-              hover:bg-neutrals-gray-3
+              cursor-pointer
               "
           >{title}</div>
         )}
