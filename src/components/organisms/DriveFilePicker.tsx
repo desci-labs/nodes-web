@@ -50,16 +50,12 @@ interface DriveTableProps {
   onInsert: (file: DriveObject) => void;
 }
 
-const DriveTable: React.FC<DriveTableProps> = ({
+const DriveTableFilePicker: React.FC<DriveTableProps> = ({
   onRequestClose,
   onInsert,
 }) => {
   const dispatch = useSetter();
   const { currentDrivePicker, breadCrumbsPicker } = useDrive();
-
-  useEffect(() => {
-    dispatch(navigateToDrivePickerByPath({ path: breadCrumbsPicker[0].path! }));
-  }, [currentDrivePicker]);
 
   const [selected, setSelected] = useState<number | undefined>(undefined);
 
@@ -129,7 +125,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
           currentDrivePicker.contains.map((f: DriveObject, idx: number) => {
             return (
               <DriveRow
-                key={`drive_row_${f.cid || f.name}`}
+                key={`drive_picker_drive_row_${f.cid}_${f.name}`}
                 file={f}
                 exploreDirectory={exploreDirectory}
                 index={idx}
@@ -161,7 +157,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
   );
 };
 
-export default DriveTable;
+export default DriveTableFilePicker;
 
 interface DriveRowProps {
   file: DriveObject;

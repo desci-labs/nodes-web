@@ -58,6 +58,8 @@ import PrimaryButton from "@src/components/atoms/PrimaryButton";
 import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
 import { useDrive } from "@src/state/drive/hooks";
 import { bfsDriveSearch } from "@src/state/drive/utils";
+import { useSetter } from "@src/store/accessors";
+import { navigateToDrivePickerByPath } from "@src/state/drive/driveSlice";
 
 const HOTKEYS: any = {
   "mod+b": "bold",
@@ -831,10 +833,11 @@ const DirectoryButton = ({
   editor: Editor;
 }) => {
   // const editor = useSlate();
+  const dispatch = useSetter();
   const directoryRef = useRef(null);
   const [showDirectory, setShowDirectory] = useState<boolean>(false);
   const { manifest } = useNodeReader();
-  const { nodeTree, currentDrive } = useDrive();
+  const { breadCrumbsPicker } = useDrive();
 
   useClickAway(directoryRef, (e) => {
     setShowDirectory(false);
@@ -842,7 +845,16 @@ const DirectoryButton = ({
 
   return (
     <span ref={directoryRef} className="relative hover:bg-neutrals-gray-8">
-      <Button onClick={() => setShowDirectory(!showDirectory)}>{icon}</Button>
+      <Button
+        onClick={() => {
+          dispatch(
+            navigateToDrivePickerByPath({ path: breadCrumbsPicker[0].path! })
+          );
+          setShowDirectory(!showDirectory);
+        }}
+      >
+        {icon}
+      </Button>
       {showDirectory ? (
         <div
           className="absolute top-[120%] left-[0%] w-96 bg-white z-50 rounded-lg"
@@ -850,7 +862,7 @@ const DirectoryButton = ({
         >
           <DriveTable
             onRequestClose={() => setShowDirectory(false)}
-            onInsert={(file) => {
+            onInsert={(file: any) => {
               const ancestorComponent = manifest?.components.find(
                 (c) => c.id === file.componentId
               );
