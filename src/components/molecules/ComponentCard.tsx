@@ -283,12 +283,6 @@ const ComponentCard = (props: ComponentCardProps) => {
           <FlexRowSpaceBetween>
             <div className="flex justify-between dark:bg-muted-700 px-3 py-2 w-full">
               <>
-                <div style={{ display: "none" }}>
-                  <AnnotationSwitcher
-                    annotations={sortedAnnotations}
-                    handleComponentClick={handleComponentClick}
-                  />
-                </div>
                 <div className="flex gap-2 justify-between w-full">
                   <div id="section-left">
                     <ButtonFair
@@ -335,18 +329,35 @@ const ComponentCard = (props: ComponentCardProps) => {
                     >
                       <IconQuotes />
                     </BlackGenericButton>
-                    <BlackGenericButton
-                      dataTip={"Methods"}
-                      dataFor={`use_${component.id}`}
-                      disabled={!drive}
-                      className="p-0 min-w-[28px] h-7"
-                      onClick={(e) => {
-                        e!.stopPropagation();
-                        dispatch(setFileBeingUsed(drive));
+                    {component.type == ResearchObjectComponentType.DATA ||
+                    component.type == ResearchObjectComponentType.CODE ||
+                    component.type == ResearchObjectComponentType.UNKNOWN ? (
+                      <BlackGenericButton
+                        dataTip={"Methods"}
+                        dataFor={`use_${component.id}`}
+                        disabled={!drive}
+                        className="p-0 min-w-[28px] h-7"
+                        onClick={(e) => {
+                          e!.stopPropagation();
+                          dispatch(setFileBeingUsed(drive));
+                        }}
+                      >
+                        <IconPlayRounded className="p-0" />
+                      </BlackGenericButton>
+                    ) : null}
+                    <div
+                      style={{
+                        display:
+                          component.type == ResearchObjectComponentType.PDF
+                            ? ""
+                            : "none",
                       }}
                     >
-                      <IconPlayRounded className="p-0" />
-                    </BlackGenericButton>
+                      <AnnotationSwitcher
+                        annotations={sortedAnnotations}
+                        handleComponentClick={handleComponentClick}
+                      />
+                    </div>
                   </div>
                 </div>
               </>
