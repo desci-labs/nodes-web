@@ -8,6 +8,7 @@ import { app, site } from "@src/constants/routes";
 import ContextMenu from "../organisms/ContextMenu";
 import { useSetter } from "@src/store/accessors";
 import { setEditNodeId, setPublicView } from "@src/state/nodes/viewer";
+import { ComponentLibraryList } from "../organisms/ComponentLibrary";
 
 export interface NodeProps {
   id?: number;
@@ -113,6 +114,7 @@ const NodeCard = ({
         <div className="text-xl font-bold text-white w-full overflow-hidden overflow-ellipsis">
           {title || "Untitled Node"}
         </div>
+        {isCurrent && <ComponentLibraryList />}
       </div>
       {/**TODO: convert following into BadgeComponent */}
       <div

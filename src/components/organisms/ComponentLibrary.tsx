@@ -32,6 +32,10 @@ export interface UiComponentDefinition {
   componentSubType?: ResearchObjectComponentSubtypes | undefined;
 }
 
+export interface IComponentButton extends UiComponentDefinition {
+  children: React.ReactElement
+}
+
 const IconWrapper = ({ Icon, className }: any) => (
   <div className="border-primary border-2 rounded-full p-1 h-[40px] w-[40px] flex justify-center items-center overflow-hidden">
     <Icon fill="white" width={24} height={24} className={className} />
@@ -166,7 +170,8 @@ const ComponentButton = ({
   icon,
   componentType,
   componentSubType,
-}: UiComponentDefinition) => {
+  children
+}: IComponentButton) => {
   const {
     setIsAddingSubcomponent,
     setIsAddingComponent,
@@ -176,20 +181,95 @@ const ComponentButton = ({
   return (
     <button
       className=""
-      onClick={() => {
+      onClick={(e) => {
+        e.stopPropagation()
         setIsAddingSubcomponent(true);
         setIsAddingComponent(false);
         setAddComponentType(componentType);
         setAddComponentSubType(componentSubType || null);
       }}
     >
-      <div className="h-[120px] w-[120px] bg-neutrals-gray-2 text-xs flex rounded-xl shadow-lg border border-[#3C3C3C] cursor-pointer hover:bg-neutrals-gray-3 flex-col items-center gap-3 text-center pt-[18.5px]">
-        {icon}
-        <h3 className="text-[12px] px-4">{title}</h3>
-      </div>
+      {React.cloneElement(children, {icon, title})}
     </button>
   );
 };
+
+const ComponentButtonPane = ({
+  icon,
+  title,
+  componentType,
+  componentSubType
+}: UiComponentDefinition
+) => {
+  return (
+    <ComponentButton
+      icon={icon}
+      title={title}
+      componentType={componentType}
+      componentSubType={componentSubType}
+      >
+        <div className="h-[120px] w-[120px] bg-neutrals-gray-2 text-xs flex rounded-xl shadow-lg border border-[#3C3C3C] cursor-pointer hover:bg-neutrals-gray-3 flex-col items-center gap-3 text-center pt-[18.5px]">
+          {icon}
+          <h3 className="text-[12px] px-4">{title}</h3>
+        </div>
+    </ComponentButton>
+  )
+}
+
+const ComponentButtonChit = ({
+  icon,
+  title,
+  componentType,
+  componentSubType
+}: UiComponentDefinition
+) => {
+  const [showTitle, setShowTitle] = React.useState(false)
+  const handleShowTitle = () => {
+    setShowTitle((old) => !old)
+  }
+  return (
+    <ComponentButton
+      icon={icon}
+      title={title}
+      componentType={componentType}
+      componentSubType={componentSubType}
+      >
+        <div
+      onMouseEnter={handleShowTitle}
+      onMouseLeave={handleShowTitle}
+        >
+        { showTitle && (
+          <div
+            className="
+              absolute translate-y-[-28px] py-[1px] px-2
+              bg-[#191B1C] rounded-3xl shadow-sm 
+              text-white text-xs font-medium w-max whitespace-normal break-words
+              hover:bg-neutrals-gray-3
+              "
+          >{title}</div>
+        )}
+          {icon}
+        </div>
+    </ComponentButton>
+
+  )
+}
+
+export const ComponentLibraryList = () => {
+  return (<div className="flex justify-between gap-2 flex-wrap">{
+    [...COMPONENT_LIBRARY, ...EXTERNAL_COMPONENTS].map((comp, i) => {
+      return (
+        <ComponentButtonChit
+          key={i}
+          icon={comp.icon}
+          title={comp.title}
+          componentType={comp.componentType}
+          componentSubType={comp.componentSubType}
+         />
+      )
+    })
+  }</div>)
+}
 
 const ComponentLibrary = () => {
   return (
@@ -207,7 +287,7 @@ const ComponentLibrary = () => {
         }}
       >
         {COMPONENT_LIBRARY.map((c) => (
-          <ComponentButton
+          <ComponentButtonPane
             key={c.title}
             icon={c.icon}
             title={c.title}
@@ -228,7 +308,7 @@ const ComponentLibrary = () => {
         }}
       >
         {EXTERNAL_COMPONENTS.map((c) => (
-          <ComponentButton
+          <ComponentButtonPane
             key={c.title}
             icon={c.icon}
             title={c.title}
