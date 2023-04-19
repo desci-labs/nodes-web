@@ -78,7 +78,7 @@ const DragDropZone = ({ children }: React.PropsWithChildren<any>) => {
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
         // If dropped items aren't files, reject them
-        if (item.kind === FileType.File) {
+        if (item.kind === FileType.FILE) {
           const file = item.webkitGetAsEntry();
           processed.push(await getFileTree(file!, ""));
           console.log(
@@ -109,7 +109,7 @@ const DragDropZone = ({ children }: React.PropsWithChildren<any>) => {
         if (
           e.dataTransfer.items &&
           !!Array.from(e.dataTransfer.items).find(
-            (i) => i.kind === FileType.File
+            (i) => i.kind === FileType.FILE
           )
         ) {
           dispatch(setIsDraggingFiles(true));

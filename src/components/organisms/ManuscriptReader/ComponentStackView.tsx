@@ -79,18 +79,31 @@ const ComponentStackView = (props: ComponentStackViewProps) => {
     if (forceRefreshDrive) setTimeout(() => setForceRefreshDrive(false));
   }, [forceRefreshDrive, setForceRefreshDrive]);
 
+  __log("ComponentStackView::render", componentStack);
   return (
     <ViewWrapper>
       {/**
        * When no components, show the drive
        */}
-      {componentStack.length < 1 && !forceRefreshDrive && manifestData ? (
+      {!componentStack ||
+      (componentStack.filter(
+        (a) =>
+          a &&
+          a.type != ResearchObjectComponentType.DATA &&
+          a.type != ResearchObjectComponentType.UNKNOWN &&
+          a.type != ResearchObjectComponentType.DATA_BUCKET
+      ).length < 1 &&
+        !forceRefreshDrive &&
+        manifestData) ? (
         <RenderedDrive />
       ) : (
-        componentStack.map(
-          (component: ResearchObjectV1Component, index: number) => {
+        componentStack
+          .filter(Boolean)
+          .map((component: ResearchObjectV1Component, index: number) => {
             const isDataComponent =
-              component.type === ResearchObjectComponentType.DATA;
+              component.type === ResearchObjectComponentType.DATA ||
+              component.type === ResearchObjectComponentType.DATA_BUCKET ||
+              component.type === ResearchObjectComponentType.UNKNOWN;
             return (
               <ComponentWrapper
                 key={`component_${component.id}`}
@@ -100,8 +113,7 @@ const ComponentStackView = (props: ComponentStackViewProps) => {
                 {renderComponent(component)}
               </ComponentWrapper>
             );
-          }
-        )
+          })
       )}
 
       {/* <PaperLoader

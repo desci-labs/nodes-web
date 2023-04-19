@@ -10,7 +10,9 @@ import { useGetter } from "@src/store/accessors";
 
 export default function AppWrapper(props: PropsWithChildren<{}>) {
   const userProfile = useUser();
-  const { hideFooter, checkingCode } = useGetter((state) => state.preferences);
+  const { hideFooter, checkingCode, isMobileView } = useGetter(
+    (state) => state.preferences
+  );
 
   // page scroll behaviour init hook
   useScroll();
@@ -25,14 +27,19 @@ export default function AppWrapper(props: PropsWithChildren<{}>) {
         className={`flex flex-col min-h-screen h-screen`}
         style={{ fontFamily: "Inter, sans-serif" }}
       >
-        <PdfHeader />
-        <Toolbar />
-        <Popovers />
+        {!isMobileView && (
+          <>
+            <PdfHeader />
+            <Toolbar />
+            <Popovers />
+          </>
+        )}
+
         {checkingCode ||
         ((!userProfile || !(userProfile as any).userId) &&
           localStorage.getItem("auth")) ? (
           <div className="fixed z-[101] bg-[#525659] h-screen w-screen">
-            <PdfHeader />
+            {!isMobileView && <PdfHeader />}
             <div className="w-full absolute z-[102] top-[52px] rounded-full h-[3px]">
               <div
                 className={`${"bg-tint-primary"} h-[3px]`}
@@ -45,7 +52,7 @@ export default function AppWrapper(props: PropsWithChildren<{}>) {
           </div>
         ) : null}
         {props.children}
-        {hideFooter ? <></> : <Footer />}
+        {!hideFooter && <Footer />}
       </div>
     </>
   );

@@ -1,19 +1,20 @@
 import { getPublishedVersions, resolvePublishedManifest } from "@api/index";
 import PaneInfo from "@components/atoms/PaneInfo";
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import {
   ResearchObjectComponentType,
   ResearchObjectV1,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 import {
+  IconChevronDown,
+  IconChevronUp,
   IconCode,
   IconCodeBracket,
   IconDocument,
   IconFile,
   IconNetwork,
 } from "@icons";
-import {
+import React, {
   ButtonHTMLAttributes,
   PropsWithChildren,
   useEffect,
@@ -23,11 +24,11 @@ import {
 import { SpinnerCircular } from "spinners-react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
-import { useCopier } from "./Copier";
 import { CheckIcon } from "@heroicons/react/outline";
 import { useGetNodesQuery } from "@src/state/api/nodes";
 import { useNodeReader, useNodeVersions } from "@src/state/nodes/hooks";
-import Modal from "@src/components/molecules/Modal/Modal";
+import { useCopier } from "@src/components/molecules/Copier";
+import SlideDown from "react-slidedown";
 
 function CopyButton(
   props: ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -67,16 +68,13 @@ function LinkCopier(
   );
 }
 
-const PopOverShareMenu = () => {
+const SharePublished = React.memo(() => {
   const {
     manifest: manifestData,
     currentObjectId,
     publicView,
   } = useNodeReader();
   const versions = useNodeVersions(currentObjectId);
-  const { showShareMenu, setShowShareMenu } = useManuscriptController([
-    "showShareMenu",
-  ]);
   const [lastManifest, setLastManifest] = useState<
     ResearchObjectV1 | undefined
   >();
@@ -90,6 +88,7 @@ const PopOverShareMenu = () => {
   const [requestedVersion, setRequestedVersion] = useState<number | undefined>(
     undefined
   );
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const versionForLink =
     publicView && versionParam ? versionParam : requestedVersion;
@@ -182,90 +181,121 @@ const PopOverShareMenu = () => {
           <div className="my-4 w-full">
             <LinkCopier
               icon={<IconNetwork height={15} stroke={"white"} width={15} />}
-              label="Public Share Link (always points to latest version)"
+              label="Public Share Link (always points to this version)"
               value={dpidLink}
             />
           </div>
-          {versionCount ? (
-            <div className="pb-4 w-full">
-              {manifestData?.components.map(
-                (c: ResearchObjectV1Component, index: number) => {
-                  const fqi = isDpidSupported
-                    ? `${lastManifest?.dpid?.id}/${versionForLink}/${index}`
-                    : `${currentObjectId.replaceAll(
-                        ".",
-                        ""
-                      )}/${versionForLink}/${index}`;
+          <div
+            className="flex flex-rows text-xs gap-2 items-center justify-end cursor-pointer group hover:text-neutrals-gray-6 select-none"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+          >
+            {showAdvanced ? (
+              <IconChevronUp
+                width={12}
+                className="fill-white group-hover:fill-neutrals-gray-6"
+              />
+            ) : (
+              <IconChevronDown
+                width={12}
+                className="fill-white group-hover:fill-neutrals-gray-6"
+              />
+            )}{" "}
+            Advanced
+          </div>
+          <SlideDown closed={!showAdvanced} className="overflow-hidden">
+            <div className="overflow-auto h-20">
+              {versionCount ? (
+                <div className="pb-4 w-full">
+                  {manifestData?.components.map(
+                    (c: ResearchObjectV1Component, index: number) => {
+                      const fqi = isDpidSupported
+                        ? `${lastManifest?.dpid?.id}/${versionForLink}/${index}`
+                        : `${currentObjectId.replaceAll(
+                            ".",
+                            ""
+                          )}/${versionForLink}/${index}`;
 
-                  const link = isDpidSupported
-                    ? `${dpidLink}/${index}`
-                    : `${window.location.protocol}//${window.location.host}/${fqi}`;
+                      const link = isDpidSupported
+                        ? `${dpidLink}/${index}`
+                        : `${window.location.protocol}//${window.location.host}/${fqi}`;
 
-                  switch (c.type) {
-                    case ResearchObjectComponentType.CODE:
-                      return (
-                        <div className="my-2" key={`component-share-${c.id}`}>
-                          <LinkCopier
-                            icon={
-                              <IconCodeBracket
-                                height={12}
-                                fill={"white"}
-                                width={12}
+                      switch (c.type) {
+                        case ResearchObjectComponentType.CODE:
+                          return (
+                            <div
+                              className="my-2"
+                              key={`component-share-${c.id}`}
+                            >
+                              <LinkCopier
+                                icon={
+                                  <IconCodeBracket
+                                    height={12}
+                                    fill={"white"}
+                                    width={12}
+                                  />
+                                }
+                                label={`${c.name} Share Link`}
+                                value={`${window.location.protocol}//${window.location.host}/${fqi}`}
                               />
-                            }
-                            label={`${c.name} Share Link`}
-                            value={`${window.location.protocol}//${window.location.host}/${fqi}`}
-                          />
-                          <div className="mt-2 w-[90%] -right-[10%] relative">
-                            <LinkCopier
-                              icon={
-                                <IconCode
-                                  height={12}
-                                  fill={"white"}
-                                  width={12}
+                              <div className="mt-2 w-[90%] -right-[10%] relative">
+                                <LinkCopier
+                                  icon={
+                                    <IconCode
+                                      height={12}
+                                      fill={"white"}
+                                      width={12}
+                                    />
+                                  }
+                                  label={`Import ${c.name} via desci-fetch`}
+                                  value={`with desci.fetch([('${c.name}.py', '${c.name}')], "${fqi}"):`}
                                 />
-                              }
-                              label={`Import ${c.name} via desci-fetch`}
-                              value={`with desci.fetch([('${c.name}.py', '${c.name}')], "${fqi}"):`}
-                            />
-                          </div>
-                          <div className="mt-2 w-[90%] -right-[10%] relative">
-                            <LinkCopier
-                              icon={
-                                <IconDocument
-                                  height={12}
-                                  fill={"white"}
-                                  width={12}
+                              </div>
+                              <div className="mt-2 w-[90%] -right-[10%] relative">
+                                <LinkCopier
+                                  icon={
+                                    <IconDocument
+                                      height={12}
+                                      fill={"white"}
+                                      width={12}
+                                    />
+                                  }
+                                  label={`Browse ${c.name} via HTTP`}
+                                  value={`${process.env.REACT_APP_NODES_API}/${fqi}/master/README.md?g=${process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE}`}
                                 />
-                              }
-                              label={`Browse ${c.name} via HTTP`}
-                              value={`${process.env.REACT_APP_NODES_API}/${fqi}/master/README.md?g=${process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE}`}
-                            />
-                          </div>
-                        </div>
-                      );
-                    default:
-                      return (
-                        <div className="my-2" key={`component-share-${c.id}`}>
-                          <LinkCopier
-                            icon={
-                              <IconFile height={12} fill={"white"} width={12} />
-                            }
-                            label={`${c.name} Share Link`}
-                            value={link}
-                          />
-                        </div>
-                      );
-                  }
-                }
-              )}
+                              </div>
+                            </div>
+                          );
+                        default:
+                          return (
+                            <div
+                              className="my-2"
+                              key={`component-share-${c.id}`}
+                            >
+                              <LinkCopier
+                                icon={
+                                  <IconFile
+                                    height={12}
+                                    fill={"white"}
+                                    width={12}
+                                  />
+                                }
+                                label={`${c.name} Share Link`}
+                                value={link}
+                              />
+                            </div>
+                          );
+                      }
+                    }
+                  )}
+                </div>
+              ) : null}
             </div>
-          ) : null}
+          </SlideDown>
         </div>
       );
     } else {
       body = (
-        <div className="flex items-center h-full flex-grow flex-col justify-evenly">
+        <div className="flex items-center h-full flex-grow flex-col justify-evenl">
           This Node is not published and cannot yet be shared
           <PaneInfo>Sharing unpublished Nodes is coming soon</PaneInfo>
         </div>
@@ -273,23 +303,7 @@ const PopOverShareMenu = () => {
     }
   }
 
-  const close = () => {
-    setShowShareMenu(false);
-  };
+  return body;
+});
 
-  return (
-    <Modal
-      isOpen={showShareMenu}
-      onDismiss={close}
-      $maxWidth={600}
-      $scrollOverlay={true}
-    >
-      <div className="px-6 py-5 text-white relative min-w-[600px]">
-        <Modal.Header title="Share Node" onDismiss={close} />
-        {body}
-      </div>
-    </Modal>
-  );
-};
-
-export default PopOverShareMenu;
+export default SharePublished;

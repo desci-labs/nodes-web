@@ -5,7 +5,7 @@ import CommitAdditionalInfoPopOver from "@components/organisms/PopOver/CommitAdd
 import CommitStatusPopover from "@components/organisms/PopOver/CommitStatusPopover";
 import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
 import { useNodeValidator } from "@src/hooks/useNodeValidator";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import styled, { StyledComponent } from "styled-components";
 import SidePanel from "..";
@@ -89,6 +89,11 @@ const CommitSidePanel = (props: CommitSidePanelProps) => {
     }
   }, [isCommitPanelOpen]);
 
+  const closePane = useCallback(
+    () => dispatch(toggleCommitPanel(false)),
+    [dispatch, toggleCommitPanel]
+  );
+
   if (!isCommitPanelOpen) {
     return (
       <Wrapper
@@ -126,7 +131,7 @@ const CommitSidePanel = (props: CommitSidePanelProps) => {
                   <PanelCloseButton
                     panelOrientation={panelOrientation}
                     visible={isCommitPanelOpen}
-                    onClick={() => dispatch(toggleCommitPanel(false))}
+                    onClick={closePane}
                   />
                   <ContentWrapper>
                     <div className="p-4">
@@ -148,7 +153,7 @@ const CommitSidePanel = (props: CommitSidePanelProps) => {
                         <FooterUpdatesText numUpdates={5} />
                         <PrimaryButton
                           onClick={() => setShowAdditionalInfoPopover(true)}
-                          disabled={!isValid || fail}
+                          disabled={!isValid()}
                         >
                           Continue
                         </PrimaryButton>

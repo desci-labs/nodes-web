@@ -30,23 +30,22 @@ export type NodeVersion = {
 
 // DataReferences
 export type DataReference = {
-  id: number
-  createdAt: Date
-  updatedAt: Date
-  name: string | null
-  description: string | null
-  cid: string
-  root: boolean
-  rootCid: string | null
-  path: string | null
-  directory: boolean
-  size: number
-  type: DataType
-  nodeId: number
-  userId: number
-  versionId: number | null
-}
-
+  id: number;
+  createdAt: Date;
+  updatedAt: Date;
+  name: string | null;
+  description: string | null;
+  cid: string;
+  root: boolean;
+  rootCid: string | null;
+  path: string | null;
+  directory: boolean;
+  size: number;
+  type: DataType;
+  nodeId: number;
+  userId: number;
+  versionId: number | null;
+};
 
 export type PublicDataReference = {
   id: number;

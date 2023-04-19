@@ -54,7 +54,8 @@ export * from "./constants";
 // how many pages you can scroll before dismissing selected annotation
 const Paper = ({ id, options, dirtyComment, payload }: any) => {
   const dispatch = useSetter();
-  const { isResearchPanelOpen, componentStack } = useNodeReader();
+  const { isResearchPanelOpen, componentStack, pdfScrollOffsetTop } =
+    useNodeReader();
   const { annotations } = payload;
   const [pendingAnnotations, setPendingAnnotations] = useState<
     ResearchObjectComponentAnnotation[]
@@ -240,7 +241,7 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
         delta,
         origin, // mouse coordinates in viewport (i.e. not larger than dimensions of screen)
       } = state;
-
+      console.log("pinch");
       setPinching(pinching);
 
       /**
@@ -404,6 +405,19 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isResearchPanelOpen, containerRef?.current?.clientWidth]);
 
+  const intersectingPagesWithPaddingLookup: { [key: number]: boolean } = {};
+  intersectingPagesWithPadding.forEach((p) => {
+    intersectingPagesWithPaddingLookup[p] = true;
+  });
+
+  const [pdfJsOptions, setPdfJsOptions] = useState({
+    standardFontDataUrl: `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/standard_fonts/`,
+    cMapUrl: `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/cmaps/`,
+    cMapPacked: true,
+    // disableFontFace: true,
+    ...options,
+  });
+
   return (
     <>
       <div
@@ -433,20 +447,32 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
         <div
           ref={gestureContainerRef}
           onClick={openLinkInNewTab}
-          className={`w-fit overflow-x-auto h-fit flex flex-row  ${
-            isResearchPanelOpen ? "w-[100%]" : "min-w-full"
+          className={`w-fit overflow-x-auto overflow-y-hidden h-fit flex flex-row  ${
+            // isResearchPanelOpen ? "w-[100%]" : "min-w-full"
+            "min-w-full"
           } ${canPan ? "justify-start" : "justify-center"}`}
           style={{
             maxWidth: isResearchPanelOpen ? `${windowWidth}px` : "100vw",
           }}
         >
           <Document
-            inputRef={(ref: HTMLDivElement) => (containerRef.current = ref)}
-            noData={<></>}
+            inputRef={useCallback(
+              (ref: HTMLDivElement) => (containerRef.current = ref),
+              [containerRef]
+            )}
+            noData={useCallback(
+              () => (
+                <></>
+              ),
+              []
+            )}
             file={currentPdf}
-            onItemClick={(pageNumber: any) => {
-              scrollToPage$.next(parseInt(pageNumber.pageNumber));
-            }}
+            onItemClick={useCallback(
+              (pageNumber: any) => {
+                scrollToPage$.next(parseInt(pageNumber.pageNumber));
+              },
+              [scrollToPage$]
+            )}
             onLoadProgress={useCallback(
               (data) => {
                 // setLoadError(false);
@@ -459,49 +485,51 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
                   debounceUpdate(pct);
                 }
               },
-              [dispatch, loadPercent, viewLoading, debounceUpdate]
+              [debounceUpdate, loadPercent, viewLoading, setLoadState]
             )}
-            onSourceSuccess={() => {
+            onSourceSuccess={useCallback(() => {
               dispatch(setViewLoading(true));
-            }}
-            onLoadSuccess={(document: PDFDocumentProxy) => {
-              const { numPages } = document;
-              documentRef.current = document;
-              // cachePageDimensions(document);
-              // console.log("REST", rest);
-              // setViewLoading(false);
-              dispatch(setViewLoading(false));
-              // setLoadProgressTaken(false);
-              dispatch(
-                setLoadState({
-                  loadProgressTaken: true,
-                })
-              );
+            }, [])}
+            onLoadSuccess={useCallback(
+              (document: PDFDocumentProxy) => {
+                const { numPages } = document;
+                documentRef.current = document;
+                // cachePageDimensions(document);
+                // console.log("REST", rest);
+                // setViewLoading(false);
+                dispatch(setViewLoading(false));
+                // setLoadProgressTaken(false);
+                dispatch(
+                  setLoadState({
+                    loadProgressTaken: true,
+                  })
+                );
 
-              debounceUpdate(0);
-              // setNumPages(numPages);
-              // setPdfTotalPages(numPages);
-              // resetPdfCurrentPage();
+                debounceUpdate(0);
+                // setNumPages(numPages);
+                // setPdfTotalPages(numPages);
+                // resetPdfCurrentPage();
 
-              dispatch(
-                updatePdfPreferences({
-                  pdfTotalPages: numPages,
-                  pdfCurrentPage: 0,
-                })
-              );
+                dispatch(
+                  updatePdfPreferences({
+                    pdfTotalPages: numPages,
+                    pdfCurrentPage: 0,
+                  })
+                );
 
-              const lastScroll =
-                lastScrollTop[componentStack[componentStack.length - 1].id];
-              if (lastScroll) {
-                const times = [50, 100, 500];
-                times.forEach((dur) => {
-                  setTimeout(() => {
-                    window.document.scrollingElement!.scrollTop = lastScroll;
-                  }, dur);
-                });
-              }
-            }}
-            onLoadError={() => {
+                const lastScroll = pdfScrollOffsetTop;
+                if (lastScroll) {
+                  const times = [0, 50, 100, 500, 1000];
+                  times.forEach((dur) => {
+                    setTimeout(() => {
+                      window.document.scrollingElement!.scrollTop = lastScroll;
+                    }, dur);
+                  });
+                }
+              },
+              [debounceUpdate, updatePdfPreferences, componentStack]
+            )}
+            onLoadError={useCallback(() => {
               // setLoadProgressTaken(false);
               // setLoadError(true);
               dispatch(
@@ -512,58 +540,70 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
                 })
               );
               throw Error(`Document failed to load`);
-            }}
-            options={{
-              standardFontDataUrl: `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/standard_fonts/`,
-              cMapUrl: `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/cmaps/`,
-              cMapPacked: true,
-              // disableFontFace: true,
-              ...options,
-            }}
+            }, [])}
+            options={pdfJsOptions}
             // loading={<PaperLoader />}
             loading={""}
-            error={
-              <div className="mt-10 bg-gray-300 p-3 rounded-sm">
-                This document failed to load
-              </div>
-            }
+            error={useCallback(
+              () => (
+                <div className="mt-10 bg-gray-300 p-3 rounded-sm">
+                  This document failed to load
+                </div>
+              ),
+              []
+            )}
             className={`relative w-fit`}
             // renderMode="svg"
           >
+            {/***pushes the height of the document to match number of pages to enable smooth body scroll */}
             {pageMetadata.map(
-              (pageMetadataItem: PageMetadata, index: number) => {
-                // return Math.abs(pdfCurrentPage - (index + 1)) < PAGE_RENDER_DISTANCE ? (
-                // return false && false ? (
-                return (
-                  <div
-                    key={`Placeholder_div_${index + 1}`}
-                    // key={`PageComponentHOC_${currentPdf}_${index + 1}`}
-                    style={{
-                      position: "relative",
-                      width: pageWidth * zoom,
-                      height: pageWidth * (pageMetadataItem.ratio || 1) * zoom,
-                      marginBottom: PDF_PAGE_SPACING,
-                      backgroundColor: "white",
-                    }}
-                  >
-                    <PlaceholderImage
+              useCallback(
+                (pageMetadataItem: PageMetadata, index: number) => {
+                  // return Math.abs(pdfCurrentPage - (index + 1)) < PAGE_RENDER_DISTANCE ? (
+                  // return false && false ? (
+                  return (
+                    <div
+                      key={`Placeholder_div_${pageMetadataItem.pageIndex}`}
+                      // key={`PageComponentHOC_${currentPdf}_${index + 1}`}
+                      style={{
+                        position: "relative",
+                        width: Math.floor(pageWidth * zoom),
+                        height: Math.floor(
+                          pageWidth * (pageMetadataItem.ratio || 1) * zoom
+                        ),
+                        marginBottom: PDF_PAGE_SPACING,
+                        backgroundColor: "white",
+                      }}
+                    >
+                      {/* <PlaceholderImage
                       pageNumber={index + 1}
                       page={pageMetadataItem.page}
-                    />
-                  </div>
-                );
-              }
+                    /> */}
+                    </div>
+                  );
+                },
+                [pageMetadata, pageWidth, zoom, pdfCurrentPage]
+              )
             )}
 
             {
               // [-2, -1, 0, 1, 2].map((mag: number) => pdfCurrentPage + mag)
-              intersectingPagesWithPadding.map((pageNum: number) => {
+              new Array(pageCount).fill(1).map((e, rawIndex: number) => {
+                const pageNum = rawIndex + 1;
                 const index = pageNum - 1;
+                const visible = intersectingPagesWithPaddingLookup[pageNum];
+
+                // console.log(
+                //   "PAGE intersectingPagesWithPaddingLookup",
+                //   pageNum,
+                //   visible
+                // );
+
                 if (!pageMetadata || !pageMetadata[index]) return null;
                 const pageMetadataItem = pageMetadata[index];
                 return (
                   <div
-                    key={`intersecting_page_${index}`}
+                    key={`intersecting_page_${currentPdf}_${pageNum}`}
                     style={{
                       position: "absolute",
                       width: pageWidth * zoom,
@@ -609,13 +649,11 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
                             ? highlightPrompt
                             : undefined
                         }
+                        pdfUrl={currentPdf}
                         zoom={zoom}
                         selectedAnnotationId={selectedAnnotationId}
-                        isAnnotating={isAnnotating}
                         pageMetadata={pageMetadataItem}
-                        isIntersecting={intersectingPagesWithPadding.includes(
-                          pageNum
-                        )}
+                        isIntersecting={visible}
                       />
                     </div>
                   </div>

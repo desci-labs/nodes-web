@@ -1,10 +1,13 @@
 .react-pdf__Document {
   line-height: 1em;
+  & > div {
+    background-color: transparent !important;
+  }
 }
 .annotation-page {
   z-index: 100;
-    background-color: rgba(255,0,0,0.5);
-    position: relative;
+  background-color: rgba(255, 0, 0, 0.5);
+  position: relative;
   pointer-events: none;
   .annotating & {
     display: block;
@@ -15,7 +18,7 @@
 }
 
 .annotation-display {
-    z-index: 3;
+  z-index: 3;
 }
 
 .react-pdf__Page__annotations {
@@ -27,11 +30,11 @@
 }
 
 .annotation-display {
-    pointer-events: none;
-    z-index: 0;
-    .annotating & {
-        pointer-events: all;
-    }
+  // pointer-events: none;
+  // z-index: 0;
+  .annotating & {
+    pointer-events: all;
+  }
 }
 .annotation-bubble {
   background-color: rgba(113, 208, 249, 0.24);
@@ -43,7 +46,8 @@
     border-color: transparent !important;
   }
 
-  .linkAnnotation > a:hover, .buttonWidgetAnnotation.pushButton > a:hover {
+  .linkAnnotation > a:hover,
+  .buttonWidgetAnnotation.pushButton > a:hover {
     background-color: rgba(113, 208, 249, 0.8);
     border: 0;
     box-shadow: none;
@@ -61,7 +65,7 @@
   align-items: center;
   top: 0;
   left: 0;
-  transform: '';
+  transform: "";
   // overflow: hidden
 }
 
@@ -71,4 +75,19 @@
   ::selection {
     background: rgba(0, 80, 250, 1);
   }
+}
+
+.hide-when-annotating {
+  .annotating & {
+    display: none;
+  }
+}
+
+.annotating .z-back-on-annotate {
+  pointer-events: none;
+  display: none !important;
+}
+
+.annotating {
+  cursor: crosshair;
 }

@@ -36,7 +36,7 @@ const ControllerDivider = styled.div.attrs({
 interface DocumentControllerProps {}
 
 const DocumentController = (props: DocumentControllerProps) => {
-  const { manifest: manifestData, mode } = useNodeReader();
+  const { manifest: manifestData, mode, componentStack } = useNodeReader();
   const dispatch = useSetter();
 
   const editButtonRef = useRef<HTMLButtonElement>(null);
@@ -51,6 +51,7 @@ const DocumentController = (props: DocumentControllerProps) => {
       setIsMounted(true);
     }
   };
+
   return (
     <Wrapper>
       <PaginationControl />
@@ -69,7 +70,9 @@ const DocumentController = (props: DocumentControllerProps) => {
                 : "hover:fill-neutrals-gray-5"
             } mt-[1.5px]`}
             onClick={() => {
-              const selectedComponent = manifestData?.components[0];
+              const selectedComponent = manifestData?.components.find(
+                (a) => a.id === componentStack[componentStack.length - 1].id
+              );
               setIsDownloading(true);
               postUserAction(
                 AvailableUserActionLogTypes.btnDownloadManuscript,
@@ -77,7 +80,7 @@ const DocumentController = (props: DocumentControllerProps) => {
               );
               if (
                 selectedComponent &&
-                selectedComponent.type == ResearchObjectComponentType.PDF
+                selectedComponent.type === ResearchObjectComponentType.PDF
               ) {
                 let url = cleanupManifestUrl(
                   (selectedComponent as PdfComponent).payload.url
@@ -95,7 +98,10 @@ const DocumentController = (props: DocumentControllerProps) => {
                     link.href = url2;
                     link.setAttribute(
                       "download",
-                      `nodes.desci.com__${
+                      `${selectedComponent.name.replaceAll(
+                        " ",
+                        "_"
+                      )}__nodes.desci.com__${
                         url.split("/")[url.split("/").length - 1]
                       }.pdf`
                     ); //or any other extension
@@ -112,11 +118,12 @@ const DocumentController = (props: DocumentControllerProps) => {
           />
         </div>
       </Control>
+      {/* // TODO: Only display the (Edit/Preview) button for auth & Guarded users  */}
       <div className="invisible absolute -right-36 w-36 flex h-[15px]">
         <ControllerDivider />
         <button
           ref={(ref) => ((editButtonRef as any).current = ref)}
-          data-tip={mode == "editor" ? "View as a reader" : "Edit your object"}
+          data-tip={mode === "editor" ? "View as a reader" : "Edit your object"}
           data-place="bottom"
           onClick={() => {
             if (mode !== "editor") {
@@ -130,7 +137,7 @@ const DocumentController = (props: DocumentControllerProps) => {
           }}
           className={`w-20 cursor-pointer transition-colors px-4 leading-none text-xs py-0 h-[24px] rounded-md -mt-[4px] whitespace-nowrap bg-gray-900 text-gray-100 hover:bg-gray-800`}
         >
-          {mode == "editor" ? "Preview" : "Edit"}
+          {mode === "editor" ? "Preview" : "Edit"}
         </button>
       </div>
     </Wrapper>

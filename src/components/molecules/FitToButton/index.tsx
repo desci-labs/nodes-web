@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { IconHorizontalExpand, IconVerticalExpand } from "@icons";
 import { DEFAULT_HEIGHT, DEFAULT_WIDTH } from "@components/organisms/Paper";
 import { useSetter } from "@src/store/accessors";
@@ -52,6 +52,9 @@ const FitToButton = () => {
     window.scrollTo({ top: 0 });
   }, []);
 
+  const handleHoriz = useCallback(handleFitToWidth, [handleFitToWidth]);
+  const handleVert = useCallback(handleFitToHeight, [handleFitToHeight]);
+
   return (
     <>
       {fitHorizontally ? (
@@ -60,7 +63,7 @@ const FitToButton = () => {
           height="20px"
           fill="rgb(241, 241, 241)"
           className="cursor-pointer hover:fill-neutrals-gray-5"
-          onClick={handleFitToWidth}
+          onClick={handleHoriz}
         />
       ) : (
         <IconVerticalExpand
@@ -68,7 +71,7 @@ const FitToButton = () => {
           height="20px"
           fill="rgb(241, 241, 241)"
           className="cursor-pointer hover:fill-neutrals-gray-5"
-          onClick={handleFitToHeight}
+          onClick={handleVert}
         />
       )}
     </>

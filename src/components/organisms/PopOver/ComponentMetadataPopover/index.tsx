@@ -26,98 +26,128 @@ import ReadOnlyComponent from "./ReadOnlyComponent";
 import axios from "axios";
 import { useManifestStatus, useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
-import { updateComponent, saveManifestDraft } from "@src/state/nodes/viewer";
+import {
+  updateComponent,
+  saveManifestDraft,
+  addComponent,
+} from "@src/state/nodes/viewer";
 import SelectList from "@src/components/molecules/FormInputs/SelectList";
 import Modal from "@src/components/molecules/Modal/Modal";
 import { useManuscriptController } from "../../ManuscriptReader/ManuscriptController";
+import { useDrive } from "@src/state/drive/hooks";
+import { v4 as uuidv4 } from "uuid";
+import { fetchTreeThunk } from "@src/state/drive/driveSlice";
+import { DriveObject } from "../../Drive";
 
 export const PDF_LICENSE_TYPES = [
-  { id: 0, name: "CC0" },
-  { id: 1, name: "CC BY" },
-  { id: 2, name: "CC BY-SA" },
-  { id: 3, name: "CC BY-NC" },
-  { id: 4, name: "CC BY-NC-SA" },
-  { id: 5, name: "CC BY-ND" },
-  { id: 6, name: "CC BY-NC-ND" },
+  { id: 0, name: "CC0", shortName: "CC0" },
+  { id: 1, name: "CC BY", shortName: "CC BY" },
+  { id: 2, name: "CC BY-SA", shortName: "CC BY-SA" },
+  { id: 3, name: "CC BY-NC", shortName: "CC BY-NC" },
+  { id: 4, name: "CC BY-NC-SA", shortName: "CC BY-NC-SA" },
+  { id: 5, name: "CC BY-ND", shortName: "CC BY-ND" },
+  { id: 6, name: "CC BY-NC-ND", shortName: "CC BY-NC-ND" },
 ];
+
+const getLicenseTypes = () => {
+  return PDF_LICENSE_TYPES.concat(CODE_LICENSE_TYPES);
+};
+
+export const getLicenseShortName = (license: string) => {
+  const licenseType = getLicenseTypes().find((l) => l.name === license);
+  return licenseType ? licenseType.shortName : "";
+};
 
 export const CODE_LICENSE_TYPES = [
   {
     id: 10,
     name: "MIT License",
+    shortName: "MIT",
     link: "https://choosealicense.com/licenses/mit/",
   },
   {
     id: 1,
     name: "Apache License 2.0",
+    shortName: "Apache 2.0",
     link: "https://choosealicense.com/licenses/apache-2.0/",
   },
   {
     id: 11,
     name: "Mozilla Public License 2.0",
+    shortName: "MPL 2.0",
     link: "https://choosealicense.com/licenses/mpl-2.0/",
   },
   {
     id: 7,
     name: "GNU General Public License v2.0",
+    shortName: "GPL 2.0",
     link: "https://choosealicense.com/licenses/gpl-2.0/",
   },
   {
     id: 8,
     name: "GNU General Public License v3.0",
+    shortName: "GPL 3.0",
     link: "https://choosealicense.com/licenses/gpl-3.0/",
   },
   {
     id: 9,
     name: "GNU Lesser General Public License v2.1",
+    shortName: "LGPL 2.1",
     link: "https://choosealicense.com/licenses/lgpl-2.1/",
   },
 
   {
     id: 5,
     name: "Creative Commons Zero v1.0 Universal",
+    shortName: "CC0",
     link: "https://choosealicense.com/licenses/cc0-1.0/",
   },
   {
     id: 2,
     name: 'BSD 2-Clause "Simplified" License',
+    shortName: "BSD 2-Clause",
     link: "https://choosealicense.com/licenses/bsd-2-clause/",
   },
 
   {
     id: 3,
     name: 'BSD 3-Clause "New" or "Revised" License',
+    shortName: "BSD 3-Clause",
     link: "https://choosealicense.com/licenses/bsd-3-clause/",
   },
   {
     id: 0,
     name: "GNU Affero General Public License v3.0",
+    shortName: "AGPL 3.0",
     link: "https://choosealicense.com/licenses/agpl-3.0/",
   },
   {
     id: 4,
     name: "Boost Software License 1.0",
+    shortName: "BSL 1.0",
     link: "https://choosealicense.com/licenses/bsl-1.0/",
   },
 
   {
     id: 6,
     name: "Eclipse Public License 2.0",
+    shortName: "EPL 2.0",
     link: "https://choosealicense.com/licenses/epl-2.0/",
   },
 
   {
     id: 12,
     name: "The Unlicense",
+    shortName: "Unlicense",
     link: "https://choosealicense.com/licenses/unlicense/",
   },
 ];
 
 interface ComponentMetadataFormProps {
-  component: ResearchObjectV1Component;
+  file: DriveObject;
   onSubmit: (data: CommonComponentPayload) => void;
+  manifest: ResearchObjectV1;
   loading?: boolean;
-  currentObjectId: string;
   defaultLicense: string;
 }
 
@@ -154,9 +184,9 @@ const ComponentMetadataForm = React.forwardRef(
     );
 
     function getLicenseTypes() {
-      if (props.component.type === ResearchObjectComponentType.PDF)
+      if (props.file.componentType === ResearchObjectComponentType.PDF)
         return PDF_LICENSE_TYPES;
-      if (props.component.type === ResearchObjectComponentType.CODE)
+      if (props.file.componentType === ResearchObjectComponentType.CODE)
         return CODE_LICENSE_TYPES;
       else return PDF_LICENSE_TYPES;
     }
@@ -164,11 +194,11 @@ const ComponentMetadataForm = React.forwardRef(
     //autodetect from code repos on github
     useEffect(() => {
       if (
-        props.component.type === "code" &&
-        !props.component.payload.licenseType
+        props.file.componentType === "code" &&
+        !props.file.metadata?.licenseType
       ) {
-        const fetchLicense = async () => {
-          const spl = props.component.payload.externalUrl.split("github.com/");
+        const fetchLicense = async (component: ResearchObjectV1Component) => {
+          const spl = component.payload.externalUrl.split("github.com/");
           const owner = spl[1].split("/")[0];
           let repo = spl[1].split("/")[1];
           if (repo.includes(".")) repo = repo.split(".")[0];
@@ -182,11 +212,14 @@ const ComponentMetadataForm = React.forwardRef(
           );
           if (license) setValue("licenseType", license.name);
         };
-        if (props.component.payload.externalUrl?.includes("github.com/"))
-          fetchLicense();
+        const component = props.manifest.components.find(
+          (c) => c.payload?.path === props.file.path
+        );
+        if (component && component.payload.externalUrl?.includes("github.com/"))
+          fetchLicense(component);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [props.component.type]);
+    }, [props.file.componentType]);
 
     return (
       <div>
@@ -228,23 +261,28 @@ const ComponentMetadataForm = React.forwardRef(
             limits.
           </div>
         </div>
-        {props.component.type !== ResearchObjectComponentType.LINK && (<div className="py-3 my-3">
+
+        <div className="py-3 my-3">
           <Controller
             name="licenseType"
             control={control}
             defaultValue={defaultLicense?.name}
             render={({ field }: any) => {
-              const val = PDF_LICENSE_TYPES.find((l) => l.name === field.value);
+              const licenses = getLicenseTypes();
+              const val = licenses.find((l) => l.name === field.value);
               return (
                 <SelectList
                   label="License Type"
                   className="mt-2"
                   mandatory={true}
-                  data={PDF_LICENSE_TYPES}
+                  data={licenses}
                   defaultValue={defaultLicense}
-                  field={{ ...field, value: val || field.value || defaultLicense }}
+                  field={{
+                    ...field,
+                    value: val || field.value || defaultLicense,
+                  }}
                 />
-              )
+              );
             }}
           />
           <div className="text-xs mt-2">
@@ -271,17 +309,12 @@ const ComponentMetadataForm = React.forwardRef(
             </a>
           </div>
         </div>
-        )}
       </div>
     );
   }
 );
 interface ComponentMetadataPopoverProps {
-  componentId: string;
-  currentObjectId: string;
-  manifestData: ResearchObjectV1;
   isVisible: boolean;
-  mode: string;
   onClose?: () => void;
 }
 
@@ -296,25 +329,25 @@ const ComponentMetadataPopover = (
   const formRef = useRef<HTMLFormElement | null>(null);
   const { isLoading: isSaving } = useManifestStatus();
   const { dialogs, setDialogs } = useManuscriptController(["dialogs"]);
+  const { fileMetadataBeingEdited } = useDrive();
 
-  const { publicView } = useNodeReader();
-  const manifestData = props.manifestData;
-  const currentObjectId = props.currentObjectId;
-  const mode = props.mode;
-
-  const componentIndex = manifestData.components.findIndex(
-    (c) => c.id === props.componentId
-  );
-
-  const component = manifestData.components.find(
-    (c) => c.id === props.componentId
-  );
+  const {
+    publicView,
+    mode,
+    manifest: manifestData,
+    currentObjectId,
+  } = useNodeReader();
 
   const methods = useForm<CommonComponentPayload>({
     defaultValues: {
-      keywords: component?.payload.keywords || FORM_DEFAULTS.keywords,
-      description: component?.payload.description || FORM_DEFAULTS.description,
-      licenseType: component?.payload.licenseType || FORM_DEFAULTS.licenseType,
+      keywords:
+        fileMetadataBeingEdited?.metadata?.keywords || FORM_DEFAULTS.keywords,
+      description:
+        fileMetadataBeingEdited?.metadata?.description ||
+        FORM_DEFAULTS.description,
+      licenseType:
+        fileMetadataBeingEdited?.metadata?.licenseType ||
+        FORM_DEFAULTS.licenseType,
     },
   });
 
@@ -324,25 +357,46 @@ const ComponentMetadataPopover = (
   }, [methods.formState.isDirty, props]);
 
   const onSubmit = async (data: CommonComponentPayload) => {
-    if (manifestData && componentIndex !== undefined) {
-      const manifestDataClone = { ...manifestData };
+    if (manifestData !== undefined) {
+      const componentIndex = manifestData!.components!.findIndex(
+        (c) => c.payload.path === fileMetadataBeingEdited?.path!
+      );
 
-      const componentPayload = {
-        ...manifestData?.components[componentIndex].payload,
+      const newPayload = {
         ...data,
       };
+      if (componentIndex !== -1) {
+        dispatch(
+          updateComponent({
+            index: componentIndex,
+            update: {
+              payload: newPayload,
+            },
+          })
+        );
+      } else {
+        const newComponent: ResearchObjectV1Component = {
+          id: uuidv4(),
+          name: fileMetadataBeingEdited!.name,
+          type: fileMetadataBeingEdited!
+            .componentType as ResearchObjectComponentType,
+          payload: {
+            ...newPayload,
+            path: fileMetadataBeingEdited!.path,
+            cid: fileMetadataBeingEdited!.cid,
+          },
+        };
+        dispatch(addComponent({ component: newComponent }));
+      }
 
       dispatch(
-        updateComponent({
-          index: componentIndex,
-          update: {
-            ...manifestDataClone.components[componentIndex],
-            payload: componentPayload,
+        saveManifestDraft({
+          onSucess: () => {
+            dispatch(fetchTreeThunk());
+            props.onClose();
           },
         })
       );
-
-      dispatch(saveManifestDraft({ onSucess: () => props.onClose() }));
     }
   };
 
@@ -377,7 +431,7 @@ const ComponentMetadataPopover = (
     ]);
   }, [dialogs, props?.onClose, setDialogs]);
 
-  const isVirtualComponent = !component || componentIndex === undefined;
+  const isVirtualComponent = !fileMetadataBeingEdited === undefined;
   if (isVirtualComponent) {
     return <div>{/* className="text-xs bg-red-500">component problem */}</div>;
   }
@@ -433,21 +487,21 @@ const ComponentMetadataPopover = (
             {mode === "editor" ? (
               <ComponentMetadataForm
                 ref={formRef}
-                component={component!}
-                currentObjectId={currentObjectId!}
+                file={fileMetadataBeingEdited!}
+                manifest={manifestData!}
                 onSubmit={onSubmit}
                 loading={isSaving}
                 defaultLicense={manifestData?.defaultLicense || ""}
               />
             ) : (
-              <ReadOnlyComponent component={component} />
+              <ReadOnlyComponent file={fileMetadataBeingEdited} />
             )}
           </div>
         </div>
         <div className="flex flex-row justify-end gap-4 items-center h-16 w-full dark:bg-[#272727] border-t border-t-[#81C3C8] rounded-b-lg p-4">
           <PrimaryButton
             onClick={() => {
-              if (publicView) {
+              if (publicView || mode === "reader") {
                 props.onClose();
               } else {
                 formRef.current!.submit();

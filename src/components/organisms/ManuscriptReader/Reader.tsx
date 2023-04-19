@@ -2,20 +2,20 @@ import ButtonMysterious from "@src/components/atoms/ButtonMysterious";
 import FloatingActionBar from "@src/components/molecules/FloatingActionBar";
 import { useSetter } from "@src/store/accessors";
 import { setHeaderHidden } from "@src/state/preferences/preferencesSlice";
-import { useEffect } from "react";
-import CitationPopover from "../PopOver/CitationPopover";
-import ManuscriptSidePanel from "../SidePanel/ManuscriptSidePanel";
-import Toolbar from "../Toolbar";
-import VSCodeViewer from "../VSCodeViewer";
-import ComponentStackView from "./ComponentStackView";
-import Placeholder from "./Placeholder";
+import { useCallback, useEffect } from "react";
+import CitationPopover from "@src/components/organisms/PopOver/CitationPopover";
+import ManuscriptSidePanel from "@src/components/organisms/SidePanel/ManuscriptSidePanel";
+import Toolbar from "@src/components/organisms/Toolbar";
+import VSCodeViewer from "@src/components/organisms/VSCodeViewer";
+import ComponentStackView from "@src/components/organisms/ManuscriptReader/ComponentStackView";
+import Placeholder from "@src/components/organisms/ManuscriptReader/Placeholder";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { setPublicView, toggleResearchPanel } from "@src/state/nodes/viewer";
 
 interface ReaderViewerProps {
   isLoading: boolean;
 }
-export default function PublicViewer({ isLoading }: ReaderViewerProps) {
+export default function Reader({ isLoading }: ReaderViewerProps) {
   const dispatch = useSetter();
   const { manifest: manifestData, componentStack } = useNodeReader();
 
@@ -27,6 +27,10 @@ export default function PublicViewer({ isLoading }: ReaderViewerProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleClose = useCallback(() => {
+    dispatch(setHeaderHidden(true));
+  }, [dispatch, setHeaderHidden]);
+
   return (
     <>
       {isLoading && <Placeholder isLoading />}
@@ -35,13 +39,8 @@ export default function PublicViewer({ isLoading }: ReaderViewerProps) {
         <>
           <ComponentStackView />
           <Toolbar />
-          <CitationPopover isOpen={true} />
           {!isLoading && !!manifestData && (
-            <ManuscriptSidePanel
-              onClose={() => {
-                dispatch(setHeaderHidden(true));
-              }}
-            />
+            <ManuscriptSidePanel onClose={handleClose} />
           )}
           {!isLoading && <ButtonMysterious />}
           {componentStack.length > 0 ? <FloatingActionBar /> : null}

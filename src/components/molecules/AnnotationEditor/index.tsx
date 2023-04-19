@@ -43,6 +43,7 @@ import {
   FormatQuote,
   FormatUnderlined,
   IconCreateFolder,
+  IconInfo,
   LatexLogo,
 } from "@icons";
 import useClickAway from "react-use/lib/useClickAway";
@@ -54,7 +55,11 @@ import {
 } from "./utils";
 import toast from "react-hot-toast";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
-import { usePdfReader } from "@src/state/nodes/hooks";
+import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
+import { useDrive } from "@src/state/drive/hooks";
+import { bfsDriveSearch } from "@src/state/drive/utils";
+import { useSetter } from "@src/store/accessors";
+import { navigateToDrivePickerByPath } from "@src/state/drive/driveSlice";
 
 const HOTKEYS: any = {
   "mod+b": "bold",
@@ -79,6 +84,7 @@ export const SlateEditor = (props: any) => {
     setMode,
     rawMarkdown,
     setRawMarkdown,
+    setBlockSlateChange,
   } = props;
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const [showLatexButton, setShowLatexButton] = useState(false);
@@ -146,28 +152,34 @@ export const SlateEditor = (props: any) => {
     }
   }, []);
 
-  const renderElement = useCallback((props) => {
-    const nodeRef = Array.from(
-      Editor.nodes(editor, {
-        match: (n) => {
-          return (
-            !Editor.isEditor(n) &&
-            SlateElement.isElement(n) &&
-            SlateElement.matches(props.element, n as CustomElement)
-          );
-        },
-      })
-    );
+  const renderElement = useCallback(
+    (props) => {
+      const nodeRef = Array.from(
+        Editor.nodes(editor, {
+          match: (n) => {
+            return (
+              !Editor.isEditor(n) &&
+              SlateElement.isElement(n) &&
+              SlateElement.matches(props.element, n as CustomElement)
+            );
+          },
+        })
+      );
 
-    return (
-      <Element
-        {...props}
-        nodeRef={nodeRef}
-        isSelected={!!nodeRef[0]}
-        readOnly={readOnly}
-      />
-    );
-  }, []);
+      return (
+        <Element
+          {...props}
+          nodeRef={nodeRef}
+          isSelected={!!nodeRef[0]}
+          readOnly={readOnly}
+          setRawMarkdown={setRawMarkdown}
+          rawMarkdown={rawMarkdown}
+          setBlockSlateChange={setBlockSlateChange}
+        />
+      );
+    },
+    [rawMarkdown]
+  );
   const renderLeaf = useCallback((props) => {
     return <Leaf {...props} />;
   }, []);
@@ -238,36 +250,36 @@ export const SlateEditor = (props: any) => {
                 />
               }
             />
-            <DirectoryButton
-              editor={editor}
-              format="link"
-              icon={
-                <IconCreateFolder
-                  fill="black"
-                  width={20}
-                  height={20}
-                  className="cursor-pointer"
-                />
-              }
-            />
 
             <Button
               onClick={() => {
                 setMode("raw");
                 if (showLatexButton) {
                   setShowLatexButton(false);
-                  toast.success("Switched to raw editor for LaTeX", {
-                    duration: 5000,
-                    position: "top-center",
-                    style: {
-                      marginTop: 0,
-                      borderRadius: "10px",
-                      background: "#111",
-                      color: "#fff",
-                    },
-                  });
+                  toast.success(
+                    <div className="flex flex-col gap-3 text-center">
+                      <div>Add LaTeX equations in Editor</div>
+                      <div>example</div>
+                      <div>
+                        <pre className="text-white bg-gray-600 text-sm p-2 rounded-lg">
+                          $$ f(x) = g(y) $$
+                        </pre>
+                      </div>
+                    </div>,
+                    {
+                      duration: 10000,
+                      position: "top-center",
+                      icon: <IconInfo fill="white" />,
+                      style: {
+                        marginTop: 0,
+                        borderRadius: "10px",
+                        background: "#111",
+                        color: "#fff",
+                      },
+                    }
+                  );
                   // add example latex to the end of the markdown to show user how to use it
-                  setRawMarkdown(rawMarkdown + `\n$$\nE = mc^2\n$$`);
+                  // setRawMarkdown(rawMarkdown + `\n$$\nE = mc^2\n$$`);
                 }
               }}
             >
@@ -278,7 +290,23 @@ export const SlateEditor = (props: any) => {
                 height={20}
               />
             </Button>
-
+            <div className="w-36 group flex items-end justify-end justify-self-end self-end  select-none">
+              <DirectoryButton
+                editor={editor}
+                format="link"
+                icon={
+                  <div className="flex flex-row gap-1 items-center justify-end pr-2 group-hover:bg-neutrals-gray-8">
+                    <IconCreateFolder
+                      fill="black"
+                      width={20}
+                      height={20}
+                      className="cursor-pointer"
+                    />
+                    <span className="text-xs font-bold">Node Drive</span>
+                  </div>
+                }
+              />
+            </div>
             {/* <LinkButton format="link" icon={
                 <FormatLink
                   fill="black"
@@ -389,6 +417,7 @@ const AnnotationEditor = (props: AnnotationEditorProps) => {
 
   // const [rawMarkdown, setRawMarkdown] = useState<any>(sampleMarkdown)
   const [slateObject, setSlateObject] = useState<CustomElement[] | null>(null);
+  const [blockSlateChange, setBlockSlateChange] = useState(false);
 
   // console.log("slateObject", slateObject);
   // console.log("rawMarkdown", rawMarkdown);
@@ -413,6 +442,7 @@ const AnnotationEditor = (props: AnnotationEditorProps) => {
               <SlateEditor
                 slateObject={slateObject}
                 onChange={(obj: any) => {
+                  if (blockSlateChange) return;
                   if (setRawMarkdown) {
                     setRawMarkdown(convertSlateToMarkdown(obj));
                   }
@@ -422,6 +452,7 @@ const AnnotationEditor = (props: AnnotationEditorProps) => {
                 rawMarkdown={rawMarkdown}
                 setRawMarkdown={setRawMarkdown}
                 className="h-[100px]"
+                setBlockSlateChange={setBlockSlateChange}
               />
             </ErrorBoundary>
           ) : null
@@ -591,6 +622,9 @@ const Element = (params: {
   nodeRef: any;
   isSelected: boolean;
   readOnly: boolean;
+  rawMarkdown: string;
+  setRawMarkdown: (rawMarkdown: string) => void;
+  setBlockSlateChange: (blockSlateChange: boolean) => void;
 }) => {
   const {
     attributes,
@@ -599,10 +633,13 @@ const Element = (params: {
     nodeRef,
     isSelected,
     readOnly,
+    rawMarkdown,
+    setRawMarkdown,
+    setBlockSlateChange,
     ...rest
   } = params;
   const style = { textAlign: element["align" as keyof CustomElement] };
-
+  const editor = useSlate();
   switch (element.type) {
     case "block_quote":
       return (
@@ -683,12 +720,38 @@ const Element = (params: {
       if (element.link.startsWith("#/")) {
         return (
           <DirectoryLinkComponent
+            setHref={(href: string) => {
+              if (setRawMarkdown === undefined) return;
+              const newMarkdown = rawMarkdown.replaceAll(element.link, href);
+              /**
+               *  important to avoid <Slate onChange> handler overwriting this
+               */
+              setBlockSlateChange(true);
+              setTimeout(() => {
+                setRawMarkdown(newMarkdown);
+                setBlockSlateChange(false);
+              }, 50);
+            }}
             attributes={attributes}
             href={element.link}
             fileName={element.fileName}
             nodeRef={nodeRef}
             element={element}
             readOnly={readOnly}
+            deleteLink={() => {
+              Transforms.removeNodes(editor, {
+                at: [],
+                match: (n) => {
+                  return (
+                    !Editor.isEditor(n) &&
+                    SlateElement.isElement(n) &&
+                    n.type === "link" &&
+                    n.link === element.link &&
+                    n == element
+                  );
+                },
+              });
+            }}
             {...{ children }}
           />
         );
@@ -770,8 +833,11 @@ const DirectoryButton = ({
   editor: Editor;
 }) => {
   // const editor = useSlate();
+  const dispatch = useSetter();
   const directoryRef = useRef(null);
   const [showDirectory, setShowDirectory] = useState<boolean>(false);
+  const { manifest } = useNodeReader();
+  const { breadCrumbsPicker } = useDrive();
 
   useClickAway(directoryRef, (e) => {
     setShowDirectory(false);
@@ -779,19 +845,49 @@ const DirectoryButton = ({
 
   return (
     <span ref={directoryRef} className="relative hover:bg-neutrals-gray-8">
-      <Button onClick={() => setShowDirectory(!showDirectory)}>{icon}</Button>
+      <Button
+        onClick={() => {
+          dispatch(
+            navigateToDrivePickerByPath({ path: breadCrumbsPicker[0].path! })
+          );
+          setShowDirectory(!showDirectory);
+        }}
+      >
+        {icon}
+      </Button>
       {showDirectory ? (
         <div
-          className="absolute top-[120%] left-[-50%] w-96 bg-white z-50 rounded-lg"
+          className="absolute top-[120%] left-[0%] w-96 bg-white z-50 rounded-lg"
           style={{ boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.8)" }}
         >
           <DriveTable
             onRequestClose={() => setShowDirectory(false)}
-            onInsert={(file) => {
+            onInsert={(file: any) => {
+              const ancestorComponent = manifest?.components.find(
+                (c) => c.id === file.componentId
+              );
+              const ancestorComponentId = ancestorComponent?.id;
+
+              let ancestorComponentPath = ancestorComponent?.payload?.path;
+              if (ancestorComponentPath) {
+                // remove ancestor path from file.path
+                ancestorComponentPath = file?.path
+                  ?.replace(ancestorComponentPath, "")
+                  .substring(1);
+              }
+
               const linkElem: any = {
                 type: "link",
-                link: `#/${file.componentType}/${file.cid}`,
-                fileName: file.name,
+                link: `#/${file.componentType}/${
+                  ancestorComponentId || file.cid
+                }${
+                  ancestorComponentPath
+                    ? `?path=${ancestorComponentPath}`
+                    : `/${file.path}`
+                }`,
+                fileName: `${
+                  ancestorComponent ? `${ancestorComponent.name}: ` : ""
+                }${file.name}`,
                 children: [{ text: "" }],
               };
               Transforms.insertNodes(editor, linkElem);
@@ -871,7 +967,7 @@ is an equation
 [To Google!](https://google.com)`;
 // console.log(sampleMarkdown)
 
-export default AnnotationEditor;
+export default React.memo(AnnotationEditor);
 
 class ErrorBoundary extends React.Component {
   constructor(props: any) {

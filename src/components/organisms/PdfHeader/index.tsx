@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import UserMenu from "@components/molecules/UserMenu";
 import {
   APPROXIMATED_HEADER_HEIGHT,
@@ -26,6 +26,8 @@ import {
   usePdfReader,
 } from "@src/state/nodes/hooks";
 import { setLoadState } from "@src/state/nodes/pdf";
+import { useGetNodesQuery } from "@src/state/api/nodes";
+import ShareModal from "@src/components/molecules/ShareModal";
 
 const HeadWrapper = styled.div.attrs({
   className: `fixed w-screen app-header`,
@@ -71,9 +73,18 @@ const PdfHeader = () => {
     loadState: { loadPercent, loadError, loadProgressTaken },
   } = usePdfReader();
   const { componentStack, publicView, currentObjectId } = useNodeReader();
+  const { data: nodes, isLoading } = useGetNodesQuery();
 
-  const { setShowShareMenu, isAddingComponent, isAddingSubcomponent } =
-    useManuscriptController(["isAddingComponent", "isAddingSubcomponent"]);
+  const {
+    setShowShareMenu,
+    showShareMenu,
+    isAddingComponent,
+    isAddingSubcomponent,
+  } = useManuscriptController([
+    "isAddingComponent",
+    "isAddingSubcomponent",
+    "showShareMenu",
+  ]);
 
   const isPdfActiveComponent =
     componentStack[componentStack.length - 1]?.type ===
@@ -122,7 +133,23 @@ const PdfHeader = () => {
     }
   }, [loadProgressTaken, loadError, dispatch]);
 
-  const canShare = publicView || !!nodeVersion;
+  // TODO: for private view add guard to check if user is node owner or currentUser has
+  // enough permissions to share private drafts
+  const canShare = useMemo(() => {
+    if (publicView) return !!nodeVersion;
+    if (isLoading) return false;
+    const isOwner = nodes?.find(
+      (n) => n.uuid === currentObjectId && n?.ownerId === userProfile.userId
+    );
+    return !!isOwner;
+  }, [
+    currentObjectId,
+    isLoading,
+    nodeVersion,
+    nodes,
+    publicView,
+    userProfile.userId,
+  ]);
 
   const openMenu = () => {
     if (userProfile.userId > 0) {
@@ -181,6 +208,7 @@ const PdfHeader = () => {
             <PrimaryButton
               className="py-1.5"
               onClick={() => {
+                console.log("click show modal", showShareMenu);
                 setShowShareMenu(true);
                 postUserAction(
                   AvailableUserActionLogTypes.btnShare,
@@ -213,8 +241,11 @@ const PdfHeader = () => {
           ></div>
         </div>
       ) : null}
+      {showShareMenu && (
+        <ShareModal isOpen={true} onDismiss={() => setShowShareMenu(false)} />
+      )}
     </HeadWrapper>
   );
 };
 
-export default PdfHeader;
+export default React.memo(PdfHeader);

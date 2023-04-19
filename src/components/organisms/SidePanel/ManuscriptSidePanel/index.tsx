@@ -1,13 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { FlexColumn, FlexRow, FlexRowSpaceBetween } from "@components/styled";
+import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
 import SidePanel from "@components/organisms/SidePanel";
-import HistoryTab from "./Tabs/HistoryTab";
-import SourceTab from "./Tabs/SourceTab";
+import HistoryTab from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/History/HistoryTab";
+import SourceTab from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/SourceTab";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import PanelCloseButton from "@components/atoms/PanelCloseButton";
-import ManuscriptAttributesSection from "@components/organisms/ManuscriptAttributesSection";
-import ManuscriptComponentsSection from "@components/organisms/ManuscriptComponentsSection";
+import ManuscriptAttributesSection from "@src/components/organisms/ManuscriptAttributesSection";
+import ManuscriptComponentsSection from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/Components/ManuscriptComponentsSection";
 import {
   convertUUIDToHex,
   isWindows,
@@ -37,6 +37,10 @@ import {
   toggleCommitPanel,
   toggleResearchPanel,
 } from "@src/state/nodes/viewer";
+import {
+  SwitchBar,
+  SwitchButton,
+} from "@src/components/atoms/SwitchBar/SwitchBar";
 
 const ManuscriptSidePanelContainer = styled(SidePanel).attrs({
   className: "bg-light-gray dark:bg-dark-gray text-black dark:text-white",
@@ -54,34 +58,6 @@ const ManuscriptTitle = styled.p.attrs({
   className:
     "transition-all duration-750 select-none text-sm font-bold text-left w-full",
 })``;
-const SwitchButton: any = styled.div.attrs((props: any) => ({
-  className: `select-none border-[1px] border-muted-300 dark:border-muted-800 font-inter ${
-    props.isSelected
-      ? "bg-black text-white font-bold"
-      : "bg-white dark:bg-medium-gray dark:hover:bg-dark-gray text-black dark:text-white"
-  }`,
-}))`
-  flex: 1;
-  font-size: 1rem;
-  text-align: center;
-  cursor: pointer;
-  transition: background-color 200ms linear, color 200ms linear;
-  padding: 4px 0;
-  border-left: 0;
-  border-top: 0;
-  border-bottom: 0;
-`;
-const SwitchBar = styled(FlexRow).attrs({
-  className: "border-[1px] border-muted-300 dark:border-muted-900",
-})`
-  border-radius: 8px;
-  overflow: hidden;
-  flex: unset;
-
-  & > ${SwitchButton}:last-child {
-    border-right: none;
-  }
-`;
 
 interface ManuscriptSidePanelProps {
   onClose: () => void;
@@ -158,8 +134,12 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
     setMounted(true);
     const panelEl = document.getElementById("manuscript-side-panel");
     if (panelEl) {
-      panelEl.onmouseover = lockScroll;
-      panelEl.onmouseout = restoreScroll;
+      panelEl.onmouseover = () => {
+        lockScroll();
+      };
+      panelEl.onmouseout = () => {
+        restoreScroll();
+      };
     }
   });
 
@@ -181,9 +161,41 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
   }, [userProfile]);
 
   const showCloseButton =
-    componentStack.length > 0 && (!isCodeActive || selectedAnnotationId);
+    componentStack.filter(
+      (a) =>
+        a &&
+        a.type != ResearchObjectComponentType.DATA &&
+        a.type != ResearchObjectComponentType.UNKNOWN &&
+        a.type != ResearchObjectComponentType.DATA_BUCKET
+    ).length > 0 &&
+    (!isCodeActive || selectedAnnotationId);
   const isResearchPanelReallyOpen =
-    isResearchPanelOpen || componentStack.length < 1;
+    isResearchPanelOpen ||
+    componentStack.filter(
+      (a) =>
+        a &&
+        a.type != ResearchObjectComponentType.DATA &&
+        a.type != ResearchObjectComponentType.UNKNOWN &&
+        a.type != ResearchObjectComponentType.DATA_BUCKET
+    ).length < 1;
+
+  const canShowDrive = !publicView && userProfile.userId > 0;
+
+  const handlePanelClose = useCallback(() => {
+    if (componentStack.length > 1 && isCodeActive) {
+      dispatch(popFromComponentStack());
+    } else {
+      dispatch(toggleResearchPanel(false));
+      onClose();
+    }
+  }, [
+    dispatch,
+    popFromComponentStack,
+    componentStack,
+    toggleResearchPanel,
+    onClose,
+    isCodeActive,
+  ]);
 
   return (
     <ManuscriptSidePanelContainer
@@ -196,14 +208,7 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
         {showCloseButton ? (
           <PanelCloseButton
             visible={isResearchPanelReallyOpen}
-            onClick={() => {
-              if (componentStack.length > 1 && isCodeActive) {
-                dispatch(popFromComponentStack());
-              } else {
-                dispatch(toggleResearchPanel(false));
-                onClose();
-              }
-            }}
+            onClick={handlePanelClose}
           />
         ) : null}
 
@@ -296,7 +301,7 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
         </div>
 
         <PerfectScrollbar className="overflow-auto">
-          {!publicView && researchPanelTab === ResearchTabs.current ? (
+          {canShowDrive && researchPanelTab === ResearchTabs.current ? (
             <NodeDrive
               className={`mb-4 ${doPad ? "w-[calc(100%-16px)]" : "w-full"}`}
             />

@@ -215,8 +215,9 @@ export const capitalize = (str: string) => {
  * The problem with this is the width of the scrollbar causes a layout shift when it disappears, so we adjust FIXED_ELEMENTS above according to the width of the scrollbar
  */
 
-export const restoreScroll = () => {
+export const restoreScroll = (nudgeForWindows?: boolean) => {
   // debugger;
+
   FIXED_ELEMENTS.forEach((a) => {
     const el = document.querySelector(a.selector) as HTMLElement;
     if (!el) {
@@ -224,10 +225,11 @@ export const restoreScroll = () => {
     }
     (el.style as any)[a.strategy] = "0px";
   });
+
   document.body.style.overflowY = "scroll";
 };
 
-export const lockScroll = () => {
+export const lockScroll = (nudgeForWindows?: boolean) => {
   // debugger;
   const appEl = document.body;
   const scrollWidth = appEl.scrollWidth - appEl.clientWidth;
@@ -275,8 +277,24 @@ export const getNonDataComponentsFromManifest = (
 ) => {
   const nonDataComponents = manifestData?.components
     ? manifestData.components.filter(
-        (a) => a.type !== ResearchObjectComponentType.DATA
+        (a) =>
+          a.type !== ResearchObjectComponentType.DATA &&
+          a.type !== ResearchObjectComponentType.DATA_BUCKET &&
+          a.type !== ResearchObjectComponentType.UNKNOWN
       )
     : [];
   return nonDataComponents;
 };
+
+export function extractCodeRepoName(url: string) {
+  if (
+    url.indexOf("github.com") &&
+    url.split("github.com/")[1].split("/").length > 1
+  ) {
+    const [, , repo] = url.match(
+      // eslint-disable-next-line no-useless-escape
+      /github.com[\/:]([^\/]+)\/([^\/^.]+)/
+    )!;
+    return repo;
+  }
+}

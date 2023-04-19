@@ -5,12 +5,10 @@ import {
   ResearchObjectComponentType,
   ResearchObjectV1Validation,
 } from "@desci-labs/desci-models";
-import { EditorHistory } from "@components/organisms/ManuscriptComponentsSection";
 import { PageMetadata } from "@components/organisms/Paper/usePageMetadata";
-import { UploadQueueItem } from "@components/organisms/UploadPanel";
-import { DriveJumpingParams, DriveObject } from "@components/organisms/Drive";
+import { DriveObject } from "@components/organisms/Drive";
 import { Wallet } from "@src/state/api/types";
-
+import { EditorHistory } from "../SidePanel/ManuscriptSidePanel/Tabs/Components/ManuscriptComponentsSection";
 /* ########################### Customizable options ################################ */
 
 interface Dialog {
@@ -55,23 +53,17 @@ interface State {
   lastScrollTop: { [componentId: string]: number };
   isAddingComponent: boolean;
   isAddingSubcomponent: boolean;
-  useMenuCids: string[];
   droppedFileList: FileList | null;
   droppedTransferItemList: FileSystemEntry[] | null;
   addComponentType: ResearchObjectComponentType | null;
   addComponentSubType: ResearchObjectComponentSubtypes | null;
-  showCitationModal: boolean;
   // selectedHistory: HistoryEntryProps | null;
   showPublicationDetails: boolean;
-  showUploadPanel: boolean;
-  uploadQueue: UploadQueueItem[];
-  batchUploadProgress: Record<string, number>;
-  driveJumpDir: DriveJumpingParams | null;
   showProfileUpdater: boolean;
-  componentToCite: DriveObject | null;
-  privCidMap: Record<string, boolean>;
+  componentToUse: DriveObject | null;
   forceRefreshDrive: boolean;
   showAddNewNode: boolean;
+  addFilesWithoutContext: boolean;
 }
 
 export const LS_PENDING_COMMITS_KEY = "DESCI_PENDING_COMMITS";
@@ -114,20 +106,14 @@ export const initialState: State = {
   changesToCommit: [],
   showShareMenu: false,
   pageMetadata: [],
-  useMenuCids: [],
+  componentToUse: null,
   addComponentType: null,
   addComponentSubType: null,
-  componentToCite: null,
-  showCitationModal: false,
   showPublicationDetails: false,
-  showUploadPanel: false,
-  uploadQueue: [],
-  batchUploadProgress: {},
-  driveJumpDir: null,
   showProfileUpdater: false,
-  privCidMap: {},
   forceRefreshDrive: false,
   showAddNewNode: false,
+  addFilesWithoutContext: false,
 };
 
 export interface IndexedNodeVersion {

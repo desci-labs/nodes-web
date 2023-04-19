@@ -1,6 +1,6 @@
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { ResearchObjectV1Component } from "@desci-labs/desci-models";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 import ComponentMetadataPopover from "@components/organisms/PopOver/ComponentMetadataPopover";
 import CollapsibleSection from "@components/organisms/CollapsibleSection";
@@ -19,13 +19,9 @@ const General = (props: GeneralProps) => {
     "showProfileUpdater",
   ]);
   const [openWalet, setOpenWallet] = useState(false);
-  const { currentObjectId, mode, manifest: manifestData } = useNodeReader();
   const userProfile = useUser();
   const { wallet, switchNetwork } = useConnectedWallet();
   const { connector } = useWeb3React();
-  const [selectedComponent, setSelectedComponent] =
-    useState<ResearchObjectV1Component | null>(null);
-
   // one entry for each component, one entry for wallet, one entry for network
   const count = 2;
   const isProfileComplete = useMemo(
@@ -84,18 +80,8 @@ const General = (props: GeneralProps) => {
       {/* {showProfileUpdater && <ProfilePopOver onClose={() => {}} />} */}
       <WalletManagerModal
         isOpen={openWalet}
-        onDismiss={() => setOpenWallet(false)}
+        onDismiss={useCallback(() => setOpenWallet(false), [setOpenWallet])}
       />
-      {selectedComponent && (
-        <ComponentMetadataPopover
-          currentObjectId={currentObjectId!}
-          manifestData={manifestData!}
-          mode={mode}
-          componentId={selectedComponent.id}
-          isVisible={!!selectedComponent}
-          onClose={() => setSelectedComponent(null)}
-        />
-      )}
     </div>
   );
 };

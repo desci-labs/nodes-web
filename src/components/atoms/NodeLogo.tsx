@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { IconDesciNodes } from "@icons";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import { TOOLBAR_ENTRY } from "../organisms/Toolbar";
@@ -72,4 +72,4 @@ const NodeLogo = () => {
   );
 };
 
-export default NodeLogo;
+export default React.memo(NodeLogo);

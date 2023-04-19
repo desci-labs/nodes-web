@@ -1,4 +1,5 @@
 import {
+  PdfComponent,
   ResearchObjectComponentAnnotation,
   ResearchObjectComponentType,
   ResearchObjectV1,
@@ -7,11 +8,15 @@ import {
 } from "@desci-labs/desci-models";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { updateDraft } from "@src/api";
+import { AnnotationLinkConfig } from "@src/components/molecules/AnnotationEditor/components";
 import { cleanupManifestUrl } from "@src/components/utils";
 import { RootState } from "@src/store";
 import axios from "axios";
+import { Path } from "react-router";
+import { DrivePath } from "../drive/types";
+import { update } from "react-spring";
 
-type ReaderMode = "reader" | "editor";
+export type ReaderMode = "reader" | "editor";
 
 export enum ResearchTabs {
   current = "current",
@@ -32,13 +37,14 @@ export enum ManifestDataStatus {
   Fulfilled = "Fulfilled",
   Rejected = "Rejected",
 }
-interface NodeReaderPref {
+export interface NodeReaderPref {
   isNew: boolean;
   mode: ReaderMode;
   manifestCid: string;
   publicView: boolean;
   editingNodeParams?: EditNodeParams | null;
   currentObjectId?: string;
+  shareId?: string;
   isDraggingFiles: boolean;
   isCommitPanelOpen: boolean;
   manifest?: ResearchObjectV1;
@@ -48,6 +54,9 @@ interface NodeReaderPref {
   startedNewAnnotationViaButton: boolean;
   componentStack: ResearchObjectV1Component[];
   manifestStatus: ManifestDataStatus;
+  recentlyAddedComponent: DrivePath;
+  annotationLinkConfig?: AnnotationLinkConfig | null;
+  pdfScrollOffsetTop?: number;
 }
 
 const initialState: NodeReaderPref = {
@@ -65,6 +74,9 @@ const initialState: NodeReaderPref = {
   researchPanelTab: ResearchTabs.history,
   startedNewAnnotationViaButton: false,
   manifestStatus: ManifestDataStatus.Idle,
+  recentlyAddedComponent: "",
+  annotationLinkConfig: null,
+  pdfScrollOffsetTop: 0,
 };
 
 export const nodeReaderSlice = createSlice({
@@ -137,22 +149,35 @@ export const nodeReaderSlice = createSlice({
         );
       }
     },
+    addComponent: (
+      state,
+      { payload }: PayloadAction<{ component: ResearchObjectV1Component }>
+    ) => {
+      if (state.manifest) {
+        state.manifest.components.push(payload.component);
+      }
+    },
     updateComponent: (
       state,
       {
         payload,
-      }: PayloadAction<{ index: number; update: ResearchObjectV1Component }>
+      }: PayloadAction<{
+        index: number;
+        update: Partial<ResearchObjectV1Component>;
+      }>
     ) => {
-      if (state.manifest) {
-        state.manifest.components = state.manifest.components.map(
-          (component, idx) => {
-            if (idx === payload.index) {
-              return payload.update;
-            }
-            return component;
-          }
-        );
+      if (!state.manifest) return;
+      if ("payload" in payload.update) {
+        // Prevent previous payload overwrite
+        payload.update.payload = {
+          ...state.manifest.components[payload.index].payload,
+          ...payload.update.payload,
+        };
       }
+      state.manifest.components[payload.index] = {
+        ...state.manifest.components[payload.index],
+        ...payload.update,
+      };
     },
     updatePendingAnnotations: (
       state,
@@ -242,11 +267,20 @@ export const nodeReaderSlice = createSlice({
         state.manifest.components = components;
       }
     },
+    setAnnotationLinkConfig: (
+      state,
+      { payload }: PayloadAction<AnnotationLinkConfig | null>
+    ) => {
+      state.annotationLinkConfig = payload;
+    },
     setManifestCid: (state, { payload }: PayloadAction<string>) => {
       state.manifestCid = payload;
     },
     setCurrentObjectId: (state, { payload }: PayloadAction<string>) => {
       state.currentObjectId = payload;
+    },
+    setCurrentShareId: (state, { payload }: PayloadAction<string>) => {
+      state.shareId = payload;
     },
     setIsDraggingFiles: (state, { payload }: PayloadAction<boolean>) => {
       state.isDraggingFiles = payload;
@@ -277,10 +311,11 @@ export const nodeReaderSlice = createSlice({
       { payload }: PayloadAction<ResearchObjectV1Component[]>
     ) => {
       if (payload.length) {
-        const lastComponent = payload[payload.length - 1];
+        const newComponent = payload[payload.length - 1];
 
         const lastStack = state.componentStack;
         const lastStackComponent = lastStack[lastStack.length - 1];
+
         if (
           lastStackComponent &&
           lastStackComponent.type === ResearchObjectComponentType.PDF
@@ -288,19 +323,24 @@ export const nodeReaderSlice = createSlice({
           const lastScrollTop = document.scrollingElement?.scrollTop ?? 0;
           state.lastScrollTop = {
             ...state.lastScrollTop,
-            [lastComponent.id]: lastScrollTop,
+            [(lastStackComponent as PdfComponent).payload.url]: lastScrollTop,
           };
         }
 
-        if (lastComponent.type === ResearchObjectComponentType.PDF) {
-          const lastScrollTop = state.lastScrollTop[lastComponent.id];
-          if (lastScrollTop) {
-            setTimeout(() => {
-              document.scrollingElement!.scrollTop = lastScrollTop!;
-            });
-          }
+        if (
+          newComponent &&
+          newComponent.type === ResearchObjectComponentType.PDF
+        ) {
+          const lastScrollTop = state.lastScrollTop[newComponent.payload.url];
+          state.pdfScrollOffsetTop = lastScrollTop;
+          // if (lastScrollTop) {
+          //   setTimeout(() => {
+          //     document.scrollingElement!.scrollTop = lastScrollTop!;
+          //   }, 500);
+          // }
         }
       }
+      state.annotationLinkConfig = null;
       state.componentStack = payload;
     },
     pushToComponentStack: (
@@ -313,7 +353,7 @@ export const nodeReaderSlice = createSlice({
         const lastScrollTop = document.scrollingElement?.scrollTop ?? 0;
         state.lastScrollTop = {
           ...state.lastScrollTop,
-          [lastComponent.id]: lastScrollTop,
+          [lastComponent.payload.url]: lastScrollTop,
         };
       }
       state.componentStack.push(payload);
@@ -322,17 +362,47 @@ export const nodeReaderSlice = createSlice({
       const value = state.componentStack;
       value.pop();
       const remainingLastValue = value[value.length - 1];
-      if (remainingLastValue) {
-        let lastScrollTop = state.lastScrollTop[remainingLastValue.id];
-        setTimeout(() => {
-          document.scrollingElement!.scrollTop = lastScrollTop!;
-        });
+      if (
+        remainingLastValue &&
+        remainingLastValue.type == ResearchObjectComponentType.PDF
+      ) {
+        let lastScrollTop = state.lastScrollTop[remainingLastValue.payload.url];
+        state.pdfScrollOffsetTop = lastScrollTop;
+        // setTimeout(() => {
+        //   // document.scrollingElement!.scrollTop = lastScrollTop!;
+        // });
         state.lastScrollTop = {
           ...state.lastScrollTop,
-          [remainingLastValue.id]: 0,
+          [remainingLastValue.payload.url]: 0,
         };
       }
+      state.annotationLinkConfig = null;
       return state;
+    },
+    addRecentlyAddedComponent: (
+      state,
+      { payload }: PayloadAction<DrivePath>
+    ) => {
+      state.recentlyAddedComponent = payload;
+    },
+    removeRecentlyAddedComponent: (state) => {
+      state.recentlyAddedComponent = "";
+    },
+    removeComponentMetadata: (
+      state,
+      {
+        payload: { componentIndexes },
+      }: PayloadAction<{ componentIndexes: number[] }>
+    ) => {
+      componentIndexes.forEach((componentIndex) => {
+        delete state.manifest!.components[componentIndex].payload.title;
+        delete state.manifest!.components[componentIndex].payload.description;
+        delete state.manifest!.components[componentIndex].payload.keywords;
+        delete state.manifest!.components[componentIndex].payload.licenseType;
+        delete state.manifest!.components[componentIndex].payload.ontologyPurl;
+        delete state.manifest!.components[componentIndex].payload
+          .controlledVocabTerms;
+      });
     },
   },
   extraReducers(builder) {
@@ -389,6 +459,10 @@ export const saveManifestDraft = createAsyncThunk(
   }
 );
 
+export const selectNodeUuid = (state: {
+  nodes: { nodeReader: NodeReaderPref };
+}) => state.nodes.nodeReader.currentObjectId;
+
 export default nodeReaderSlice.reducer;
 
 export const {
@@ -401,6 +475,7 @@ export const {
   setEditNodeId,
   resetEditNode,
   setManifestCid,
+  setAnnotationLinkConfig,
   saveAnnotation,
   resetNodeViewer,
   deleteComponent,
@@ -410,6 +485,7 @@ export const {
   deleteAnnotation,
   toggleCommitPanel,
   setComponentStack,
+  setCurrentShareId,
   setIsDraggingFiles,
   setCurrentObjectId,
   toggleResearchPanel,
@@ -418,4 +494,8 @@ export const {
   popFromComponentStack,
   updatePendingAnnotations,
   setStartedNewAnnotationViaButton,
+  addComponent,
+  addRecentlyAddedComponent,
+  removeRecentlyAddedComponent,
+  removeComponentMetadata,
 } = nodeReaderSlice.actions;

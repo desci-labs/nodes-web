@@ -1,11 +1,13 @@
-import ManuscriptReader from "@src/components/organisms/ManuscriptReader";
-import PdfHeader from "@src/components/organisms/PdfHeader";
-import { app, site } from "@src/constants/routes";
-import useScroll from "@src/hooks/useScroll";
 import { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { Popovers } from "./Providers/AppWrapper";
+import useScroll from "@src/hooks/useScroll";
 import { useUser } from "@src/state/user/hooks";
+import { isMobile } from "react-device-detect";
+import { app, site } from "@src/constants/routes";
+import { Popovers } from "./Providers/AppWrapper";
+import { useLocation, useNavigate } from "react-router-dom";
+import PdfHeader from "@src/components/organisms/PdfHeader";
+import ManuscriptReader from "@src/components/organisms/ManuscriptReader";
+import MobileReader from "@src/components/organisms/ManuscriptReader/MobileReader/MobileReader";
 
 const auth = localStorage.getItem("auth");
 export default function PublicViewer() {
@@ -33,10 +35,18 @@ export default function PublicViewer() {
       className={`flex flex-col min-h-screen h-screen`}
       style={{ fontFamily: "Inter, sans-serif" }}
     >
-      <PdfHeader />
-      <Popovers />
+      {!isMobile && (
+        <>
+          <PdfHeader />
+          <Popovers />
+        </>
+      )}
       <div id="app" className="flex-grow">
-        <ManuscriptReader publicView />
+        {isMobile ? (
+          <MobileReader publicView />
+        ) : (
+          <ManuscriptReader publicView />
+        )}
       </div>
     </div>
   );

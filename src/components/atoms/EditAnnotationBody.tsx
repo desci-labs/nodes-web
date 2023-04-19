@@ -1,43 +1,50 @@
-import AnnotationEditor, {
-  SlateEditor,
-} from "@components/molecules/AnnotationEditor";
+import AnnotationEditor from "@components/molecules/AnnotationEditor";
 import { ExternalLinkIcon } from "@heroicons/react/solid";
-import { useState } from "react";
+import React, { useState } from "react";
 import PrimaryButton from "./PrimaryButton";
+import { __log } from "../utils";
 
 interface EditAnnotationBodyProps {
   isCode: boolean;
   annotationText: string;
   setAnnotationText: (text: string) => void;
-  setCounter: (num: number) => void;
-  counter: number;
   readOnly?: boolean;
 }
 const EditAnnotationBody = ({
   isCode,
   annotationText,
   setAnnotationText,
-  setCounter,
-  counter,
   readOnly = false,
 }: EditAnnotationBodyProps) => {
-  const [mode, setMode] = useState<"editor" | "raw">("editor");
+  const [annotationMode, setAnnotationMode] = useState<"editor" | "raw">(
+    "editor"
+  );
+  // __log("<EditAnnotationBody render>", annotationText, annotationMode);
   return (
     <>
-    {mode === "raw" ? (
-      <div className="flex flex-row text-xs gap-2 justify-between h-12 font-mono p-4 bg-gray-200 -mx-3 w-[calc(100%+12px)]">Raw Annotation <a href="https://en.wikipedia.org/wiki/Markdown" target="blank" rel="noreferrer noopener">markdown format (?)</a></div>
-    ) : null}
+      {annotationMode === "raw" ? (
+        <div className="flex flex-row text-xs gap-2 justify-between h-12 font-mono p-4 bg-gray-200 -mx-3 w-[calc(100%+12px)]">
+          Raw Annotation{" "}
+          <a
+            href="https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax"
+            target="blank"
+            rel="noreferrer noopener"
+          >
+            markdown format (?)
+          </a>
+        </div>
+      ) : null}
       <AnnotationEditor
         rawMarkdown={annotationText}
         setRawMarkdown={setAnnotationText}
-        mode={mode}
+        mode={annotationMode}
         setMode={(e) => {
-          setMode(e);
-          setCounter(counter + 1);
+          setAnnotationMode(e);
+          // setCounter(counter + 1);
         }}
         readOnly={readOnly}
       />
     </>
   );
 };
-export default EditAnnotationBody;
+export default React.memo(EditAnnotationBody);

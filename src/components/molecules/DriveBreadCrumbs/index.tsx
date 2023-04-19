@@ -1,21 +1,17 @@
 import { DriveObject, FileDir } from "@components/organisms/Drive";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/solid";
+import { useDrive } from "@src/state/drive/hooks";
 import React from "react";
 
-export interface BreadCrumb {
-  name: string;
-  drive: DriveObject;
-}
-
 interface BreadCrumbsProps {
-  crumbs: BreadCrumb[];
   eatBreadCrumb: (index: number) => void;
 }
 
-const DriveBreadCrumbs = ({ crumbs, eatBreadCrumb }: BreadCrumbsProps) => {
+const DriveBreadCrumbs = ({ eatBreadCrumb }: BreadCrumbsProps) => {
+  const { breadCrumbs } = useDrive();
   return (
     <div className="flex items-center my-3 h-[28px]">
-      {crumbs.map((c, i) => {
+      {breadCrumbs.map((c, i) => {
         return (
           <div
             key={`breadcrumb_${c.name}+${i}`}

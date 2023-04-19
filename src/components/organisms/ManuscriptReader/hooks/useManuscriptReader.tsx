@@ -22,6 +22,7 @@ import {
   resetNodeViewer,
   setComponentStack,
   setCurrentObjectId,
+  setCurrentShareId,
   setIsNew,
   setManifest,
   setManifestCid,
@@ -32,6 +33,7 @@ import { useSetter } from "@src/store/accessors";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import useParseObjectID from "@src/components/organisms/ManuscriptReader/useParseObjectID";
 import { manuscriptLoader } from "@src/components/screens/Nodes";
+import { setCurrentVersion } from "@src/state/nodes/history";
 
 export default function useManuscriptReader(publicView: boolean = false) {
   const parsedManuscript = useLoaderData() as Awaited<
@@ -41,37 +43,38 @@ export default function useManuscriptReader(publicView: boolean = false) {
   const dispatch = useSetter();
   const { mode } = useNodeReader();
 
-  const { setPrivCidMap, scrollToPage$ } = useManuscriptController([
+  const { scrollToPage$ } = useManuscriptController([
     "scrollToPage$",
     "isAddingComponent",
     "isAddingSubcomponent",
-    "showUploadPanel",
   ]);
 
+  console.log("Parsed Manusciprt", parsedManuscript);
   const initPrivateReader = async (cid: string) => {
     if (
       !publicView &&
       "manifest" in parsedManuscript &&
       "cid" in parsedManuscript
     ) {
+      // update shareId
+      if ("shareId" in parsedManuscript) {
+        dispatch(setCurrentShareId(parsedManuscript.shareId!));
+      } else {
+        dispatch(setCurrentShareId(""));
+      }
+
       dispatch(setIsNew(false));
       dispatch(setCurrentPdf(""));
-
+      dispatch(setManifest(parsedManuscript.manifest));
       dispatch(setCurrentObjectId(parsedManuscript.cid));
       dispatch(setResearchPanelTab(ResearchTabs.current));
 
-      if (mode !== "editor") {
+      // TODO: remove line to support reader mode in private share
+      if (mode !== parsedManuscript.mode) {
         dispatch(toggleMode());
       }
       dispatch(setIsAnnotating(false));
 
-      if ("privateCids" in parsedManuscript) {
-        const cidMap: Record<string, boolean> = {};
-        parsedManuscript.privateCids.forEach((c: string) => (cidMap[c] = true));
-        setPrivCidMap(cidMap);
-      }
-
-      dispatch(setManifest(parsedManuscript.manifest));
       const manifestUrlCleaned = cleanupManifestUrl(
         parsedManuscript.manifestUrl
       );
@@ -194,6 +197,9 @@ export default function useManuscriptReader(publicView: boolean = false) {
     } else {
       const parsedCid = "cid" in parsedManuscript ? parsedManuscript.cid : "";
       initPrivateReader(parsedCid ?? (cid as string));
+    }
+    if ("version" in parsedManuscript) {
+      dispatch(setCurrentVersion(parsedManuscript.version));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cid, parsedManuscript, publicView]);

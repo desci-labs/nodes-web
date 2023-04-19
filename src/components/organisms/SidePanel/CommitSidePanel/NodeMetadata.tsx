@@ -1,10 +1,13 @@
-import { ResearchObjectV1Component } from "@desci-labs/desci-models";
-import { useState } from "react";
-import ComponentMetadataPopover from "@components/organisms/PopOver/ComponentMetadataPopover";
+import {
+  ResearchObjectComponentType,
+  ResearchObjectV1Component,
+} from "@desci-labs/desci-models";
 import CollapsibleSection from "@components/organisms/CollapsibleSection";
 import { useNodeValidator } from "@src/hooks/useNodeValidator";
 import { ComponentTodoItem } from "./TodoItem";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import { showMetadataForComponent } from "@src/state/drive/driveSlice";
+import { useDispatch } from "react-redux";
 
 interface NodeMetadataProps {
   className?: string;
@@ -12,10 +15,8 @@ interface NodeMetadataProps {
 
 const NodeMetadata = (props: NodeMetadataProps) => {
   const { manifest: manifestData, mode, currentObjectId } = useNodeReader();
-
+  const dispatch = useDispatch();
   const { nodeValidity: validationObj } = useNodeValidator();
-  const [selectedComponent, setSelectedComponent] =
-    useState<ResearchObjectV1Component | null>(null);
 
   // one entry for each component, one entry for wallet, one entry for network
   const count = manifestData?.components.length || 0;
@@ -37,10 +38,13 @@ const NodeMetadata = (props: NodeMetadataProps) => {
       >
         <div>
           {manifestData &&
-            manifestData?.components.map(
-              (component: ResearchObjectV1Component, idx) => (
+            manifestData?.components
+              .filter((a) => a.type != ResearchObjectComponentType.DATA_BUCKET)
+              .map((component: ResearchObjectV1Component, idx) => (
                 <ComponentTodoItem
-                  onHandleSelect={() => setSelectedComponent(component)}
+                  onHandleSelect={() =>
+                    dispatch(showMetadataForComponent(component))
+                  }
                   currentObjectId={currentObjectId!}
                   manifestData={manifestData}
                   mode={mode}
@@ -48,20 +52,9 @@ const NodeMetadata = (props: NodeMetadataProps) => {
                   component={component}
                   completed={validationObj.components[component.id]}
                 />
-              )
-            )}
+              ))}
         </div>
       </CollapsibleSection>
-      {selectedComponent && (
-        <ComponentMetadataPopover
-          currentObjectId={currentObjectId!}
-          manifestData={manifestData!}
-          mode={mode}
-          componentId={selectedComponent.id}
-          isVisible={!!selectedComponent}
-          onClose={() => setSelectedComponent(null)}
-        />
-      )}
     </div>
   );
 };

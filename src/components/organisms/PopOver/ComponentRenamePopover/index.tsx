@@ -48,6 +48,7 @@ const ComponentRenamePopover = (props: {
           })
         );
         dispatch(saveManifestDraft({}));
+        props?.onClose();
       }
     }
   };

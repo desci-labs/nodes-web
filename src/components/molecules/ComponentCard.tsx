@@ -1,45 +1,58 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styled, { StyledComponent } from "styled-components";
 import ButtonCopyLink from "@components/atoms/ButtonCopyLink";
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
 
 import AnnotationSwitcher from "@components/atoms/AnnotationSwitcher";
 import {
   ExternalLinkComponent,
-  PdfComponent,
   PdfComponentPayload,
   ResearchObjectComponentType,
   ResearchObjectV1,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 import { cleanupManifestUrl } from "@components/utils";
-import ComponentMetadataPopover from "@components/organisms/PopOver/ComponentMetadataPopover";
 import TooltipIcon from "@components/atoms/TooltipIcon";
 import ReactTooltip from "react-tooltip";
-import {
-  COMPONENT_LIBRARY,
-  UiComponentDefinition,
-} from "../organisms/ComponentLibrary";
+import { findTarget } from "@components/organisms/ComponentLibrary";
 import ButtonFair from "@components/atoms/ButtonFair";
-import { SessionStorageKeys } from "../driveUtils";
+import {
+  DRIVE_DATA_PATH,
+  DRIVE_NODE_ROOT_PATH,
+  SessionStorageKeys,
+} from "../driveUtils";
 import { useSetter } from "@src/store/accessors";
 import { setComponentStack } from "@src/state/nodes/viewer";
 import { updatePdfPreferences } from "@src/state/nodes/pdf";
+import { useNodeReader } from "@src/state/nodes/hooks";
+import {
+  navigateToDriveByPath,
+  setComponentTypeBeingAssignedTo,
+  setFileBeingCited,
+  setFileBeingUsed,
+} from "@src/state/drive/driveSlice";
+import BlackGenericButton from "../atoms/BlackGenericButton";
+import { IconDrive, IconPlayRounded, IconQuotes } from "@src/icons";
+import { findDriveByPath } from "@src/state/drive/utils";
+import { useDrive } from "@src/state/drive/hooks";
+import { AccessStatus } from "../organisms/Drive";
+import { getLicenseShortName } from "../organisms/PopOver/ComponentMetadataPopover";
 
 const CardWrapper: StyledComponent<
   "div",
   any,
-  { isSelected?: boolean; isHalfSelected?: boolean },
+  { isSelected?: boolean; isHalfSelected?: boolean; isRecentlyAdded?: boolean },
   never
-> = styled.div.attrs(({ isSelected, isHalfSelected }: any) => ({
-  className: `cursor-pointer shadow-md ${
-    isSelected || isHalfSelected
-      ? "border-2 border-black dark:border-white"
-      : "border-[1px] border-muted-300 dark:border-muted-500 hover:border-black hover:dark:border-gray-500"
-  }`,
-}))`
+> = styled.div.attrs(
+  ({ isSelected, isHalfSelected, isRecentlyAdded }: any) => ({
+    className: `cursor-pointer shadow-md ${
+      isSelected || isHalfSelected
+        ? "border-2 border-black dark:border-white"
+        : "border-[1px] border-muted-300 dark:border-muted-500 hover:border-black hover:dark:border-gray-500"
+    } ${isRecentlyAdded ? "animate-pulsatingGlow" : null}`,
+  })
+)`
   width: 100%;
   margin: ${(props: { isSelected?: boolean; isHalfSelected?: boolean }) =>
     props.isSelected || props.isHalfSelected
@@ -51,8 +64,7 @@ const CardWrapper: StyledComponent<
     isHalfSelected ? "border-color: #888 !important; " : ""}
 `;
 const HeaderWrapper = styled(FlexRowSpaceBetween).attrs({
-  className:
-    "border-b-[1px] bg-zinc-200 dark:bg-muted-900 border-muted-300 dark:border-teal",
+  className: " bg-zinc-200 dark:bg-muted-900 border-muted-300 dark:border-teal",
 })`
   align-items: flex-start;
   padding: 0.75rem;
@@ -70,31 +82,7 @@ export interface SectionCardProps {
 
 export interface ComponentCardProps extends SectionCardProps {
   component: ResearchObjectV1Component;
-  currentObjectId: string;
-  componentStack: ResearchObjectV1Component[];
-  mode: string;
-  manifestData: ResearchObjectV1;
 }
-
-const findTarget = (
-  component: ResearchObjectV1Component
-): UiComponentDefinition | undefined => {
-  const foundEntry = COMPONENT_LIBRARY.find((target) => {
-    const matchesType = target.componentType === component.type;
-    switch (target.componentType) {
-      case ResearchObjectComponentType.PDF:
-        const documentPayload = component as PdfComponent;
-        return (
-          matchesType && documentPayload.subtype === target.componentSubType
-        );
-      default:
-        return matchesType;
-    }
-  });
-
-  return foundEntry;
-};
-
 const labelFor = (component: ResearchObjectV1Component): string => {
   const obj = findTarget(component);
   if (obj) {
@@ -116,11 +104,10 @@ const iconFor = (
 
 const ComponentCard = (props: ComponentCardProps) => {
   const dispatch = useSetter();
-  const { component, componentStack, mode, currentObjectId, manifestData } =
-    props;
-  const [showComponentMetadata, setShowComponentMetadata] =
-    useState<boolean>(false);
-  const { setDriveJumpDir } = useManuscriptController([]);
+  const { component } = props;
+  const { mode, componentStack, recentlyAddedComponent, manifest } =
+    useNodeReader();
+  const { nodeTree } = useDrive();
   /***
    * Use local click tracking for fast click response
    * */
@@ -154,11 +141,18 @@ const ComponentCard = (props: ComponentCardProps) => {
   }, [component]);
 
   const isSelected =
-    componentStack[componentStack.length - 1]?.id === component.id;
+    componentStack[componentStack?.length - 1]?.id === component.id;
 
   const sortedAnnotations = [
     ...((component.payload as PdfComponentPayload).annotations || []),
   ].sort((b, a) => (b.pageIndex! - a.pageIndex!) * 10 + (b.startY - a.startY));
+
+  const drive = useMemo(() => {
+    if (nodeTree && isSelected) {
+      return findDriveByPath(nodeTree, component.payload.path);
+    }
+    return null;
+  }, [component.payload.path, nodeTree, isSelected]);
 
   const handleComponentClick = () => {
     setClicked(true);
@@ -176,15 +170,26 @@ const ComponentCard = (props: ComponentCardProps) => {
             selectedAnnotationId: "",
           })
         );
-        if (component.type === ResearchObjectComponentType.DATA) {
+        if (
+          component.type === ResearchObjectComponentType.DATA ||
+          component.type === ResearchObjectComponentType.UNKNOWN
+        ) {
           sessionStorage.removeItem(SessionStorageKeys.lastDirUid);
-          setDriveJumpDir({ targetPath: "Data" });
-          dispatch(setComponentStack([]));
+          // dispatch(
+          //   navigateToDriveByPath({
+          //     path: DRIVE_NODE_ROOT_PATH + "/" + DRIVE_DATA_PATH,
+          //   })
+          // );
+          dispatch(navigateToDriveByPath(component.payload.path));
+          dispatch(setComponentStack([component]));
         } else {
           if (!isSelected) {
             dispatch(setComponentStack([component]));
           }
         }
+        // if (component.type === ResearchObjectComponentType.UNKNOWN) {
+        //   dispatch(setComponentTypeBeingAssignedTo(component.payload.path));
+        // }
       }
     }, 50);
   };
@@ -197,10 +202,20 @@ const ComponentCard = (props: ComponentCardProps) => {
     copyLinkUrl = (component as ExternalLinkComponent).payload.url;
   }
 
+  const Icon = iconFor(component, false);
+
+  const canCite =
+    drive?.accessStatus &&
+    (drive.accessStatus === AccessStatus.PUBLIC ||
+      drive.accessStatus === AccessStatus.PARTIAL);
+
   return (
     <CardWrapper
       isSelected={isSelected}
       isHalfSelected={clicked}
+      isRecentlyAdded={
+        recentlyAddedComponent === component.payload?.path ?? false
+      }
       onClick={handleComponentClick}
     >
       <FlexColumn>
@@ -208,7 +223,7 @@ const ComponentCard = (props: ComponentCardProps) => {
           <span className="text-xs font-bold">{component.name}</span>
           {/* {headerRight} */}
           <span className="flex flex-col items-center">
-            <div className="border-white border-[1px] p-1 rounded-full scale-75 block -my-1">
+            <div className="border-tint-primary border-[2px] p-1 rounded-full scale-75 block -my-1">
               <span
                 className={`
                 cursor-pointer
@@ -224,7 +239,7 @@ const ComponentCard = (props: ComponentCardProps) => {
                 data-subtype={(component as any).subtype}
               >
                 <TooltipIcon
-                  icon={<>{iconFor(component, false)}</>}
+                  icon={Icon ? <Icon /> : <></>}
                   id={`icon_component_${component.id}`}
                   tooltip={labelFor(component)}
                   placement={"left"}
@@ -241,54 +256,117 @@ const ComponentCard = (props: ComponentCardProps) => {
               effect="solid"
               id={`fair_${component.id}`}
             />
+            <ReactTooltip
+              backgroundColor="black"
+              effect="solid"
+              id={`drive_${component.id}`}
+            />
+            <ReactTooltip
+              backgroundColor="black"
+              effect="solid"
+              id={`cite_${component.id}`}
+            />
+            <ReactTooltip
+              backgroundColor="black"
+              effect="solid"
+              id={`use_${component.id}`}
+            />
           </span>
         </HeaderWrapper>
-        <FlexRowSpaceBetween>
-          <div className="flex justify-between dark:bg-muted-700 px-3 py-2 w-full">
-            {component.type !== ResearchObjectComponentType.DATA ? (
+        <div
+          style={{
+            height: isSelected ? 45 : 0,
+            overflow: "hidden",
+            transition: "height 0.1s ease-in",
+          }}
+        >
+          <FlexRowSpaceBetween>
+            <div className="flex justify-between dark:bg-muted-700 px-3 py-2 w-full">
               <>
-                <AnnotationSwitcher
-                  annotations={sortedAnnotations}
-                  handleComponentClick={handleComponentClick}
-                />
-                <div className="flex gap-2">
-                  <ButtonFair
-                    isFair={
-                      component.payload.licenseType &&
-                      component.payload.description
-                    }
-                    mode={mode}
-                    setShowComponentMetadata={setShowComponentMetadata}
-                    componentId={component.id}
-                  />
-                  <ButtonCopyLink text={copyLinkUrl} />
+                <div className="flex gap-2 justify-between w-full">
+                  <div id="section-left">
+                    <ButtonFair
+                      isFair={false}
+                      component={component}
+                      text={getLicenseShortName(
+                        drive?.metadata.licenseType ||
+                          component.payload?.licenseType ||
+                          manifest?.defaultLicense
+                      )} //Should only ever hit unknown for deprecated tree
+                      classname="w-auto bg-neutrals-gray-2 px-2 font-medium text-xs h-7"
+                    />
+                  </div>
+                  <div id="section-right" className="flex gap-2">
+                    <BlackGenericButton
+                      dataTip={"Show File Location"}
+                      dataFor={`drive_${component.id}`}
+                      disabled={false}
+                      className="p-0"
+                      onClick={(e) => {
+                        e!.stopPropagation();
+                        dispatch(navigateToDriveByPath(component.payload.path));
+                        if (
+                          component.type === ResearchObjectComponentType.DATA ||
+                          component.type === ResearchObjectComponentType.UNKNOWN
+                        ) {
+                          dispatch(setComponentStack([component]));
+                        } else {
+                          dispatch(setComponentStack([]));
+                        }
+                      }}
+                    >
+                      <IconDrive className="p-0 min-w-[28px] scale-[1.2]" />
+                    </BlackGenericButton>
+                    <BlackGenericButton
+                      dataTip={"Cite"}
+                      dataFor={`cite_${component.id}`}
+                      className="w-7 h-7"
+                      disabled={!canCite}
+                      onClick={(e) => {
+                        e!.stopPropagation();
+                        dispatch(setFileBeingCited(drive));
+                      }}
+                    >
+                      <IconQuotes />
+                    </BlackGenericButton>
+                    {component.type == ResearchObjectComponentType.DATA ||
+                    component.type == ResearchObjectComponentType.CODE ||
+                    component.type == ResearchObjectComponentType.UNKNOWN ? (
+                      <BlackGenericButton
+                        dataTip={"Methods"}
+                        dataFor={`use_${component.id}`}
+                        disabled={!drive}
+                        className="p-0 min-w-[28px] h-7"
+                        onClick={(e) => {
+                          e!.stopPropagation();
+                          dispatch(setFileBeingUsed(drive));
+                        }}
+                      >
+                        <IconPlayRounded className="p-0" />
+                      </BlackGenericButton>
+                    ) : null}
+                    <div
+                      style={{
+                        display:
+                          component.type == ResearchObjectComponentType.PDF
+                            ? ""
+                            : "none",
+                      }}
+                    >
+                      <AnnotationSwitcher
+                        annotations={sortedAnnotations}
+                        handleComponentClick={handleComponentClick}
+                      />
+                    </div>
+                  </div>
                 </div>
               </>
-            ) : (
-              <div
-                className="text-[10px] text-neutrals-gray-4 text-right w-full"
-                title="This component is pointing to a nested data structure"
-              >
-                DeSci Node Drive
-              </div>
-            )}
-          </div>
-        </FlexRowSpaceBetween>
+            </div>
+          </FlexRowSpaceBetween>
+        </div>
       </FlexColumn>
-      {/** If we keep this rendered everytime, it results in a performance problem when switching to "current" tab */}
-      {showComponentMetadata &&
-      component.type !== ResearchObjectComponentType.DATA ? (
-        <ComponentMetadataPopover
-          currentObjectId={currentObjectId}
-          manifestData={manifestData}
-          mode={mode}
-          componentId={component.id}
-          isVisible={showComponentMetadata}
-          onClose={() => setShowComponentMetadata(false)}
-        />
-      ) : null}
     </CardWrapper>
   );
 };
 
-export default ComponentCard;
+export default React.memo(ComponentCard);

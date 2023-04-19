@@ -14,6 +14,12 @@ import {
   PublicDataReference,
   PublicDataReferenceOnIpfsMirror,
 } from "@src/types/client";
+import {
+  CidString,
+  DrivePath,
+  ExternalCid,
+  ExternalUrl,
+} from "@src/state/drive/types";
 export const SCIWEAVE_URL =
   process.env.REACT_APP_NODES_API || "http://localhost:5420";
 
@@ -31,8 +37,9 @@ export type ResearchObjectStub = {
   links?: any;
 };
 
-export const config = (): AxiosRequestConfig => {
+export const config = (preset?: AxiosRequestConfig): AxiosRequestConfig => {
   return {
+    ...preset,
     withCredentials: true,
     headers: {
       authorization: `Bearer ${localStorage.getItem("auth")}`,
@@ -184,13 +191,41 @@ export const __adminWaitlistPromote = async (id: string) => {
   return data;
 };
 
-export const getResearchObjectStub = async (id: string) => {
+export const getResearchObjectStub = async (id: string, shareId?: string) => {
   const { data } = await axios.get(
-    `${SCIWEAVE_URL}/v1/nodes/${id}${
-      process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE
-        ? `?g=${process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE}`
-        : ""
-    }`,
+    `${SCIWEAVE_URL}/v1/nodes/${id}`,
+    config({
+      params: {
+        shareId: shareId,
+        g: process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE
+          ? process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE
+          : "",
+      },
+    })
+  );
+  return data;
+};
+
+export const resolvePrivateResearchObjectStub = async (
+  id: string,
+  shareId?: string
+) => {
+  const { data } = await axios.get(
+    `${SCIWEAVE_URL}/v1/nodes/showPrivate/${id}`,
+    config({
+      params: {
+        shareId: shareId,
+        g: process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE
+          ? process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE
+          : "",
+      },
+    })
+  );
+  return data;
+};
+export const verifyPrivateShareLink = async (shareId?: string) => {
+  const { data } = await axios.get(
+    `${SCIWEAVE_URL}/v1/nodes/share/verify/${shareId}`,
     config()
   );
   return data;
@@ -276,51 +311,51 @@ export const logout = async () => {
   return {};
 };
 
-export const addDatasetComponent = async (
-  uuid: string,
-  files: FileList | FileSystemEntry[],
-  dataFields: { title: string; description?: string },
-  manifest: ResearchObjectV1,
-  onProgress?: (e: ProgressEvent) => void
-) => {
-  const formData = new FormData();
-  formData.append("uuid", uuid);
-  formData.append("dataFields", JSON.stringify(dataFields));
-  formData.append("manifest", JSON.stringify(manifest));
-  if (files.length) {
-    if (files instanceof FileList) {
-      // files.forEach((f) => formData.append("files", f));
-      Array.prototype.forEach.call(files, (f) => {
-        formData.append("files", f);
-      });
-    } else {
-      const entryList = files as FileSystemEntry[];
-      for (let i = 0; i < entryList.length; i++) {
-        const f = entryList[i];
-        const p = new Promise<File>((res, rej) => {
-          (f as FileSystemFileEntry).file((v) => res(v), rej);
-        });
-        const tempFile = await p;
-        const fileName = entryList[i].fullPath;
+// export const addDatasetComponent = async (
+//   uuid: string,
+//   files: FileList | FileSystemEntry[],
+//   dataFields: { title: string; description?: string },
+//   manifest: ResearchObjectV1,
+//   onProgress?: (e: ProgressEvent) => void
+// ) => {
+//   const formData = new FormData();
+//   formData.append("uuid", uuid);
+//   formData.append("dataFields", JSON.stringify(dataFields));
+//   formData.append("manifest", JSON.stringify(manifest));
+//   if (files.length) {
+//     if (files instanceof FileList) {
+//       // files.forEach((f) => formData.append("files", f));
+//       Array.prototype.forEach.call(files, (f) => {
+//         formData.append("files", f);
+//       });
+//     } else {
+//       const entryList = files as FileSystemEntry[];
+//       for (let i = 0; i < entryList.length; i++) {
+//         const f = entryList[i];
+//         const p = new Promise<File>((res, rej) => {
+//           (f as FileSystemFileEntry).file((v) => res(v), rej);
+//         });
+//         const tempFile = await p;
+//         const fileName = entryList[i].fullPath;
 
-        formData.append("files", new File([tempFile], fileName));
-      }
-    }
-  }
+//         formData.append("files", new File([tempFile], fileName));
+//       }
+//     }
+//   }
 
-  const adjustedConfig: any = config();
-  adjustedConfig.headers["content-type"] = "multipart/form-data";
-  if (onProgress) {
-    adjustedConfig.onUploadProgress = (e: ProgressEvent) => onProgress(e);
-  }
+//   const adjustedConfig: any = config();
+//   adjustedConfig.headers["content-type"] = "multipart/form-data";
+//   if (onProgress) {
+//     adjustedConfig.onUploadProgress = (e: ProgressEvent) => onProgress(e);
+//   }
 
-  const { data } = await axios.post(
-    `${SCIWEAVE_URL}/v1/datasets/upload`,
-    formData,
-    adjustedConfig
-  );
-  return data;
-};
+//   const { data } = await axios.post(
+//     `${SCIWEAVE_URL}/v1/datasets/upload`,
+//     formData,
+//     adjustedConfig
+//   );
+//   return data;
+// };
 
 export const publishResearchObject = async (input: {
   uuid: string;
@@ -342,11 +377,14 @@ export const publishResearchObject = async (input: {
 export const getDatasetTree = async (
   cid: string,
   nodeUuid: string,
-  pub = false
+  pub = false,
+  shareId = ""
 ) => {
   const route = pub ? "pubTree" : "retrieveTree";
   const { data } = await axios.get(
-    `${SCIWEAVE_URL}/v1/datasets/${route}/${nodeUuid}/${cid}`,
+    `${SCIWEAVE_URL}/v1/datasets/${route}/${nodeUuid}/${cid}${
+      shareId ? "/" + shareId : ""
+    }`,
     config()
   );
   return data;
@@ -365,36 +403,72 @@ export const getDataset = async (cid: string, nodeUuid: string) => {
   return data;
 };
 
-export const updateDatasetComponent = async (
-  uuid: string,
-  files: FileList | FileSystemEntry[],
-  manifest: ResearchObjectV1,
-  rootCid: string,
-  contextPath: string,
-  onProgress?: (e: ProgressEvent) => void
-) => {
+export interface UpdateDag {
+  uuid: string;
+  files?: FileList | FileSystemEntry[] | File[];
+  manifest: ResearchObjectV1;
+  contextPath: DrivePath;
+  componentType?: ResearchObjectComponentType;
+  componentSubType?: ResearchObjectComponentSubtypes;
+  externalCids?: ExternalCid[];
+  externalUrl?: ExternalUrl;
+  onProgress?: (e: ProgressEvent) => void;
+}
+
+interface FileEntryBase extends FileSystemEntry {}
+interface FileEntry extends FileEntryBase, FileSystemFileEntry {}
+
+export const updateDag = async ({
+  uuid,
+  files,
+  manifest,
+  contextPath,
+  onProgress,
+  componentType,
+  componentSubType,
+  externalCids,
+  externalUrl,
+}: UpdateDag) => {
+  if (files?.length && externalCids?.length)
+    return { error: "Cannot update DAG with both files and externalCids" };
+  if (
+    !files?.length &&
+    !externalCids?.length &&
+    !externalUrl?.path?.length &&
+    !externalUrl?.url?.length
+  )
+    return { error: "Missing content, files, externalUrl or externalCid" };
   const formData = new FormData();
   formData.append("uuid", uuid);
   formData.append("manifest", JSON.stringify(manifest));
-  formData.append("rootCid", rootCid);
+  if (componentType) formData.append("componentType", componentType);
+  if (componentSubType) formData.append("componentSubType", componentSubType);
+  if (externalCids?.length)
+    formData.append("externalCid", JSON.stringify(externalCids));
   formData.append("contextPath", contextPath);
-  if (files.length) {
-    if (files instanceof FileList) {
-      Array.prototype.forEach.call(files, (f) => {
-        formData.append("files", f);
-      });
-    } else {
-      const entryList = files as FileSystemEntry[];
+  // debugger;
+  if (externalUrl?.path?.length && externalUrl?.url?.length)
+    formData.append("externalUrl", JSON.stringify(externalUrl));
+  if (files?.length) {
+    if (
+      files[0].toString() === "[object FileEntry]" ||
+      files[0].toString() === "[object FileSystemFileEntry]"
+    ) {
+      const entryList = files as FileEntryBase[];
       for (let i = 0; i < entryList.length; i++) {
         const f = entryList[i];
         const p = new Promise<File>((res, rej) => {
-          (f as FileSystemFileEntry).file((v) => res(v), rej);
+          (f as FileEntry).file((v) => res(v), rej);
         });
         const tempFile = await p;
         const fileName = entryList[i].fullPath;
 
         formData.append("files", new File([tempFile], fileName));
       }
+    } else {
+      Array.prototype.forEach.call(files, (f) => {
+        formData.append("files", f);
+      });
     }
   }
 
@@ -511,16 +585,5 @@ export const postUserAction = async (
     { action, message },
     config()
   );
-  return data;
-};
-
-export const getPublishStatus = async (
-  manifestCid: string,
-  nodeUuid: string
-) => {
-  const { data } = await axios.get(
-    `${SCIWEAVE_URL}/v1/nodes/publishStatus/${nodeUuid}/${manifestCid}`
-  );
-  // debugger
   return data;
 };

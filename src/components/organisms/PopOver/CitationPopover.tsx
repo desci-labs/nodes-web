@@ -1,5 +1,4 @@
 import PrimaryButton from "@components/atoms/PrimaryButton";
-import { useManuscriptController } from "@components/organisms/ManuscriptReader/ManuscriptController";
 import { IconWarning } from "@icons";
 import {
   PropsWithChildren,
@@ -21,17 +20,16 @@ import {
   DEFAULT_RESULT,
   getFormatter,
 } from "@src/helper/citation";
-import { useUser } from "@src/state/user/hooks";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 import SelectList from "@src/components/molecules/FormInputs/SelectList";
+import { useDrive } from "@src/state/drive/hooks";
+import { setFileBeingCited } from "@src/state/drive/driveSlice";
+import { useSetter } from "@src/store/accessors";
 
 const CitationComponent = () => {
-  const userProfile = useUser();
-  const { componentToCite, setShowProfileUpdater } = useManuscriptController([
-    "componentToCite",
-    "showProfileUpdater",
-  ]);
+  const { fileBeingCited } = useDrive();
+  const componentToCite = fileBeingCited!;
   const {
     manifest: manifestData,
     currentObjectId,
@@ -93,7 +91,7 @@ const CitationComponent = () => {
     if (!componentToCite) return "";
 
     const component =
-      componentToCite.type === FileType.Dir
+      componentToCite.type === FileType.DIR
         ? componentToCite?.contains?.find(
             (file) => file.accessStatus === AccessStatus.PUBLIC
           ) ?? null
@@ -132,7 +130,7 @@ const CitationComponent = () => {
       if (splitPath && splitPath.length > 1) {
         let newPath = splitPath.slice(1);
         newPath.unshift(componentParent.name);
-        if (componentToCite.type === FileType.Dir) {
+        if (componentToCite.type === FileType.DIR) {
           newPath = [componentParent.name];
         }
         fqiDataSuffix = newPath.join("/");
@@ -165,13 +163,13 @@ const CitationComponent = () => {
     version,
   ]);
 
-  const canCite = (publicView || userProfile?.profile.name) && manifestData;
+  const canCite = !!manifestData && manifestData?.authors?.length;
   const formatter = useMemo(() => getFormatter(format.name), [format.name]);
+
   const { citation } = useMemo(
     () =>
       canCite
         ? formatter({
-            author: userProfile?.profile?.name,
             manifest: manifestData!,
             dpidLink: getComponentDpid(),
             year,
@@ -182,7 +180,6 @@ const CitationComponent = () => {
     [
       canCite,
       formatter,
-      userProfile?.profile?.name,
       manifestData,
       getComponentDpid,
       year,
@@ -225,19 +222,19 @@ const CitationComponent = () => {
             />
           </div>
         </Box>
-        {!publicView && !userProfile?.profile.name && (
+        {!publicView && !manifestData?.authors?.length && (
           <div>
             <div className="text-neutrals-gray-7 text-sm border-yellow-300 gap-2 bg-neutrals-gray-3 p-2 rounded-md flex flex-row items-center">
-              <IconWarning height={16} /> Complete your profile to cite this
-              component
+              <IconWarning height={16} /> Credit co-authors and collaborators
+              via the "Source" tab
             </div>
-            <PrimaryButton
+            {/* <PrimaryButton
               className="bg-transparent hover:bg-transparent text-tint-primary hover:text-white"
               onClick={() => setShowProfileUpdater(true)}
             >
               {" "}
               Complete Profile{" "}
-            </PrimaryButton>
+            </PrimaryButton> */}
           </div>
         )}
         {isDpidSupported && dpidLink && (
@@ -288,17 +285,15 @@ function Box(props: PropsWithChildren<{}>) {
 }
 
 const CitationPopover = (props: ModalProps) => {
-  const { showCitationModal, setShowCitationModal } = useManuscriptController([
-    "showCitationModal",
-  ]);
+  const dispatch = useSetter();
   const close = () => {
     props?.onDismiss?.();
-    setShowCitationModal(false);
+    dispatch(setFileBeingCited(null));
   };
 
   return (
     <Modal
-      isOpen={showCitationModal}
+      isOpen={true}
       onDismiss={close}
       $maxWidth={650}
       $scrollOverlay={true}

@@ -7,9 +7,11 @@ import { SpinnerCircular } from "spinners-react";
 
 interface Props {
   close: () => void;
+  directory?: boolean;
+  id: string;
 }
 
-export const ButtonAddData = ({ close }: Props) => {
+export const ButtonAddData = ({ close, directory, id }: Props) => {
   const ref = useRef<HTMLInputElement>(null);
   const { setDroppedFileList, setIsAddingComponent } = useManuscriptController(
     []
@@ -19,8 +21,10 @@ export const ButtonAddData = ({ close }: Props) => {
     <>
       <div className="hidden">
         <FileUploaderBare
+          id={id}
           ref={ref}
           autoUpload={true}
+          directoryPicker={directory}
           customReq={(files) => {
             setTimeout(() => {
               setIsAddingComponent(false);
@@ -38,8 +42,7 @@ export const ButtonAddData = ({ close }: Props) => {
         onClick={() => {
           document.body.onfocus = () => {
             if (
-              (document.getElementById("input") as HTMLInputElement).value
-                .length
+              (document.getElementById(id) as HTMLInputElement).value.length
             ) {
               toast.success("Upload started", {
                 duration: 3000,
@@ -58,7 +61,7 @@ export const ButtonAddData = ({ close }: Props) => {
             }
             document.body.onfocus = null;
           };
-          document.getElementById("input")?.click();
+          document.getElementById(id)?.click();
           setLoading(true);
           //   ref.current!.click();
         }}
@@ -71,7 +74,7 @@ export const ButtonAddData = ({ close }: Props) => {
         ) : (
           <div className="flex flex-row items-center gap-2">
             <IconFile />
-            Upload Files
+            Upload {directory ? "Folders" : "Files"}
           </div>
         )}
       </div>
@@ -82,7 +85,8 @@ export const ButtonAddData = ({ close }: Props) => {
 const AddDataComponent = ({ close }: Props) => {
   return (
     <div className="py-3 flex flex-col gap-6 items-center text-white">
-      <ButtonAddData close={close} />
+      <ButtonAddData id="file_data" close={close} />
+      <ButtonAddData id="folder_data" directory={true} close={close} />
     </div>
   );
 };

@@ -1,15 +1,16 @@
 import { DialogOverlay, DialogContent } from "@reach/dialog";
 import styled, { css } from "styled-components";
 import { animated, useTransition } from "react-spring";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useEffect } from "react";
 import { IconX } from "@src/icons";
+import { lockScroll, restoreScroll } from "@src/components/utils";
 
 const AnimatedDialogOverlay = animated(DialogOverlay);
 const StyledDialogOverlay = styled(AnimatedDialogOverlay)<{
   $scrollOverlay?: boolean;
 }>`
   &[data-reach-dialog-overlay] {
-    padding 20px;
+    padding: 20px;
     backdrop-filter: blur(3px);
     background-color: transparent;
     overflow: hidden;
@@ -95,6 +96,17 @@ export default function Modal({
     leave: { opacity: 0 },
   });
 
+  useEffect(() => {
+    if (isOpen) {
+      lockScroll(true);
+    } else {
+      restoreScroll(true);
+    }
+    return () => {
+      restoreScroll(true);
+    };
+  }, []);
+
   return (
     <>
       {fadeTransition(
@@ -104,6 +116,7 @@ export default function Modal({
               isOpen={isOpen}
               onDismiss={onDismiss}
               initialFocusRef={initialFocusRef}
+              dangerouslyBypassFocusLock={true}
               style={{
                 opacity: opacity.to({ range: [0.0, 1.0], output: [0, 1] }),
               }}

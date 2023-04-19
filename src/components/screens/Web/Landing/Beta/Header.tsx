@@ -6,7 +6,8 @@ import { useUser } from "@src/state/user/hooks";
 import { NavLink, useNavigate } from "react-router-dom";
 import { TextLink } from "./Footer";
 import { useMobileMenu, useSetMobileMenu } from "./useAppMenu";
-
+const LINK_STYLE =
+  "text-white hover:border-tint-primary border-transparent border-b-4 !no-underline transition-all";
 export const BetaLogo = ({
   textClassName,
   className,
@@ -48,7 +49,7 @@ export default function Header() {
   const isLoggedIn = userProfile.userId > 0;
 
   return (
-    <div className="px-4 md:px-0 w-screen bg-black py-3 flex justify-center select-none transition-transform duration-1000 relative">
+    <div className="px-10 md:px-0 w-screen bg-black py-3 flex justify-center select-none transition-transform duration-1000 relative">
       <div className="container mx-auto flex gap-5 justify-between items-center h-[60px]">
         <nav className="flex gap-10 items-center md:grow">
           <BetaLogo textClassName="text-xs" />
@@ -57,7 +58,7 @@ export default function Header() {
             target="_blank"
             rel="noreferrer noopener"
             title="Getting Started"
-            className="hidden md:block text-white hover:text-gray-500"
+            className={`hidden md:block ${LINK_STYLE}`}
           >
             Getting Started
           </a>
@@ -66,7 +67,7 @@ export default function Header() {
             title="FAQ"
             target="_blank"
             rel="noreferrer noopener"
-            className="hidden md:block text-white hover:text-gray-500"
+            className={`hidden md:block ${LINK_STYLE}`}
           >
             FAQ
           </a>
@@ -100,7 +101,7 @@ function MenuTrigger() {
       >
         <IconHamburger
           color="white"
-          stroke="#000"
+          stroke="transparent"
           fill="#fff"
           width={40}
           height={20}
@@ -113,10 +114,11 @@ function MenuTrigger() {
 function MobileMenu() {
   const opened = useMobileMenu();
   const { toggleMenu } = useSetMobileMenu();
+
   return (
     <div
-      className={`z-50 pointer-none opacity-0 md:hidden fixed left-0 right-0 top-0 min-h-[50px] p-4 backdrop-blur-2xl overflow-hidden w-full ${
-        opened ? "pointer-click opacity-100 animate-slideFromTop" : "h-0"
+      className={`pointer-none opacity-0 z-[-1] md:hidden fixed left-0 right-0 top-0 min-h-[50px] p-4 backdrop-blur-2xl overflow-hidden w-full ${
+        opened ? "!z-50 pointer-click opacity-100 animate-slideFromTop" : "h-0"
       }`}
     >
       <div className="flex items-center">
@@ -124,13 +126,9 @@ function MobileMenu() {
           <TextLink
             url={URL_GETTING_STARTED}
             title="Getting Started"
-            className="text-white hover:text-gray-500"
+            className={LINK_STYLE}
           />
-          <TextLink
-            title="FAQ"
-            url={URL_FAQ}
-            className="text-white hover:text-gray-500"
-          />
+          <TextLink title="FAQ" url={URL_FAQ} className={LINK_STYLE} />
         </div>
         <button className="m-0 p-4" onClick={toggleMenu}>
           <IconX color="white" stroke="#ffffff" width={40} height={20} />
