@@ -312,18 +312,19 @@ const ComponentButtonChit = ({
     <div
       onMouseEnter={handleShowTitle}
       onMouseLeave={handleShowTitle}
-      className="rounded-3xl hover:bg-neutrals-gray-3"
-      > { showTitle && (
-          <div
+      className=" group relative flex rounded-3xl hover:bg-neutrals-gray-3"
+      > 
+      {icon ? icon({}):<></> }
+      { showTitle && (
+          <span
             className="
-              absolute translate-y-[-28px] py-[1px] px-2 bg-[#191B1C]
-              border border-[#3C3C3C] rounded-3xl shadow-lg
-              text-white text-xs font-medium w-max whitespace-normal break-words
-              cursor-pointer
+            absolute bottom-10 scale-0 transition-all bg-[#191B1C] p-2 group-hover:scale-100
+            border border-[#3C3C3C] rounded-2xl shadow-lg
+            text-white text-xs font-medium w-max whitespace-normal break-words
+            cursor-pointer
               "
-          >{title}</div>
+          >{title}</span>
         )}
-          {icon ? icon({}):<></> }
         </div>
     </ComponentButton>
 

@@ -17,6 +17,9 @@ import {
 } from "@src/state/nodes/viewer";
 import CreateNodeModal from "./CreateNodeModal/CreateNodeModal";
 
+import UploadPanel from "./UploadPanel";
+import { useDrive } from "@src/state/drive/hooks";
+
 export interface EditNodeInfo {
   uuid: string;
   title: string;
@@ -24,6 +27,8 @@ export interface EditNodeInfo {
 }
 
 export default React.memo(function PaneNodeCollection() {
+  const { showUploadPanel, componentTypeBeingAssignedTo } = useDrive();
+
   const { setIsAddingComponent, setIsAddingSubcomponent, setShowAddNewNode } =
     useManuscriptController(["showAddNewNode"]);
   const [isOpen, setOpen] = useState(false);
@@ -126,6 +131,7 @@ export default React.memo(function PaneNodeCollection() {
         {isLoading ? <NodeCollectionLoader /> : <LoadedNodesCollection />}
         <CreateNodeModal isOpen={isOpen} onDismiss={() => setOpen(false)} />
       </div>
+      {showUploadPanel && <UploadPanel show={showUploadPanel} />}
     </div>
   );
 });
