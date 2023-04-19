@@ -8,8 +8,6 @@ import { useRef } from "react";
 import debounce from "lodash.debounce";
 
 interface PdfTestProps {
-  id: string;
-  options: any;
   payload: any;
 }
 
@@ -20,26 +18,26 @@ interface RenderedPage {
   width?: number;
   started?: boolean;
 }
-const useHasChanged = (val: any) => {
-  const prevVal = usePrevious(val);
-  return prevVal !== val;
-};
 
-const usePrevious = (value: any) => {
-  const ref = useRef();
-  useEffect(() => {
-    ref.current = value;
-  });
-  return ref.current;
-};
 const DEFAULT_WIDTH = 600;
 const DEFAULT_HEIGHT = 800;
 
-let mupdfLoad = new Promise<MuPdf.Instance>(async (resolve, reject) => {
-  let mupdf: MuPdf.Instance;
+interface MuPdfWorker {
+  instance: MuPdf.Instance;
+  doc?: MuPdf.DocumentHandle;
+}
+
+let mupdfLoad = new Promise<MuPdfWorker[]>(async (resolve, reject) => {
   // console.time("initpdf");
 
-  mupdf = await createMuPdf();
+  const MAX_INSTANCE = 4;
+  const numInstance = Math.min(MAX_INSTANCE, navigator.hardwareConcurrency);
+  let mupdf: MuPdfWorker[] = new Array();
+  for (let i = 0; i < numInstance; i++) {
+    __log(`[mupdfLoad] creating instance ${i} of ${numInstance}`);
+    const worker = await createMuPdf();
+    mupdf.push({ instance: worker });
+  }
   resolve(mupdf);
   // console.timeEnd("initpdf");
 });
@@ -47,15 +45,37 @@ let mupdfLoad = new Promise<MuPdf.Instance>(async (resolve, reject) => {
 const renderJobs: Array<number> = [];
 let renderComplete: { [page: number]: boolean } = {};
 
-const PdfTest = ({ id, options, payload }: PdfTestProps) => {
+const PdfTest = ({ payload }: PdfTestProps) => {
   const DPI = 72;
   const [numPages, setNumPages] = useState<number | null>(null);
   const [mupdf, setMupdf] = useState<MuPdf.Instance | null>(null);
   const [doc, setDoc] = useState<MuPdf.DocumentHandle | null>(null);
   const [state, setState] = useState<RenderedPage[]>([]);
 
+  const getAllInstances = async (): Promise<MuPdfWorker[]> => {
+    return mupdfLoad;
+  };
+
+  const getInstance = async (): Promise<MuPdfWorker> => {
+    const mupdf = await mupdfLoad;
+    const pool = mupdf!;
+    const index = Math.floor(Math.random() * pool.length);
+
+    return pool[index];
+  };
+
   let canceled = false;
   const [mounted, setMounted] = useState(false);
+  // const pdfWorker: Worker = useMemo(
+  //   () => new Worker(new URL("../../webworkers/pdf.ts", import.meta.url)),
+  //   []
+  // );
+
+  // useEffect(() => {
+  //   if (window.Worker && mupdf && doc) {
+  //     pdfWorker.postMessage([{num: 1, fn: () =>  mupdf.drawPageAsPNG(doc, 1, DPI);}]);
+  //   }
+  // }, [mupdf, doc]);
 
   /**
    * Load strategy:
@@ -96,6 +116,7 @@ const PdfTest = ({ id, options, payload }: PdfTestProps) => {
       }
     });
   }, [state, mupdf, doc]);
+
   const debouncedTick = useMemo(() => debounce(tick, 30), [state, mupdf, doc]);
   let autotick = useRef<NodeJS.Timeout | undefined>();
   /**
@@ -146,22 +167,32 @@ const PdfTest = ({ id, options, payload }: PdfTestProps) => {
 
   const handleSomePdf = async (url: string) => {
     // const {createMuPdf} = await import("mupdf-js");
-    const mupdf = await mupdfLoad;
+    // const mupdfPool = await mupdfLoad;
+    const pool = await getAllInstances();
+    if (!pool) {
+      console.error("no mupdf instance");
+      return;
+    }
     // console.time("fetchpdf");
     const file = await fetch(url);
     const buf = await file.arrayBuffer();
     const arrayBuf = new Uint8Array(buf);
-    const doc = mupdf.load(arrayBuf);
+
+    pool.forEach((m) => {
+      m.doc = m.instance.load(arrayBuf);
+    });
+    const mupdf = await getInstance();
+    const doc = mupdf.doc!;
     // console.timeEnd("fetchpdf");
     // Each of these returns a string:
 
-    const pageCount = mupdf.countPages(doc);
-    setMupdf(mupdf);
+    const pageCount = mupdf.instance.countPages(doc);
+    setMupdf(mupdf.instance);
     setDoc(doc);
     setNumPages(pageCount);
 
-    const height = mupdf.pageHeight(doc, 1, DPI);
-    const width = mupdf.pageWidth(doc, 1, DPI);
+    const height = mupdf.instance.pageHeight(doc, 1, DPI);
+    const width = mupdf.instance.pageWidth(doc, 1, DPI);
     __log("num pages", pageCount);
     const initState = new Array(pageCount).fill({ num: 0 }).map((_, i) => ({
       num: i + 1,
@@ -194,7 +225,7 @@ const PdfTest = ({ id, options, payload }: PdfTestProps) => {
           console.warn("render already completed for", z);
           return resolve("");
         }
-        const job = setTimeout(() => {
+        const job = setTimeout(async () => {
           const key = `render_${z}_${payload.url}`;
           if (!mupdf || !doc) {
             console.error("mupdf not loaded", mupdf, doc);
@@ -202,8 +233,8 @@ const PdfTest = ({ id, options, payload }: PdfTestProps) => {
             return;
           }
           // console.time(key);
-
-          const png = mupdf.drawPageAsPNG(doc, z, DPI);
+          const instance = await getInstance();
+          const png = instance.instance.drawPageAsPNG(instance.doc!, z, DPI);
           // console.timeEnd(key);
           const checkCancel = () => {
             if (canceled) {
