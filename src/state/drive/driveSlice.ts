@@ -311,6 +311,7 @@ export const driveSlice = createSlice({
         const externalLinks = createVirtualDrive({
           name: "External Links",
           componentType: ResearchObjectComponentType.LINK,
+          componentId: "external-links",
           path: DRIVE_NODE_ROOT_PATH + "/" + DRIVE_EXTERNAL_LINKS_PATH,
           contains: [],
         });
@@ -319,13 +320,15 @@ export const driveSlice = createSlice({
             externalLinks.contains!.push(
               createVirtualDrive({
                 name: c.name,
+                componentId: c.id,
                 componentType: ResearchObjectComponentType.LINK,
                 cid: c.payload.url || c.payload.cid,
                 type: FileType.FILE,
+                contains: undefined,
                 path: [
                   DRIVE_NODE_ROOT_PATH,
                   DRIVE_EXTERNAL_LINKS_PATH,
-                  c.id,
+                  c.name,
                 ].join("/"),
               })
             );
