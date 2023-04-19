@@ -15,6 +15,7 @@ import {
   IconIpfs,
   IconResearchNode,
   IconResearchReport,
+  IconViewLink,
   IconX,
 } from "@icons";
 
@@ -182,22 +183,6 @@ function DriveRow({
   exploreDirectory,
   onInsert,
 }: DriveRowProps) {
-  function renderComponentIcon() {
-    const classes = "w-[34px] h-[34px] ";
-    switch (file.componentType) {
-      case DriveNonComponentTypes.MANIFEST:
-        return <IconResearchNode className={classes} />;
-      case ResearchObjectComponentType.PDF:
-        return <IconResearchReport className={classes} />;
-      case ResearchObjectComponentType.DATA:
-        return <IconData className={classes} />;
-      case ResearchObjectComponentType.CODE:
-        return <IconCodeRepo className={classes} />;
-      default:
-        return <IconResearchNode className={classes} />;
-    }
-  }
-
   return (
     <ul
       className={`h-[48px]list-none font-medium text-sm content-center justify-items-center items-center gap-10 px-5 hover:bg-neutrals-gray-8

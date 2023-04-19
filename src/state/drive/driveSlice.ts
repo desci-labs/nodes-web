@@ -9,6 +9,8 @@ import { getDatasetTree, updateDag } from "@src/api";
 import { DriveObject, FileType } from "@src/components/organisms/Drive";
 import { RequestStatus, RootState } from "@src/store";
 import {
+  ExternalLinkComponent,
+  ResearchObjectComponentLinkSubtype,
   ResearchObjectComponentType,
   ResearchObjectV1,
   ResearchObjectV1Component,
@@ -309,6 +311,7 @@ export const driveSlice = createSlice({
         const externalLinks = createVirtualDrive({
           name: "External Links",
           componentType: ResearchObjectComponentType.LINK,
+          componentId: "external-links",
           path: DRIVE_NODE_ROOT_PATH + "/" + DRIVE_EXTERNAL_LINKS_PATH,
           contains: [],
         });
@@ -317,12 +320,16 @@ export const driveSlice = createSlice({
             externalLinks.contains!.push(
               createVirtualDrive({
                 name: c.name,
+                componentId: c.id,
                 componentType: ResearchObjectComponentType.LINK,
-                cid: c.payload.url,
+                cid: c.payload.url || c.payload.cid,
                 type: FileType.FILE,
-                path:
-                  DRIVE_NODE_ROOT_PATH + "/" + DRIVE_EXTERNAL_LINKS_PATH + c.id,
-                parent: externalLinks,
+                contains: undefined,
+                path: [
+                  DRIVE_NODE_ROOT_PATH,
+                  DRIVE_EXTERNAL_LINKS_PATH,
+                  c.name,
+                ].join("/"),
               })
             );
           }
@@ -399,6 +406,38 @@ export interface FetchTreeThunkParams {
   nodeUuid: string;
 }
 
+export const addExternalLinkThunk = createAsyncThunk(
+  "drive/addExternalLink",
+  async (
+    payload: {
+      name: string;
+      url: string;
+      subtype: ResearchObjectComponentLinkSubtype;
+    },
+    { getState, dispatch }
+  ) => {
+    const state = getState() as RootState;
+
+    const { name, url, subtype } = payload;
+    const newComponent: ExternalLinkComponent = {
+      id: uuidv4(),
+      name: name || "Link",
+      type: ResearchObjectComponentType.LINK,
+      subtype,
+      payload: {
+        url,
+      },
+      starred: true,
+    };
+    dispatch(addComponent({ component: newComponent }));
+    dispatch(
+      saveManifestDraft({
+        onSucess: () => dispatch(fetchTreeThunk()),
+      })
+    );
+  }
+);
+
 export const fetchTreeThunk = createAsyncThunk(
   "drive/fetchTree",
   async (_, { getState }) => {
@@ -415,7 +454,6 @@ export const fetchTreeThunk = createAsyncThunk(
             (c: ResearchObjectV1Component) =>
               c.type === ResearchObjectComponentType.DATA_BUCKET
           );
-
     if (hasDataBucket) {
       const rootCid = hasDataBucket.payload.cid;
       const { tree } = await getDatasetTree(
