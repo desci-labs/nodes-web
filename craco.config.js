@@ -1,5 +1,6 @@
 const CracoAlias = require("craco-alias");
 const webpack = require("webpack");
+const cracoWasm = require("craco-wasm");
 
 module.exports = {
   webpack: {
@@ -13,6 +14,8 @@ module.exports = {
           zlib: require.resolve("browserify-zlib"),
           buffer: require.resolve("buffer"),
           asset: require.resolve("assert"),
+          path: require.resolve("path-browserify"),
+          fs: require.resolve("browserify-fs"),
         },
       },
       plugins: [
@@ -43,5 +46,6 @@ module.exports = {
         tsConfigPath: "./tsconfig.extend.json",
       },
     },
+    cracoWasm(),
   ],
 };

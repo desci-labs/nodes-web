@@ -15,6 +15,7 @@ import tw from "tailwind-styled-components";
 import PaneDrive from "@components/organisms/PaneDrive";
 import ExternalLinkViewer from "@components/molecules/ExternalLinkViewer";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import PdfTest from "@src/components/screens/PdfTest";
 
 const RenderedDrive = () => (
   <div className="w-[calc(100%-320px)] h-[calc(100vh-56px)] pt-10 bg-neutrals-black absolute left-0">
@@ -49,7 +50,7 @@ const ComponentStackView = (props: ComponentStackViewProps) => {
     __log("ComponentStackView::renderComponent", component);
     switch (component.type) {
       case ResearchObjectComponentType.PDF:
-        return <Paper {...component} />;
+        return <PdfTest {...component} />;
       case ResearchObjectComponentType.CODE:
         const Viewer = (props: any) => <></>;
         return <Viewer {...component} />;
