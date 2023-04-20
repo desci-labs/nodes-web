@@ -50,6 +50,7 @@ export enum AccessStatus {
   PUBLIC = "Public",
   PRIVATE = "Private",
   PARTIAL = "Partial",
+  EXTERNAL = "External",
   UPLOADING = "Uploading",
   FAILED = "Failed",
 }
