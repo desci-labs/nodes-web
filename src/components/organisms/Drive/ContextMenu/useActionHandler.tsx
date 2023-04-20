@@ -52,6 +52,7 @@ export default function useActionHandler() {
       [
         ResearchObjectComponentType.PDF,
         ResearchObjectComponentType.CODE,
+        ResearchObjectComponentType.LINK,
       ].includes(file.componentType as ResearchObjectComponentType)
     ) {
       const component = manifestData?.components.find(

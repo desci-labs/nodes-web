@@ -54,7 +54,8 @@ export * from "./constants";
 // how many pages you can scroll before dismissing selected annotation
 const Paper = ({ id, options, dirtyComment, payload }: any) => {
   const dispatch = useSetter();
-  const { isResearchPanelOpen, componentStack } = useNodeReader();
+  const { isResearchPanelOpen, componentStack, pdfScrollOffsetTop } =
+    useNodeReader();
   const { annotations } = payload;
   const [pendingAnnotations, setPendingAnnotations] = useState<
     ResearchObjectComponentAnnotation[]
@@ -516,10 +517,9 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
                   })
                 );
 
-                const lastScroll =
-                  lastScrollTop[componentStack[componentStack.length - 1].id];
+                const lastScroll = pdfScrollOffsetTop;
                 if (lastScroll) {
-                  const times = [50, 100, 500];
+                  const times = [0, 50, 100, 500, 1000];
                   times.forEach((dur) => {
                     setTimeout(() => {
                       window.document.scrollingElement!.scrollTop = lastScroll;
@@ -676,7 +676,7 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
   );
 };
 
-export default React.memo(Paper);
+export default Paper;
 
 /**
  * TODO: React 18 should allow us to render these faster without

@@ -21,6 +21,7 @@ import AddCodeComponent from "@components/molecules/AddComponentFlow/AddCodeComp
 import { useNavigate } from "react-router-dom";
 import {
   RESEARCH_OBJECT_NODES_PREFIX,
+  ResearchObjectComponentLinkSubtype,
   ResearchObjectComponentType,
   ResearchObjectV1,
 } from "@desci-labs/desci-models";
@@ -36,7 +37,10 @@ import {
 } from "@src/state/nodes/viewer";
 import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 import { useDispatch } from "react-redux";
-import { addFilesToDrive } from "@src/state/drive/driveSlice";
+import {
+  addExternalLinkThunk,
+  addFilesToDrive,
+} from "@src/state/drive/driveSlice";
 import { useFileUpload } from "react-use-file-upload/dist/lib/useFileUpload";
 import { ExternalUrl } from "@src/state/drive/types";
 
@@ -222,10 +226,27 @@ const AddComponentPopOver = (
         componentSubtype: addComponentSubType || undefined,
       });
 
+      if (addComponentType === ResearchObjectComponentType.LINK) {
+        dispatch(
+          addExternalLinkThunk({
+            name: componentTitle!,
+            url: urlOrDoi!,
+            subtype: addComponentSubType as ResearchObjectComponentLinkSubtype,
+          })
+        );
+        const components = manifestData?.components!;
+        dispatch(setComponentStack([components[components.length - 1]]));
+        close(true);
+        return;
+      }
+
       let externalUrl;
-      if (urlOrDoi?.length) {
-        const extractedName = extractCodeRepoName(urlOrDoi);
-        if (extractedName) externalUrl = { path: extractedName, url: urlOrDoi };
+      if (addComponentType == ResearchObjectComponentType.CODE) {
+        if (urlOrDoi?.length) {
+          const extractedName = extractCodeRepoName(urlOrDoi);
+          if (extractedName)
+            externalUrl = { path: extractedName, url: urlOrDoi };
+        }
       }
 
       dispatch(
@@ -250,6 +271,7 @@ const AddComponentPopOver = (
       close(true);
     } catch (err) {
       let resp = (err as any).response;
+      console.error(err);
       const errorMessage = resp.data.error;
       setError(errorMessage);
     } finally {

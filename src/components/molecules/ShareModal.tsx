@@ -78,7 +78,7 @@ const ShareModal = React.memo((props: ModalProps) => {
       $maxWidth={600}
       $scrollOverlay={true}
     >
-      <div className="px-6 py-5 text-white relative min-w-[600px]">
+      <div className="px-6 py-5 text-white relative min-w-[600px] min-h-[400px] h-0">
         <Modal.Header
           title="Share Research Node"
           onDismiss={props?.onDismiss}
@@ -111,9 +111,21 @@ const ShareModal = React.memo((props: ModalProps) => {
         {currentTab === ShareTabs.Invite && <NodeInvite />}
         {currentTab === ShareTabs.Public && <SharePublished />}
       </div>
+      {currentTab === ShareTabs.Public && (
+        <Modal.Footer>
+          <div className="flex items-center justify-end w-full gap-2">
+            <PrimaryButton
+              onClick={() => props?.onDismiss && props.onDismiss()}
+              className="flex gap-1"
+            >
+              Done
+            </PrimaryButton>
+          </div>
+        </Modal.Footer>
+      )}
       {currentTab === ShareTabs.Invite && (
         <Modal.Footer>
-          <div className="flex items-center justify-start w-full gap-2">
+          <div className="flex items-center justify-end w-full gap-2">
             {!shareId && (
               <ButtonSecondary
                 disabled={isLoading || isCreated}
@@ -135,7 +147,7 @@ const ShareModal = React.memo((props: ModalProps) => {
                 </span>
               </ButtonSecondary>
             )}
-            {shareId && <CopyShareLink link={getShareLink(shareId)} />}
+
             {shareId && (
               <PrimaryButton
                 disabled={isRevoking}
@@ -156,6 +168,7 @@ const ShareModal = React.memo((props: ModalProps) => {
                 </span>
               </PrimaryButton>
             )}
+            {shareId && <CopyShareLink link={getShareLink(shareId)} />}
           </div>
         </Modal.Footer>
       )}

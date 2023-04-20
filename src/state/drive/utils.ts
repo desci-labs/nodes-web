@@ -15,6 +15,7 @@ import {
 
 import { v4 as uuidv4 } from "uuid";
 import { BreadCrumb, DrivePath } from "./types";
+import { __log } from "@src/components/utils";
 
 export function neutralizePath(path: DrivePath) {
   return path.replace(/^[^/]+/, DRIVE_NODE_ROOT_PATH);
@@ -134,7 +135,7 @@ export function inheritMetadata(
   return {};
 }
 
-export const DRIVE_EXTERNAL_LINKS_PATH = "externallinks";
+export const DRIVE_EXTERNAL_LINKS_PATH = "External Links";
 
 export function getAncestorComponent(
   drive: DriveObject,
@@ -262,7 +263,10 @@ export function findDriveByPath(rootDrive: DriveObject, targetPath: string) {
   while (queue.length) {
     if (!currentDrive) return null;
     const nextPath = queue.shift();
-    currentDrive = currentDrive.contains?.find((d) => d.name === nextPath);
+    currentDrive = currentDrive.contains?.find((d) => {
+      __log("[findDriveByPath]", d.name, nextPath);
+      return d.name === nextPath;
+    });
   }
   if (currentDrive?.path === targetPath) return currentDrive;
   return null;

@@ -14,9 +14,11 @@ import { useDrive } from "@src/state/drive/hooks";
 
 interface Props {
   close: () => void;
+  directory?: boolean;
+  id: string;
 }
 
-export const ButtonAddData = ({ close }: Props) => {
+export const ButtonAddData = ({ close, directory, id }: Props) => {
   const ref = useRef<HTMLInputElement>(null);
   const { setDroppedFileList, setIsAddingComponent } = useManuscriptController(
     []
@@ -87,8 +89,10 @@ export const ButtonAddData = ({ close }: Props) => {
     <>
       <div className="hidden">
         <FileUploaderBare
+          id={id}
           ref={ref}
           autoUpload={true}
+          directoryPicker={directory}
           customReq={(files) => {
             setTimeout(() => {
               dispatch(
@@ -188,7 +192,8 @@ export const ButtonAddData = ({ close }: Props) => {
 const AddDataComponent = ({ close }: Props) => {
   return (
     <div className="py-3 flex flex-col gap-6 items-center text-white">
-      <ButtonAddData close={close} />
+      <ButtonAddData id="file_data" close={close} />
+      <ButtonAddData id="folder_data" directory={true} close={close} />
     </div>
   );
 };

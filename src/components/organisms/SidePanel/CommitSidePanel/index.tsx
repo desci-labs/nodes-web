@@ -153,7 +153,7 @@ const CommitSidePanel = (props: CommitSidePanelProps) => {
                         <FooterUpdatesText numUpdates={5} />
                         <PrimaryButton
                           onClick={() => setShowAdditionalInfoPopover(true)}
-                          disabled={!isValid() || fail}
+                          disabled={!isValid()}
                         >
                           Continue
                         </PrimaryButton>

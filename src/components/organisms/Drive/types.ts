@@ -39,7 +39,7 @@ export interface DriveObject {
   metadata: DriveMetadata;
   cid: string;
   type: FileType;
-  contains?: Array<DriveObject>;
+  contains?: Array<DriveObject> | null;
   parent?: DriveObject | FileDir | null;
   path?: string;
   starred?: boolean;

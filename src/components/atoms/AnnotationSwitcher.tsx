@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styled, { StyledComponent } from "styled-components";
 import { FlexRowAligned } from "@components/styled";
 import { IconTriangleLeft, IconTriangleRight } from "icons";
@@ -11,6 +11,7 @@ import {
   setIsAnnotating,
   setSelectedAnnotationId,
 } from "@src/state/nodes/pdf";
+import ReactTooltip from "react-tooltip";
 
 const Wrapper: StyledComponent<"div", any, any> = styled(FlexRowAligned)`
   flex: unset;
@@ -189,6 +190,12 @@ const AnnotationSwitcher = (props: AnnotationSwitcherProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [annotationSwitchCall, selectedAnnotationId]);
 
+  React.useEffect(() => {
+    setTimeout(() => {
+      ReactTooltip.rebuild();
+    }, 500);
+  }, []);
+
   if (!annotations.length) {
     return (
       <Wrapper
@@ -201,15 +208,20 @@ const AnnotationSwitcher = (props: AnnotationSwitcherProps) => {
   }
 
   return (
-    <Wrapper onClick={(e: any) => e.stopPropagation()} data-annotation-switch>
+    <Wrapper
+      onClick={(e: any) => e.stopPropagation()}
+      data-annotation-switch
+      className="group"
+    >
       <IconTriangleLeft
         title="Previous annotation"
-        className={`cursor-pointer fill-black dark:fill-white outline-none`}
+        className={`cursor-pointer fill-black dark:fill-white hover:dark:fill-neutrals-gray-5 outline-none`}
         onClick={() => decrement()}
         data-tip={"Previous Annotation"}
         data-place="bottom"
         data-type="info"
         data-background-color="black"
+        width={15}
       />
       <MiddleElementWrapper onClick={pinax} title="Back to selected annotation">
         <MiddleElementText>
@@ -218,12 +230,13 @@ const AnnotationSwitcher = (props: AnnotationSwitcherProps) => {
       </MiddleElementWrapper>
       <IconTriangleRight
         title="Next annotation"
-        className="cursor-pointer fill-black dark:fill-white outline-none"
+        className="cursor-pointer fill-black dark:fill-white hover:dark:fill-neutrals-gray-5 outline-none"
         onClick={() => increment()}
         data-tip={"Next Annotation"}
         data-place="bottom"
         data-type="info"
         data-background-color="black"
+        width={15}
       />
     </Wrapper>
   );

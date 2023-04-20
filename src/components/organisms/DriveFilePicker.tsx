@@ -15,6 +15,7 @@ import {
   IconIpfs,
   IconResearchNode,
   IconResearchReport,
+  IconViewLink,
   IconX,
 } from "@icons";
 
@@ -50,7 +51,7 @@ interface DriveTableProps {
   onInsert: (file: DriveObject) => void;
 }
 
-const DriveTable: React.FC<DriveTableProps> = ({
+const DriveTableFilePicker: React.FC<DriveTableProps> = ({
   onRequestClose,
   onInsert,
 }) => {
@@ -125,7 +126,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
           currentDrivePicker.contains.map((f: DriveObject, idx: number) => {
             return (
               <DriveRow
-                key={`drive_row_${f.cid || f.name}`}
+                key={`drive_picker_drive_row_${f.cid}_${f.name}`}
                 file={f}
                 exploreDirectory={exploreDirectory}
                 index={idx}
@@ -157,7 +158,7 @@ const DriveTable: React.FC<DriveTableProps> = ({
   );
 };
 
-export default DriveTable;
+export default DriveTableFilePicker;
 
 interface DriveRowProps {
   file: DriveObject;
@@ -182,22 +183,6 @@ function DriveRow({
   exploreDirectory,
   onInsert,
 }: DriveRowProps) {
-  function renderComponentIcon() {
-    const classes = "w-[34px] h-[34px] ";
-    switch (file.componentType) {
-      case DriveNonComponentTypes.MANIFEST:
-        return <IconResearchNode className={classes} />;
-      case ResearchObjectComponentType.PDF:
-        return <IconResearchReport className={classes} />;
-      case ResearchObjectComponentType.DATA:
-        return <IconData className={classes} />;
-      case ResearchObjectComponentType.CODE:
-        return <IconCodeRepo className={classes} />;
-      default:
-        return <IconResearchNode className={classes} />;
-    }
-  }
-
   return (
     <ul
       className={`h-[48px]list-none font-medium text-sm content-center justify-items-center items-center gap-10 px-5 hover:bg-neutrals-gray-8

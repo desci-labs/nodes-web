@@ -18,7 +18,11 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "./molecules/AnnotationEditor/components";
 import { UploadQueueItem } from "@src/state/drive/types";
-import { formatDbDate, recursiveFlattenTree } from "@src/state/drive/utils";
+import {
+  formatDbDate,
+  getComponentCid,
+  recursiveFlattenTree,
+} from "@src/state/drive/utils";
 
 export const tempDate = "12/02/2022 7:00PM";
 
@@ -31,6 +35,7 @@ export enum SessionStorageKeys {
 interface VirtualDriveArgs {
   name: string;
   componentType: ResearchObjectComponentType | DriveNonComponentTypes;
+  componentId?: string;
   size?: number;
   contains?: Array<DriveObject>;
   lastModified?: string;
@@ -46,6 +51,7 @@ interface VirtualDriveArgs {
 export function createVirtualDrive({
   name,
   componentType,
+  componentId,
   size,
   contains,
   lastModified,
@@ -59,10 +65,11 @@ export function createVirtualDrive({
   type,
 }: VirtualDriveArgs): DriveObject {
   return {
-    name: name,
-    componentType: componentType,
+    name,
+    componentType,
+    componentId,
     size: size || 0,
-    contains: contains || [],
+    contains: contains, // if we default to blank array External Links are treated as folders for file picker
     lastModified: lastModified || tempDate,
     accessStatus: accessStatus || AccessStatus.PRIVATE,
     metadata: metadata || {},
