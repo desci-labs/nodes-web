@@ -59,8 +59,8 @@ export const ButtonAddData = ({ close }: Props) => {
         externalCids: [{ name: externalCidName, cid: externalCid }],
       })
     );
-    // close();
-    // setIsAddingComponent(false);
+    close();
+    setIsAddingComponent(false);
   };
 
   useEffect(() => {
