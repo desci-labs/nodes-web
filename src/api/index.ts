@@ -44,6 +44,13 @@ export const config = (preset?: AxiosRequestConfig): AxiosRequestConfig => {
     headers: {
       authorization: `Bearer ${localStorage.getItem("auth")}`,
     },
+    onDownloadProgress: (progressEvent) => {
+      const percentCompleted = Math.round(
+        (progressEvent.loaded * 100) / progressEvent.total
+      );
+      console.log("api/index axios progress", percentCompleted);
+      (window as any).globalProgress = percentCompleted;
+    },
   };
 };
 

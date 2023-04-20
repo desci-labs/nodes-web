@@ -58,8 +58,6 @@ const NavStart = styled.div.attrs({
   flex-shrink: 1;
 `;
 
-// let highWaterMarkLoad = -1;
-
 const PdfHeader = () => {
   const userProfile = useUser();
   const dispatch = useSetter();
@@ -114,24 +112,6 @@ const PdfHeader = () => {
     setTimeout(triggerTooltips);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, orcidData, orcidLoading]);
-
-  useEffect(() => {
-    if (loadPercent >= 100) {
-      setTimeout(() => {
-        dispatch(setLoadState({ loadPercent: 0 }));
-      }, 200);
-    }
-  }, [dispatch, loadPercent]);
-
-  useEffect(() => {
-    if (loadError) {
-      dispatch(setLoadState({ loadProgressTaken: true, loadPercent: 99 }));
-    } else {
-      if (!loadProgressTaken) {
-        dispatch(setLoadState({ loadPercent: 0 }));
-      }
-    }
-  }, [loadProgressTaken, loadError, dispatch]);
 
   // TODO: for private view add guard to check if user is node owner or currentUser has
   // enough permissions to share private drafts

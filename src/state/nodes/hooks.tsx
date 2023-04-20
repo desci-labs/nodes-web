@@ -3,13 +3,14 @@ import { PDF_PAGE_SPACING } from "@src/components/organisms/Paper/constants";
 import { useGetter } from "@src/store/accessors";
 import { useCallback, useMemo } from "react";
 import { ManifestDataStatus, NodeReaderPref } from "./viewer";
+import { PdfViewerState } from "./pdf";
 
 export const useNodeReader = (): NodeReaderPref => {
   const state = useGetter((state) => state.nodes.nodeReader);
   return state;
 };
 
-export const usePdfReader = () => {
+export const usePdfReader = (): PdfViewerState => {
   const state = useGetter((state) => state.nodes.pdfViewer);
   return state;
 };

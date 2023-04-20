@@ -17,7 +17,7 @@ interface ZoomParams {
 }
 
 type AnnotationSwitch = "next" | "prev" | null;
-interface PdfViewerState {
+export interface PdfViewerState {
   currentPdf: string;
   selectedAnnotationId: string;
   zoom: number;
@@ -116,7 +116,7 @@ export const pdfViewerSlice = createSlice({
     setCurrentPage: (state, { payload }: PayloadAction<number>) => {
       state.pdfCurrentPage = payload;
     },
-    setTotalPages: (state, { payload }: PayloadAction<number>) => {
+    setPdfTotalPages: (state, { payload }: PayloadAction<number>) => {
       state.pdfTotalPages = payload;
     },
 
@@ -163,7 +163,7 @@ export const {
   zoomOut,
   addToZoom,
   setLoadState,
-  setTotalPages,
+  setPdfTotalPages,
   setCurrentPdf,
   setViewLoading,
   setCurrentPage,

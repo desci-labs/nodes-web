@@ -6,10 +6,18 @@ import { InView } from "react-intersection-observer";
 
 import { useRef } from "react";
 import debounce from "lodash.debounce";
+import NodesPdfPage from "../organisms/NodesPdfPage";
+import useGestureZoom from "@src/hooks/useGestureZoom";
+import { usePdfReader } from "@src/state/nodes/hooks";
+import { setCurrentPage, setPdfTotalPages } from "@src/state/nodes/pdf";
+import { useSetter } from "@src/store/accessors";
+import {
+  DEFAULT_HEIGHT,
+  DEFAULT_WIDTH,
+  PDF_PAGE_SPACING,
+} from "../organisms/Paper";
 
 interface PdfTestProps {
-  id: string;
-  options: any;
   payload: any;
 }
 
@@ -20,20 +28,6 @@ interface RenderedPage {
   width?: number;
   started?: boolean;
 }
-const useHasChanged = (val: any) => {
-  const prevVal = usePrevious(val);
-  return prevVal !== val;
-};
-
-const usePrevious = (value: any) => {
-  const ref = useRef();
-  useEffect(() => {
-    ref.current = value;
-  });
-  return ref.current;
-};
-const DEFAULT_WIDTH = 600;
-const DEFAULT_HEIGHT = 800;
 
 let mupdfLoad = new Promise<MuPdf.Instance>(async (resolve, reject) => {
   let mupdf: MuPdf.Instance;
@@ -47,8 +41,12 @@ let mupdfLoad = new Promise<MuPdf.Instance>(async (resolve, reject) => {
 const renderJobs: Array<number> = [];
 let renderComplete: { [page: number]: boolean } = {};
 
-const PdfTest = ({ id, options, payload }: PdfTestProps) => {
-  const DPI = 72;
+const PdfTest = ({ payload }: PdfTestProps) => {
+  const DPI_HI = 300;
+
+  const DPI_LO = 100;
+  const DPI = DPI_LO;
+
   const [numPages, setNumPages] = useState<number | null>(null);
   const [mupdf, setMupdf] = useState<MuPdf.Instance | null>(null);
   const [doc, setDoc] = useState<MuPdf.DocumentHandle | null>(null);
@@ -56,6 +54,24 @@ const PdfTest = ({ id, options, payload }: PdfTestProps) => {
 
   let canceled = false;
   const [mounted, setMounted] = useState(false);
+
+  const { containerRef, isDragging, pinching, setIsDragging, setPinching } =
+    useGestureZoom();
+  const { zoom, pdfCurrentPage } = usePdfReader();
+
+  const dispatch = useSetter();
+  const [scaleFactor, setScaleFactor] = useState(1);
+  useEffect(() => {
+    //  if zoom is different from the previous zoom state
+    if (mupdf && doc) {
+      // renderComplete = {};
+      // renderJobs.length = 0;
+      // // setState([]);
+      // renderPage(pdfCurrentPage + 1);
+    }
+
+    setScaleFactor(Math.ceil(zoom * 100) / 100);
+  }, [zoom]);
 
   /**
    * Load strategy:
@@ -68,11 +84,8 @@ const PdfTest = ({ id, options, payload }: PdfTestProps) => {
       console.error("[tick] mupdf not loaded", mupdf, doc);
       return;
     }
-    const pageHeight = getHeightOfRow(state[0]);
-    const curPage = Math.min(
-      Math.max(0, getCurrentPage(pageHeight) + 1),
-      numPages!
-    );
+    const pageHeight = getHeightOfRow(state[0], zoom);
+    const curPage = getCurrentPage(pageHeight, numPages!, zoom) + 1;
     const curPageIsLoaded = renderComplete[curPage];
     const nextUnrenderedPage = getNextUnrenderedPage(curPage);
     const prevUnrenderedPage = getPreviousUnrenderedPage(curPage);
@@ -95,7 +108,29 @@ const PdfTest = ({ id, options, payload }: PdfTestProps) => {
         return;
       }
     });
-  }, [state, mupdf, doc]);
+  }, [state, mupdf, doc, zoom]);
+
+  const trackPage = useCallback(() => {
+    const pageHeight = getHeightOfRow(state[0], zoom);
+    const calculatedPage = getCurrentPage(pageHeight, numPages!, zoom);
+    const curPage = Math.min(Math.max(0, calculatedPage + 1), numPages!);
+    if (pdfCurrentPage != curPage) {
+      __log(
+        "trackPage",
+        pdfCurrentPage,
+        curPage,
+        zoom,
+        calculatedPage,
+        pageHeight
+      );
+      // dispatch(setCurrentPage(curPage));
+    }
+  }, [setCurrentPage, dispatch, zoom, pdfCurrentPage, numPages]);
+  const debouncedTrackPage = useMemo(
+    () => debounce(trackPage, 30),
+    [setCurrentPage, dispatch, zoom]
+  );
+
   const debouncedTick = useMemo(() => debounce(tick, 30), [state, mupdf, doc]);
   let autotick = useRef<NodeJS.Timeout | undefined>();
   /**
@@ -122,6 +157,7 @@ const PdfTest = ({ id, options, payload }: PdfTestProps) => {
     return () => {
       debouncedTick.cancel();
       unregisterLoader();
+      unregisterScrollTrack();
       __log("!!!! unmount PDF", payload.url);
       window.removeEventListener("beforeunload", cancelAllJobs);
       cancelAllJobs();
@@ -139,6 +175,8 @@ const PdfTest = ({ id, options, payload }: PdfTestProps) => {
 
         window.addEventListener("scroll", debouncedTick);
       }
+
+      window.addEventListener("scroll", debouncedTrackPage);
     } else {
       // console.log("no-pass", mupdf, doc, numPages, state[0]);
     }
@@ -159,6 +197,7 @@ const PdfTest = ({ id, options, payload }: PdfTestProps) => {
     setMupdf(mupdf);
     setDoc(doc);
     setNumPages(pageCount);
+    dispatch(setPdfTotalPages(pageCount));
 
     const height = mupdf.pageHeight(doc, 1, DPI);
     const width = mupdf.pageWidth(doc, 1, DPI);
@@ -180,6 +219,9 @@ const PdfTest = ({ id, options, payload }: PdfTestProps) => {
       autotick.current = undefined;
     }
     window.removeEventListener("scroll", debouncedTick);
+  };
+  const unregisterScrollTrack = () => {
+    window.removeEventListener("scroll", debouncedTrackPage);
   };
 
   /**
@@ -203,7 +245,7 @@ const PdfTest = ({ id, options, payload }: PdfTestProps) => {
           }
           // console.time(key);
 
-          const png = mupdf.drawPageAsPNG(doc, z, DPI);
+          const png = mupdf.drawPageAsPNG(doc, z, zoom > 1 ? DPI_HI : DPI_LO);
           // console.timeEnd(key);
           const checkCancel = () => {
             if (canceled) {
@@ -233,7 +275,7 @@ const PdfTest = ({ id, options, payload }: PdfTestProps) => {
         renderJobs.push(job);
       });
     },
-    [setState, mupdf, doc]
+    [setState, mupdf, doc, zoom]
   );
 
   const isFullyLoaded = () => {
@@ -258,7 +300,16 @@ const PdfTest = ({ id, options, payload }: PdfTestProps) => {
   };
 
   return (
-    <div className="pdf flex flex-col gap-5">
+    <div
+      className={`pdf flex flex-col gap-[${PDF_PAGE_SPACING}px] transition-transform origin-top`}
+      style={{
+        transform: `scale(${scaleFactor})`,
+      }}
+      ref={useCallback(
+        (ref: HTMLDivElement) => (containerRef.current = ref),
+        [containerRef]
+      )}
+    >
       {state.map((item: RenderedPage, i: number) => {
         return (
           <div
@@ -269,15 +320,16 @@ const PdfTest = ({ id, options, payload }: PdfTestProps) => {
             }}
           >
             <InView>
-              {(inView: boolean) =>
-                item.png && inView ? (
-                  <div className={`h-full w-full bg-white`}>
-                    <img src={item.png} />
-                  </div>
-                ) : (
-                  <div className={`h-full w-full bg-white`}></div>
-                )
-              }
+              {(inView: boolean, ref) => (
+                <div
+                  className={`h-full w-full bg-white`}
+                  ref={(r) => (ref ? (ref.current = r) : null)}
+                >
+                  {item.png && inView ? (
+                    <NodesPdfPage image={item.png} />
+                  ) : null}
+                </div>
+              )}
             </InView>
           </div>
         );
@@ -286,18 +338,21 @@ const PdfTest = ({ id, options, payload }: PdfTestProps) => {
   );
 };
 
-const getHeightOfRow = (p: RenderedPage) => {
-  const VERTICAL_PADDING = 20;
-  const height = p?.height ? p.height + VERTICAL_PADDING : DEFAULT_HEIGHT;
-  return height;
+const getHeightOfRow = (p: RenderedPage, zoom: number) => {
+  const height = p?.height ? p.height + PDF_PAGE_SPACING : DEFAULT_HEIGHT;
+
+  return height * zoom;
 };
 
-const getCurrentPage = (rowHeight: number) => {
+const getCurrentPage = (rowHeight: number, numPages: number, zoom: number) => {
   const height = rowHeight || DEFAULT_HEIGHT;
   const pageBeingViewed = Math.floor(
-    document.scrollingElement!.scrollTop / height
+    document.scrollingElement!.scrollTop / zoom / height
   );
-  return pageBeingViewed;
+
+  const clamped = Math.min(Math.max(0, pageBeingViewed), numPages!);
+
+  return clamped;
 };
 
 export default PdfTest;

@@ -234,15 +234,15 @@ export const lockScroll = (nudgeForWindows?: boolean) => {
   const appEl = document.body;
   const scrollWidth = appEl.scrollWidth - appEl.clientWidth;
 
-  document.body.style.overflowY = "hidden";
+  // document.body.style.overflowY = "hidden";
 
-  FIXED_ELEMENTS.forEach((a) => {
-    const el = document.querySelector(a.selector) as HTMLElement;
-    if (!el) {
-      return;
-    }
-    (el.style as any)[a.strategy] = `${scrollWidth}px`;
-  });
+  // FIXED_ELEMENTS.forEach((a) => {
+  //   const el = document.querySelector(a.selector) as HTMLElement;
+  //   if (!el) {
+  //     return;
+  //   }
+  //   (el.style as any)[a.strategy] = `${scrollWidth}px`;
+  // });
 };
 
 export const getChainInfo = () => {
