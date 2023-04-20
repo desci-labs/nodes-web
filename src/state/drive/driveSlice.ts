@@ -1,13 +1,9 @@
-import {
-  AsyncThunkAction,
-  PayloadAction,
-  createAsyncThunk,
-  createSlice,
-} from "@reduxjs/toolkit";
+import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 import { getDatasetTree, updateDag } from "@src/api";
 import { DriveObject, FileType } from "@src/components/organisms/Drive";
 import { RequestStatus, RootState } from "@src/store";
+import toast from "react-hot-toast";
 import {
   ResearchObjectComponentType,
   ResearchObjectV1,
@@ -482,6 +478,17 @@ export const addFilesToDrive = createAsyncThunk(
         externalUrl
       );
     }
+
+    if (!state.drive?.currentDrive?.external) {
+      console.error(
+        "[addFilesToDrive] Error: Cannot expand external directory",
+        files,
+        externalCids,
+        externalUrl
+      );
+      return;
+    }
+
     //Transform files to usable data for displaying state (upload panel items, optimistic drives)
     let fileInfo;
     if (files) {
