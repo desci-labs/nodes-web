@@ -1,6 +1,6 @@
 import FileUploaderBare from "@components/organisms/FileUploaderBare";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
-import { IconFile, IconIpfs } from "@icons";
+import { IconFile, IconIpfs, IconWarning } from "@icons";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { SpinnerCircular } from "spinners-react";
@@ -10,6 +10,7 @@ import { strIsCid } from "@src/components/driveUtils";
 import { addFilesToDrive } from "@src/state/drive/driveSlice";
 import { useSetter } from "@src/store/accessors";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
+import { useDrive } from "@src/state/drive/hooks";
 
 interface Props {
   close: () => void;
@@ -21,11 +22,13 @@ export const ButtonAddData = ({ close }: Props) => {
     []
   );
   const [loading, setLoading] = useState(false);
+  const { currentDrive } = useDrive();
   const dispatch = useSetter();
 
   const [showCidFields, setShowCidFields] = useState(false);
   const [externalCidName, setExternalCidName] = useState("");
   const [externalCid, setExternalCid] = useState("");
+  const [externalCidError, setExternalCidError] = useState("");
 
   const handleOnFileUploadClick = () => {
     document.body.onfocus = () => {
@@ -53,6 +56,15 @@ export const ButtonAddData = ({ close }: Props) => {
 
   const handleAddExternalCid = () => {
     if (!externalCidName.length || !externalCid.length) return;
+    if (!strIsCid(externalCid)) {
+      setExternalCidError("Invalid CID provided");
+      return;
+    }
+    if (currentDrive?.external) {
+      setExternalCidError("Can't add files to external directory");
+      return;
+    }
+
     dispatch(
       addFilesToDrive({
         componentType: ResearchObjectComponentType.DATA,
@@ -67,6 +79,7 @@ export const ButtonAddData = ({ close }: Props) => {
     return () => {
       setExternalCidName("");
       setExternalCid("");
+      setExternalCidError("");
     };
   }, []);
 
@@ -123,40 +136,50 @@ export const ButtonAddData = ({ close }: Props) => {
         </div>
       </div>
       {showCidFields && (
-        <div className="flex gap-3 self-start">
-          <InsetLabelSmallInput
-            className="w-[270px]"
-            label="External CID Name"
-            value={externalCidName}
-            onChange={(e) => {
-              const value = e.target.value;
-              const lastChar = value[value.length - 1];
-              if (lastChar !== "/") {
-                setExternalCidName(value);
-              } else {
-                setExternalCidName(externalCidName);
-              }
-            }}
-          />
-          <InsetLabelSmallInput
-            className="w-full"
-            label="External CID"
-            value={externalCid}
-            onChange={(e) => setExternalCid(e.target.value)}
-          />
-          <PrimaryButton
-            disabled={
-              !(
-                externalCidName.length &&
-                externalCid.length &&
-                strIsCid(externalCid)
-              )
-            }
-            onClick={handleAddExternalCid}
-          >
-            Add
-          </PrimaryButton>
-        </div>
+        <>
+          <div className="self-start">
+            <p className="flex gap-2 font-medium items-center bg-neutrals-gray-1 px-2 py-1 rounded-md w-fit">
+              <IconWarning /> Experimental Feature
+            </p>
+            <p className=" text-sm">
+              This feature is experimental. Please report any issues using the
+              feedback form, and include the CID used.
+            </p>
+            <p className="text-rose-400 text-sm">{externalCidError}</p>
+          </div>
+          <div className="flex gap-3 self-start">
+            <InsetLabelSmallInput
+              className="w-[270px]"
+              label="External CID Name"
+              value={externalCidName}
+              onChange={(e) => {
+                const value = e.target.value;
+                const lastChar = value[value.length - 1];
+                if (lastChar !== "/") {
+                  setExternalCidName(value);
+                } else {
+                  setExternalCidName(externalCidName);
+                }
+              }}
+            />
+            <InsetLabelSmallInput
+              className="w-full"
+              label="External CID"
+              value={externalCid}
+              onChange={(e) => {
+                setExternalCid(e.target.value);
+                if (!strIsCid(e.target.value))
+                  setExternalCidError("Invalid CID provided");
+              }}
+            />
+            <PrimaryButton
+              disabled={!(externalCidName.length && externalCid.length)}
+              onClick={handleAddExternalCid}
+            >
+              Add
+            </PrimaryButton>
+          </div>
+        </>
       )}
     </>
   );
