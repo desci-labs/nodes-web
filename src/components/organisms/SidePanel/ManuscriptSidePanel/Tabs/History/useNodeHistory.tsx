@@ -1,4 +1,3 @@
-import { LS_PENDING_COMMITS_KEY } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./history.scss";
 import { ResearchObjectV1History } from "@desci-labs/desci-models";
@@ -12,7 +11,7 @@ import { setNodeHistory, setPendingCommits } from "@src/state/nodes/history";
 import { tags } from "@src/state/api/tags";
 import { publishApi } from "@src/state/api/publish";
 
-const LS_HISTORY_MAP = "DESCI::node-version-history";
+// const LS_HISTORY_MAP = "DESCI::node-version-history";
 
 export default function useNodeHistory() {
   const dispatch = useSetter();
@@ -67,7 +66,7 @@ export default function useNodeHistory() {
   }, [history, pendingHistory]);
 
   useEffect(() => {
-    let isMounted = true
+    let isMounted = true;
     if (loadRef.current === false) {
       setLoadingChain(true);
     }
@@ -126,8 +125,9 @@ export default function useNodeHistory() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     return () => {
-      isMounted = false
-    }
+      isMounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentObjectId]);
 
   return {

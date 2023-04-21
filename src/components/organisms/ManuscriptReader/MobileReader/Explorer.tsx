@@ -5,17 +5,26 @@ import {
   SwitchButton,
 } from "@src/components/atoms/SwitchBar/SwitchBar";
 import { useSetter } from "@src/store/accessors";
-import { useNodeReader } from "@src/state/nodes/hooks";
+import { useHistoryReader, useNodeReader } from "@src/state/nodes/hooks";
 import ComponentsPreview from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/Components/ComponentsPreview";
 import HistoryPreview from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/History/Preview";
 import CreditsPreview from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/SourceTab/CreditsPreview";
+import useNodeHistory from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/History/useNodeHistory";
 
 export default function Explorer() {
   const dispatch = useSetter();
   const { researchPanelTab } = useNodeReader();
+  const { selectedHistoryId } = useHistoryReader();
+  const { history } = useNodeHistory();
 
   const onSetResearchPanelTab = (tab: ResearchTabs) =>
     dispatch(setResearchPanelTab(tab));
+
+  const isPreviousHistory =
+    history &&
+    selectedHistoryId &&
+    Number(selectedHistoryId) < history.length - 1;
+  console.log("old version", isPreviousHistory, selectedHistoryId, history);
 
   return (
     <>
