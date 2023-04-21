@@ -1,5 +1,6 @@
 import {
   CodeComponent,
+  ExternalLinkComponent,
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
@@ -91,6 +92,9 @@ function ComponentPreview({
 
       case ResearchObjectComponentType.CODE:
         return (component as CodeComponent).payload.externalUrl;
+
+      case ResearchObjectComponentType.LINK:
+        return (component as ExternalLinkComponent).payload.url;
     }
   };
 
