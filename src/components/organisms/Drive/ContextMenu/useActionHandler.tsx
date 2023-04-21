@@ -11,6 +11,7 @@ import { setComponentStack, setManifestData } from "@src/state/nodes/viewer";
 import { useSetter } from "@src/store/accessors";
 import { setFileMetadataBeingEdited } from "@src/state/drive/driveSlice";
 import { setComponentTypeBeingAssignedTo } from "@src/state/drive/driveSlice";
+import { useSetNodeCoverMutation } from "@src/state/api/nodes";
 
 const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
 
@@ -38,6 +39,10 @@ export const getActionState = (action: Actions, file: DriveObject) => {
           file.componentType === ResearchObjectComponentType.CODE
         ),
       };
+    case Actions.SET_NODE_COVER:
+      return {
+        disabled: file.componentType !== ResearchObjectComponentType.PDF,
+      };
     default:
       return { disabled: true };
   }
@@ -46,6 +51,7 @@ export const getActionState = (action: Actions, file: DriveObject) => {
 export default function useActionHandler() {
   const dispatch = useDispatch();
   const { manifest: manifestData, currentObjectId } = useNodeReader();
+  const [setCover, { isLoading: isSettingCover }] = useSetNodeCoverMutation();
 
   async function preview(file: DriveObject) {
     if (
@@ -63,6 +69,20 @@ export default function useActionHandler() {
       }
     } else {
       window.open(`${IPFS_URL}/${file.cid}`, "_blank");
+    }
+  }
+
+  async function setNodeCover(file: DriveObject) {
+    if (isSettingCover) return;
+    if (file.componentType === ResearchObjectComponentType.PDF) {
+      const component = manifestData?.components.find(
+        (c: ResearchObjectV1Component) => c.payload.url === file.cid
+      );
+      if (component) {
+        setCover({ cid: component.payload.url!, nodeUuid: currentObjectId! });
+      }
+    } else {
+      // show error toast or smth
     }
   }
 
@@ -127,6 +147,7 @@ export default function useActionHandler() {
     REMOVE: remove,
     ASSIGN_TYPE: assignType,
     EDIT_METADATA: editMetadata,
+    SET_NODE_COVER: setNodeCover,
   };
 
   return handler;
