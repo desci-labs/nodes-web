@@ -14,6 +14,7 @@ import {
 } from "@src/state/preferences/preferencesSlice";
 import AdminAnalyticsScreen from "../screens/adminAnalyticsScreen";
 import { useGetUser } from "@src/hooks/useGetUser";
+import { AppPreferences } from "@src/state/preferences/types";
 
 export enum TOOLBAR_ENTRY {
   collection,
@@ -88,7 +89,13 @@ const Toolbar = () => {
   const dispatch = useSetter();
   const { activeToolbar, isToolbarVisible } = useGetter(
     (state) => state.preferences
-  );
+  ) as AppPreferences;
+
+  useEffect(() => {
+    if (activeToolbar == TOOLBAR_ENTRY.collection) {
+      dispatch(toggleToolbar(false));
+    }
+  }, [activeToolbar]);
 
   const closePane = () => {
     restoreScroll();

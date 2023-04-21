@@ -127,7 +127,7 @@ export default React.memo(function PaneNodeCollection() {
             Create Research Node
           </PrimaryButton>
         </div>
-        <PerfectScrollbar className="overflow-y-scroll w-full justify-center flex h-full">
+        <PerfectScrollbar className="overflow-y-scroll w-full justify-center flex h-full px-4 sm:px-0">
           {isLoading ? <NodeCollectionLoader /> : <LoadedNodesCollection />}
         </PerfectScrollbar>
         <CreateNodeModal isOpen={isOpen} onDismiss={() => setOpen(false)} />

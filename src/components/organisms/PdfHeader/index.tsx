@@ -220,11 +220,12 @@ const PdfHeader = () => {
             >
               Share
             </PrimaryButton>
-          ) : (
+          ) : null}
+          {!canShare && hideHeader ? (
             <div className="mr-4 rounded-lg bg-neutrals-gray-1 text-neutrals-gray-7 text-[10px] px-2 py-1">
               Privately Shared
             </div>
-          )}
+          ) : null}
         </div>
         {userProfile && userProfile.email ? (
           <UserMenu address={userProfile.email} name={userProfile.email} />
