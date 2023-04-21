@@ -62,7 +62,7 @@ export default function DriveRow({
   const contextRef = useRef<HTMLDivElement>();
   const { init } = useDriveContext(file);
   const { handleDbClick } = useInteractionHandler();
-  const { manifestCid, mode } = useNodeReader();
+  const { publicView, shareId, manifestCid, mode } = useNodeReader();
 
   const dispatch = useSetter();
 
@@ -98,12 +98,16 @@ export default function DriveRow({
       <li
         className={`${everyRow} ${
           deprecated ? "hidden" : ""
-        } p-2 cursor-pointer group`}
+        } p-2 cursor-pointer group ${
+          mode === "reader" ? "pointer-events-none" : ""
+        }`}
         onDoubleClick={(e) => {
           e.stopPropagation();
         }}
         onClick={() => {
-          dispatch(starComponentThunk({ item: file }));
+          if (mode === "editor") {
+            dispatch(starComponentThunk({ item: file }));
+          }
         }}
       >
         <IconStar

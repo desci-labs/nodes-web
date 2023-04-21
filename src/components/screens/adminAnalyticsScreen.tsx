@@ -31,7 +31,7 @@ const AdminAnalyticsScreen = () => {
 
   return (
     <div
-      className={`h-screen text-white w-screen fixed left-0 pl-16 pt-14 top-0 z-[102] will-change-transform transition-opacity duration-150 bg-neutrals-black opacity-100`}
+      className={`h-screen text-white w-screen overflow-y-auto pb-10 fixed left-0 pl-16 pt-14 top-0 z-[102] will-change-transform transition-opacity duration-150 bg-neutrals-black opacity-100`}
     >
       <div className="flex flex-col mt-6 items-center ">
         <h1 className="text-xl font-semibold">Admin Analytics</h1>

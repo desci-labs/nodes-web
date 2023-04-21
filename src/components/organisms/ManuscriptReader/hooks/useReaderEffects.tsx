@@ -87,7 +87,7 @@ export default function useReaderEffects(publicView: boolean = false) {
    */
   useEffect(() => {
     if (!cid || !cid.length || cid.includes("/start")) {
-      if (userProfile) {
+      if (userProfile && mode !== "reader") {
         /**
          * Default view when on nodes/start
          */

@@ -99,7 +99,7 @@ export default function useManuscriptReader(publicView: boolean = false) {
     if ("uuid" in parsedManuscript && !!parsedManuscript.uuid) {
       const { uuid } = parsedManuscript;
 
-      setCurrentPdf("");
+      dispatch(setCurrentPdf(""));
       setIsNew(false);
       setIsAnnotating(false);
       const currentId = uuid;
