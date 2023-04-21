@@ -23,7 +23,6 @@ export default function Explorer() {
   const isPreviousHistory = selectedHistoryId
     ? history && Number(selectedHistoryId) < history.length - 1
     : false;
-  console.log("old version", isPreviousHistory, selectedHistoryId, history);
 
   return (
     <>

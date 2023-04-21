@@ -10,6 +10,7 @@ import { useNodeReader } from "@src/state/nodes/hooks";
 import Header from "@components/organisms/ManuscriptReader/MobileReader/Header";
 import {
   setMobileView,
+  setShowMobileWarning,
   setShowComponentStack,
 } from "@src/state/preferences/preferencesSlice";
 import { useSetter } from "@src/store/accessors";
@@ -17,6 +18,7 @@ import { useAppPreferences } from "@src/state/preferences/hooks";
 import Placeholder from "@components/organisms/ManuscriptReader/Placeholder";
 import Explorer from "@components/organisms/ManuscriptReader/MobileReader/Explorer";
 import ComponentStackModal from "@components/organisms/ManuscriptReader/MobileReader/ComponentStackModal";
+import { IconX } from "@src/icons";
 
 const MobileWrapper = styled(FlexRow)`
   background-color: transparent;
@@ -62,6 +64,7 @@ const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
 
   useEffect(() => {
     dispatch(setMobileView(true));
+    dispatch(setShowMobileWarning(true));
 
     return () => {
       dispatch(setMobileView(false));
@@ -79,7 +82,42 @@ const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
           onDismiss={() => dispatch(setShowComponentStack(false))}
         />
       )}
+      <MobileWarning />
     </MobileWrapper>
+  );
+};
+
+const MobileWarning = () => {
+  const dispatch = useSetter();
+  const { mobileViewWarning } = useAppPreferences();
+
+  return (
+    <div
+      className={`absolute bottom-0 w-full bg-transparent m-0 px-4 pb-4 animate-slideFromBottom ${
+        !mobileViewWarning ? "hidden" : ""
+      }`}
+    >
+      <div className="bg-black p-2 rounded-lg flex items-start justify-between">
+        <span className="inline-block text-white text-[12px]">
+          Publishing research objects helps make science richer and more
+          reproducible. For the best experience, view on desktop.{" "}
+          <a
+            href="https://docs.desci.com/"
+            target="_blank"
+            rel="noreferrer"
+            className="text-tint-primary"
+          >
+            Learn More
+          </a>
+        </span>
+        <button
+          className="cursor-pointer p-2 stroke-black dark:stroke-white hover:stroke-muted-300 hover:dark:stroke-muted-300"
+          onClick={() => dispatch(setShowMobileWarning(false))}
+        >
+          <IconX />
+        </button>
+      </div>
+    </div>
   );
 };
 
