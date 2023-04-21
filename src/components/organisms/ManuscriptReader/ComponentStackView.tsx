@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
 import Paper from "@components/organisms/Paper";
 import { useManuscriptController } from "./ManuscriptController";
-// import CodeViewer from "@components/organisms/CodeViewer";
-
 import Youtube from "@components/atoms/Youtube";
 import {
   ExternalLinkComponent,
@@ -50,8 +48,6 @@ const ComponentStackView = (props: ComponentStackViewProps) => {
   ]);
   const { manifest: manifestData, componentStack } = useNodeReader();
 
-  // console.log("componentStack", JSON.stringify(componentStack));
-
   const renderComponent = (component: ResearchObjectV1Component) => {
     __log("ComponentStackView::renderComponent", component);
     switch (component.type) {
@@ -76,17 +72,10 @@ const ComponentStackView = (props: ComponentStackViewProps) => {
     }
   };
 
-  // __log(
-  //   `ComponentStackView::render componentStack=`,
-  //   JSON.stringify(componentStack)
-  // );
-  // console.log("component stack", componentStack);
-
   useEffect(() => {
     if (forceRefreshDrive) setTimeout(() => setForceRefreshDrive(false));
   }, [forceRefreshDrive, setForceRefreshDrive]);
 
-  __log("ComponentStackView::render", componentStack);
   return (
     <ViewWrapper>
       {/**
@@ -122,15 +111,6 @@ const ComponentStackView = (props: ComponentStackViewProps) => {
             );
           })
       )}
-
-      {/* <PaperLoader
-        hidden={
-          !(
-            currentObjectId &&
-            (viewLoading || !componentStack || !componentStack.length)
-          )
-        }
-      /> */}
     </ViewWrapper>
   );
 };
