@@ -20,14 +20,20 @@ export default function Explorer() {
   const onSetResearchPanelTab = (tab: ResearchTabs) =>
     dispatch(setResearchPanelTab(tab));
 
-  const isPreviousHistory =
-    history &&
-    selectedHistoryId &&
-    Number(selectedHistoryId) < history.length - 1;
+  const isPreviousHistory = selectedHistoryId
+    ? history && Number(selectedHistoryId) < history.length - 1
+    : false;
   console.log("old version", isPreviousHistory, selectedHistoryId, history);
 
   return (
     <>
+      {isPreviousHistory && (
+        <div className="w-full py-2 flex items-center justify-center bg-tint-primary">
+          <span className="text-sm">
+            You're viewing a previous version of this node.
+          </span>
+        </div>
+      )}
       <div className="px-4 text-white">
         <SwitchBar style={{ margin: "1rem 0 1rem 0", height: 35 }}>
           <SwitchButton

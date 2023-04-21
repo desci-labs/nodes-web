@@ -9,6 +9,7 @@ export default function useNodeCover() {
   const pdf = manifest?.components.find(
     (c) => c.type === ResearchObjectComponentType.PDF
   );
+  console.log(pdf);
   const { isLoading, data, isSuccess } = useNodesMediaCoverQuery(
     { cid: pdf?.payload?.url, nodeUuid: currentObjectId! },
     {

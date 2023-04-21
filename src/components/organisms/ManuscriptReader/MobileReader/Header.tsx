@@ -13,6 +13,7 @@ export default function Header() {
   const { dpid } = useComponentDpid();
   const { cover } = useNodeCover();
   const headerRef = useRef<HTMLDivElement>();
+
   const onHandleShare = async () => {
     try {
       await navigator.share({
