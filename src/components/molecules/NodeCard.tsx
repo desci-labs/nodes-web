@@ -61,7 +61,7 @@ const NodeCard = ({
         <div className="flex items-center gap-2">
           {updatedAt ? (
             <>
-              <div className="rounded-md bg-black text-white font-bold text-sm px-2 py-0.5">
+              <div className="rounded-md bg-black text-white font-bold text-xs md:text-sm px-2 py-0.5">
                 Creator: Author
               </div>
               <div className="text-[11px] text-neutrals-gray-5">
