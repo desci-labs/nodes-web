@@ -2,14 +2,17 @@ import { ResearchNodeIcon } from "@src/components/Icons";
 import { IconShare } from "@src/icons";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import useComponentDpid from "@components/organisms/Drive/hooks/useComponentDpid";
+import useNodeCover from "@components/organisms/ManuscriptReader/hooks/useNodeCover";
+import React, { useCallback, useRef } from "react";
+import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 
-const BANNER_URL =
-  "https://images.unsplash.com/photo-1679669693237-74d556d6b5ba?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2298&q=80";
+const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
 
 export default function Header() {
   const { manifest } = useNodeReader();
   const { dpid } = useComponentDpid();
-
+  const { cover } = useNodeCover();
+  const headerRef = useRef<HTMLDivElement>();
   const onHandleShare = async () => {
     try {
       await navigator.share({
@@ -22,16 +25,36 @@ export default function Header() {
     }
   };
 
+  const onHandleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    if (headerRef.current === e.target) {
+      const pdf = manifest?.components.find(
+        (c) => c.type === ResearchObjectComponentType.PDF
+      );
+      pdf && window.open(`${IPFS_URL}/${pdf.payload.url}`, "_blank");
+    }
+  };
+
+  const handleRef = useCallback((node: HTMLDivElement) => {
+    headerRef.current = node;
+  }, []);
+
   return (
     <div
-      className="h-[27%] w-full p-2 mobile-reader-header relative flex items-end overflow-hidden shrink-0"
+      className="h-[30%] min-h-[250px] w-full p-2 relative flex items-end overflow-hidden shrink-0"
       style={{
-        backgroundImage: `url(${BANNER_URL})`,
+        backgroundImage: `linear-gradient(
+          180deg,
+          rgba(2, 0, 36, 0.015865721288515378) 0%,
+          rgba(0, 0, 0, 0.8618040966386554) 100%
+        ), url(${cover})`,
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
         backgroundSize: "cover",
         objectFit: "cover",
       }}
+      ref={handleRef}
+      onClick={onHandleClick}
     >
       <IconShare
         width={30}

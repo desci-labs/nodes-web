@@ -13,6 +13,7 @@ import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { useDrive } from "@src/state/drive/hooks";
 import { addFilesToDrive } from "@src/state/drive/driveSlice";
+import { isMobile } from "react-device-detect";
 
 const PaneDrive = () => {
   const {
@@ -95,7 +96,7 @@ const PaneDrive = () => {
             <DriveTable />
           </div>
         </PerfectScrollbar>
-        <SidePanelStorage />
+        {!isMobile && <SidePanelStorage />}
       </div>
     </ContextMenuProvider>
   );

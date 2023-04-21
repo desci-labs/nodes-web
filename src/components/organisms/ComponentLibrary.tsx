@@ -343,7 +343,10 @@ export const findTarget = (
     }
   );
 
-  return foundEntry;
+  return (
+    foundEntry ||
+    COMPONENT_LIBRARY.find((c) => c.title.toLowerCase() === "unknown")
+  );
 };
 
 export default ComponentLibrary;

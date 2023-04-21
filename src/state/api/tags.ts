@@ -4,6 +4,7 @@ export enum tags {
   collection = "collection",
   nodeVersions = "nodeVersions",
   privateShare = "privateShare",
+  mediaCover = "mediaCover",
 }
 
 export enum nodes {}

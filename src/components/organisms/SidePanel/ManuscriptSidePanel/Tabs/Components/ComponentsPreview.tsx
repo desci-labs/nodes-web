@@ -7,33 +7,51 @@ import EmptyPreview from "@src/components/molecules/EmptyPreview";
 import { findTarget } from "@src/components/organisms/ComponentLibrary";
 import { IconData } from "@src/icons";
 import { useNodeReader } from "@src/state/nodes/hooks";
+import { setComponentStack, toggleMode } from "@src/state/nodes/viewer";
+import { setShowComponentStack } from "@src/state/preferences/preferencesSlice";
+import { useSetter } from "@src/store/accessors";
+import { useMemo } from "react";
+
+const ROOT_COMPONENTS_PATHS = [
+  "root/Research Reports",
+  "root/Code Repositories",
+  "root/Data",
+];
+const isDriveComponent = (component: ResearchObjectV1Component) =>
+  !ROOT_COMPONENTS_PATHS.includes(component.payload?.path) &&
+  component.type !== ResearchObjectComponentType.DATA_BUCKET;
 
 export default function ComponentsPreview() {
   const { manifest: manifestData } = useNodeReader();
 
-  const hasDataComponent =
-    manifestData &&
-    manifestData.components.filter(
-      (c) => c.type === ResearchObjectComponentType.DATA
-    ).length;
-  const components = manifestData && manifestData.components;
-  let componentsWithOneData = components;
+  const components = useMemo(() => {
+    const hasDataComponent =
+      manifestData &&
+      manifestData.components.filter(
+        (c) => c.type === ResearchObjectComponentType.DATA
+      ).length;
+    const components = manifestData && manifestData.components;
+    let componentsWithOneData = components;
 
-  if (hasDataComponent) {
-    componentsWithOneData = components?.filter(
-      (c) => c.type !== ResearchObjectComponentType.DATA
-    );
+    if (hasDataComponent) {
+      componentsWithOneData = components?.filter(
+        (c) => c.type !== ResearchObjectComponentType.DATA
+      );
 
-    componentsWithOneData?.push({
-      name: "Node Data",
-      id: "__virtual_node_data",
-      payload: {},
-      type: ResearchObjectComponentType.DATA,
-      icon: IconData,
-    });
-  }
+      componentsWithOneData?.push({
+        name: "Node Data",
+        id: "__virtual_node_data",
+        payload: {},
+        type: ResearchObjectComponentType.DATA,
+        icon: IconData,
+      });
+    }
 
-  if (!components || components?.length === 0) {
+    // Remove the default 3 (data, code, reports) added components
+    return componentsWithOneData?.filter(isDriveComponent);
+  }, [manifestData]);
+
+  if (!components?.length || components?.length > 7) {
     return (
       <EmptyPreview
         title="No Components"
@@ -44,7 +62,7 @@ export default function ComponentsPreview() {
 
   return (
     <div className="flex flex-col gap-2">
-      {components?.map((component, i) => (
+      {components.map((component, i) => (
         <ComponentPreview key={i} component={component} />
       ))}
     </div>
@@ -57,6 +75,9 @@ function ComponentPreview({
   component: ResearchObjectV1Component;
 }) {
   const target = findTarget(component);
+  const dispatch = useSetter();
+  const { mode } = useNodeReader();
+
   if (!target) return null;
 
   const urlForComponent = (c: ResearchObjectV1Component) => {
@@ -73,12 +94,29 @@ function ComponentPreview({
     }
   };
 
+  const onHandleClick = () => {
+    if (
+      [
+        ResearchObjectComponentType.DATA,
+        ResearchObjectComponentType.DATA_BUCKET,
+      ].includes(component.type)
+    ) {
+      // dispatch(navigateToDriveByPath(component.payload.path));
+      dispatch(setComponentStack([component]));
+      dispatch(setShowComponentStack(true));
+      mode === "editor" && dispatch(toggleMode());
+    } else {
+      const link = urlForComponent(component);
+
+      if (link) return window.open(link, "_blank");
+      // TODO: show toast asking users to view node in desktop
+    }
+  };
+
   return (
     <div
       className="flex gap-4 items-center bg-zinc-200 bg-neutrals-black active:bg-neutrals-gray-5 rounded-lg px-4 py-2 border border-black"
-      onClick={() => {
-        window.open(urlForComponent(component), "_blank");
-      }}
+      onClick={onHandleClick}
     >
       <target.icon
         width={24}
@@ -86,7 +124,7 @@ function ComponentPreview({
         wrapperClassName="w-[30px] h-[30px]"
         className="p-[3px] fill-white stroke-white"
       />
-      <span className="font-bold">{target.title}</span>
+      <span className="font-bold capitalize">{component.name}</span>
     </div>
   );
 }
