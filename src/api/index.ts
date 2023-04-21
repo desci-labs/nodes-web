@@ -440,22 +440,12 @@ export const updateDag = async ({
   return data;
 };
 
-export const deleteDatasetComponent = async (
-  uuid: string,
-  manifest: ResearchObjectV1,
-  rootCid: string
-) => {
-  const formData = new FormData();
-  formData.append("uuid", uuid);
-  formData.append("manifest", JSON.stringify(manifest));
-  formData.append("rootCid", rootCid);
-
+export const deleteData = async (uuid: string, path: string) => {
   const { data } = await axios.post(
     `${SCIWEAVE_URL}/v1/data/delete`,
     {
       uuid,
-      rootCid,
-      manifest: JSON.stringify(manifest),
+      path,
     },
     config()
   );
