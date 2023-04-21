@@ -19,10 +19,10 @@ import { isMobile } from "react-device-detect";
 
 const RenderedDrive = () => (
   <div
-    className={`pt-10 ${
+    className={`${
       isMobile
-        ? "w-full h-full "
-        : "w-[calc(100%-320px)] h-[calc(100vh-56px)] bg-neutrals-black absolute left-0"
+        ? "w-full h-fit"
+        : "pt-10 w-[calc(100%-320px)] h-[calc(100vh-56px)] bg-neutrals-black absolute left-0"
     }`}
   >
     <PaneDrive />
@@ -96,9 +96,9 @@ const ComponentStackView = (props: ComponentStackViewProps) => {
       (componentStack.filter(
         (a) =>
           a &&
-          a.type != ResearchObjectComponentType.DATA &&
-          a.type != ResearchObjectComponentType.UNKNOWN &&
-          a.type != ResearchObjectComponentType.DATA_BUCKET
+          a.type !== ResearchObjectComponentType.DATA &&
+          a.type !== ResearchObjectComponentType.UNKNOWN &&
+          a.type !== ResearchObjectComponentType.DATA_BUCKET
       ).length < 1 &&
         !forceRefreshDrive &&
         manifestData) ? (
