@@ -68,7 +68,7 @@ export default function Footer() {
             <IconGitbook color="black" width={30} />
           </a>
           <a
-            href="https://discord.gg/BeJ4dxXdaJ"
+            href="https://discord.gg/A5P9fgB5Cf"
             target="_blank"
             rel="noreferrer"
             className="mx-2 dark:bg-tint-primary dark:hover:bg-tint-primary-hover p-1 w-[30px] h-[30px] rounded-full flex items-center justify-center"

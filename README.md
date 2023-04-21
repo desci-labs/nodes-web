@@ -140,6 +140,6 @@ Notes:
 
 # Contributing
 
-- Make a PR or issue, or hit us up on [Discord](https://discord.gg/BeJ4dxXdaJ)
+- Make a PR or issue, or hit us up on [Discord](https://discord.gg/A5P9fgB5Cf)
 - We would like to open up our task management software, let us know if interested in early access
 - We will share roadmap and 2023 development targets soon
