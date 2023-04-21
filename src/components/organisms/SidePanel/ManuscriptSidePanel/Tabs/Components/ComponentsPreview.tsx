@@ -103,6 +103,7 @@ function ComponentPreview({
       [
         ResearchObjectComponentType.DATA,
         ResearchObjectComponentType.DATA_BUCKET,
+        ResearchObjectComponentType.UNKNOWN,
       ].includes(component.type)
     ) {
       // dispatch(navigateToDriveByPath(component.payload.path));

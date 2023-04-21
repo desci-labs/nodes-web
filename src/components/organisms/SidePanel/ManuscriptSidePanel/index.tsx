@@ -112,7 +112,7 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
   );
   const refVideo = useRef(null);
   useEffect(() => {
-    window.localStorage.setItem("closeCube", closeCube ? 1 : 0);
+    window.localStorage.setItem("closeCube", closeCube ? "1" : "0");
   }, [closeCube]);
 
   useEffect(() => {
