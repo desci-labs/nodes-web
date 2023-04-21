@@ -107,11 +107,13 @@ const DriveTable: React.FC = () => {
           <li
             className={`${everyRow} ${headerRow} ${deprecated ? "hidden" : ""}`}
           >
-            <IconStar
-              className="fill-tint-primary stroke-tint-primary"
-              width={18}
-              height={18}
-            />
+            {mode === "reader" ? null : (
+              <IconStar
+                className="fill-tint-primary stroke-tint-primary"
+                width={18}
+                height={18}
+              />
+            )}
           </li>
           <li className={`${everyRow} ${headerRow} !justify-start`}>
             File Name

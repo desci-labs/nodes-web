@@ -50,13 +50,13 @@ const ContentWrapper = styled(FlexColumn)`
   height: 100%;
 `;
 const ManuscriptHeader = styled(FlexRowSpaceBetween)`
-  padding: 1rem 1.625rem;
+  padding: 0.6rem 1.625rem;
   flex: unset;
   justify-content: center;
 `;
 const ManuscriptTitle = styled.p.attrs({
   className:
-    "transition-all duration-750 select-none text-sm font-bold text-left w-full",
+    "group-hover:text-neutrals-gray-7 transition-all duration-750 select-none text-sm font-bold text-left w-full cursor-pointer",
 })``;
 
 interface ManuscriptSidePanelProps {
@@ -82,7 +82,7 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
 
   const onSetResearchPanelTab = (tab: ResearchTabs) =>
     dispatch(setResearchPanelTab(tab));
-  const [doPad] = useState(false);
+
   const { saveManifest } = useSaveManifest();
   const userProfile = useUser();
 
@@ -107,7 +107,13 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
     ResearchObjectV1 | undefined
   >(manifestData);
   const [, setMounted] = useState(false);
+  const [closeCube, setCloseCube] = useState(
+    window.localStorage.getItem("closeCube") == "1"
+  );
   const refVideo = useRef(null);
+  useEffect(() => {
+    window.localStorage.setItem("closeCube", closeCube ? 1 : 0);
+  }, [closeCube]);
 
   useEffect(() => {
     const didPush = !!nodeVersions;
@@ -211,67 +217,73 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
             onClick={handlePanelClose}
           />
         ) : null}
-
-        <ManuscriptHeader>
-          <ManuscriptTitle>
-            {mode === "editor" ? <>Edit Node</> : "Research Node Navigator"}
-          </ManuscriptTitle>
-          {/* <IconResearchObject /> */}
-        </ManuscriptHeader>
-        <div
-          className={` relative overflow-hidden z-[-1]`}
-          style={{ height: 276 }}
-        >
+        <div className="flex flex-col">
           <div
-            className={`overflow-hidden relative w-[420px] h-[260px]`}
-            key={`cube-wrapper-${mode}-${shouldBeBlue}`}
-            style={{
-              filter: `${
-                mode === "reader" || shouldBeBlue
-                  ? null
-                  : "sepia(1.0) saturate(0)"
-              }`,
+            className="cursor-pointer group"
+            onClick={() => setCloseCube(!closeCube)}
+          >
+            <ManuscriptHeader>
+              <ManuscriptTitle>
+                {mode === "editor" ? <>Edit Node</> : "Research Node Navigator"}
+              </ManuscriptTitle>
+              {/* <IconResearchObject /> */}
+            </ManuscriptHeader>
+            <div
+              className={`duration-75 relative overflow-hidden z-[-1] transition-all`}
+              style={{
+                height: closeCube ? 0 : 172,
+                marginBottom: closeCube ? 0 : 10,
+              }}
+            >
+              <div
+                className={`overflow-hidden relative w-[420px] h-[260px]`}
+                key={`cube-wrapper-${mode}-${shouldBeBlue}`}
+                style={{
+                  filter: `${shouldBeBlue ? null : "sepia(1.0) saturate(0)"}`,
+                }}
+              >
+                <video
+                  loop
+                  ref={refVideo}
+                  playsInline
+                  autoPlay
+                  key={`cube-panel`}
+                  muted
+                  onTimeUpdate={() => {
+                    if (refVideo.current) {
+                      playTime = (refVideo.current! as HTMLVideoElement)
+                        .currentTime;
+                    }
+                  }}
+                  src={`https://d3ibh1pfr1vlpk.cloudfront.net/two.mp4`}
+                  className="absolute "
+                  style={{
+                    left: "-50px",
+                    height: 260,
+                    top: -35,
+                  }}
+                ></video>
+              </div>
+            </div>
+          </div>
+          <PrimaryButton
+            disabled={isCommitPanelOpen}
+            className={`${
+              mode === "reader"
+                ? "opacity-0 h-0 !mx-0 !py-0 overflow-hidden"
+                : "opacity-100 mx-4 py-1 shadow-md hover:shadow-none"
+            } block transition-all duration-200 text-sm font-medium`}
+            // disabled={!changesToCommit.length} // uncomment when this func is implemented
+            onClick={() => {
+              dispatch(toggleCommitPanel(true));
             }}
           >
-            <video
-              loop
-              ref={refVideo}
-              playsInline
-              autoPlay
-              key={`cube-panel`}
-              muted
-              onTimeUpdate={() => {
-                if (refVideo.current) {
-                  playTime = (refVideo.current! as HTMLVideoElement)
-                    .currentTime;
-                }
-              }}
-              src={`https://d3ibh1pfr1vlpk.cloudfront.net/two.mp4`}
-              className="absolute"
-              style={{
-                left: "-50px",
-                height: 260,
-                top: -35,
-              }}
-            ></video>
-          </div>
+            {isCommitPanelOpen
+              ? "Finish in Commit Panel (Left)"
+              : "Publish Node"}
+          </PrimaryButton>
         </div>
-        <PrimaryButton
-          disabled={isCommitPanelOpen}
-          className={`${
-            mode === "reader"
-              ? "opacity-0 h-0 !mx-0 !py-0 overflow-hidden"
-              : "opacity-100 mt-4 mx-4 py-1 shadow-md hover:shadow-none"
-          } block transition-all duration-200 text-sm font-medium`}
-          // disabled={!changesToCommit.length} // uncomment when this func is implemented
-          onClick={() => {
-            dispatch(toggleCommitPanel(true));
-          }}
-          style={{ marginRight: doPad ? 35 : undefined }}
-        >
-          {isCommitPanelOpen ? "Finish in Commit Panel (Left)" : "Publish Node"}
-        </PrimaryButton>
-        <div className="px-4" style={{ marginRight: doPad ? 15 : undefined }}>
+        <div className="px-4">
           <SwitchBar style={{ margin: "1rem 0 1rem 0", height: 28 }}>
             <SwitchButton
               isSelected={researchPanelTab === ResearchTabs.current}
@@ -302,11 +314,9 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
 
         <PerfectScrollbar className="overflow-auto">
           {canShowDrive && researchPanelTab === ResearchTabs.current ? (
-            <NodeDrive
-              className={`mb-4 ${doPad ? "w-[calc(100%-16px)]" : "w-full"}`}
-            />
+            <NodeDrive className={`mb-4 w-full`} />
           ) : null}
-          <div className={`pl-4 ${doPad ? "pr-8" : "pr-4"}`}>
+          <div className={`pl-4 pr-4`}>
             {researchPanelTab === ResearchTabs.current ? (
               <>
                 <ManuscriptAttributesSection />

@@ -78,7 +78,11 @@ const ShareModal = React.memo((props: ModalProps) => {
       $maxWidth={600}
       $scrollOverlay={true}
     >
-      <div className="px-6 py-5 text-white relative min-w-[600px] min-h-[400px] h-0">
+      <div
+        className={`px-6 py-5 text-white relative min-w-[600px] ${
+          canSharePublished ? "min-h-[400px]" : "min-h-[200px]"
+        } h-0`}
+      >
         <Modal.Header
           title="Share Research Node"
           onDismiss={props?.onDismiss}

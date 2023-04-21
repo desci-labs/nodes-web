@@ -29,7 +29,7 @@ interface ReaderViewerProps {
 }
 export default function Editor({ isLoading }: ReaderViewerProps) {
   const dispatch = useSetter();
-  const { isDraggingFiles, componentStack } = useNodeReader();
+  const { publicView, isDraggingFiles, componentStack } = useNodeReader();
   const { componentTypeBeingAssignedTo } = useDrive();
   const { isToolbarVisible } = useGetter((state) => state.preferences);
   const { showUploadPanel } = useDrive();
@@ -47,7 +47,9 @@ export default function Editor({ isLoading }: ReaderViewerProps) {
 
   return (
     <DragDropZone>
-      {!isToolbarVisible && isDraggingFiles ? <DropTargetFullScreen /> : null}
+      {!isToolbarVisible && isDraggingFiles && !publicView ? (
+        <DropTargetFullScreen />
+      ) : null}
       <AddComponentPopOver
         onDismiss={() => {
           setIsAddingSubcomponent(false);

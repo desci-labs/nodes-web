@@ -97,7 +97,7 @@ export default React.memo(function PaneNodeCollection() {
 
   return (
     <div
-      className={`h-screen w-screen fixed left-0 px-4 pt-3 sm:pl-16 sm:pt-14 top-0 z-[102] will-change-transform transition-opacity duration-150 bg-neutrals-black opacity-100`}
+      className={`h-screen w-screen fixed left-0 pt-3 sm:pl-16 sm:pt-14 top-0 z-[102] will-change-transform transition-opacity duration-150 bg-neutrals-black opacity-100`}
     >
       <div className="flex flex-col pt-20 h-full">
         <div className="flex gap-5 sm:gap-0 flex-col max-w-full sm:flex-row mx-auto pb-5 border-b border-neutrals-gray-3 mb-5 sm:max-w-2xl w-full justify-between items-center">
