@@ -80,34 +80,38 @@ const UserAttestations = () => {
 
   return (
     <>
-      <div className="flex flex-col h=fit w-full max-w-[270px] gap-8 py-8 bg-neutrals-black-2 border-l px-3 border-[#333639] h-[100%] fixed z-1" />
-      <div className="flex flex-col h=fit w-full max-w-[270px] gap-4 py-4 bg-neutrals-black-2 border-l px-3 border-[#333639] h-[100%] relative z-2">
-        <PopOverBasic
-          isVisible={Boolean(selectedAttestation)}
-          title=""
-          onClose={() => setSelectedAttestation(null)}
-        >
-          <div>
-            {selectedAttestation && (
-              <AttestationDetails metaAttestation={selectedAttestation} />
-            )}
+      <div className="flex flex-col h-fit w-full gap-8 py-8 bg-neutrals-black-2 border-l px-3 border-[#333639] h-[100%] fixed z-1" />
+      <div className="flex flex-col h-fit w-full gap-4 py-4 bg-neutrals-black-2 border-l px-3 border-[#333639] h-[100%] relative z-2">
+        <div className="max-w-[270px] mx-auto pb-8">
+          <PopOverBasic
+            isVisible={Boolean(selectedAttestation)}
+            title=""
+            onClose={() => setSelectedAttestation(null)}
+          >
+            <div>
+              {selectedAttestation && (
+                <AttestationDetails metaAttestation={selectedAttestation} />
+              )}
+            </div>
+          </PopOverBasic>
+
+          <div className="flex flex-col mb-2">
+            <h1 className="text-[18px] font-semibold text-white">
+              Attestations
+            </h1>
+            <p className="text-neutrals-gray-5 text-[10px] font-semibold">
+              Reputation tokens linked to your digital signature
+            </p>
           </div>
-        </PopOverBasic>
 
-        <div>
-          <h1 className="text-[18px] font-semibold text-white">Attestations</h1>
-          <p className="text-neutrals-gray-5 text-[10px] font-semibold">
-            Reputation tokens linked to your digital signature
-          </p>
-        </div>
-
-        <div className="mr-[16px]">
-          <UserAttestationsGrid
-            metaAttestations={metaAttestations}
-            onAttestationClick={(metaAttestation: AttestationMeta) => {
-              setSelectedAttestation(metaAttestation);
-            }}
-          />
+          <div className="sm:mr-[16px] sm:mx-[inherit] sm:max-w-none">
+            <UserAttestationsGrid
+              metaAttestations={metaAttestations}
+              onAttestationClick={(metaAttestation: AttestationMeta) => {
+                setSelectedAttestation(metaAttestation);
+              }}
+            />
+          </div>
         </div>
       </div>
     </>

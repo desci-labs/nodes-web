@@ -129,28 +129,34 @@ export default function useLogin() {
         await patchAcceptFriendReferral(referralUuid);
       }
 
-      setIsLoading(false);
+      // setIsLoading(false);
       // setCheckingCode(false);
       dispatch(setCheckingCode(false));
       setTimeout(() => {
         navigate(`${site.app}${app.nodes}/start`);
       }, 500);
     } catch (err) {
-      setIsLoading(false);
-      let resp = (err as any).response;
-      let errorMessage = resp.data.error;
-      if (errorMessage === "Not found") {
-        errorMessage = "Magic link expired";
-        setStep(Steps.MagicLinkExpired);
+      if (step === Steps.AutoLogin || step === Steps.VerifyCode) {
+        setIsLoading(false);
+        let resp = err as any;
+        let errorMessage = resp.data.error;
+        if (errorMessage === "Not found") {
+          errorMessage = "Magic link expired";
+          setStep((prevStep) =>
+            prevStep != Steps.VerifyCode || Steps.AutoLogin
+              ? prevStep
+              : Steps.MagicLinkExpired
+          );
+        }
+        setError("Notice: " + errorMessage);
       }
-      setError("Notice: " + errorMessage);
-      // setCheckingCode(false);
       dispatch(setCheckingCode(false));
     }
   };
 
   const reset = () => {
     setError("");
+    setIsLoading(false);
     setStep(Steps.ConfirmEmail);
   };
 
