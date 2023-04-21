@@ -5,10 +5,13 @@ import InsetLabelInput from "@src/components/molecules/FormInputs/InsetLabelInpu
 import PdfHeader from "@src/components/organisms/PdfHeader";
 import PopOver from "@src/components/organisms/PopOver";
 import { site } from "@src/constants/routes";
-import { IconInfo, IconWarning, IconX } from "@src/icons";
-import { useCallback, useRef, useState } from "react";
+import { IconGreenCheck, IconInfo, IconWarning, IconX } from "@src/icons";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useLogin, { Steps } from "./useLogin";
+import { useGetter } from "@src/store/accessors";
+import VerificationInput from "react-verification-input";
+import { MailIcon } from "@heroicons/react/solid";
 
 const labels: Record<Steps, { title: string; caption: string }> = {
   [Steps.AutoLogin]: {
@@ -33,41 +36,57 @@ const labels: Record<Steps, { title: string; caption: string }> = {
   },
 };
 
-const Footer = ({ step, goBack, nextStep, isLoading }: any) => (
-  <PopoverFooter>
-    {[Steps.VerifyCode, Steps.WaitList, Steps.MagicLinkExpired].includes(
-      step
-    ) && (
-      <PrimaryButton
-        className="bg-transparent hover:bg-transparent text-white hover:text-neutrals-gray-5"
-        onClick={goBack}
-        type="button"
-      >
-        Back
-      </PrimaryButton>
-    )}
-    {[Steps.ConfirmEmail, Steps.VerifyCode].includes(step) && (
-      <PrimaryButton
-        disabled={isLoading}
-        type="submit"
-        onClick={nextStep}
-        className="flex gap-2 items-center"
-      >
-        {step === Steps.ConfirmEmail ? "Login" : "Continue"}{" "}
-        {isLoading && <DefaultSpinner color="black" size={20} />}
-      </PrimaryButton>
-    )}
-  </PopoverFooter>
-);
+const Footer = ({ step, goBack, nextStep, isLoading, code }: any) => {
+  const { checkingCode } = useGetter((state) => state.preferences);
+  return (
+    <PopoverFooter>
+      {[Steps.VerifyCode, Steps.WaitList, Steps.MagicLinkExpired].includes(
+        step
+      ) && (
+        <PrimaryButton
+          className="bg-transparent hover:bg-transparent text-white hover:text-neutrals-gray-5"
+          onClick={goBack}
+          type="button"
+        >
+          Back
+        </PrimaryButton>
+      )}
+      {[Steps.ConfirmEmail, Steps.VerifyCode].includes(step) && (
+        <PrimaryButton
+          disabled={isLoading || (step == Steps.VerifyCode && code?.length < 6)}
+          type="submit"
+          onClick={nextStep}
+          className="flex gap-2 items-center"
+        >
+          {step === Steps.ConfirmEmail ? "Login" : "Continue"}{" "}
+          {isLoading && checkingCode && (
+            <DefaultSpinner color="white" size={20} />
+          )}
+          {step == Steps.VerifyCode && isLoading && !checkingCode && (
+            <IconGreenCheck width={20} />
+          )}
+        </PrimaryButton>
+      )}
+    </PopoverFooter>
+  );
+};
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const navigate = useNavigate();
-  const { step, isLoading, error, onSubmitEmail, onVerifyCode, setStep } =
-    useLogin();
+  const {
+    step,
+    isLoading,
+    error,
+    onSubmitEmail,
+    onVerifyCode,
+    setStep,
+    reset,
+  } = useLogin();
 
   const inputRef = useRef<HTMLFormElement | null>(null);
+  const codeRef = useRef<HTMLInputElement | null>(null);
 
   const handleRef = useCallback((node) => {
     console.log("Node", node);
@@ -81,36 +100,49 @@ export default function Login() {
     if (inputRef.current?.checkValidity()) {
       if (step === Steps.ConfirmEmail) {
         onSubmitEmail(email);
-      } else if (step === Steps.VerifyCode) {
-        onVerifyCode({ code, email });
       }
+    }
+    if (codeRef.current) {
+      codeRef.current.focus();
     }
   };
 
+  /**auto-focus code field */
+  useEffect(() => {
+    if (step === Steps.VerifyCode) {
+      codeRef.current?.focus();
+    }
+  }, [step]);
+
+  /**
+   * clear code if error
+   */
+  useEffect(() => {
+    if (error) {
+      setCode("");
+    }
+  }, [error]);
+
   const goBack = () => {
-    if ([Steps.VerifyCode, Steps.WaitList].includes(step))
+    if ([Steps.VerifyCode, Steps.WaitList].includes(step)) {
+      reset();
       return setStep(Steps.ConfirmEmail);
+    }
 
     if (step === Steps.MagicLinkExpired) return setStep(Steps.VerifyCode);
   };
 
   return (
     <>
-      <PdfHeader />
-      return (
+      <PdfHeader />(
       <PopOver
         isVisible
-        style={{
-          width: 400,
-          maxWidth: "100%",
-          margin: "3rem 0.75rem",
-          overflow: "visible",
-        }}
         containerClassName="flex items-center justify-center min-h-screen bg-neutrals-gray-3"
-        className="rounded-lg bg-zinc-100 dark:bg-zinc-900"
+        className="bg-zinc-100 dark:bg-zinc-900 rounded-lg !max-w-none !w-fit !mx-2 sm:m-[initial] sm:py-0 sm:w-[400px] sm:mx-12 !sm:my-3 overflow-visible"
         footer={useCallback(
           () => (
             <Footer
+              code={code}
               step={step}
               goBack={goBack}
               isLoading={isLoading}
@@ -120,6 +152,14 @@ export default function Login() {
           // eslint-disable-next-line react-hooks/exhaustive-deps
           [step, goBack, isLoading]
         )}
+        onClick={() => {
+          if (step === Steps.VerifyCode) {
+            codeRef.current?.focus();
+          }
+          if (step === Steps.ConfirmEmail) {
+            inputRef.current?.focus();
+          }
+        }}
       >
         <form onSubmit={handleSubmit}>
           <div className="px-6 py-5">
@@ -146,7 +186,13 @@ export default function Login() {
                 ""
               )}
             </div>
-            <div className="text-xs text-state-error mb-1">{error}</div>
+            <div
+              className={`text-xs ${
+                error ? "bg-red-900" : ""
+              } px-2 rounded-md text-center py-1 font-bold text-white mb-1`}
+            >
+              {error}&nbsp;
+            </div>
             {step === Steps.ConfirmEmail && (
               <InsetLabelInput
                 label="Enter email"
@@ -164,33 +210,32 @@ export default function Login() {
               />
             )}
             {step === Steps.VerifyCode && (
-              <>
-                <InsetLabelInput
-                  label="Enter verification code"
-                  className="mb-6 transition-transform animate-fadeIn"
+              <div className="flex flex-col items-center">
+                <VerificationInput
+                  classNames={{
+                    container: "my-4 transition-transform animate-fadeIn",
+                  }}
                   value={code}
-                  onChange={(e: any) => setCode(e.target.value)}
-                  mandatory
-                  field={{
-                    type: "text",
-                    minLength: 6,
-                    maxLength: 6,
-                    tabIndex: 0,
-                    autoFocus: true,
-                    required: true,
-                    ref: handleRef,
+                  onComplete={(e: any) => onVerifyCode({ code: e, email })}
+                  onChange={(e: any) => setCode(e)}
+                  validChars="/0-9/"
+                  placeholder="_"
+                  inputProps={{
+                    id: "box-search", // use search in id to disable 1password autofill prompt
+                    ref: (r: any) => (codeRef.current = r),
+                    autoComplete: "off",
                     disabled: isLoading,
                   }}
                 />
                 <div className="text-neutrals-gray-7 mb-4 text-xs border-tint-primary-300 gap-1 justify-center items-center p-4 rounded-md flex flex-row">
-                  <IconInfo fill="rgba(216, 216, 216,1)" height={20} /> Sent to{" "}
+                  <MailIcon fill="rgba(216, 216, 216,1)" height={20} /> Sent to{" "}
                   <b>{email}</b>
                 </div>
-                <div className="text-neutrals-gray-7 text-sm border-yellow-300 gap-2 bg-neutrals-gray-3 p-4 rounded-md flex flex-row">
+                <div className="text-neutrals-gray-7 text-xs sm:text-sm items-center border-yellow-300 gap-4 md:gap-3 bg-neutrals-gray-3 p-4 rounded-md flex flex-row">
                   <IconWarning height={20} /> Please check your spam folder for
                   the email
                 </div>
-              </>
+              </div>
             )}
             {step === Steps.AutoLogin && (
               <div className="flex justify-center w-full items-center">

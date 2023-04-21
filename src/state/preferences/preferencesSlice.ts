@@ -18,6 +18,7 @@ const initialState: AppPreferences = {
   isToolbarVisible: false,
   showReferralModal: false,
   isMobileView: false,
+  showMobileComponentStack: false,
 };
 
 const slice = createSlice({
@@ -57,6 +58,9 @@ const slice = createSlice({
     setActiveToolbar: (state, { payload }: PayloadAction<TOOLBAR_ENTRY>) => {
       state.activeToolbar = payload;
     },
+    setShowComponentStack: (state, { payload }: PayloadAction<boolean>) => {
+      state.showMobileComponentStack = payload;
+    },
     setPreferences: (
       state,
       { payload }: PayloadAction<Partial<AppPreferences>>
@@ -83,4 +87,5 @@ export const {
   setActiveToolbar,
   setMobileView,
   setShowReferralModal,
+  setShowComponentStack,
 } = slice.actions;

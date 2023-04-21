@@ -16,7 +16,7 @@ import {
   toggleResearchPanel,
 } from "@src/state/nodes/viewer";
 import CreateNodeModal from "./CreateNodeModal/CreateNodeModal";
-
+import PerfectScrollbar from "react-perfect-scrollbar";
 export interface EditNodeInfo {
   uuid: string;
   title: string;
@@ -63,7 +63,7 @@ export default React.memo(function PaneNodeCollection() {
   }, [isNew, nodes]);
 
   const NodeCollectionView = () => (
-    <div className="max-w-2xl w-full self-center flex flex-col gap-6 pb-10">
+    <div className="max-w-2xl w-full self-center flex flex-col gap-6 h-full pb-10">
       {nodes &&
         nodes?.map((node) => (
           <NodeCard
@@ -85,7 +85,7 @@ export default React.memo(function PaneNodeCollection() {
   );
 
   const NodeCollectionLoader = () => (
-    <div className="max-w-2xl w-full self-center flex flex-col gap-6 pb-10 animate-pulse">
+    <div className="max-w-2xl w-full self-center flex flex-col gap-6 animate-pulse h-full pb-10">
       {[1, 2, 3, 4, 5, 6, 7].map((i: number) => (
         <NodeCardLoader key={`node-card-sidepanel-loader-${i}`} />
       ))}
@@ -97,17 +97,21 @@ export default React.memo(function PaneNodeCollection() {
 
   return (
     <div
-      className={`h-screen w-screen fixed left-0 pl-16 pt-14 top-0 z-[102] will-change-transform transition-opacity duration-150 bg-neutrals-black opacity-100`}
+      className={`h-screen w-screen fixed left-0 pt-3 sm:pl-16 sm:pt-14 top-0 z-[102] will-change-transform transition-opacity duration-150 bg-neutrals-black opacity-100`}
     >
-      <div className="flex flex-col pt-20 h-full overflow-y-scroll">
-        <div className="flex mx-auto pb-5 border-b border-neutrals-gray-3 mb-5 max-w-2xl w-full justify-between items-center">
-          <div className="flex gap-3 ">
-            <IconNodeCollection width={42} height={42} />
+      <div className="flex flex-col pt-20 h-full">
+        <div className="flex gap-5 sm:gap-0 flex-col max-w-full sm:flex-row mx-auto pb-5 border-b border-neutrals-gray-3 mb-5 sm:max-w-2xl w-full justify-between items-center">
+          <div className="flex items-center gap-3">
+            <IconNodeCollection
+              width={42}
+              height={42}
+              className="scale-75 sm:scale-100"
+            />
             <div>
               <div className="text-white font-bold text-[21px] leading-[27px]">
                 My Collection
               </div>
-              <div className="text-neutrals-gray-5 text-sm">
+              <div className="text-neutrals-gray-5 text-sm hidden sm:block">
                 Below is a collection of your contributions
               </div>
             </div>
@@ -123,7 +127,9 @@ export default React.memo(function PaneNodeCollection() {
             Create Research Node
           </PrimaryButton>
         </div>
-        {isLoading ? <NodeCollectionLoader /> : <LoadedNodesCollection />}
+        <PerfectScrollbar className="overflow-y-scroll w-full justify-center flex h-full px-4 sm:px-0">
+          {isLoading ? <NodeCollectionLoader /> : <LoadedNodesCollection />}
+        </PerfectScrollbar>
         <CreateNodeModal isOpen={isOpen} onDismiss={() => setOpen(false)} />
       </div>
     </div>

@@ -7,12 +7,16 @@ import { AvailableUserActionLogTypes, postUserAction } from "@api/index";
 import useManuscriptReader from "@components/organisms/ManuscriptReader/hooks/useManuscriptReader";
 import useReaderEffects from "@components/organisms/ManuscriptReader/hooks/useReaderEffects";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import Header from "./Header";
-import { setMobileView } from "@src/state/preferences/preferencesSlice";
+import Header from "@components/organisms/ManuscriptReader/MobileReader/Header";
+import {
+  setMobileView,
+  setShowComponentStack,
+} from "@src/state/preferences/preferencesSlice";
 import { useSetter } from "@src/store/accessors";
 import { useAppPreferences } from "@src/state/preferences/hooks";
 import Placeholder from "@components/organisms/ManuscriptReader/Placeholder";
-import Explorer from "./Explorer";
+import Explorer from "@components/organisms/ManuscriptReader/MobileReader/Explorer";
+import ComponentStackModal from "@components/organisms/ManuscriptReader/MobileReader/ComponentStackModal";
 
 const MobileWrapper = styled(FlexRow)`
   background-color: transparent;
@@ -36,7 +40,7 @@ const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
   const dispatch = useSetter();
   const { currentObjectId } = useNodeReader();
   const { isLoading } = useManuscriptReader(publicView);
-  const { isMobileView } = useAppPreferences();
+  const { isMobileView, showMobileComponentStack } = useAppPreferences();
 
   // trigger Reader side effects
   useReaderEffects(publicView);
@@ -69,6 +73,12 @@ const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
       <Header />
       {isLoading && <Placeholder isLoading={true} fullHeight />}
       <Explorer />
+      {showMobileComponentStack && (
+        <ComponentStackModal
+          isOpen={true}
+          onDismiss={() => dispatch(setShowComponentStack(false))}
+        />
+      )}
     </MobileWrapper>
   );
 };

@@ -29,6 +29,9 @@ export const authApi = api.injectEndpoints({
           body: data,
         };
       },
+      extraOptions: {
+        maxRetries: 2, // avoid user waiting too long for magic link due to default exponential backoff
+      },
       async onQueryStarted(args, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;

@@ -12,9 +12,7 @@ import { AnnotationLinkConfig } from "@src/components/molecules/AnnotationEditor
 import { cleanupManifestUrl } from "@src/components/utils";
 import { RootState } from "@src/store";
 import axios from "axios";
-import { Path } from "react-router";
 import { DrivePath } from "../drive/types";
-import { update } from "react-spring";
 
 export type ReaderMode = "reader" | "editor";
 
@@ -71,7 +69,7 @@ const initialState: NodeReaderPref = {
   isDraggingFiles: false,
   isCommitPanelOpen: false,
   isResearchPanelOpen: true,
-  researchPanelTab: ResearchTabs.history,
+  researchPanelTab: ResearchTabs.current,
   startedNewAnnotationViaButton: false,
   manifestStatus: ManifestDataStatus.Idle,
   recentlyAddedComponent: "",
