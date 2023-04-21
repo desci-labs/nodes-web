@@ -91,6 +91,7 @@ export interface PopOverProps {
   id?: String;
   zIndex?: number;
   displayCloseIcon?: boolean;
+  onClick?: (e: any) => void;
 }
 
 const PopOver = (props: React.PropsWithChildren<PopOverProps>) => {
@@ -103,6 +104,7 @@ const PopOver = (props: React.PropsWithChildren<PopOverProps>) => {
     containerClassName = "",
     style = {},
     className = "",
+    onClick,
     // footer,
     // displayCloseIcon = true,
   } = props;
@@ -133,6 +135,7 @@ const PopOver = (props: React.PropsWithChildren<PopOverProps>) => {
       onClick={(e: any) => {
         e.stopPropagation();
         onClose?.();
+        onClick?.(e);
       }}
     >
       <PopOverContent

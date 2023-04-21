@@ -141,14 +141,14 @@ export default function useLogin() {
         let resp = err as any;
         let errorMessage = resp.data.error;
         if (errorMessage === "Not found") {
-          errorMessage = "Magic link expired";
+          errorMessage = "Code invalid or expired";
           setStep((prevStep) =>
             prevStep != Steps.VerifyCode || Steps.AutoLogin
               ? prevStep
-              : Steps.MagicLinkExpired
+              : Steps.VerifyCode
           );
         }
-        setError("Notice: " + errorMessage);
+        setError(errorMessage);
       }
       dispatch(setCheckingCode(false));
     }
