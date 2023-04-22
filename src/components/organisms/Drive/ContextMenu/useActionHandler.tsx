@@ -4,11 +4,9 @@ import {
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
-import { isRootComponentDrive } from "@src/components/driveUtils";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useDispatch } from "react-redux";
-import { setComponentStack, setManifestData } from "@src/state/nodes/viewer";
-import { useSetter } from "@src/store/accessors";
+import { setComponentStack } from "@src/state/nodes/viewer";
 import { setFileMetadataBeingEdited } from "@src/state/drive/driveSlice";
 import { setComponentTypeBeingAssignedTo } from "@src/state/drive/driveSlice";
 import { useSetNodeCoverMutation } from "@src/state/api/nodes";

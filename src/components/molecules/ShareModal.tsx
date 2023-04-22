@@ -1,9 +1,4 @@
-import React, {
-  ButtonHTMLAttributes,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { ButtonHTMLAttributes, useEffect, useState } from "react";
 import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
 import { useNodeReader, useNodeVersions } from "@src/state/nodes/hooks";
 import {
@@ -12,11 +7,9 @@ import {
 } from "@src/components/atoms/SwitchBar/SwitchBar";
 import NodeInvite from "@src/components/molecules/NodeShare/Invite/Invite";
 import SharePublished from "@src/components/molecules/NodeShare/SharePublished/SharePublished";
-import { useUser } from "@src/state/user/hooks";
 import {
   nodesApi,
   useCreateShareLinkMutation,
-  useGetNodesQuery,
   usePrivateShareQuery,
   useRevokeShareLinkMutation,
 } from "@src/state/api/nodes";
@@ -34,9 +27,9 @@ enum ShareTabs {
 }
 
 const ShareModal = React.memo((props: ModalProps) => {
-  const user = useUser();
+  // const user = useUser();
   const dispatch = useSetter();
-  const { data: nodes } = useGetNodesQuery();
+  // const { data: nodes } = useGetNodesQuery();
   const { currentObjectId, publicView } = useNodeReader();
   const versions = useNodeVersions(currentObjectId);
   const { data: shareId } = usePrivateShareQuery(currentObjectId!, {
@@ -55,15 +48,15 @@ const ShareModal = React.memo((props: ModalProps) => {
     );
   }, [currentObjectId, dispatch, shareId]);
 
-  const canSendInvite = useMemo(() => {
-    if (publicView || !user) return false;
+  // const canSendInvite = useMemo(() => {
+  //   if (publicView || !user) return false;
 
-    // TODO: in future add more sophisticated check for user permissions
-    const isOwner = nodes?.find(
-      (n) => n.uuid === currentObjectId && n?.ownerId === user.userId
-    );
-    return !!isOwner;
-  }, [publicView, user, nodes, currentObjectId]);
+  //   // TODO: in future add more sophisticated check for user permissions
+  //   const isOwner = nodes?.find(
+  //     (n) => n.uuid === currentObjectId && n?.ownerId === user.userId
+  //   );
+  //   return !!isOwner;
+  // }, [publicView, user, nodes, currentObjectId]);
 
   const canSharePublished = publicView || !!versions;
 

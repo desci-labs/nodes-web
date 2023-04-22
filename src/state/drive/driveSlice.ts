@@ -1,9 +1,4 @@
-import {
-  AsyncThunkAction,
-  PayloadAction,
-  createAsyncThunk,
-  createSlice,
-} from "@reduxjs/toolkit";
+import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 import { getDatasetTree, updateDag } from "@src/api";
 import { DriveObject, FileType } from "@src/components/organisms/Drive";
@@ -416,7 +411,7 @@ export const addExternalLinkThunk = createAsyncThunk(
     },
     { getState, dispatch }
   ) => {
-    const state = getState() as RootState;
+    // const state = getState() as RootState;
 
     const { name, url, subtype } = payload;
     const newComponent: ExternalLinkComponent = {
@@ -578,8 +573,8 @@ export const addFilesToDrive = createAsyncThunk(
         manifest: updatedManifest,
         rootDataCid,
         manifestCid,
-        tree,
-        date,
+        // tree,
+        // date,
       } = await updateDag({
         uuid: currentObjectId!,
         files,
