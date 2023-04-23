@@ -252,11 +252,14 @@ export const driveSlice = createSlice({
     },
     removeFileFromCurrentDrive: (
       state,
-      { payload }: PayloadAction<DrivePath>
+      { payload }: PayloadAction<{ where: Partial<DriveObject> }>
     ) => {
       if (!state.currentDrive) return;
       state.currentDrive.contains = state.currentDrive.contains?.filter(
-        (fd: DriveObject) => fd.path !== payload
+        (fd: DriveObject) =>
+          Object.entries(payload.where).every(
+            ([key, value]) => fd[key as keyof DriveObject] !== value
+          )
       );
     },
   },

@@ -6,6 +6,7 @@ import {
 } from "@desci-labs/desci-models";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import {
+  saveManifestDraft,
   setComponentStack,
   setManifest,
   setManifestCid,
@@ -35,7 +36,7 @@ export const getActionState = (action: Actions, file: DriveObject) => {
       };
     case Actions.REMOVE:
       return {
-        disabled: file?.path?.startsWith(DRIVE_FULL_EXTERNAL_LINKS_PATH),
+        disabled: file?.path === DRIVE_FULL_EXTERNAL_LINKS_PATH,
       };
     case Actions.ASSIGN_TYPE:
       return { disabled: false };
@@ -82,13 +83,23 @@ export default function useActionHandler() {
 
   async function remove(file: DriveObject) {
     if (mode !== "editor") return;
+
+    if (file.componentType === ResearchObjectComponentType.LINK) {
+      dispatch(
+        removeFileFromCurrentDrive({ where: { componentId: file.componentId } })
+      );
+      dispatch(deleteComponent({ componentId: file.componentId! }));
+      dispatch(saveManifestDraft({ uuid: currentObjectId! }));
+      return;
+    }
+
     const snapshotManifest = { ...manifestData! };
     const snapshotManifestCid = manifestCid;
     const component = manifestData?.components?.find(
       (c) => c.payload?.path === file.path
     );
     if (component) dispatch(deleteComponent({ componentId: component.id }));
-    dispatch(removeFileFromCurrentDrive(file.path!));
+    dispatch(removeFileFromCurrentDrive({ where: { path: file.path! } }));
     try {
       const { manifestCid: newManifestCid, manifest: newManifest } =
         await deleteData(currentObjectId!, file.path!);
