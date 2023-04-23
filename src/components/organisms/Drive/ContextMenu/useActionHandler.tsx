@@ -13,11 +13,13 @@ import {
 import { useSetter } from "@src/store/accessors";
 import {
   fetchTreeThunk,
+  removeFileFromCurrentDrive,
   setFileMetadataBeingEdited,
 } from "@src/state/drive/driveSlice";
 import { setComponentTypeBeingAssignedTo } from "@src/state/drive/driveSlice";
 import { deleteData } from "@src/api";
 import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
+import { deleteComponent } from "@src/state/nodes/viewer";
 
 const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
 
@@ -52,7 +54,12 @@ export const getActionState = (action: Actions, file: DriveObject) => {
 
 export default function useActionHandler() {
   const dispatch = useSetter();
-  const { manifest: manifestData, currentObjectId, mode } = useNodeReader();
+  const {
+    manifest: manifestData,
+    manifestCid,
+    currentObjectId,
+    mode,
+  } = useNodeReader();
 
   async function preview(file: DriveObject) {
     if (
@@ -75,16 +82,19 @@ export default function useActionHandler() {
 
   async function remove(file: DriveObject) {
     if (mode !== "editor") return;
-    // optimistically delete components with payload path
-    // optimistically delete from cwd
+    const snapshotManifest = { ...manifestData! };
+    const snapshotManifestCid = manifestCid;
+    const component = manifestData?.components?.find(
+      (c) => c.payload?.path === file.path
+    );
+    if (component) dispatch(deleteComponent({ componentId: component.id }));
+    dispatch(removeFileFromCurrentDrive(file.path!));
     try {
-      const { manifestCid, manifest } = await deleteData(
-        currentObjectId!,
-        file.path!
-      );
-      if (manifestCid && manifest) {
-        dispatch(setManifest(manifest));
-        dispatch(setManifestCid(manifestCid));
+      const { manifestCid: newManifestCid, manifest: newManifest } =
+        await deleteData(currentObjectId!, file.path!);
+      if (newManifestCid && newManifest) {
+        dispatch(setManifest(newManifest));
+        dispatch(setManifestCid(newManifestCid));
         dispatch(fetchTreeThunk());
       }
     } catch (e: any) {
@@ -94,6 +104,10 @@ export default function useActionHandler() {
         "file: ",
         file
       );
+      if (component) {
+        dispatch(setManifest(snapshotManifest!));
+        dispatch(setManifestCid(snapshotManifestCid));
+      }
       dispatch(fetchTreeThunk());
     }
   }
