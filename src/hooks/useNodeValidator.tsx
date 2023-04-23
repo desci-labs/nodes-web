@@ -1,13 +1,19 @@
 import { useCallback, useMemo } from "react";
-import validate from "@src/modules/componentMetadataValidator";
+import validate, {
+  ValidationResult,
+} from "@src/modules/componentMetadataValidator";
 import { ResearchObjectV1Component } from "@desci-labs/desci-models";
 import useConnectedWallet from "./useConnectedWallet";
 import { useNodeReader } from "@src/state/nodes/hooks";
 
 const recursiveCheck = (obj: any): boolean => {
   for (let val of Object.values(obj)) {
-    if (!val || (typeof val === "object" && !recursiveCheck(val))) {
-      return false;
+    if (Object.keys(val as any).indexOf("valid") > -1) {
+      // is a ValidationResult
+      const res = val as ValidationResult;
+      return res.valid;
+    } else {
+      return recursiveCheck(val);
     }
   }
   return true;
@@ -42,7 +48,14 @@ export function useNodeValidator() {
   );
 
   const isValid = () => {
-    console.log("NODEVALID", nodeValidity);
+    const validityCheck = recursiveCheck(nodeValidity);
+    console.log("NODEVALID", nodeValidity, "valid check", validityCheck);
+    console.log(
+      "wallet checks, network=",
+      wallet.isValidNetwork,
+      "wallet=",
+      wallet.isValidWallet
+    );
     return (
       recursiveCheck(nodeValidity) &&
       wallet.isValidNetwork &&
