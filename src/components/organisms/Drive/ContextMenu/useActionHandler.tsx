@@ -85,6 +85,7 @@ export default function useActionHandler() {
       if (manifestCid && manifest) {
         dispatch(setManifest(manifest));
         dispatch(setManifestCid(manifestCid));
+        dispatch(fetchTreeThunk());
       }
     } catch (e: any) {
       console.error(
