@@ -1,14 +1,36 @@
-import { ResearchObject, ResearchObjectV1, ResearchObjectV1Component } from "@desci-labs/desci-models"
+import {
+  ResearchObject,
+  ResearchObjectV1,
+  ResearchObjectV1Component,
+} from "@desci-labs/desci-models";
 
-const validate = (component: ResearchObjectV1Component, researchObject: ResearchObjectV1) => {
+export interface ValidationResult {
+  valid: boolean;
+  reason?: string[];
+}
+
+const validate = (
+  component: ResearchObjectV1Component,
+  researchObject: ResearchObjectV1
+): ValidationResult => {
   // if(!component.payload.keywords) {}
   // if(!component.payload.description) {
   //   return false
   // }
-  if(!researchObject || (!component.payload.licenseType && !researchObject.defaultLicense)) {
-    return false
+  if (
+    !researchObject ||
+    (!component.payload.licenseType && !researchObject.defaultLicense)
+  ) {
+    return {
+      valid: false,
+      reason: [
+        ...(component.payload.licenseType ? [] : ["No license type set"]),
+        ...(researchObject.defaultLicense ? [] : ["No default license set"]),
+        ...(!researchObject ? ["Research object not found"] : []),
+      ],
+    };
   }
-  return true
-}
+  return { valid: true };
+};
 
-export default validate
+export default validate;
