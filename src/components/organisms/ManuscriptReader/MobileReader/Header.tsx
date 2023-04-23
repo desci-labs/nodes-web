@@ -5,6 +5,7 @@ import useComponentDpid from "@components/organisms/Drive/hooks/useComponentDpid
 import useNodeCover from "@components/organisms/ManuscriptReader/hooks/useNodeCover";
 import React, { useCallback, useRef } from "react";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
+import { Helmet } from "react-helmet";
 
 const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
 
@@ -14,12 +15,15 @@ export default function Header() {
   const { cover } = useNodeCover();
   const headerRef = useRef<HTMLDivElement>();
 
+  const url = dpid || window.location.href;
+  const description = `Have a look at this Research Node published with DeSci Nodes.\n${dpid}`;
+
   const onHandleShare = async () => {
     try {
       await navigator.share({
-        text: `Have a look at this Research Node published with DeSci Nodes. ${dpid}`,
+        text: description,
         title: manifest?.title,
-        url: dpid || window.location.href,
+        url: url,
       });
     } catch (e) {
       console.log("Error: Unable to share", dpid, e);
@@ -76,6 +80,31 @@ export default function Header() {
           </span>
         </div>
       </div>
+      <Helmet>
+        <title>{manifest?.title || "Research Node"}</title>
+        {/* Default tags */}
+        <meta name="description" content={description} />
+        <meta itemProp="image" content={cover} />
+
+        {/* Facebook tags */}
+        <meta property="og:url" content={url} />
+        <meta property="og:type" content="website" />
+        <meta
+          property="og:title"
+          content={manifest?.title || "DeSci Nodes: Elevate your Research"}
+        />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content={cover} />
+        {/* Twitter tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:title"
+          content={manifest?.title || "DeSci Nodes: Elevate your Research"}
+        />
+        <meta property="twitter:url" content={url} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={cover} />
+      </Helmet>
     </div>
   );
 }
