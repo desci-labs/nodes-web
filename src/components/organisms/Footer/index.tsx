@@ -41,7 +41,7 @@ export default function Footer() {
     social: [
       {
         name: "Discord",
-        href: "https://discord.gg/BeJ4dxXdaJ",
+        href: "https://discord.gg/A5P9fgB5Cf",
         icon: (props: any) => (
           <svg
             width="24"
