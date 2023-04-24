@@ -62,7 +62,7 @@ export default function Explorer() {
         </SwitchBar>
       </div>
 
-      <PerfectScrollbar className="overflow-auto text-white pb-4 w-full">
+      <PerfectScrollbar className="overflow-auto text-white pb-4 w-full overflow-x-hidden">
         <div className="px-4">
           {researchPanelTab === ResearchTabs.current ? (
             <ComponentsPreview />

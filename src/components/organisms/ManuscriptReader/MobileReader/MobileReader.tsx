@@ -2,7 +2,6 @@
 import React, { useEffect } from "react";
 import "react-pdf/dist/umd/Page/AnnotationLayer.css";
 import styled from "styled-components";
-import { FlexRow } from "@components/styled";
 import { AvailableUserActionLogTypes, postUserAction } from "@api/index";
 import useManuscriptReader from "@components/organisms/ManuscriptReader/hooks/useManuscriptReader";
 import useReaderEffects from "@components/organisms/ManuscriptReader/hooks/useReaderEffects";
@@ -19,11 +18,11 @@ import Placeholder from "@components/organisms/ManuscriptReader/Placeholder";
 import Explorer from "@components/organisms/ManuscriptReader/MobileReader/Explorer";
 import ComponentStackModal from "@components/organisms/ManuscriptReader/MobileReader/ComponentStackModal";
 import { IconX } from "@src/icons";
+import { FlexColumn } from "@components/styled";
 
-const MobileWrapper = styled(FlexRow)`
+const MobileWrapper = styled(FlexColumn)`
   background-color: transparent;
-  position: relative;
-  height: calc(100vh);
+  height: 100vh;
   width: 100%;
   left: 0;
   top: 0;
@@ -93,7 +92,7 @@ const MobileWarning = () => {
 
   return (
     <div
-      className={`absolute bottom-0 mb-20 w-[calc(100%-32px)] bg-transparent px-4 pb-4 animate-slideFromBottom h-30 ${
+      className={`absolute bottom-0 mb-5 w-full bg-transparent px-4 pb-4 animate-slideFromBottom h-30 ${
         !mobileViewWarning ? "hidden" : ""
       }`}
     >

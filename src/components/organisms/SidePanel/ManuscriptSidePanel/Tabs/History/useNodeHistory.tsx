@@ -72,7 +72,7 @@ export default function useNodeHistory() {
   }, [history, pendingHistory, pendingCommits]);
 
   const processHistory = useCallback(async () => {
-    debugger;
+    // debugger;
     if (!currentObjectId) return;
     try {
       const versions = await getResearchObjectVersions(currentObjectId);
