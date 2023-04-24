@@ -20,7 +20,7 @@ const recursiveCheck = (obj: any): boolean => {
 };
 
 export function useNodeValidator() {
-  const { manifest: manifestData } = useNodeReader();
+  const { manifest: manifestData, currentObjectId } = useNodeReader();
   const { wallet } = useConnectedWallet();
 
   const validateComponents = useCallback(
@@ -33,7 +33,7 @@ export function useNodeValidator() {
       }, {});
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [manifestData, currentObjectId]
   );
 
   const nodeValidity = useMemo(
@@ -44,7 +44,7 @@ export function useNodeValidator() {
       // contributors: !!manifestData?.contributors?.length,
       // organizations: !!manifestData?.organizations?.length,
     }),
-    [manifestData, validateComponents]
+    [manifestData, validateComponents, currentObjectId]
   );
 
   const isValid = () => {

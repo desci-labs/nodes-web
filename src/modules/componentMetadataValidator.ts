@@ -17,15 +17,18 @@ const validate = (
   // if(!component.payload.description) {
   //   return false
   // }
+  if (!researchObject) {
+    return { valid: false, reason: ["Not loaded"] };
+  }
   if (
     !researchObject ||
-    (!component.payload.licenseType && !researchObject.defaultLicense)
+    (!component.payload.licenseType && !researchObject?.defaultLicense)
   ) {
     return {
       valid: false,
       reason: [
         ...(component.payload.licenseType ? [] : ["No license type set"]),
-        ...(researchObject.defaultLicense ? [] : ["No default license set"]),
+        ...(researchObject?.defaultLicense ? [] : ["No default license set"]),
         ...(!researchObject ? ["Research object not found"] : []),
       ],
     };
