@@ -21,8 +21,10 @@ import { setComponentTypeBeingAssignedTo } from "@src/state/drive/driveSlice";
 import { deleteData } from "@src/api";
 import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
 import { deleteComponent } from "@src/state/nodes/viewer";
+import { useDrive } from "@src/state/drive/hooks";
 
 const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
+const PUB_IPFS_URL = process.env.REACT_APP_PUBLIC_IPFS_RESOLVER;
 
 export const getActionState = (action: Actions, file: DriveObject) => {
   switch (action) {
@@ -61,6 +63,7 @@ export default function useActionHandler() {
     currentObjectId,
     mode,
   } = useNodeReader();
+  const { deprecated } = useDrive();
 
   async function preview(file: DriveObject) {
     if (
@@ -70,14 +73,22 @@ export default function useActionHandler() {
         ResearchObjectComponentType.LINK,
       ].includes(file.componentType as ResearchObjectComponentType)
     ) {
-      const component = manifestData?.components.find(
-        (c: ResearchObjectV1Component) => c.payload.url === file.cid
-      );
+      const component = deprecated
+        ? manifestData?.components.find(
+            (c: ResearchObjectV1Component) => c.payload.url === file.cid
+          )
+        : manifestData?.components.find(
+            (c: ResearchObjectV1Component) => c.payload.path === file.path
+          );
       if (component) {
         dispatch(setComponentStack([component]));
       }
     } else {
-      window.open(`${IPFS_URL}/${file.cid}`, "_blank");
+      if (file.external) {
+        window.open(`${PUB_IPFS_URL}/${file.cid}`, "_blank");
+      } else {
+        window.open(`${IPFS_URL}/${file.cid}`, "_blank");
+      }
     }
   }
 

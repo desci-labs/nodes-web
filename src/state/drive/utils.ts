@@ -195,6 +195,8 @@ export function convertIpfsTreeToDriveObjectTree(
       if (isPartial) branch.accessStatus = AccessStatus.PARTIAL;
     }
 
+    if (branch.external) branch.accessStatus = AccessStatus.EXTERNAL;
+
     branch.metadata = inheritMetadata(branch.path, pathToCompMap);
     branch.starred = component?.starred || false;
     branch.uid = component?.id || uuidv4(); //add cached uuids

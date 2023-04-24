@@ -1,13 +1,9 @@
-import {
-  AsyncThunkAction,
-  PayloadAction,
-  createAsyncThunk,
-  createSlice,
-} from "@reduxjs/toolkit";
+import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 import { getDatasetTree, updateDag } from "@src/api";
 import { DriveObject, FileType } from "@src/components/organisms/Drive";
 import { RequestStatus, RootState } from "@src/store";
+import toast from "react-hot-toast";
 import {
   ExternalLinkComponent,
   ResearchObjectComponentLinkSubtype,
@@ -47,8 +43,9 @@ import {
   StarComponentThunkPayload,
   UpdateBatchUploadProgressAction,
   UploadQueueItem,
+  UploadTypes,
 } from "./types";
-import { __log } from "@src/components/utils";
+import { __log, arrayXor } from "@src/components/utils";
 import {
   addComponent,
   addRecentlyAddedComponent,
@@ -524,10 +521,29 @@ export const addFilesToDrive = createAsyncThunk(
       onSuccess,
     } = payload;
     if (!nodeTree || !manifest) return;
+    if (!arrayXor([files?.length, externalCids?.length, externalUrl])) {
+      console.error(
+        "[addFilesToDrive] Error: More than one upload method was used",
+        files,
+        externalCids,
+        externalUrl
+      );
+    }
+
+    if (state.drive?.currentDrive?.external) {
+      console.error(
+        "[addFilesToDrive] Error: Cannot expand external directory",
+        files,
+        externalCids,
+        externalUrl
+      );
+      return;
+    }
+
     //Transform files to usable data for displaying state (upload panel items, optimistic drives)
-    const dirs: Record<string, string> = {};
     let fileInfo;
     if (files) {
+      const dirs: Record<string, string> = {};
       fileInfo = Array.prototype.filter
         .call(files, (f) => {
           if (!("fullPath" in f)) f.fullPath = "/" + f.name;
@@ -543,13 +559,17 @@ export const addFilesToDrive = createAsyncThunk(
             ? overwritePathContext + f.fullPath
             : state.drive.currentDrive!.path + f.fullPath;
           return {
-            isDirectory: f.isDirectory,
+            uploadType: f.isDirectory ? UploadTypes.DIR : UploadTypes.FILE,
             name: f.name,
             path: path,
           };
         });
       Object.keys(dirs).forEach((key) =>
-        fileInfo.push({ isDirectory: true, name: key, path: dirs[key] })
+        fileInfo.push({
+          uploadType: UploadTypes.DIR,
+          name: key,
+          path: dirs[key],
+        })
       );
     }
     if (externalUrl?.path && externalUrl?.url) {
@@ -562,13 +582,26 @@ export const addFilesToDrive = createAsyncThunk(
 
       fileInfo = [
         {
-          isDirectory: isDirectory,
+          uploadType: isDirectory ? UploadTypes.DIR : UploadTypes.FILE,
           name: name,
           path: overwritePathContext
             ? overwritePathContext + "/" + externalUrl.path
             : state.drive.currentDrive!.path + "/" + externalUrl.path,
         },
       ];
+    }
+
+    if (externalCids?.length) {
+      //IMPORTANT: Paths can't start with a '/'
+      fileInfo = externalCids.map((extCid) => {
+        return {
+          uploadType: UploadTypes.CID,
+          name: extCid.name,
+          path: overwritePathContext
+            ? overwritePathContext + "/" + extCid.name
+            : state.drive.currentDrive!.path + "/" + extCid.name,
+        };
+      });
     }
 
     if (!fileInfo) return console.error("[AddFilesToDrive] fileInfo undefined");
@@ -578,6 +611,7 @@ export const addFilesToDrive = createAsyncThunk(
       nodeUuid: currentObjectId!,
       path: f.path,
       batchUid: batchUid,
+      uploadType: f.uploadType,
     }));
     dispatch(setShowUploadPanel(true));
     dispatch(addItemsToUploadQueue({ items: uploadQueueItems }));
@@ -586,7 +620,6 @@ export const addFilesToDrive = createAsyncThunk(
     const contextPath = overwritePathContext || state.drive.currentDrive!.path!;
     const snapshotNodeUuid = currentObjectId!;
     try {
-      // debugger;
       const {
         manifest: updatedManifest,
         rootDataCid,

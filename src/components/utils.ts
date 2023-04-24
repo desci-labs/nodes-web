@@ -298,3 +298,7 @@ export function extractCodeRepoName(url: string) {
     return repo;
   }
 }
+
+export function arrayXor(arr: any[]): boolean {
+  return arr.reduce((acc, val) => acc !== !!val, false);
+}
