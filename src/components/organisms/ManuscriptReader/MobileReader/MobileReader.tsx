@@ -27,7 +27,7 @@ const MobileWrapper = styled(FlexColumn)`
   left: 0;
   top: 0;
   background-color: #1e1e1e;
-  position: fixed;
+  position: relative;
   display: flex;
   flex-direction: column;
   overflow: hidden;

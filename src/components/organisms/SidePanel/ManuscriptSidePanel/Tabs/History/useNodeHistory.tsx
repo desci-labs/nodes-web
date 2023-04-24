@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./history.scss";
 import {
-  ResearchObjectV1,
   ResearchObjectV1History,
 } from "@desci-labs/desci-models";
 import { CHAIN_DEPLOYMENT } from "@components/../chains";
@@ -93,6 +92,7 @@ export default function useNodeHistory() {
       setIsFetching(false);
       setLoadingChain(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentObjectId]);
 
   useEffect(() => {
