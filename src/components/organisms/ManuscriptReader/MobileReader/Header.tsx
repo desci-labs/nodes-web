@@ -6,6 +6,8 @@ import useNodeCover from "@components/organisms/ManuscriptReader/hooks/useNodeCo
 import React, { useCallback, useRef } from "react";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import { Helmet } from "react-helmet";
+import { useSpring } from "react-spring";
+import { animated } from "@react-spring/web";
 
 const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
 const DEFAULT_URL =
@@ -16,6 +18,11 @@ export default function Header() {
   const { dpid } = useComponentDpid();
   const { cover } = useNodeCover();
   const headerRef = useRef<HTMLDivElement>();
+  const [height, api] = useSpring(() => ({
+    from: { height: 0 },
+    to: { height: 250 },
+  }));
+  const [expanded, setExpanded] = React.useState(false);
 
   const url = dpid || window.location.href;
   const description = `Have a look at this Research Node published with DeSci Nodes.\n${dpid}`;
@@ -47,9 +54,10 @@ export default function Header() {
   }, []);
 
   return (
-    <div
-      className="h-[30%] min-h-[250px] w-full p-2 relative flex items-end overflow-hidden shrink-0"
+    <animated.div
+      className="min-h-[250px] w-full p-2 relative flex items-end overflow-hidden shrink-0"
       style={{
+        height: height.height.get(),
         backgroundImage: `linear-gradient(
           180deg,
           rgba(2, 0, 36, 0.015865721288515378) 0%,
@@ -59,6 +67,7 @@ export default function Header() {
         backgroundPosition: "center bottom",
         backgroundSize: "cover",
         objectFit: "cover",
+        transition: "height 0.3s ease-in-out",
       }}
       ref={handleRef}
       onClick={onHandleClick}
@@ -69,7 +78,22 @@ export default function Header() {
         className="absolute top-3 right-3"
         onClick={onHandleShare}
       />
-      <div className="px-4 flex gap-3 items-center">
+      <div
+        className="px-4 flex gap-3 items-center"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          // window.getnext;
+          if (!expanded) {
+            api.start({ height: 500, immediate: true });
+            setExpanded(true);
+          } else {
+            api.start({ height: 250, immediate: true });
+            setExpanded(false);
+          }
+        }}
+      >
         <div className="shrink-0 w-fit">
           <ResearchNodeIcon width={40} className="" />
         </div>
@@ -107,6 +131,6 @@ export default function Header() {
         <meta name="twitter:description" content={description} />
         <meta name="twitter:image" content={cover || DEFAULT_URL} />
       </Helmet>
-    </div>
+    </animated.div>
   );
 }
