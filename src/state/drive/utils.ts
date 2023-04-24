@@ -322,3 +322,13 @@ export function constructBreadCrumbs(path: DrivePath): BreadCrumb[] {
 
   return result;
 }
+
+export function separateFileNameAndMimeType(fileName: string): {
+  fileName: string;
+  mimeType?: string;
+} {
+  const splitName = fileName.split(".");
+  const mimeType = splitName.length > 1 ? splitName.pop() : "";
+  const name = splitName.join(".");
+  return { fileName: name, mimeType };
+}

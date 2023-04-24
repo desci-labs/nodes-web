@@ -4,13 +4,15 @@ import {
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
-import { isRootComponentDrive } from "@src/components/driveUtils";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useDispatch } from "react-redux";
 import { setComponentStack, setManifestData } from "@src/state/nodes/viewer";
 import { useSetter } from "@src/store/accessors";
+import axios from "axios";
 import { setFileMetadataBeingEdited } from "@src/state/drive/driveSlice";
+import { AvailableUserActionLogTypes, postUserAction } from "@api/index";
 import { setComponentTypeBeingAssignedTo } from "@src/state/drive/driveSlice";
+import { separateFileNameAndMimeType } from "@src/state/drive/utils";
 
 const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
 
@@ -23,6 +25,12 @@ export const getActionState = (action: Actions, file: DriveObject) => {
     case Actions.RENAME:
       return {
         disabled: true,
+      };
+    case Actions.DOWNLOAD:
+      return {
+        disabled:
+          file.componentType === ResearchObjectComponentType.LINK ||
+          file.type === FileType.DIR,
       };
     case Actions.REMOVE:
       return {
@@ -109,6 +117,33 @@ export default function useActionHandler() {
     // setRenameComponentId(file.cid);
   }
 
+  async function download(file: DriveObject) {
+    if (file.componentType === ResearchObjectComponentType.LINK) return;
+    postUserAction(
+      AvailableUserActionLogTypes.btnDownloadData,
+      JSON.stringify({ nodeUuid: currentObjectId, cid: file.cid })
+    );
+    const url = `${IPFS_URL}/${file.cid}`;
+    const { fileName, mimeType } = separateFileNameAndMimeType(file.name);
+    axios({
+      url,
+      method: "GET",
+      responseType: "blob", // important
+    }).then((response: any) => {
+      const url2 = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url2;
+      link.setAttribute(
+        "download",
+        `${fileName.replaceAll(" ", "_")}__nodes.desci.com__${
+          url.split("/")[url.split("/").length - 1]
+        }${mimeType ? `.${mimeType}` : ""}`
+      );
+      document.body.appendChild(link);
+      link.click();
+    });
+  }
+
   async function assignType(file: DriveObject) {
     dispatch(setComponentTypeBeingAssignedTo(file.path!));
   }
@@ -123,7 +158,7 @@ export default function useActionHandler() {
   > = {
     RENAME: rename,
     PREVIEW: preview,
-    DOWNLOAD: null,
+    DOWNLOAD: download,
     REMOVE: remove,
     ASSIGN_TYPE: assignType,
     EDIT_METADATA: editMetadata,
