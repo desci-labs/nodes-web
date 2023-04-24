@@ -120,7 +120,7 @@ function ComponentPreview({
 
   return (
     <div
-      className="flex gap-4 items-center bg-zinc-200 bg-neutrals-black active:bg-neutrals-gray-5 rounded-lg px-4 py-2 border border-black"
+      className="flex w-full gap-4 items-center bg-zinc-200 bg-neutrals-black active:bg-neutrals-gray-5 rounded-lg px-4 py-2 border border-black"
       onClick={onHandleClick}
     >
       <target.icon
@@ -129,7 +129,9 @@ function ComponentPreview({
         wrapperClassName="w-[30px] h-[30px]"
         className="p-[3px] fill-white stroke-white"
       />
-      <span className="font-bold capitalize">{component.name}</span>
+      <span className="font-bold capitalize w-[calc(100%-80px)] truncate overflow-ellipsis">
+        {component.name}
+      </span>
     </div>
   );
 }

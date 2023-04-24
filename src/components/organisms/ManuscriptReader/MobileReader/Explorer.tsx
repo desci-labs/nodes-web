@@ -25,7 +25,7 @@ export default function Explorer() {
     : false;
 
   return (
-    <>
+    <div className="w-full">
       {isPreviousHistory && (
         <div className="w-full py-2 flex items-center justify-center bg-tint-primary">
           <span className="text-sm">
@@ -62,7 +62,7 @@ export default function Explorer() {
         </SwitchBar>
       </div>
 
-      <PerfectScrollbar className="overflow-auto text-white pb-4">
+      <PerfectScrollbar className="overflow-auto text-white pb-4 w-full">
         <div className="px-4">
           {researchPanelTab === ResearchTabs.current ? (
             <ComponentsPreview />
@@ -73,6 +73,6 @@ export default function Explorer() {
           {researchPanelTab === ResearchTabs.source ? <CreditsPreview /> : null}
         </div>
       </PerfectScrollbar>
-    </>
+    </div>
   );
 }

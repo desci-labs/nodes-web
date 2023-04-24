@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./history.scss";
-import { ResearchObjectV1History } from "@desci-labs/desci-models";
+import {
+  ResearchObjectV1,
+  ResearchObjectV1History,
+} from "@desci-labs/desci-models";
 import { CHAIN_DEPLOYMENT } from "@components/../chains";
 import { ethers } from "ethers";
 import { getResearchObjectVersions } from "@src/api";
@@ -60,10 +63,37 @@ export default function useNodeHistory() {
       const update = pendingHistory.filter(
         (p) => !hashes.includes(p.transaction?.id)
       );
-      updatePendingCommits(update);
+      // only update if there are new commits
+      if (!pendingCommits[currentObjectId!]) {
+        updatePendingCommits(update);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [history, pendingHistory]);
+  }, [history, pendingHistory, pendingCommits]);
+
+  const processHistory = useCallback(async () => {
+    debugger;
+    if (!currentObjectId) return;
+    try {
+      const versions = await getResearchObjectVersions(currentObjectId);
+      const currentHistory = transformVersions(versions);
+      if (history.length === currentHistory.length) return;
+
+      dispatch(
+        setNodeHistory({ id: currentObjectId, history: currentHistory })
+      );
+      dispatch(
+        publishApi.util.invalidateTags([
+          { type: tags.nodeVersions, id: currentObjectId },
+        ])
+      );
+    } catch (e) {
+      console.log("ERROR", e);
+    } finally {
+      setIsFetching(false);
+      setLoadingChain(false);
+    }
+  }, [currentObjectId]);
 
   useEffect(() => {
     let isMounted = true;
@@ -75,27 +105,7 @@ export default function useNodeHistory() {
       const refresh = () => {
         if (isMounted) setIsFetching(true);
 
-        (async () => {
-          try {
-            const versions = await getResearchObjectVersions(currentObjectId);
-            const currentHistory = transformVersions(versions);
-            if (history.length === currentHistory.length) return;
-
-            dispatch(
-              setNodeHistory({ id: currentObjectId, history: currentHistory })
-            );
-            dispatch(
-              publishApi.util.invalidateTags([
-                { type: tags.nodeVersions, id: currentObjectId },
-              ])
-            );
-          } catch (e) {
-            console.log("ERROR", e);
-          } finally {
-            if (isMounted) setIsFetching(false);
-            if (isMounted) setLoadingChain(false);
-          }
-        })();
+        processHistory();
       };
 
       refresh();

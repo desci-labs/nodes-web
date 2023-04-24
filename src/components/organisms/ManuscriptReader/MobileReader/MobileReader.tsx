@@ -93,7 +93,7 @@ const MobileWarning = () => {
 
   return (
     <div
-      className={`absolute bottom-0 w-full bg-transparent m-0 px-4 pb-4 animate-slideFromBottom ${
+      className={`absolute bottom-0 mb-20 w-[calc(100%-32px)] bg-transparent px-4 pb-4 animate-slideFromBottom h-30 ${
         !mobileViewWarning ? "hidden" : ""
       }`}
     >
