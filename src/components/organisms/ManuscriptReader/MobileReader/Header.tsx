@@ -64,7 +64,7 @@ export default function Header() {
           rgba(0, 0, 0, 0.8618040966386554) 100%
         ), url(${cover})`,
         backgroundRepeat: "no-repeat",
-        backgroundPosition: "center bottom",
+        backgroundPosition: "center top",
         backgroundSize: "cover",
         objectFit: "cover",
         transition: "height 0.3s ease-in-out",
