@@ -516,8 +516,9 @@ export const addFilesToDrive = createAsyncThunk(
         externalUrl
       );
     }
+    debugger;
 
-    if (!state.drive?.currentDrive?.external) {
+    if (state.drive?.currentDrive?.external) {
       console.error(
         "[addFilesToDrive] Error: Cannot expand external directory",
         files,
