@@ -516,7 +516,6 @@ export const addFilesToDrive = createAsyncThunk(
         externalUrl
       );
     }
-    debugger;
 
     if (state.drive?.currentDrive?.external) {
       console.error(

@@ -1,6 +1,6 @@
 import FileUploaderBare from "@components/organisms/FileUploaderBare";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
-import { IconFile, IconIpfs, IconWarning } from "@icons";
+import { IconFile, IconFolder, IconIpfs, IconWarning } from "@icons";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { SpinnerCircular } from "spinners-react";
@@ -24,17 +24,11 @@ export const ButtonAddData = ({ close, directory, id }: Props) => {
     []
   );
   const [loading, setLoading] = useState(false);
-  const { currentDrive } = useDrive();
   const dispatch = useSetter();
-
-  const [showCidFields, setShowCidFields] = useState(false);
-  const [externalCidName, setExternalCidName] = useState("");
-  const [externalCid, setExternalCid] = useState("");
-  const [externalCidError, setExternalCidError] = useState("");
 
   const handleOnFileUploadClick = () => {
     document.body.onfocus = () => {
-      if ((document.getElementById("input") as HTMLInputElement).value.length) {
+      if ((document.getElementById(id) as HTMLInputElement).value.length) {
         toast.success("Upload started", {
           duration: 3000,
           position: "top-center",
@@ -52,9 +46,95 @@ export const ButtonAddData = ({ close, directory, id }: Props) => {
       }
       document.body.onfocus = null;
     };
-    document.getElementById("input")?.click();
+    document.getElementById(id)?.click();
     setLoading(true);
   };
+
+  return (
+    <>
+      <div className="hidden">
+        <FileUploaderBare
+          id={id}
+          ref={ref}
+          autoUpload={true}
+          directoryPicker={directory}
+          customReq={(files) => {
+            setTimeout(() => {
+              dispatch(
+                addFilesToDrive({
+                  componentType: ResearchObjectComponentType.DATA,
+                  files,
+                })
+              );
+            }, 500);
+            setTimeout(() => {
+              close();
+              setIsAddingComponent(false);
+            }, 50);
+          }}
+        />
+      </div>
+      <div className="w-[150px] select-none rounded-md bg-neutrals-black  border-neutrals-gray-2 flex gap-3 transition-all">
+        <div
+          className="w-[150px] h-24 font-medium text-base border-neutrals-gray-3 border-2 rounded-md hover:bg-neutrals-gray-2 active:bg-neutrals-gray-1 cursor-pointer"
+          onClick={handleOnFileUploadClick}
+        >
+          {loading ? (
+            <div className="flex h-full flex-col items-center justify-center gap-2">
+              <SpinnerCircular color="white" size={30} />
+              Selecting files
+            </div>
+          ) : (
+            <div className="flex h-full flex-col items-center justify-center gap-2">
+              {id === "file_data" ? (
+                <IconFile width={30} height={30} />
+              ) : (
+                <IconFolder width={30} height={30} />
+              )}
+              {id === "file_data" ? "Upload Files" : "Upload Folder"}
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+};
+
+const AddExternalCidButton = ({
+  showCidFields,
+  setShowCidFields,
+}: {
+  showCidFields: boolean;
+  setShowCidFields: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+  return (
+    <div
+      className={`w-[150px] h-24 font-medium text-base border-neutrals-gray-3 border-2 rounded-md hover:bg-neutrals-gray-2 active:bg-neutrals-gray-1 cursor-pointer
+  ${showCidFields ? "bg-tint-primary/10" : ""}`}
+      onClick={() => {
+        setShowCidFields(!showCidFields);
+      }}
+    >
+      <div className="flex h-full flex-col items-center justify-center gap-2">
+        <IconIpfs width={30} height={30} />
+        External CID
+      </div>
+    </div>
+  );
+};
+
+const AddDataComponent = ({ close }: Props) => {
+  const [externalCidName, setExternalCidName] = useState("");
+  const [externalCid, setExternalCid] = useState("");
+  const [externalCidError, setExternalCidError] = useState("");
+  const [showCidFields, setShowCidFields] = useState(false);
+
+  const { setDroppedFileList, setIsAddingComponent } = useManuscriptController(
+    []
+  );
+
+  const { currentDrive } = useDrive();
+  const dispatch = useSetter();
 
   const handleAddExternalCid = () => {
     if (!externalCidName.length || !externalCid.length) return;
@@ -87,60 +167,16 @@ export const ButtonAddData = ({ close, directory, id }: Props) => {
 
   return (
     <>
-      <div className="hidden">
-        <FileUploaderBare
-          id={id}
-          ref={ref}
-          autoUpload={true}
-          directoryPicker={directory}
-          customReq={(files) => {
-            setTimeout(() => {
-              dispatch(
-                addFilesToDrive({
-                  componentType: ResearchObjectComponentType.DATA,
-                  files,
-                })
-              );
-            }, 500);
-            setTimeout(() => {
-              close();
-              setIsAddingComponent(false);
-            }, 50);
-          }}
+      <div className="py-3 flex items-center gap-3 text-white">
+        <ButtonAddData id="file_data" close={close} />
+        <ButtonAddData id="folder_data" directory={true} close={close} />
+        <AddExternalCidButton
+          setShowCidFields={setShowCidFields}
+          showCidFields={showCidFields}
         />
       </div>
-      <div className="w-full select-none rounded-md bg-neutrals-black p-2 border-neutrals-gray-2 flex gap-3 transition-all">
-        <div
-          className="w-[150px] h-24 font-medium text-base border-neutrals-gray-3 border-2 rounded-md hover:bg-neutrals-gray-2 active:bg-neutrals-gray-1 cursor-pointer"
-          onClick={handleOnFileUploadClick}
-        >
-          {loading ? (
-            <div className="flex h-full flex-col items-center justify-center gap-2">
-              <SpinnerCircular color="white" size={30} />
-              Selecting files
-            </div>
-          ) : (
-            <div className="flex h-full flex-col items-center justify-center gap-2">
-              <IconFile width={30} height={30} />
-              Upload Files
-            </div>
-          )}
-        </div>
-        <div
-          className={`w-[150px] h-24 font-medium text-base border-neutrals-gray-3 border-2 rounded-md hover:bg-neutrals-gray-2 active:bg-neutrals-gray-1 cursor-pointer
-          ${showCidFields ? "bg-tint-primary/10" : ""}`}
-          onClick={() => {
-            setShowCidFields(!showCidFields);
-          }}
-        >
-          <div className="flex h-full flex-col items-center justify-center gap-2">
-            <IconIpfs width={30} height={30} />
-            External CID
-          </div>
-        </div>
-      </div>
       {showCidFields && (
-        <>
+        <div className="text-white mt-2 flex flex-col gap-3">
           <div className="self-start">
             <p className="flex gap-2 font-medium items-center bg-neutrals-gray-1 px-2 py-1 rounded-md w-fit">
               <IconWarning /> Experimental Feature
@@ -183,18 +219,9 @@ export const ButtonAddData = ({ close, directory, id }: Props) => {
               Add
             </PrimaryButton>
           </div>
-        </>
+        </div>
       )}
     </>
-  );
-};
-
-const AddDataComponent = ({ close }: Props) => {
-  return (
-    <div className="py-3 flex flex-col gap-6 items-center text-white">
-      <ButtonAddData id="file_data" close={close} />
-      <ButtonAddData id="folder_data" directory={true} close={close} />
-    </div>
   );
 };
 
