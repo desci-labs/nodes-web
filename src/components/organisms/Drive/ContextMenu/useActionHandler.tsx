@@ -4,13 +4,23 @@ import {
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
-import { isRootComponentDrive } from "@src/components/driveUtils";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import { useDispatch } from "react-redux";
-import { setComponentStack, setManifestData } from "@src/state/nodes/viewer";
+import {
+  saveManifestDraft,
+  setComponentStack,
+  setManifest,
+  setManifestCid,
+} from "@src/state/nodes/viewer";
 import { useSetter } from "@src/store/accessors";
-import { setFileMetadataBeingEdited } from "@src/state/drive/driveSlice";
+import {
+  fetchTreeThunk,
+  removeFileFromCurrentDrive,
+  setFileMetadataBeingEdited,
+} from "@src/state/drive/driveSlice";
 import { setComponentTypeBeingAssignedTo } from "@src/state/drive/driveSlice";
+import { deleteData } from "@src/api";
+import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
+import { deleteComponent } from "@src/state/nodes/viewer";
 import { useDrive } from "@src/state/drive/hooks";
 
 const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
@@ -28,7 +38,7 @@ export const getActionState = (action: Actions, file: DriveObject) => {
       };
     case Actions.REMOVE:
       return {
-        disabled: true,
+        disabled: file?.path === DRIVE_FULL_EXTERNAL_LINKS_PATH,
       };
     case Actions.ASSIGN_TYPE:
       return { disabled: false };
@@ -46,8 +56,13 @@ export const getActionState = (action: Actions, file: DriveObject) => {
 };
 
 export default function useActionHandler() {
-  const dispatch = useDispatch();
-  const { manifest: manifestData, currentObjectId } = useNodeReader();
+  const dispatch = useSetter();
+  const {
+    manifest: manifestData,
+    manifestCid,
+    currentObjectId,
+    mode,
+  } = useNodeReader();
   const { deprecated } = useDrive();
 
   async function preview(file: DriveObject) {
@@ -78,34 +93,49 @@ export default function useActionHandler() {
   }
 
   async function remove(file: DriveObject) {
-    //optimistically remove
-    //   setDirectory((prev) => {
-    //     const driveIdx = prev.findIndex((drv) => drv.path === file.path);
-    //     const newDir = [...prev];
-    //     newDir.splice(driveIdx, 1);
-    //     prev.splice(driveIdx, 1);
-    //     return newDir;
-    //   });
-    //   const { manifestCid, manifest } = await deleteDatasetComponent(
-    //     currentObjectId!,
-    //     manifestData!,
-    //     file.cid
-    //   );
-    //   if (manifestCid && manifest) {
-    //     // setManifestData(manifest);
-    //     // setManifestCid(manifestCid);
-    //     dispatch(setManifestData({ cid: manifestCid, manifest }));
-    //   }
-    // } catch (e) {
-    //   //re-add on failure
-    //   setDirectory((prev) => {
-    //     const newDir = [...prev, file];
-    //     return newDir;
-    //   });
-    // }
+    if (mode !== "editor") return;
+
+    if (file.componentType === ResearchObjectComponentType.LINK) {
+      dispatch(
+        removeFileFromCurrentDrive({ where: { componentId: file.componentId } })
+      );
+      dispatch(deleteComponent({ componentId: file.componentId! }));
+      dispatch(saveManifestDraft({ uuid: currentObjectId! }));
+      return;
+    }
+
+    const snapshotManifest = { ...manifestData! };
+    const snapshotManifestCid = manifestCid;
+    const component = manifestData?.components?.find(
+      (c) => c.payload?.path === file.path
+    );
+    if (component) dispatch(deleteComponent({ componentId: component.id }));
+    dispatch(removeFileFromCurrentDrive({ where: { path: file.path! } }));
+    try {
+      const { manifestCid: newManifestCid, manifest: newManifest } =
+        await deleteData(currentObjectId!, file.path!);
+      if (newManifestCid && newManifest) {
+        dispatch(setManifest(newManifest));
+        dispatch(setManifestCid(newManifestCid));
+        dispatch(fetchTreeThunk());
+      }
+    } catch (e: any) {
+      console.error(
+        "[DATA::DELETE] Failed to delete, error: ",
+        e,
+        "file: ",
+        file
+      );
+      if (component) {
+        dispatch(setManifest(snapshotManifest!));
+        dispatch(setManifestCid(snapshotManifestCid));
+      }
+      dispatch(fetchTreeThunk());
+    }
   }
 
   async function rename(file: DriveObject) {
+    if (mode !== "editor") return;
     //TODO: in the future a similar action as below may be required for code components, or any component where cid !== id
     // if (
     //   file.componentType === ResearchObjectComponentType.DATA &&
@@ -121,10 +151,12 @@ export default function useActionHandler() {
   }
 
   async function assignType(file: DriveObject) {
+    if (mode !== "editor") return;
     dispatch(setComponentTypeBeingAssignedTo(file.path!));
   }
 
   async function editMetadata(file: DriveObject) {
+    if (mode !== "editor") return;
     dispatch(setFileMetadataBeingEdited(file));
   }
 

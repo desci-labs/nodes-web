@@ -247,6 +247,18 @@ export const driveSlice = createSlice({
       }
       state.fileMetadataBeingEdited = driveFound;
     },
+    removeFileFromCurrentDrive: (
+      state,
+      { payload }: PayloadAction<{ where: Partial<DriveObject> }>
+    ) => {
+      if (!state.currentDrive) return;
+      state.currentDrive.contains = state.currentDrive.contains?.filter(
+        (fd: DriveObject) =>
+          Object.entries(payload.where).every(
+            ([key, value]) => fd[key as keyof DriveObject] !== value
+          )
+      );
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -396,6 +408,7 @@ export const {
   showMetadataForComponent,
   setFileBeingUsed,
   setFileBeingCited,
+  removeFileFromCurrentDrive,
 } = driveSlice.actions;
 
 export interface FetchTreeThunkParams {

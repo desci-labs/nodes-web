@@ -136,6 +136,8 @@ export function inheritMetadata(
 }
 
 export const DRIVE_EXTERNAL_LINKS_PATH = "External Links";
+export const DRIVE_FULL_EXTERNAL_LINKS_PATH =
+  DRIVE_NODE_ROOT_PATH + "/" + DRIVE_EXTERNAL_LINKS_PATH;
 
 export function getAncestorComponent(
   drive: DriveObject,

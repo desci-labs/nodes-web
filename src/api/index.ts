@@ -311,52 +311,6 @@ export const logout = async () => {
   return {};
 };
 
-// export const addDatasetComponent = async (
-//   uuid: string,
-//   files: FileList | FileSystemEntry[],
-//   dataFields: { title: string; description?: string },
-//   manifest: ResearchObjectV1,
-//   onProgress?: (e: ProgressEvent) => void
-// ) => {
-//   const formData = new FormData();
-//   formData.append("uuid", uuid);
-//   formData.append("dataFields", JSON.stringify(dataFields));
-//   formData.append("manifest", JSON.stringify(manifest));
-//   if (files.length) {
-//     if (files instanceof FileList) {
-//       // files.forEach((f) => formData.append("files", f));
-//       Array.prototype.forEach.call(files, (f) => {
-//         formData.append("files", f);
-//       });
-//     } else {
-//       const entryList = files as FileSystemEntry[];
-//       for (let i = 0; i < entryList.length; i++) {
-//         const f = entryList[i];
-//         const p = new Promise<File>((res, rej) => {
-//           (f as FileSystemFileEntry).file((v) => res(v), rej);
-//         });
-//         const tempFile = await p;
-//         const fileName = entryList[i].fullPath;
-
-//         formData.append("files", new File([tempFile], fileName));
-//       }
-//     }
-//   }
-
-//   const adjustedConfig: any = config();
-//   adjustedConfig.headers["content-type"] = "multipart/form-data";
-//   if (onProgress) {
-//     adjustedConfig.onUploadProgress = (e: ProgressEvent) => onProgress(e);
-//   }
-
-//   const { data } = await axios.post(
-//     `${SCIWEAVE_URL}/v1/datasets/upload`,
-//     formData,
-//     adjustedConfig
-//   );
-//   return data;
-// };
-
 export const publishResearchObject = async (input: {
   uuid: string;
   cid: string;
@@ -382,7 +336,7 @@ export const getDatasetTree = async (
 ) => {
   const route = pub ? "pubTree" : "retrieveTree";
   const { data } = await axios.get(
-    `${SCIWEAVE_URL}/v1/datasets/${route}/${nodeUuid}/${cid}${
+    `${SCIWEAVE_URL}/v1/data/${route}/${nodeUuid}/${cid}${
       shareId ? "/" + shareId : ""
     }`,
     config()
@@ -397,7 +351,7 @@ export const getDataUsage = async () => {
 
 export const getDataset = async (cid: string, nodeUuid: string) => {
   const { data } = await axios.get(
-    `${SCIWEAVE_URL}/v1/datasets/downloadDataset/${nodeUuid}/${cid}`,
+    `${SCIWEAVE_URL}/v1/data/downloadDataset/${nodeUuid}/${cid}`,
     config()
   );
   return data;
@@ -479,29 +433,19 @@ export const updateDag = async ({
   }
 
   const { data } = await axios.post(
-    `${SCIWEAVE_URL}/v1/datasets/update`,
+    `${SCIWEAVE_URL}/v1/data/update`,
     formData,
     adjustedConfig
   );
   return data;
 };
 
-export const deleteDatasetComponent = async (
-  uuid: string,
-  manifest: ResearchObjectV1,
-  rootCid: string
-) => {
-  const formData = new FormData();
-  formData.append("uuid", uuid);
-  formData.append("manifest", JSON.stringify(manifest));
-  formData.append("rootCid", rootCid);
-
+export const deleteData = async (uuid: string, path: string) => {
   const { data } = await axios.post(
-    `${SCIWEAVE_URL}/v1/datasets/delete`,
+    `${SCIWEAVE_URL}/v1/data/delete`,
     {
       uuid,
-      rootCid,
-      manifest: JSON.stringify(manifest),
+      path,
     },
     config()
   );
