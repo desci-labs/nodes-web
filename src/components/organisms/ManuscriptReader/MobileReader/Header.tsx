@@ -8,6 +8,8 @@ import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import { Helmet } from "react-helmet";
 
 const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
+const DEFAULT_URL =
+  "http://d3ibh1pfr1vlpk.cloudfront.net/desci-nodes-preview.jpg";
 
 export default function Header() {
   const { manifest } = useNodeReader();
@@ -84,7 +86,7 @@ export default function Header() {
         <title>{manifest?.title || "Research Node"}</title>
         {/* Default tags */}
         <meta name="description" content={description} />
-        <meta itemProp="image" content={cover} />
+        <meta itemProp="image" content={cover || DEFAULT_URL} />
 
         {/* Facebook tags */}
         <meta property="og:url" content={url} />
@@ -94,7 +96,7 @@ export default function Header() {
           content={manifest?.title || "DeSci Nodes: Elevate your Research"}
         />
         <meta property="og:description" content={description} />
-        <meta property="og:image" content={cover} />
+        <meta property="og:image" content={cover || DEFAULT_URL} />
         {/* Twitter tags */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta
@@ -103,7 +105,7 @@ export default function Header() {
         />
         <meta property="twitter:url" content={url} />
         <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content={cover} />
+        <meta name="twitter:image" content={cover || DEFAULT_URL} />
       </Helmet>
     </div>
   );
