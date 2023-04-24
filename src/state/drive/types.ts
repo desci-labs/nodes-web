@@ -25,6 +25,13 @@ export interface UploadQueueItem {
   nodeUuid: string;
   path: string;
   batchUid: string;
+  uploadType: UploadTypes;
+}
+
+export enum UploadTypes {
+  FILE = "file",
+  DIR = "dir",
+  CID = "cid",
 }
 export interface AddItemsToUploadQueueAction {
   payload: {
@@ -56,9 +63,10 @@ export type DrivePath = string;
 export type CidString = string;
 export type ComponentId = string;
 
-//Path expected here is the same as regular file drop path, i.e. /hey.txt, or /folder/hey.txt
-type Path = string;
-export type ExternalCid = Record<Path, CidString>;
+export type ExternalCid = {
+  name: string;
+  cid: string;
+};
 
 //IMPORTANT: Paths can't start with a '/'
 export type ExternalUrl = {

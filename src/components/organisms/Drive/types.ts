@@ -43,12 +43,14 @@ export interface DriveObject {
   parent?: DriveObject | FileDir | null;
   path?: string;
   starred?: boolean;
+  external?: boolean;
 }
 
 export enum AccessStatus {
   PUBLIC = "Public",
   PRIVATE = "Private",
   PARTIAL = "Partial",
+  EXTERNAL = "External",
   UPLOADING = "Uploading",
   FAILED = "Failed",
 }

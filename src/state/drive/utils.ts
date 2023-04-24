@@ -136,6 +136,8 @@ export function inheritMetadata(
 }
 
 export const DRIVE_EXTERNAL_LINKS_PATH = "External Links";
+export const DRIVE_FULL_EXTERNAL_LINKS_PATH =
+  DRIVE_NODE_ROOT_PATH + "/" + DRIVE_EXTERNAL_LINKS_PATH;
 
 export function getAncestorComponent(
   drive: DriveObject,
@@ -192,6 +194,8 @@ export function convertIpfsTreeToDriveObjectTree(
       const isPartial = hasPublic(branch);
       if (isPartial) branch.accessStatus = AccessStatus.PARTIAL;
     }
+
+    if (branch.external) branch.accessStatus = AccessStatus.EXTERNAL;
 
     branch.metadata = inheritMetadata(branch.path, pathToCompMap);
     branch.starred = component?.starred || false;
