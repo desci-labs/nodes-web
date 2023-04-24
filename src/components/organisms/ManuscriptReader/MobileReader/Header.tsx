@@ -5,20 +5,34 @@ import useComponentDpid from "@components/organisms/Drive/hooks/useComponentDpid
 import useNodeCover from "@components/organisms/ManuscriptReader/hooks/useNodeCover";
 import React, { useCallback, useRef } from "react";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
+import { Helmet } from "react-helmet";
+import { useSpring } from "react-spring";
+import { animated } from "@react-spring/web";
 
 const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
+const DEFAULT_URL =
+  "http://d3ibh1pfr1vlpk.cloudfront.net/desci-nodes-preview.jpg";
 
 export default function Header() {
   const { manifest } = useNodeReader();
   const { dpid } = useComponentDpid();
   const { cover } = useNodeCover();
   const headerRef = useRef<HTMLDivElement>();
+  const [height, api] = useSpring(() => ({
+    from: { height: 0 },
+    to: { height: 250 },
+  }));
+  const [expanded, setExpanded] = React.useState(false);
+
+  const url = dpid || window.location.href;
+  const description = `Have a look at this Research Node published with DeSci Nodes.\n${dpid}`;
+
   const onHandleShare = async () => {
     try {
       await navigator.share({
-        text: `Have a look at this Research Node published with DeSci Nodes. ${dpid}`,
+        text: description,
         title: manifest?.title,
-        url: dpid || window.location.href,
+        url: url,
       });
     } catch (e) {
       console.log("Error: Unable to share", dpid, e);
@@ -40,18 +54,20 @@ export default function Header() {
   }, []);
 
   return (
-    <div
-      className="h-[30%] min-h-[250px] w-full p-2 relative flex items-end overflow-hidden shrink-0"
+    <animated.div
+      className="min-h-[250px] w-full p-2 relative flex items-end overflow-hidden shrink-0"
       style={{
+        height: height.height.get(),
         backgroundImage: `linear-gradient(
           180deg,
           rgba(2, 0, 36, 0.015865721288515378) 0%,
           rgba(0, 0, 0, 0.8618040966386554) 100%
         ), url(${cover})`,
         backgroundRepeat: "no-repeat",
-        backgroundPosition: "center",
+        backgroundPosition: "center bottom",
         backgroundSize: "cover",
         objectFit: "cover",
+        transition: "height 0.3s ease-in-out",
       }}
       ref={handleRef}
       onClick={onHandleClick}
@@ -62,7 +78,22 @@ export default function Header() {
         className="absolute top-3 right-3"
         onClick={onHandleShare}
       />
-      <div className="px-4 flex gap-3 items-center">
+      <div
+        className="px-4 flex gap-3 items-center"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          // window.getnext;
+          if (!expanded) {
+            api.start({ height: 500, immediate: true });
+            setExpanded(true);
+          } else {
+            api.start({ height: 250, immediate: true });
+            setExpanded(false);
+          }
+        }}
+      >
         <div className="shrink-0 w-fit">
           <ResearchNodeIcon width={40} className="" />
         </div>
@@ -75,6 +106,31 @@ export default function Header() {
           </span>
         </div>
       </div>
-    </div>
+      <Helmet>
+        <title>{manifest?.title || "Research Node"}</title>
+        {/* Default tags */}
+        <meta name="description" content={description} />
+        <meta itemProp="image" content={cover || DEFAULT_URL} />
+
+        {/* Facebook tags */}
+        <meta property="og:url" content={url} />
+        <meta property="og:type" content="website" />
+        <meta
+          property="og:title"
+          content={manifest?.title || "DeSci Nodes: Elevate your Research"}
+        />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content={cover || DEFAULT_URL} />
+        {/* Twitter tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:title"
+          content={manifest?.title || "DeSci Nodes: Elevate your Research"}
+        />
+        <meta property="twitter:url" content={url} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={cover || DEFAULT_URL} />
+      </Helmet>
+    </animated.div>
   );
 }

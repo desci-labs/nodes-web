@@ -1,5 +1,4 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import { __log } from "@src/components/utils";
 import adminAnalyticsReducer from "@src/state/analytics/analyticsSlice";
 import driveReducer from "@src/state/drive/driveSlice";
 import { nodeReaderMiddleware } from "@src/state/nodes/middleware";
@@ -28,7 +27,7 @@ const rootReducer = combineReducers({
 
 const migrations = {
   1: (state: PersistedState) => {
-    console.log("migrate, ", state);
+    // console.log("migrate, ", state);
     return {} as PersistedState; // reset all state, except version
   },
 };
@@ -70,11 +69,8 @@ export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false })
-    .prepend(nodeReaderMiddleware.middleware)
-    .concat([
-      api.middleware,
-      media_api.middleware,
-    ]),
+      .prepend(nodeReaderMiddleware.middleware)
+      .concat([api.middleware, media_api.middleware]),
 });
 
 export const persistor = persistStore(store);
@@ -87,8 +83,8 @@ export type RequestStatus = "idle" | "loading" | "succeeded" | "failed";
 
 const next = store.dispatch;
 store.dispatch = function dispatchAndLog(action: any) {
-  __log("dispatching", action);
+  // __log("dispatching", action);
   let result = next(action);
-  __log("next state", store.getState());
+  // __log("next state", store.getState());
   return result;
 };

@@ -1,7 +1,8 @@
-import { LS_PENDING_COMMITS_KEY } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./history.scss";
-import { ResearchObjectV1History } from "@desci-labs/desci-models";
+import {
+  ResearchObjectV1History,
+} from "@desci-labs/desci-models";
 import { CHAIN_DEPLOYMENT } from "@components/../chains";
 import { ethers } from "ethers";
 import { getResearchObjectVersions } from "@src/api";
@@ -12,7 +13,7 @@ import { setNodeHistory, setPendingCommits } from "@src/state/nodes/history";
 import { tags } from "@src/state/api/tags";
 import { publishApi } from "@src/state/api/publish";
 
-const LS_HISTORY_MAP = "DESCI::node-version-history";
+// const LS_HISTORY_MAP = "DESCI::node-version-history";
 
 export default function useNodeHistory() {
   const dispatch = useSetter();
@@ -61,13 +62,41 @@ export default function useNodeHistory() {
       const update = pendingHistory.filter(
         (p) => !hashes.includes(p.transaction?.id)
       );
-      updatePendingCommits(update);
+      // only update if there are new commits
+      if (!pendingCommits[currentObjectId!]) {
+        updatePendingCommits(update);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [history, pendingHistory]);
+  }, [history, pendingHistory, pendingCommits]);
+
+  const processHistory = useCallback(async () => {
+    // debugger;
+    if (!currentObjectId) return;
+    try {
+      const versions = await getResearchObjectVersions(currentObjectId);
+      const currentHistory = transformVersions(versions);
+      if (history.length === currentHistory.length) return;
+
+      dispatch(
+        setNodeHistory({ id: currentObjectId, history: currentHistory })
+      );
+      dispatch(
+        publishApi.util.invalidateTags([
+          { type: tags.nodeVersions, id: currentObjectId },
+        ])
+      );
+    } catch (e) {
+      console.log("ERROR", e);
+    } finally {
+      setIsFetching(false);
+      setLoadingChain(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentObjectId]);
 
   useEffect(() => {
-    let isMounted = true
+    let isMounted = true;
     if (loadRef.current === false) {
       setLoadingChain(true);
     }
@@ -76,27 +105,7 @@ export default function useNodeHistory() {
       const refresh = () => {
         if (isMounted) setIsFetching(true);
 
-        (async () => {
-          try {
-            const versions = await getResearchObjectVersions(currentObjectId);
-            const currentHistory = transformVersions(versions);
-            if (history.length === currentHistory.length) return;
-
-            dispatch(
-              setNodeHistory({ id: currentObjectId, history: currentHistory })
-            );
-            dispatch(
-              publishApi.util.invalidateTags([
-                { type: tags.nodeVersions, id: currentObjectId },
-              ])
-            );
-          } catch (e) {
-            console.log("ERROR", e);
-          } finally {
-            if (isMounted) setIsFetching(false);
-            if (isMounted) setLoadingChain(false);
-          }
-        })();
+        processHistory();
       };
 
       refresh();
@@ -126,8 +135,9 @@ export default function useNodeHistory() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     return () => {
-      isMounted = false
-    }
+      isMounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentObjectId]);
 
   return {

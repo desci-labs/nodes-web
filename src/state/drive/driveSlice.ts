@@ -426,7 +426,7 @@ export const addExternalLinkThunk = createAsyncThunk(
     },
     { getState, dispatch }
   ) => {
-    const state = getState() as RootState;
+    // const state = getState() as RootState;
 
     const { name, url, subtype } = payload;
     const newComponent: ExternalLinkComponent = {
@@ -624,8 +624,8 @@ export const addFilesToDrive = createAsyncThunk(
         manifest: updatedManifest,
         rootDataCid,
         manifestCid,
-        tree,
-        date,
+        // tree,
+        // date,
       } = await updateDag({
         uuid: currentObjectId!,
         files,
