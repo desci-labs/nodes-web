@@ -69,6 +69,7 @@ export interface DriveState {
   fileMetadataBeingEdited: DriveObject | null;
   fileBeingUsed: DriveObject | null;
   fileBeingCited: DriveObject | null;
+  fileBeingRenamed: DriveObject | null;
   breadCrumbs: BreadCrumb[];
 
   // drive picker state
@@ -88,6 +89,7 @@ const initialState: DriveState = {
   showUploadPanel: false,
   componentTypeBeingAssignedTo: null,
   fileMetadataBeingEdited: null,
+  fileBeingRenamed: null,
   fileBeingUsed: null,
   fileBeingCited: null,
   breadCrumbs: [],
@@ -209,6 +211,12 @@ export const driveSlice = createSlice({
     ) => {
       state.fileBeingUsed = payload;
     },
+    setFileBeingRenamed: (
+      state,
+      { payload }: PayloadAction<DriveObject | null>
+    ) => {
+      state.fileBeingRenamed = payload;
+    },
     setFileBeingCited: (
       state,
       { payload }: PayloadAction<DriveObject | null>
@@ -258,6 +266,21 @@ export const driveSlice = createSlice({
             ([key, value]) => fd[key as keyof DriveObject] !== value
           )
       );
+    },
+    renameFileInCurrentDrive: (
+      state,
+      { payload }: PayloadAction<{ filePath: string; newName: string }>
+    ) => {
+      const file = state.currentDrive?.contains?.find(
+        (f) => f.path === payload.filePath
+      );
+      if (file) {
+        file.name = payload.newName;
+        const oldPathSplit = file.path?.split("/");
+        oldPathSplit?.pop();
+        oldPathSplit?.push(payload.newName);
+        file.path = oldPathSplit?.join("/");
+      }
     },
   },
   extraReducers: (builder) => {
@@ -409,6 +432,8 @@ export const {
   setFileBeingUsed,
   setFileBeingCited,
   removeFileFromCurrentDrive,
+  setFileBeingRenamed,
+  renameFileInCurrentDrive,
 } = driveSlice.actions;
 
 export interface FetchTreeThunkParams {

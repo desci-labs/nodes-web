@@ -18,6 +18,7 @@ import { separateFileNameAndMimeType } from "@src/state/drive/utils";
 import {
   fetchTreeThunk,
   removeFileFromCurrentDrive,
+  setFileBeingRenamed,
   setFileMetadataBeingEdited,
 } from "@src/state/drive/driveSlice";
 import { setComponentTypeBeingAssignedTo } from "@src/state/drive/driveSlice";
@@ -37,7 +38,7 @@ export const getActionState = (action: Actions, file: DriveObject) => {
       };
     case Actions.RENAME:
       return {
-        disabled: true,
+        disabled: file?.path === DRIVE_FULL_EXTERNAL_LINKS_PATH,
       };
     case Actions.DOWNLOAD:
       return {
@@ -145,18 +146,7 @@ export default function useActionHandler() {
 
   async function rename(file: DriveObject) {
     if (mode !== "editor") return;
-    //TODO: in the future a similar action as below may be required for code components, or any component where cid !== id
-    // if (
-    //   file.componentType === ResearchObjectComponentType.DATA &&
-    //   manifestData
-    // ) {
-    //   const comp = manifestData.components.find(
-    //     (c: ResearchObjectV1Component) => c.payload.cid === file.cid
-    //   );
-    //   if (comp) setRenameComponentId(comp.id);
-    //   return;
-    // }
-    // setRenameComponentId(file.cid);
+    dispatch(setFileBeingRenamed(file));
   }
 
   async function download(file: DriveObject) {
