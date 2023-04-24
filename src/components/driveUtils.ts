@@ -35,7 +35,7 @@ export enum SessionStorageKeys {
 interface VirtualDriveArgs {
   name: string;
   componentType: ResearchObjectComponentType | DriveNonComponentTypes;
-  componentId: string;
+  componentId?: string;
   size?: number;
   contains?: Array<DriveObject>;
   lastModified?: string;

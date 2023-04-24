@@ -1,5 +1,12 @@
 import RadialLoader from "@components/atoms/RadialLoader";
-import { IconDirectory, IconFolderStroke, IconGreenCheck, IconX } from "@icons";
+import {
+  IconDirectory,
+  IconFile,
+  IconFolderStroke,
+  IconGreenCheck,
+  IconIpfs,
+  IconX,
+} from "@icons";
 import React, { useEffect, useState } from "react";
 import ReactTooltip from "react-tooltip";
 import { SessionStorageKeys } from "@src/components/driveUtils";
@@ -12,10 +19,22 @@ import {
   navigateToDriveByPath,
   setShowUploadPanel,
 } from "@src/state/drive/driveSlice";
-import { UploadQueueItem } from "@src/state/drive/types";
+import { UploadQueueItem, UploadTypes } from "@src/state/drive/types";
 
 export interface UploadPanelProps {
   show: boolean;
+}
+
+export function getIconForUploadType(type: UploadTypes) {
+  switch (type) {
+    case UploadTypes.DIR:
+      return <IconFolderStroke />;
+    case UploadTypes.CID:
+      return <IconIpfs width={18} />;
+    case UploadTypes.FILE:
+    default:
+      return <IconFile width={18} height={18} />;
+  }
 }
 
 const UploadPanel: React.FC<UploadPanelProps> = ({ show }) => {
@@ -105,9 +124,7 @@ const UploadPanel: React.FC<UploadPanelProps> = ({ show }) => {
               key={qI.batchUid + idx}
             >
               <div className="flex items-center gap-2">
-                <span>
-                  <IconFolderStroke />
-                </span>
+                <span>{getIconForUploadType(qI.uploadType)}</span>
                 {qI.path.split("/").pop()}
               </div>
               <aside>
