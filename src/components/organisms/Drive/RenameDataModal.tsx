@@ -19,6 +19,7 @@ import {
 } from "@src/state/drive/driveSlice";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import { renameData } from "@src/api";
+import { useDrive } from "@src/state/drive/hooks";
 
 interface RenameDataModalProps {
   file: DriveObject;
@@ -31,8 +32,10 @@ const RenameDataModal: React.FC<RenameDataModalProps> = ({ file }) => {
     manifestCid,
     currentObjectId,
   } = useNodeReader();
+  const { currentDrive } = useDrive();
   const [newName, setNewName] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setNewName(file.name);
@@ -42,6 +45,12 @@ const RenameDataModal: React.FC<RenameDataModalProps> = ({ file }) => {
 
   const handleSubmit = async () => {
     setLoading(true);
+    if (currentDrive?.contains!.some((f) => f.name === newName)) {
+      setError("File with this name already exists in current directory");
+      setLoading(false);
+      return;
+    }
+
     dispatch(
       renameFileInCurrentDrive({ filePath: file.path!, newName: newName })
     );
@@ -108,6 +117,7 @@ const RenameDataModal: React.FC<RenameDataModalProps> = ({ file }) => {
             mandatory={true}
           />
         </div>
+        <p className="text-rose-400 text-xs">{error}</p>
       </div>
       <Modal.Footer>
         <PrimaryButton onClick={handleSubmit}>
