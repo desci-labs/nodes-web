@@ -189,9 +189,7 @@ export default function useActionHandler() {
       link.href = url2;
       link.setAttribute(
         "download",
-        `${fileName.replaceAll(" ", "_")}__nodes.desci.com__${
-          url.split("/")[url.split("/").length - 1]
-        }${mimeType ? `.${mimeType}` : ""}`
+        `${fileName}${mimeType ? `.${mimeType}` : ""}`
       );
       document.body.appendChild(link);
       link.click();
