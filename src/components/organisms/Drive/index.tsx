@@ -13,6 +13,8 @@ import "./styles.scss";
 import DriveBreadCrumbs from "@src/components/molecules/DriveBreadCrumbs";
 import ComponentUseModal from "@src/components/molecules/ComponentUseModal";
 import { useManuscriptController } from "../ManuscriptReader/ManuscriptController";
+import ContextMenu from "../ContextMenu";
+import { FolderAddIcon } from "@heroicons/react/solid";
 
 const Empty = () => {
   return <div className="p-5 text-xs col-span-7">No files</div>;
@@ -28,6 +30,10 @@ const DriveTable: React.FC = () => {
     useManuscriptController();
   const { currentDrive, deprecated, breadCrumbs, fileBeingRenamed } =
     useDrive();
+
+  const [showAddBtnSelectMenu, setShowAddBtnSelectMenu] =
+    useState<boolean>(false);
+
   const dispatch = useSetter();
 
   const [selected, setSelected] = useState<
@@ -76,21 +82,56 @@ const DriveTable: React.FC = () => {
       {!publicView ? (
         <div className="w-full flex flex-row -mt-8">
           <div className="flex-grow"></div>
-          <div className="w-42 self-end">
+          <div className="w-42 self-end relative">
             {mode === "editor" && (
-              <ButtonSecondary
-                onClick={() => {
-                  setAddFilesWithoutContext(false);
-                  setIsAddingComponent(true);
-                }}
-              >
-                <IconCirclePlus className="group-hover:hidden" fill="white" />
-                <IconCirclePlus
-                  className="group-hover:!block hidden"
-                  fill="black"
-                />{" "}
-                Add
-              </ButtonSecondary>
+              <>
+                <ButtonSecondary
+                  onClick={() => {
+                    setShowAddBtnSelectMenu(true);
+                  }}
+                >
+                  <IconCirclePlus className="group-hover:hidden" fill="white" />
+                  <IconCirclePlus
+                    className="group-hover:!block hidden"
+                    fill="black"
+                  />{" "}
+                  Add
+                </ButtonSecondary>
+                {showAddBtnSelectMenu && (
+                  <ContextMenu
+                    items={[
+                      {
+                        icon: (
+                          <IconCirclePlus
+                            className="group-hover:hidden"
+                            fill="white"
+                          />
+                        ),
+                        label: <span>Add Component</span>,
+                        onClick: () => {
+                          setAddFilesWithoutContext(false);
+                          setIsAddingComponent(true);
+                        },
+                      },
+                      {
+                        icon: (
+                          <FolderAddIcon
+                            className="group-hover:hidden"
+                            fill="white"
+                          />
+                        ),
+                        label: <span>Create New Folder</span>,
+                        onClick: () => {
+                          setAddFilesWithoutContext(false);
+                          setIsAddingComponent(true);
+                        },
+                      },
+                    ]}
+                    close={() => setShowAddBtnSelectMenu(false)}
+                    className={"right-0"}
+                  />
+                )}
+              </>
             )}
           </div>
         </div>

@@ -1,7 +1,5 @@
 import BlackGenericButton from "@components/atoms/BlackGenericButton";
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { BytesToHumanFileSize } from "@components/utils";
-import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import {
   IconCodeRepo,
   IconData,
@@ -62,23 +60,18 @@ export default function DriveRow({
   const contextRef = useRef<HTMLDivElement>();
   const { init } = useDriveContext(file);
   const { handleDbClick } = useInteractionHandler();
-  const { publicView, shareId, manifestCid, mode } = useNodeReader();
+  const { mode } = useNodeReader();
 
   const dispatch = useSetter();
 
   const handleRef = useCallback(
     (node: HTMLDivElement) => {
-      if (
-        file.type === FileType.DIR &&
-        file.parent?.path?.toLowerCase().includes("noderoot")
-      )
-        return;
       if (node !== null) {
         contextRef.current = node;
         init(node);
       }
     },
-    [file.parent?.path, file.type, init]
+    [init]
   );
 
   return (
