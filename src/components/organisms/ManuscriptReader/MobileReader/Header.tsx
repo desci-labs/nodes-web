@@ -55,7 +55,7 @@ export default function Header() {
 
   return (
     <animated.div
-      className="min-h-[250px] w-full p-2 relative flex items-end overflow-hidden shrink-0"
+      className="min-h-[320px] w-full p-2 relative flex items-end overflow-hidden shrink-0"
       style={{
         height: height.height.get(),
         backgroundImage: `linear-gradient(
