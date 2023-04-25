@@ -74,7 +74,7 @@ const InsetLabelSmallInput = forwardRef<
       <label
         className={`absolute font-medium text-sm text-gray-900 dark:text-white pointer-events-none ${
           props.labelClassName
-        } ${field.value ? "top-0 text-[10px]" : "top-3"}`}
+        } ${field.value || value?.length ? "top-0 text-[10px]" : "top-3"}`}
       >
         {label}
         {optional && (

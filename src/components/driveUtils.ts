@@ -6,7 +6,6 @@ import {
 } from "@desci-labs/desci-models";
 import CID from "cids";
 import { ButtonState } from "./atoms/StatusButton";
-import { BreadCrumb } from "./molecules/DriveBreadCrumbs";
 import {
   AccessStatus,
   DriveMetadata,
@@ -16,13 +15,8 @@ import {
   FileType,
 } from "./organisms/Drive";
 import { v4 as uuidv4 } from "uuid";
-import { Button } from "./molecules/AnnotationEditor/components";
 import { UploadQueueItem } from "@src/state/drive/types";
-import {
-  formatDbDate,
-  getComponentCid,
-  recursiveFlattenTree,
-} from "@src/state/drive/utils";
+import { formatDbDate, recursiveFlattenTree } from "@src/state/drive/utils";
 
 export const tempDate = "12/02/2022 7:00PM";
 
@@ -35,7 +29,7 @@ export enum SessionStorageKeys {
 interface VirtualDriveArgs {
   name: string;
   componentType: ResearchObjectComponentType | DriveNonComponentTypes;
-  componentId: string;
+  componentId?: string;
   size?: number;
   contains?: Array<DriveObject>;
   lastModified?: string;
@@ -233,7 +227,11 @@ export async function getAllTrees(
       );
       if (!tree) return dataComp;
       // debugger;
-      gracefullyAssignTreeUids(tree, dataComp.contains, options?.pathUidMap!);
+      gracefullyAssignTreeUids(
+        tree,
+        dataComp.contains || [],
+        options?.pathUidMap!
+      );
       if (date) dates.push(new Date(date));
       tree.forEach((fd: any) => (fd.parent = dataComp));
       dataComp.contains = tree;

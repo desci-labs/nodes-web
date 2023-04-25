@@ -8,9 +8,10 @@ import { lockScroll, restoreScroll } from "@src/components/utils";
 const AnimatedDialogOverlay = animated(DialogOverlay);
 const StyledDialogOverlay = styled(AnimatedDialogOverlay)<{
   $scrollOverlay?: boolean;
+  $padOverlay?: boolean;
 }>`
   &[data-reach-dialog-overlay] {
-    padding: 20px;
+    padding: ${({ $padOverlay }) => ($padOverlay === false ? "0" : "20px")};
     backdrop-filter: blur(3px);
     background-color: transparent;
     overflow: hidden;
@@ -77,6 +78,7 @@ export interface ModalProps {
   $minHeight?: number | false;
   $maxHeight?: number;
   $maxWidth?: number;
+  $padOverlay?: boolean;
 }
 
 export default function Modal({
@@ -88,6 +90,7 @@ export default function Modal({
   isOpen,
   onDismiss,
   $scrollOverlay,
+  $padOverlay,
 }: ModalProps) {
   const fadeTransition = useTransition(isOpen, {
     config: { duration: 200 },
@@ -105,7 +108,7 @@ export default function Modal({
     return () => {
       restoreScroll(true);
     };
-  }, []);
+  }, [isOpen]);
 
   return (
     <>
@@ -121,6 +124,7 @@ export default function Modal({
                 opacity: opacity.to({ range: [0.0, 1.0], output: [0, 1] }),
               }}
               $scrollOverlay={$scrollOverlay}
+              $padOverlay={$padOverlay}
             >
               <StyledDialogContent
                 aria-label="dialog"
@@ -157,7 +161,7 @@ const ModalHeader = ({
       </div>
       {!hideCloseIcon && (
         <button
-          className="cursor-pointer p-5 -m-5 absolute right-5 top-5 stroke-black dark:stroke-white hover:stroke-muted-300 hover:dark:stroke-muted-300"
+          className="cursor-pointer p-5 -m-5 absolute right-5 top-5 z-[999] stroke-black dark:stroke-white hover:stroke-muted-300 hover:dark:stroke-muted-300"
           onClick={onDismiss}
         >
           <IconX />

@@ -33,7 +33,7 @@ export interface DriveObject {
   name: string;
   lastModified: string; //date later
   componentType: ResearchObjectComponentType | DriveNonComponentTypes;
-  componentId: string | undefined;
+  componentId?: string | undefined;
   accessStatus: AccessStatus;
   size: number;
   metadata: DriveMetadata;
@@ -43,12 +43,14 @@ export interface DriveObject {
   parent?: DriveObject | FileDir | null;
   path?: string;
   starred?: boolean;
+  external?: boolean;
 }
 
 export enum AccessStatus {
   PUBLIC = "Public",
   PRIVATE = "Private",
   PARTIAL = "Partial",
+  EXTERNAL = "External",
   UPLOADING = "Uploading",
   FAILED = "Failed",
 }

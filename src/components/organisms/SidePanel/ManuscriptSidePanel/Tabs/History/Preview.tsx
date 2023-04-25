@@ -12,7 +12,7 @@ export default function HistoryPreview() {
   const [height] = useState(0);
   const { selectedHistoryId } = useHistoryReader();
   const { loadingChain, history } = useNodeHistory();
-  const selectedId = selectedHistoryId || history.length.toString();
+  const selectedId = selectedHistoryId || (history.length - 1).toString();
 
   return (
     <div className="flex flex-row">
@@ -40,7 +40,7 @@ export default function HistoryPreview() {
             pending={false}
             latest={index === 0}
             index={history.length - index}
-            selected={selectedId === `${history.length - index}`}
+            selected={index === history.length - +selectedId - 1}
           />
         ))}
       </div>
