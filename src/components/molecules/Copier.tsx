@@ -27,14 +27,14 @@ export default function Copier(props: {
   return (
     <>
       {copied ? (
-        <CheckIcon className={`w-8 ${props.classes ?? ""}`} />
+        <CheckIcon className={`w-5 ${props.classes ?? ""}`} />
       ) : (
         <>
           {props?.icon ? (
             <>{props?.icon({ onClick: () => handleCopy(props.text) })}</>
           ) : (
             <BsClipboard
-              className={`cursor-pointer w-8 ${props.classes ?? ""}`}
+              className={`cursor-pointer w-5 ${props.classes ?? ""}`}
               onClick={() => handleCopy(props.text)}
             />
           )}
