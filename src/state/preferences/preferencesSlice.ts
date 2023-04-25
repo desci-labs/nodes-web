@@ -18,6 +18,7 @@ const initialState: AppPreferences = {
   isToolbarVisible: false,
   showReferralModal: false,
   isMobileView: false,
+  mobileViewWarning: false,
   showMobileComponentStack: false,
 };
 
@@ -33,6 +34,9 @@ const slice = createSlice({
     },
     setMobileView: (state, { payload }: PayloadAction<boolean>) => {
       state.isMobileView = payload;
+    },
+    setShowMobileWarning: (state, { payload }: PayloadAction<boolean>) => {
+      state.mobileViewWarning = payload;
     },
     setOrcid: (state, { payload }: PayloadAction<Partial<Orcid>>) => {
       state.orcid = { ...state.orcid, ...payload };
@@ -87,5 +91,6 @@ export const {
   setActiveToolbar,
   setMobileView,
   setShowReferralModal,
+  setShowMobileWarning,
   setShowComponentStack,
 } = slice.actions;

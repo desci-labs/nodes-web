@@ -220,7 +220,7 @@ const ComponentCard = (props: ComponentCardProps) => {
     >
       <FlexColumn>
         <HeaderWrapper>
-          <span className="text-xs font-bold">{component.name}</span>
+          <span className="text-xs font-bold truncate">{component.name}</span>
           {/* {headerRight} */}
           <span className="flex flex-col items-center">
             <div className="border-tint-primary border-[2px] p-1 rounded-full scale-75 block -my-1">
@@ -329,9 +329,11 @@ const ComponentCard = (props: ComponentCardProps) => {
                     >
                       <IconQuotes />
                     </BlackGenericButton>
-                    {component.type == ResearchObjectComponentType.DATA ||
-                    component.type == ResearchObjectComponentType.CODE ||
-                    component.type == ResearchObjectComponentType.UNKNOWN ? (
+                    {[
+                      ResearchObjectComponentType.DATA,
+                      ResearchObjectComponentType.CODE,
+                      ResearchObjectComponentType.UNKNOWN,
+                    ].includes(component.type) ? (
                       <BlackGenericButton
                         dataTip={"Methods"}
                         dataFor={`use_${component.id}`}

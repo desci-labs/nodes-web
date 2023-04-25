@@ -17,6 +17,7 @@ export type AppPreferences = {
   isMobileView: boolean;
   isToolbarVisible: boolean;
   showReferralModal: boolean;
+  mobileViewWarning: boolean;
   activeToolbar: TOOLBAR_ENTRY;
   showMobileComponentStack: boolean;
 };

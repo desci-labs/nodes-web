@@ -362,13 +362,11 @@ export const nodeReaderSlice = createSlice({
       const remainingLastValue = value[value.length - 1];
       if (
         remainingLastValue &&
-        remainingLastValue.type == ResearchObjectComponentType.PDF
+        remainingLastValue.type === ResearchObjectComponentType.PDF
       ) {
         let lastScrollTop = state.lastScrollTop[remainingLastValue.payload.url];
         state.pdfScrollOffsetTop = lastScrollTop;
-        // setTimeout(() => {
-        //   // document.scrollingElement!.scrollTop = lastScrollTop!;
-        // });
+
         state.lastScrollTop = {
           ...state.lastScrollTop,
           [remainingLastValue.payload.url]: 0,

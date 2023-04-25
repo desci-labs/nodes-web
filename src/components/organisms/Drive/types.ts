@@ -33,7 +33,7 @@ export interface DriveObject {
   name: string;
   lastModified: string; //date later
   componentType: ResearchObjectComponentType | DriveNonComponentTypes;
-  componentId: string | undefined;
+  componentId?: string | undefined;
   accessStatus: AccessStatus;
   size: number;
   metadata: DriveMetadata;
