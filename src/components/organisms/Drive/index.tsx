@@ -110,7 +110,7 @@ const DriveTable: React.FC = () => {
                             fill="white"
                           />
                         ),
-                        label: <span>Add Component</span>,
+                        label: <span>New Component</span>,
                         onClick: () => {
                           setAddFilesWithoutContext(false);
                           setIsAddingComponent(true);
@@ -123,7 +123,7 @@ const DriveTable: React.FC = () => {
                             fill="white"
                           />
                         ),
-                        label: <span>Create New Folder</span>,
+                        label: <span>New Folder</span>,
                         onClick: () => {
                           setAddFilesWithoutContext(false);
                           dispatch(addFilesToDrive({ newFolder: true }));
