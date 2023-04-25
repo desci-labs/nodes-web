@@ -336,3 +336,13 @@ export function separateFileNameAndMimeType(fileName: string): {
   const name = splitName.join(".");
   return { fileName: name, mimeType };
 }
+
+export function findUniqueName(name: string, existingNames: string[]) {
+  let newName = name;
+  let i = 1;
+  while (existingNames.includes(newName)) {
+    newName = `${name} (${i})`;
+    i++;
+  }
+  return newName;
+}

@@ -31,6 +31,7 @@ import {
   constructBreadCrumbs,
   bfsDriveSearch,
   getComponentCid,
+  findUniqueName,
 } from "./utils";
 import {
   AddFilesToDrivePayload,
@@ -543,15 +544,19 @@ export const addFilesToDrive = createAsyncThunk(
       externalUrl,
       componentType,
       componentSubType,
+      newFolder,
       onSuccess,
     } = payload;
     if (!nodeTree || !manifest) return;
-    if (!arrayXor([files?.length, externalCids?.length, externalUrl])) {
+    if (
+      !arrayXor([files?.length, externalCids?.length, externalUrl, newFolder])
+    ) {
       console.error(
         "[addFilesToDrive] Error: More than one upload method was used",
         files,
         externalCids,
-        externalUrl
+        externalUrl,
+        newFolder
       );
     }
 
@@ -629,6 +634,22 @@ export const addFilesToDrive = createAsyncThunk(
       });
     }
 
+    let newFolderName;
+    if (newFolder) {
+      const existingNames =
+        state.drive.currentDrive?.contains?.map((f) => f.name) || [];
+      const newFolderName = findUniqueName("New Folder", existingNames);
+      fileInfo = [
+        {
+          uploadType: UploadTypes.DIR,
+          name: newFolderName,
+          path: overwritePathContext
+            ? overwritePathContext + "/" + newFolderName
+            : state.drive.currentDrive!.path + "/" + newFolderName,
+        },
+      ];
+    }
+
     if (!fileInfo) return console.error("[AddFilesToDrive] fileInfo undefined");
 
     const batchUid = Date.now().toString();
@@ -660,6 +681,7 @@ export const addFilesToDrive = createAsyncThunk(
         externalUrl,
         componentType,
         componentSubType,
+        newFolderName,
         onProgress: (e) => {
           const perc = Math.ceil((e.loaded / e.total) * 100);
           const passedPerc = perc < 90 ? perc : 90;
