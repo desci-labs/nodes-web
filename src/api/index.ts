@@ -386,7 +386,14 @@ export const updateDag = async ({
   externalUrl,
   newFolderName,
 }: UpdateDag) => {
-  if (!arrayXor([files?.length, externalCids?.length, externalUrl, newFolder]))
+  if (
+    !arrayXor([
+      files?.length,
+      externalCids?.length,
+      externalUrl,
+      newFolderName?.length,
+    ])
+  )
     return { error: "Can only update DAG using a single update method" };
   if (
     !files?.length &&
@@ -396,6 +403,7 @@ export const updateDag = async ({
     !newFolderName?.length
   )
     return { error: "Missing content, files, externalUrl or externalCid" };
+
   const formData = new FormData();
   formData.append("uuid", uuid);
   formData.append("manifest", JSON.stringify(manifest));

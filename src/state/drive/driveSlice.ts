@@ -638,7 +638,7 @@ export const addFilesToDrive = createAsyncThunk(
     if (newFolder) {
       const existingNames =
         state.drive.currentDrive?.contains?.map((f) => f.name) || [];
-      const newFolderName = findUniqueName("New Folder", existingNames);
+      newFolderName = findUniqueName("New Folder", existingNames);
       fileInfo = [
         {
           uploadType: UploadTypes.DIR,
@@ -662,12 +662,12 @@ export const addFilesToDrive = createAsyncThunk(
     dispatch(setShowUploadPanel(true));
     dispatch(addItemsToUploadQueue({ items: uploadQueueItems }));
     dispatch(updateBatchUploadProgress({ batchUid: batchUid, progress: 0 }));
-
     const contextPath = overwritePathContext || state.drive.currentDrive!.path!;
     const snapshotNodeUuid = currentObjectId!;
     try {
       const {
         manifest: updatedManifest,
+        error,
         rootDataCid,
         manifestCid,
         // tree,
@@ -690,6 +690,7 @@ export const addFilesToDrive = createAsyncThunk(
           );
         },
       });
+      if (error) console.error(`[addFilesToDrive] Error: ${error}`);
       if (onSuccess) onSuccess(updatedManifest);
       dispatch(removeBatchFromUploadQueue({ batchUid }));
       if (rootDataCid && updatedManifest && manifestCid) {

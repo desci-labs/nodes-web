@@ -7,7 +7,10 @@ import { IconCirclePlus, IconStar } from "@src/icons";
 import RenameDataModal from "./RenameDataModal";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useDrive } from "@src/state/drive/hooks";
-import { navigateToDriveByPath } from "@src/state/drive/driveSlice";
+import {
+  addFilesToDrive,
+  navigateToDriveByPath,
+} from "@src/state/drive/driveSlice";
 import { useSetter } from "@src/store/accessors";
 import "./styles.scss";
 import DriveBreadCrumbs from "@src/components/molecules/DriveBreadCrumbs";
@@ -123,7 +126,7 @@ const DriveTable: React.FC = () => {
                         label: <span>Create New Folder</span>,
                         onClick: () => {
                           setAddFilesWithoutContext(false);
-                          setIsAddingComponent(true);
+                          dispatch(addFilesToDrive({ newFolder: true }));
                         },
                       },
                     ]}
