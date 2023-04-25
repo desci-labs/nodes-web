@@ -93,9 +93,11 @@ const PageComponent = React.memo((props: any) => {
       pageNumber={pageNumber}
       // @ts-ignore
       enhanceTextSelection={isRendered}
-      className={`absolute left-[50%] top-[50%] h-full w-full ${
+      className={`absolute transition-opacity left-[50%] top-[50%] h-full w-full ${
         visible ? "" : "invisible"
-      } bg-transparent ${props.className}`}
+      } ${isRendered ? "opacity-100" : "opacity-0"} bg-transparent ${
+        props.className
+      }`}
       onLoadSuccess={onLoadSuccess}
       onRenderSuccess={onRenderSuccessHandle}
       renderTextLayer={true}
