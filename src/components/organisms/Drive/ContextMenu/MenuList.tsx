@@ -6,7 +6,6 @@ import { AiOutlineDownload } from "react-icons/ai";
 import { VscLinkExternal } from "react-icons/vsc";
 import { SlPencil } from "react-icons/sl";
 import { BsTrash } from "react-icons/bs";
-import { MdOutlineWallpaper } from "react-icons/md";
 import { IconAssignType } from "@src/icons";
 
 const menuListLabel: Record<Actions, string> = {
@@ -16,7 +15,7 @@ const menuListLabel: Record<Actions, string> = {
   REMOVE: "Delete",
   ASSIGN_TYPE: "Assign Type",
   EDIT_METADATA: "Edit Metadata",
-  SET_NODE_COVER: "Set Node Cover",
+  // SET_NODE_COVER: "Set Node Cover",
 };
 
 type IconType = React.FunctionComponent<
@@ -32,7 +31,7 @@ const ActionIcons: Record<Actions, IconType> = {
   REMOVE: BsTrash,
   ASSIGN_TYPE: IconAssignType,
   EDIT_METADATA: SlPencil,
-  SET_NODE_COVER: MdOutlineWallpaper,
+  // SET_NODE_COVER: MdOutlineWallpaper,
 };
 
 function MenuList({ file }: { file: DriveObject }) {
