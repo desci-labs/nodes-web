@@ -26,7 +26,8 @@ const DriveTable: React.FC = () => {
   const { publicView, mode } = useNodeReader();
   const { setAddFilesWithoutContext, setIsAddingComponent } =
     useManuscriptController();
-  const { currentDrive, deprecated, breadCrumbs } = useDrive();
+  const { currentDrive, deprecated, breadCrumbs, fileBeingRenamed } =
+    useDrive();
   const dispatch = useSetter();
 
   const [selected, setSelected] = useState<
@@ -156,13 +157,7 @@ const DriveTable: React.FC = () => {
           )}
         </ul>
       </div>
-      {/* {renameComponentId && (
-        <RenameDataModal
-          renameComponentId={renameComponentId}
-          setRenameComponentId={setRenameComponentId}
-          setDirectory={setDirectory}
-        />
-      )} */}
+      {fileBeingRenamed && <RenameDataModal file={fileBeingRenamed} />}
     </div>
   );
 };
