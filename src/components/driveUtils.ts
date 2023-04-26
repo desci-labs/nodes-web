@@ -28,7 +28,7 @@ export enum SessionStorageKeys {
 
 interface VirtualDriveArgs {
   name: string;
-  componentType: ResearchObjectComponentType | DriveNonComponentTypes;
+  componentType?: ResearchObjectComponentType | DriveNonComponentTypes;
   componentId?: string;
   size?: number;
   contains?: Array<DriveObject>;
@@ -60,8 +60,8 @@ export function createVirtualDrive({
 }: VirtualDriveArgs): DriveObject {
   return {
     name,
-    componentType,
-    componentId,
+    componentType: componentType || ResearchObjectComponentType.UNKNOWN,
+    componentId: componentId || undefined,
     size: size || 0,
     contains: contains, // if we default to blank array External Links are treated as folders for file picker
     lastModified: lastModified || tempDate,

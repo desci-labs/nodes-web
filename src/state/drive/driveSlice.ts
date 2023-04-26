@@ -33,6 +33,8 @@ import {
   getComponentCid,
   findUniqueName,
   GENERIC_NEW_FOLDER_NAME,
+  CID_PENDING,
+  getAncestorComponent,
 } from "./utils";
 import {
   AddFilesToDrivePayload,
@@ -286,6 +288,12 @@ export const driveSlice = createSlice({
         file.path = oldPathSplit?.join("/");
       }
     },
+    optimisticAddFileToCurrentDrive: (
+      state,
+      { payload }: PayloadAction<DriveObject>
+    ) => {
+      state.currentDrive?.contains?.push(payload);
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -438,6 +446,7 @@ export const {
   removeFileFromCurrentDrive,
   setFileBeingRenamed,
   renameFileInCurrentDrive,
+  optimisticAddFileToCurrentDrive,
 } = driveSlice.actions;
 
 export interface FetchTreeThunkParams {
@@ -651,6 +660,17 @@ export const addFilesToDrive = createAsyncThunk(
             : state.drive.currentDrive!.path + "/" + newFolderName,
         },
       ];
+    }
+
+    if (newFolderName && newFolder) {
+      const optimisticNewFolder = createVirtualDrive({
+        name: newFolderName!,
+        cid: CID_PENDING,
+        type: FileType.DIR,
+        contains: undefined,
+        path: [state.drive.currentDrive!.path!, newFolderName].join("/"),
+      });
+      dispatch(optimisticAddFileToCurrentDrive(optimisticNewFolder));
     }
 
     if (!fileInfo) return console.error("[AddFilesToDrive] fileInfo undefined");
