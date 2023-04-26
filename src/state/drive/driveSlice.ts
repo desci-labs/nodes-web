@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from "uuid";
 import { getDatasetTree, updateDag } from "@src/api";
 import { DriveObject, FileType } from "@src/components/organisms/Drive";
 import { RequestStatus, RootState } from "@src/store";
-import toast from "react-hot-toast";
 import {
   ExternalLinkComponent,
   ResearchObjectComponentLinkSubtype,
@@ -79,6 +78,7 @@ export interface DriveState {
   fileBeingRenamed: DriveObject | null;
   breadCrumbs: BreadCrumb[];
   sortingFunction: (a: DriveObject, b: DriveObject) => number;
+  selected: Record<number, ResearchObjectComponentType>;
 
   // drive picker state
   currentDrivePicker: DriveObject | null;
@@ -104,6 +104,7 @@ const initialState: DriveState = {
   breadCrumbsPicker: [],
   currentDrivePicker: null,
   sortingFunction: defaultSort,
+  selected: {},
 };
 
 const navigateToDriveGeneric =
@@ -301,6 +302,21 @@ export const driveSlice = createSlice({
       state.currentDrive?.contains?.push(payload);
       state.currentDrive?.contains?.sort(state.sortingFunction);
     },
+    toggleSelectFileInCurrentDrive: (
+      state,
+      {
+        payload,
+      }: PayloadAction<{
+        index: number;
+        componentType: ResearchObjectComponentType;
+      }>
+    ) => {
+      if (payload.index in state.selected) delete state.selected[payload.index];
+      else state.selected[payload.index] = payload.componentType;
+    },
+    resetSelected: (state) => {
+      state.selected = {};
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -457,6 +473,8 @@ export const {
   setFileBeingRenamed,
   renameFileInCurrentDrive,
   optimisticAddFileToCurrentDrive,
+  toggleSelectFileInCurrentDrive,
+  resetSelected,
 } = driveSlice.actions;
 
 export interface FetchTreeThunkParams {

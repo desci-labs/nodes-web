@@ -49,11 +49,8 @@ export default function DriveRow({
   file,
   index,
   selected,
-  isMultiselecting,
   toggleSelected,
   exploreDirectory,
-  selectedFiles,
-  canEditMetadata,
   canUse,
   deprecated,
 }: DriveRowProps) {

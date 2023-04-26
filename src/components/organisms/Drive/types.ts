@@ -63,28 +63,11 @@ export interface DriveRowProps {
   ) => void;
   index: number;
   selected: boolean;
-  isMultiselecting: boolean;
   toggleSelected: (
     index: number,
     componentType: ResearchObjectComponentType | DriveNonComponentTypes
   ) => void;
-  selectedFiles: Record<
-    number,
-    ResearchObjectComponentType | DriveNonComponentTypes
-  >;
   canEditMetadata: boolean;
   canUse: boolean;
   deprecated?: boolean;
-}
-
-export interface DriveJumpingParams {
-  targetUid?: string;
-  targetPath?: string; //fallback
-  itemUid?: string;
-  itemPath?: string; //fallback
-}
-
-export interface oldComponentMetadata {
-  componentId: string;
-  cb: () => void;
 }
