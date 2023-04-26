@@ -4,8 +4,7 @@ import {
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
-import { useHistoryReader, useNodeReader } from "@src/state/nodes/hooks";
-import { useSetNodeCoverMutation } from "@src/state/api/media";
+import { useNodeReader } from "@src/state/nodes/hooks";
 import {
   saveManifestDraft,
   setComponentStack,
@@ -23,8 +22,6 @@ import { deleteData } from "@src/api";
 import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
 import { deleteComponent } from "@src/state/nodes/viewer";
 import { useDrive } from "@src/state/drive/hooks";
-import useNodeHistory from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/History/useNodeHistory";
-// import { useCallback } from "react";
 
 const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
 const PUB_IPFS_URL = process.env.REACT_APP_PUBLIC_IPFS_RESOLVER;
@@ -73,15 +70,6 @@ export default function useActionHandler() {
     mode,
   } = useNodeReader();
   const { deprecated } = useDrive();
-  const [setCover, { isLoading: isSettingCover }] = useSetNodeCoverMutation();
-  const { selectedHistoryId } = useHistoryReader();
-  const { loadingChain, history } = useNodeHistory();
-  const version = loadingChain
-    ? selectedHistoryId
-    : history.length
-    ? `v${history.length}`
-    : 0;
-  
 
   async function preview(file: DriveObject) {
     if (
@@ -109,36 +97,6 @@ export default function useActionHandler() {
       }
     }
   }
-
-  // const setNodeCover = useCallback(
-  //   async (file: DriveObject) => {
-  //     if (isSettingCover) return;
-  //     if (
-  //       file.componentType === ResearchObjectComponentType.PDF &&
-  //       file.type !== FileType.DIR
-  //     ) {
-  //       const component = manifestData?.components.find(
-  //         (c: ResearchObjectV1Component) => c.payload.url === file.cid
-  //       );
-  //       if (component) {
-  //         setCover({
-  //           cid: component.payload.url!,
-  //           uuid: currentObjectId!,
-  //           version,
-  //         });
-  //       }
-  //     } else {
-  //       // show error toast or smth
-  //     }
-  //   },
-  //   [
-  //     currentObjectId,
-  //     isSettingCover,
-  //     manifestData?.components,
-  //     setCover,
-  //     version,
-  //   ]
-  // );
 
   async function remove(file: DriveObject) {
     if (mode !== "editor") return;
