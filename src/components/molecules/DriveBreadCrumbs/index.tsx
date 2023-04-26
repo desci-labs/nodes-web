@@ -19,13 +19,13 @@ const DriveBreadCrumbs = ({ eatBreadCrumb }: BreadCrumbsProps) => {
           >
             {i !== 0 && (
               <ChevronRightIcon
-                width={28}
-                height={28}
+                width={20}
+                height={20}
                 // className="fill-neutrals-gray-7"
               />
             )}
             <span
-              className={`font-medium text-white hover:text-tint-primary-hover cursor-pointer  ${
+              className={`font-medium text-sm text-white hover:text-tint-primary-hover cursor-pointer  ${
                 i == 0 ? "text-tint-primary" : "text-white"
               }`}
               onClick={() => eatBreadCrumb(i)}

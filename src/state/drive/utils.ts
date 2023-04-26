@@ -17,6 +17,9 @@ import { v4 as uuidv4 } from "uuid";
 import { BreadCrumb, DrivePath } from "./types";
 import { __log } from "@src/components/utils";
 
+export const GENERIC_NEW_FOLDER_NAME = "New Folder";
+export const CID_PENDING = "Pending";
+
 export function neutralizePath(path: DrivePath) {
   return path.replace(/^[^/]+/, DRIVE_NODE_ROOT_PATH);
 }
@@ -336,3 +339,35 @@ export function separateFileNameAndMimeType(fileName: string): {
   const name = splitName.join(".");
   return { fileName: name, mimeType };
 }
+
+export function findUniqueName(name: string, existingNames: string[]) {
+  let newName = name;
+  let i = 1;
+  while (existingNames.includes(newName)) {
+    newName = `${name} (${i})`;
+    i++;
+  }
+  return newName;
+}
+
+/*
+ ** Sortations
+ */
+
+export const defaultSort = (a: DriveObject, b: DriveObject) => {
+  // Sorts by folders first, then by name in alphabetical order
+  const aIsDir = a.type === "dir";
+  const bIsDir = b.type === "dir";
+
+  if (aIsDir !== bIsDir) {
+    return bIsDir ? 1 : -1;
+  }
+
+  if (a.name < b.name) {
+    return -1;
+  }
+  if (a.name > b.name) {
+    return 1;
+  }
+  return 0;
+};

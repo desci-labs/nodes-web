@@ -18,6 +18,7 @@ export interface AddFilesToDrivePayload {
   overwritePathContext?: string;
   componentType?: ResearchObjectComponentType;
   componentSubType?: ResearchObjectComponentSubtypes;
+  newFolder?: boolean;
   onSuccess?: (manifest: ResearchObjectV1) => void;
 }
 
