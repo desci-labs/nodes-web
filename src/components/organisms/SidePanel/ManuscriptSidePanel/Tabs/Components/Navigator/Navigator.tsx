@@ -8,11 +8,7 @@ import {
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
-import {
-  IconData,
-  IconInfo,
-  IconStar,
-} from "icons";
+import { IconData, IconInfo, IconStar } from "icons";
 import React, { useMemo, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -38,7 +34,6 @@ export interface EditorHistory {
   createdAt: Date;
   objectId: string;
 }
-
 
 const Navigator = () => {
   const { setIsAddingComponent } = useManuscriptController([
@@ -90,8 +85,6 @@ const Navigator = () => {
     return components;
   }, [manifestData, deprecatedDrive]);
 
-  console.log("cardComponents", cardComponents, manifestData?.components);
-  console.log("deprecatedDrive", deprecatedDrive);
 
   return (
     <>
@@ -143,12 +136,21 @@ const Navigator = () => {
         className="mb-4"
       >
         <div className="flex flex-col gap-3 py-2 px-0">
-          <DndProvider backend={HTML5Backend}>
-            {cardComponents && cardComponents.length ? (
+          {cardComponents && cardComponents.length ? (
+            <DndProvider backend={HTML5Backend}>
               <Container
                 components={cardComponents}
-                renderComponent={(component, index) => (
+                renderComponent={({
+                  component,
+                  index,
+                  ref,
+                  handlerId,
+                  style,
+                }) => (
                   <EditableWrapper
+                    ref={ref}
+                    style={style}
+                    data-handler-id={handlerId}
                     key={`editable_hoc_${currentObjectId}_${component.id}`}
                     id={component.id}
                     index={index}
@@ -158,13 +160,13 @@ const Navigator = () => {
                   </EditableWrapper>
                 )}
               />
-            ) : (
-              <div className="text-[10px] text-neutrals-gray-6 flex flex-row gap-1 items-center">
-                <IconStar width={12} className="fill-tint-primary-hover" />
-                Star a component in Drive to see it here
-              </div>
-            )}
-          </DndProvider>
+            </DndProvider>
+          ) : (
+            <div className="text-[10px] text-neutrals-gray-6 flex flex-row gap-1 items-center">
+              <IconStar width={12} className="fill-tint-primary-hover" />
+              Star a component in Drive to see it here
+            </div>
+          )}
         </div>
       </CollapsibleSection>
     </>

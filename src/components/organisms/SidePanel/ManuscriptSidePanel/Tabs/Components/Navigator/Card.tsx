@@ -1,5 +1,5 @@
 import type { Identifier, XYCoord } from "dnd-core";
-import type { FC, ReactNode } from "react";
+import type { CSSProperties, FC, ReactNode } from "react";
 import { useRef } from "react";
 import { useDrag, useDrop } from "react-dnd";
 
@@ -16,7 +16,13 @@ const style = {
 export interface CardProps {
   id: any;
   component: ResearchObjectV1Component;
-  renderComponent: (component: ResearchObjectV1Component, index: number) => ReactNode;
+  renderComponent: (props: {
+    component: ResearchObjectV1Component;
+    index: number;
+    ref: any;
+    handlerId: Identifier | null;
+    style: CSSProperties;
+  }) => ReactNode;
   index: number;
   moveCard: (dragIndex: number, hoverIndex: number) => void;
 }
@@ -27,14 +33,20 @@ interface DragItem {
   type: string;
 }
 
-export const Card: FC<CardProps> = ({ id, component, renderComponent, index, moveCard }) => {
+export const Card: FC<CardProps> = ({
+  id,
+  component,
+  renderComponent,
+  index,
+  moveCard,
+}) => {
   const ref = useRef<HTMLDivElement>(null);
   const [{ handlerId }, drop] = useDrop<
     DragItem,
     void,
     { handlerId: Identifier | null }
   >({
-    accept: 'Component',
+    accept: "Component",
     collect(monitor) {
       return {
         handlerId: monitor.getHandlerId(),
@@ -91,7 +103,7 @@ export const Card: FC<CardProps> = ({ id, component, renderComponent, index, mov
   });
 
   const [{ isDragging }, drag] = useDrag({
-    type: 'Component',
+    type: "Component",
     item: () => {
       return { id, index };
     },
@@ -103,8 +115,15 @@ export const Card: FC<CardProps> = ({ id, component, renderComponent, index, mov
   const opacity = isDragging ? 0 : 1;
   drag(drop(ref));
   return (
-    <div ref={ref} style={{ ...style, opacity }} data-handler-id={handlerId}>
-      {renderComponent(component, index)}
+    <div ref={ref} style={{ opacity }} data-handler-id={handlerId}>
+      {/* {renderComponent({
+        component,
+        index,
+        ref,
+        handlerId,
+        style: { opacity },
+      })} */}
+      <h2>{component.name}</h2>
     </div>
   );
 };

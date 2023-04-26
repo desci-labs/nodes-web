@@ -1,14 +1,22 @@
-import type { FC, ReactNode } from "react";
+import type { CSSProperties, FC, ReactNode } from "react";
 import { useCallback } from "react";
 import { Card } from "./Card";
 import { ResearchObjectV1Component } from "@src/../../nodes/desci-models/dist";
+import { Identifier } from "dnd-core";
 
 // const style = {
 //   width: 400,
 // };
 interface ContainerProps {
   components: ResearchObjectV1Component[];
-  renderComponent: (component: ResearchObjectV1Component, index: number) => ReactNode
+  // renderComponent: (component: ResearchObjectV1Component, index: number) => ReactNode
+  renderComponent: (props: {
+    component: ResearchObjectV1Component;
+    index: number;
+    ref: any;
+    handlerId: Identifier | null;
+    style: CSSProperties;
+  }) => ReactNode;
 }
 export const Container: FC<ContainerProps> = ({ components, renderComponent }: ContainerProps) => {
   const moveCard = useCallback((dragIndex: number, hoverIndex: number) => {

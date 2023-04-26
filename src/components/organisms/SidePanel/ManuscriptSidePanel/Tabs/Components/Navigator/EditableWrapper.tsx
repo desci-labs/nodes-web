@@ -1,12 +1,6 @@
-
-import {
-  ResearchObjectV1Component,
-} from "@desci-labs/desci-models";
-import {
-  IconDeleteForever,
-  IconPen,
-} from "icons";
-import { useState } from "react";
+import { ResearchObjectV1Component } from "@desci-labs/desci-models";
+import { IconDeleteForever, IconPen } from "icons";
+import { Ref, forwardRef, useState } from "react";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import {
@@ -17,7 +11,7 @@ import {
 import ComponentRenamePopover from "@src/components/organisms/PopOver/ComponentRenamePopover";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 
-export default function EditableWrapper(props: any) {
+const EditableWrapper = forwardRef((props: any, ref: Ref<HTMLDivElement>) => {
   const { children, isEditable, id } = props;
   const dispatch = useSetter();
   const { componentStack, manifest: manifestData } = useNodeReader();
@@ -43,7 +37,7 @@ export default function EditableWrapper(props: any) {
   };
 
   return (
-    <div className="flex flex-row">
+    <div className="flex flex-row" ref={ref}>
       {/* <div
         className="relative flex justify-start items-center transition-all ease-out duration-200 overflow-hidden"
         style={{ width: isEditable ? 31 : 0, minWidth: isEditable ? 31 : 0 }}
@@ -125,4 +119,7 @@ export default function EditableWrapper(props: any) {
       />
     </div>
   );
-};
+});
+
+export default EditableWrapper;
+
