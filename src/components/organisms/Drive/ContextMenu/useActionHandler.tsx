@@ -52,7 +52,9 @@ export const getActionState = (action: Actions, file: DriveObject) => {
         disabled: file?.path === DRIVE_FULL_EXTERNAL_LINKS_PATH,
       };
     case Actions.ASSIGN_TYPE:
-      return { disabled: false };
+      return {
+        disabled: file.componentType === ResearchObjectComponentType.LINK,
+      };
     case Actions.EDIT_METADATA:
       return {
         disabled: !(

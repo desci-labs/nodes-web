@@ -355,7 +355,7 @@ export function findUniqueName(name: string, existingNames: string[]) {
  ** Sortations
  */
 
-export const defaultSort = (a: DriveObject, b: DriveObject) => {
+export function defaultSort(a: DriveObject, b: DriveObject) {
   // Sorts by folders first, then by name in alphabetical order
   const aIsDir = a.type === "dir";
   const bIsDir = b.type === "dir";
@@ -371,4 +371,4 @@ export const defaultSort = (a: DriveObject, b: DriveObject) => {
     return 1;
   }
   return 0;
-};
+}
