@@ -36,6 +36,7 @@ import {
   CID_PENDING,
   getAncestorComponent,
   defaultSort,
+  GENERIC_NEW_LINK_NAME,
 } from "./utils";
 import {
   AddFilesToDrivePayload,
@@ -472,16 +473,29 @@ export const addExternalLinkThunk = createAsyncThunk(
     },
     { getState, dispatch }
   ) => {
-    // const state = getState() as RootState;
+    const state = getState() as RootState;
 
     const { name, url, subtype } = payload;
+    const fullExternalLinksPath =
+      DRIVE_NODE_ROOT_PATH + "/" + DRIVE_EXTERNAL_LINKS_PATH;
+    const externalLinksDrive = findDriveByPath(
+      state.drive.nodeTree!,
+      fullExternalLinksPath
+    );
+    const collisionArray =
+      externalLinksDrive?.contains?.map((f) => f.name) || [];
+
+    const uniqueName = name
+      ? findUniqueName(name, collisionArray)
+      : findUniqueName(GENERIC_NEW_LINK_NAME, collisionArray);
     const newComponent: ExternalLinkComponent = {
       id: uuidv4(),
-      name: name || "Link",
+      name: uniqueName,
       type: ResearchObjectComponentType.LINK,
       subtype,
       payload: {
         url,
+        path: fullExternalLinksPath + "/" + uniqueName,
       },
       starred: true,
     };
