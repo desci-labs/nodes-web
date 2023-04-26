@@ -163,9 +163,7 @@ export const driveSlice = createSlice({
       action: UpdateBatchUploadProgressAction
     ) => {
       const { batchUid, progress } = action.payload;
-      if (batchUid in state.batchUploadProgress) {
-        state.batchUploadProgress[batchUid] = progress;
-      }
+      state.batchUploadProgress[batchUid] = progress;
     },
     cleanupUploadProgressMap: (state) => {
       const incomplete = Object.entries(state.batchUploadProgress).filter(
