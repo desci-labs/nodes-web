@@ -15,7 +15,6 @@ const menuListLabel: Record<Actions, string> = {
   REMOVE: "Delete",
   ASSIGN_TYPE: "Assign Type",
   EDIT_METADATA: "Edit Metadata",
-  // SET_NODE_COVER: "Set Node Cover",
 };
 
 type IconType = React.FunctionComponent<
@@ -31,7 +30,6 @@ const ActionIcons: Record<Actions, IconType> = {
   REMOVE: BsTrash,
   ASSIGN_TYPE: IconAssignType,
   EDIT_METADATA: SlPencil,
-  // SET_NODE_COVER: MdOutlineWallpaper,
 };
 
 function MenuList({ file }: { file: DriveObject }) {
@@ -74,7 +72,7 @@ function MenuListItem({
 
   return (
     <li
-      className={`px-4 py-2 list-none flex items-center gap-4 ${
+      className={`px-3 text-xs py-2 list-none flex items-center gap-2 ${
         disabled
           ? "opacity-30"
           : "hover:bg-dark-gray dark:hover:bg-dark-gray cursor-pointer"

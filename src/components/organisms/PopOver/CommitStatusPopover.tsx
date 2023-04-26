@@ -72,6 +72,7 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
   const createCommit = useCallback(async () => {
     setLoading(true);
 
+    const modifiedObject = { cid: manifestCid, manifest: manifestData };
     try {
       setError(undefined);
       if (provider) {
@@ -152,12 +153,16 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
             expectedDpidTx[0],
             { value: regFee[0], gasLimit: 350000 }
           );
-
           if (retrievedManifestData) {
+            // FIXME: this never hits
+            modifiedObject.cid = hash;
+            modifiedObject.manifest = retrievedManifestData;
             dispatch(setManifest(retrievedManifestData));
           } else {
             const newManifestUrl = cleanupManifestUrl(uri || manifestUrl);
             const { data } = await axios.get(newManifestUrl);
+            modifiedObject.cid = hash;
+            modifiedObject.manifest = data;
             dispatch(setManifest(data));
           }
         }
@@ -221,14 +226,13 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
         //   LS_PENDING_COMMITS_KEY,
         //   JSON.stringify(newPendingCommits)
         // );
-
         if (currentObjectId && manifestCid && manifestData) {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
           publishResearchObject({
             uuid: currentObjectId,
-            cid: manifestCid,
-            manifest: manifestData,
+            cid: modifiedObject.cid,
+            manifest: modifiedObject.manifest!,
             transactionId: tx.hash,
           });
         }

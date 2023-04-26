@@ -60,12 +60,6 @@ export const getActionState = (action: Actions, file: DriveObject) => {
           file.componentType === ResearchObjectComponentType.CODE
         ),
       };
-    // case Actions.SET_NODE_COVER:
-    //   return {
-    //     disabled:
-    //       file.type === FileType.DIR ||
-    //       file.componentType !== ResearchObjectComponentType.PDF,
-    //   };
     default:
       return { disabled: true };
   }
@@ -200,7 +194,6 @@ export default function useActionHandler() {
     REMOVE: remove,
     ASSIGN_TYPE: assignType,
     EDIT_METADATA: editMetadata,
-    // SET_NODE_COVER: setNodeCover,
   };
 
   return handler;
