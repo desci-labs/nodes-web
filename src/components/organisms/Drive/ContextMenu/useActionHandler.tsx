@@ -4,8 +4,8 @@ import {
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
-import { useNodeReader } from "@src/state/nodes/hooks";
-import { useSetNodeCoverMutation } from "@src/state/api/nodes";
+import { useHistoryReader, useNodeReader } from "@src/state/nodes/hooks";
+import { useSetNodeCoverMutation } from "@src/state/api/media";
 import {
   saveManifestDraft,
   setComponentStack,
@@ -27,6 +27,8 @@ import { deleteData } from "@src/api";
 import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
 import { deleteComponent } from "@src/state/nodes/viewer";
 import { useDrive } from "@src/state/drive/hooks";
+import useNodeHistory from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/History/useNodeHistory";
+// import { useCallback } from "react";
 
 const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
 const PUB_IPFS_URL = process.env.REACT_APP_PUBLIC_IPFS_RESOLVER;
@@ -61,19 +63,12 @@ export const getActionState = (action: Actions, file: DriveObject) => {
           file.componentType === ResearchObjectComponentType.CODE
         ),
       };
-    case Actions.SET_NODE_COVER:
-      return {
-        disabled: file.componentType !== ResearchObjectComponentType.PDF,
-      };
     default:
       return { disabled: true };
   }
 };
 
 export default function useActionHandler() {
-  // const dispatch = useDispatch();
-  // const { manifest: manifestData, currentObjectId } = useNodeReader();
-  const [setCover, { isLoading: isSettingCover }] = useSetNodeCoverMutation();
   const dispatch = useSetter();
   const {
     manifest: manifestData,
@@ -82,6 +77,14 @@ export default function useActionHandler() {
     mode,
   } = useNodeReader();
   const { deprecated } = useDrive();
+  const [setCover, { isLoading: isSettingCover }] = useSetNodeCoverMutation();
+  const { selectedHistoryId } = useHistoryReader();
+  const { loadingChain, history } = useNodeHistory();
+  const version = loadingChain
+    ? selectedHistoryId
+    : history.length
+    ? `v${history.length}`
+    : 0;
 
   async function preview(file: DriveObject) {
     if (
@@ -107,20 +110,6 @@ export default function useActionHandler() {
       } else {
         window.open(`${IPFS_URL}/${file.cid}`, "_blank");
       }
-    }
-  }
-
-  async function setNodeCover(file: DriveObject) {
-    if (isSettingCover) return;
-    if (file.componentType === ResearchObjectComponentType.PDF) {
-      const component = manifestData?.components.find(
-        (c: ResearchObjectV1Component) => c.payload.url === file.cid
-      );
-      if (component) {
-        setCover({ cid: component.payload.url!, nodeUuid: currentObjectId! });
-      }
-    } else {
-      // show error toast or smth
     }
   }
 
@@ -216,7 +205,6 @@ export default function useActionHandler() {
     REMOVE: remove,
     ASSIGN_TYPE: assignType,
     EDIT_METADATA: editMetadata,
-    SET_NODE_COVER: setNodeCover,
   };
 
   return handler;

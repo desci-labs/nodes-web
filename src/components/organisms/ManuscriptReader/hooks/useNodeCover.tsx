@@ -1,21 +1,48 @@
-import { ResearchObjectComponentType } from "@desci-labs/desci-models";
+import {
+  PdfComponent,
+  ResearchObjectComponentDocumentSubtype,
+  ResearchObjectComponentType,
+} from "@desci-labs/desci-models";
 import { useNodesMediaCoverQuery } from "@src/state/api/media";
-import { useNodeReader } from "@src/state/nodes/hooks";
-// const DEFAULT_COVER =
-//   "https://images.unsplash.com/photo-1679669693237-74d556d6b5ba?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2298&q=80";
+import { useHistoryReader, useNodeReader } from "@src/state/nodes/hooks";
+import useNodeHistory from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/History/useNodeHistory";
+import { useEffect } from "react";
+import { nodesApi } from "@src/state/api/nodes";
+import { tags } from "@src/state/api/tags";
 
 export default function useNodeCover() {
   const { manifest, currentObjectId } = useNodeReader();
-  const pdf = manifest?.components.find(
-    (c) => c.type === ResearchObjectComponentType.PDF
+  const { selectedHistoryId } = useHistoryReader();
+  const { loadingChain, history } = useNodeHistory();
+
+  const version = loadingChain
+    ? selectedHistoryId
+    : history.length
+    ? `v${history.length}`
+    : 0;
+
+  const pdfs = manifest?.components.filter(
+    (c) => c.type === ResearchObjectComponentType.PDF // component.subType should be used when available on model
+  ) as PdfComponent[];
+  const pdf = pdfs?.find(
+    (doc) =>
+      doc.subtype === ResearchObjectComponentDocumentSubtype.RESEARCH_ARTICLE
   );
+  console.log("pdfs", pdfs, manifest?.components)
   const { isLoading, data, isSuccess } = useNodesMediaCoverQuery(
-    { cid: pdf?.payload?.url, nodeUuid: currentObjectId! },
+    { cid: pdf?.payload?.url!, uuid: currentObjectId!, version },
     {
       skip: !pdf?.payload?.url || !currentObjectId,
     }
   );
 
+  useEffect(() => {
+    nodesApi.util.invalidateTags([
+      { type: tags.mediaCover, id: `${currentObjectId}/${version}` },
+    ]);
+  }, [currentObjectId, version]);
+
+  // console.log("cover", isLoading, data, isSuccess, isError);
   return {
     cover: isSuccess ? data.url : "",
     isLoading,

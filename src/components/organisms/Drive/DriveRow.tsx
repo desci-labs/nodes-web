@@ -1,7 +1,5 @@
 import BlackGenericButton from "@components/atoms/BlackGenericButton";
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { BytesToHumanFileSize } from "@components/utils";
-import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import {
   IconCodeRepo,
   IconData,
@@ -62,23 +60,18 @@ export default function DriveRow({
   const contextRef = useRef<HTMLDivElement>();
   const { init } = useDriveContext(file);
   const { handleDbClick } = useInteractionHandler();
-  const { publicView, shareId, manifestCid, mode } = useNodeReader();
+  const { mode } = useNodeReader();
 
   const dispatch = useSetter();
 
   const handleRef = useCallback(
     (node: HTMLDivElement) => {
-      if (
-        file.type === FileType.DIR &&
-        file.parent?.path?.toLowerCase().includes("noderoot")
-      )
-        return;
       if (node !== null) {
         contextRef.current = node;
         init(node);
       }
     },
-    [file.parent?.path, file.type, init]
+    [init]
   );
 
   return (
@@ -121,7 +114,7 @@ export default function DriveRow({
         />
       </li>
       <li
-        className={`${everyRow} !justify-start gap-1 cursor-pointer`}
+        className={`${everyRow} !justify-start gap-1 cursor-pointer text-xs`}
         onClick={(e) => {
           if (e.ctrlKey) return;
           if (
@@ -150,10 +143,14 @@ export default function DriveRow({
             </div>
           )}
         </div>
-        <span className="truncate max-w-sm">{file.name}</span>
+        <span className="truncate max-w-sm align-middle leading-loose">
+          {file.name}
+        </span>
       </li>
-      <li className={`${everyRow} col-last-modified`}>{file.lastModified}</li>
-      <li className={`${everyRow} col-status`}>{file.accessStatus}</li>
+      <li className={`${everyRow} col-last-modified text-xs`}>
+        {file.lastModified}
+      </li>
+      <li className={`${everyRow} col-status text-xs`}>{file.accessStatus}</li>
       <li
         onClick={() =>
           console.log(
@@ -162,7 +159,7 @@ export default function DriveRow({
             }: ${JSON.stringify(file.metadata)}`
           )
         }
-        className={`${everyRow}`}
+        className={`${everyRow} text-xs`}
       >
         {BytesToHumanFileSize(file.size)}
       </li>
