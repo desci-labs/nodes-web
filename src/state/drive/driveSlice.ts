@@ -32,6 +32,7 @@ import {
   bfsDriveSearch,
   getComponentCid,
   findUniqueName,
+  GENERIC_NEW_FOLDER_NAME,
 } from "./utils";
 import {
   AddFilesToDrivePayload,
@@ -156,7 +157,9 @@ export const driveSlice = createSlice({
       action: UpdateBatchUploadProgressAction
     ) => {
       const { batchUid, progress } = action.payload;
-      state.batchUploadProgress[batchUid] = progress;
+      if (batchUid in state.batchUploadProgress) {
+        state.batchUploadProgress[batchUid] = progress;
+      }
     },
     cleanupUploadProgressMap: (state) => {
       const incomplete = Object.entries(state.batchUploadProgress).filter(
@@ -638,7 +641,7 @@ export const addFilesToDrive = createAsyncThunk(
     if (newFolder) {
       const existingNames =
         state.drive.currentDrive?.contains?.map((f) => f.name) || [];
-      newFolderName = findUniqueName("New Folder", existingNames);
+      newFolderName = findUniqueName(GENERIC_NEW_FOLDER_NAME, existingNames);
       fileInfo = [
         {
           uploadType: UploadTypes.DIR,
@@ -652,16 +655,20 @@ export const addFilesToDrive = createAsyncThunk(
 
     if (!fileInfo) return console.error("[AddFilesToDrive] fileInfo undefined");
 
-    const batchUid = Date.now().toString();
-    const uploadQueueItems = fileInfo.map((f) => ({
-      nodeUuid: currentObjectId!,
-      path: f.path,
-      batchUid: batchUid,
-      uploadType: f.uploadType,
-    }));
-    dispatch(setShowUploadPanel(true));
-    dispatch(addItemsToUploadQueue({ items: uploadQueueItems }));
-    dispatch(updateBatchUploadProgress({ batchUid: batchUid, progress: 0 }));
+    let batchUid: string;
+    if (!newFolder) {
+      batchUid = Date.now().toString();
+      const uploadQueueItems = fileInfo.map((f) => ({
+        nodeUuid: currentObjectId!,
+        path: f.path,
+        batchUid: batchUid,
+        uploadType: f.uploadType,
+      }));
+      dispatch(setShowUploadPanel(true));
+      dispatch(addItemsToUploadQueue({ items: uploadQueueItems }));
+      dispatch(updateBatchUploadProgress({ batchUid: batchUid, progress: 0 }));
+    }
+
     const contextPath = overwritePathContext || state.drive.currentDrive!.path!;
     const snapshotNodeUuid = currentObjectId!;
     try {
@@ -685,29 +692,33 @@ export const addFilesToDrive = createAsyncThunk(
         onProgress: (e) => {
           const perc = Math.ceil((e.loaded / e.total) * 100);
           const passedPerc = perc < 90 ? perc : 90;
-          dispatch(
-            updateBatchUploadProgress({ batchUid, progress: passedPerc })
-          );
+          if (batchUid)
+            dispatch(
+              updateBatchUploadProgress({ batchUid, progress: passedPerc })
+            );
         },
       });
       if (error) console.error(`[addFilesToDrive] Error: ${error}`);
       if (onSuccess) onSuccess(updatedManifest);
-      dispatch(removeBatchFromUploadQueue({ batchUid }));
+      if (batchUid! !== undefined)
+        dispatch(removeBatchFromUploadQueue({ batchUid }));
       if (rootDataCid && updatedManifest && manifestCid) {
         const latestState = getState() as RootState;
         if (snapshotNodeUuid === latestState.nodes.nodeReader.currentObjectId) {
-          dispatch(updateBatchUploadProgress({ batchUid, progress: 100 }));
+          if (batchUid! !== undefined)
+            dispatch(updateBatchUploadProgress({ batchUid, progress: 100 }));
           dispatch(setManifest(updatedManifest));
           dispatch(setManifestCid(manifestCid));
           dispatch(fetchTreeThunk());
         }
       }
     } catch (e) {
-      dispatch(removeBatchFromUploadQueue({ batchUid }));
-      dispatch(updateBatchUploadProgress({ batchUid, progress: -1 }));
+      if (batchUid! !== undefined)
+        dispatch(removeBatchFromUploadQueue({ batchUid }));
+      if (batchUid! !== undefined)
+        dispatch(updateBatchUploadProgress({ batchUid, progress: -1 }));
       __log("PaneDrive::handleUpdate", files, e);
     }
-    // debugger;
   }
 );
 

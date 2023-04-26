@@ -17,6 +17,8 @@ import { v4 as uuidv4 } from "uuid";
 import { BreadCrumb, DrivePath } from "./types";
 import { __log } from "@src/components/utils";
 
+export const GENERIC_NEW_FOLDER_NAME = "New Folder";
+
 export function neutralizePath(path: DrivePath) {
   return path.replace(/^[^/]+/, DRIVE_NODE_ROOT_PATH);
 }
