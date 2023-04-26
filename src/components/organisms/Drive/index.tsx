@@ -167,11 +167,11 @@ const DriveTable: React.FC = () => {
                   file={f}
                   exploreDirectory={exploreDirectory}
                   index={idx}
-                  selected={!!selected[idx]}
+                  selected={!!selected[f.path!]}
                   toggleSelected={() =>
                     dispatch(
                       toggleSelectFileInCurrentDrive({
-                        index: idx,
+                        path: f.path!,
                         componentType:
                           f.componentType as ResearchObjectComponentType,
                       })

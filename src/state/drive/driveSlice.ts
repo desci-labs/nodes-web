@@ -78,7 +78,7 @@ export interface DriveState {
   fileBeingRenamed: DriveObject | null;
   breadCrumbs: BreadCrumb[];
   sortingFunction: (a: DriveObject, b: DriveObject) => number;
-  selected: Record<number, ResearchObjectComponentType>;
+  selected: Record<DrivePath, ResearchObjectComponentType>;
 
   // drive picker state
   currentDrivePicker: DriveObject | null;
@@ -307,12 +307,12 @@ export const driveSlice = createSlice({
       {
         payload,
       }: PayloadAction<{
-        index: number;
+        path: string;
         componentType: ResearchObjectComponentType;
       }>
     ) => {
-      if (payload.index in state.selected) delete state.selected[payload.index];
-      else state.selected[payload.index] = payload.componentType;
+      if (payload.path in state.selected) delete state.selected[payload.path];
+      else state.selected[payload.path] = payload.componentType;
     },
     resetSelected: (state) => {
       state.selected = {};

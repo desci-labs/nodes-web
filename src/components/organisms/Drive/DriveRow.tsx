@@ -81,7 +81,7 @@ export default function DriveRow({
       onClick={(e) => {
         if (e.ctrlKey) {
           e.stopPropagation();
-          toggleSelected(index, file.componentType);
+          toggleSelected(file.path!, file.componentType);
         }
       }}
     >

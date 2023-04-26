@@ -64,7 +64,7 @@ export interface DriveRowProps {
   index: number;
   selected: boolean;
   toggleSelected: (
-    index: number,
+    path: string,
     componentType: ResearchObjectComponentType | DriveNonComponentTypes
   ) => void;
   canEditMetadata: boolean;
