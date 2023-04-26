@@ -203,7 +203,9 @@ const ManuscriptComponentsSection = () => {
     return components;
   }, [manifestData, deprecatedDrive]);
 
-  console.log(deprecatedDrive, cardComponents, manifestData?.components);
+  console.log("cardComponents", cardComponents, manifestData?.components);
+  console.log("deprecatedDrive", deprecatedDrive);
+
   return (
     <>
       <CollapsibleSection

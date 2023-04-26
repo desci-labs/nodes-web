@@ -41,6 +41,7 @@ import {
   SwitchBar,
   SwitchButton,
 } from "@src/components/atoms/SwitchBar/SwitchBar";
+import Navigator from "./Tabs/Components/Navigator/Navigator";
 
 const ManuscriptSidePanelContainer = styled(SidePanel).attrs({
   className: "bg-light-gray dark:bg-dark-gray text-black dark:text-white",
@@ -170,9 +171,9 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
     componentStack.filter(
       (a) =>
         a &&
-        a.type != ResearchObjectComponentType.DATA &&
-        a.type != ResearchObjectComponentType.UNKNOWN &&
-        a.type != ResearchObjectComponentType.DATA_BUCKET
+        a.type !== ResearchObjectComponentType.DATA &&
+        a.type !== ResearchObjectComponentType.UNKNOWN &&
+        a.type !== ResearchObjectComponentType.DATA_BUCKET
     ).length > 0 &&
     (!isCodeActive || selectedAnnotationId);
   const isResearchPanelReallyOpen =
@@ -180,9 +181,9 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
     componentStack.filter(
       (a) =>
         a &&
-        a.type != ResearchObjectComponentType.DATA &&
-        a.type != ResearchObjectComponentType.UNKNOWN &&
-        a.type != ResearchObjectComponentType.DATA_BUCKET
+        a.type !== ResearchObjectComponentType.DATA &&
+        a.type !== ResearchObjectComponentType.UNKNOWN &&
+        a.type !== ResearchObjectComponentType.DATA_BUCKET
     ).length < 1;
 
   const canShowDrive = !publicView && userProfile.userId > 0;
@@ -314,7 +315,8 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
               <>
                 <ManuscriptAttributesSection />
                 {/* <ManuscriptValidationSection /> */}
-                <ManuscriptComponentsSection />
+                {/* <ManuscriptComponentsSection /> */}
+                <Navigator />
               </>
             ) : null}
             {researchPanelTab === ResearchTabs.history ? <HistoryTab /> : null}
