@@ -118,14 +118,14 @@ const navigateToDriveGeneric =
       | "currentDrivePicker" = `currentDrive${key}`;
 
     if (state.status !== "succeeded" || !state.nodeTree!) return;
-    let path: any = action.payload;
-    if (path.path) {
-      path = path.path;
-    }
-
+    const { path, selectPath } = action.payload;
+    let fileSelectionType: ResearchObjectComponentType | undefined;
     let driveFound = state.deprecated
       ? driveBfsByPath(state.nodeTree!, path)
       : findDriveByPath(state.nodeTree!!, path);
+    if (driveFound)
+      fileSelectionType =
+        driveFound.componentType as ResearchObjectComponentType;
     if (driveFound && driveFound.type === FileType.FILE) {
       const pathSplit = path.split("/");
       pathSplit.pop();
@@ -140,6 +140,10 @@ const navigateToDriveGeneric =
       );
       return;
     }
+
+    state.selected =
+      selectPath && fileSelectionType ? { [path]: fileSelectionType } : {};
+
     state[keyBreadcrumbs] = constructBreadCrumbs(driveFound.path!);
     driveFound.contains?.sort(state.sortingFunction);
     state[keyCurrentDrive] = driveFound;
@@ -714,13 +718,13 @@ export const addFilesToDrive = createAsyncThunk(
 
     if (!fileInfo) return console.error("[AddFilesToDrive] fileInfo undefined");
 
-    let batchUid: string;
+    let batchUid: string | undefined;
     if (!newFolder) {
       batchUid = Date.now().toString();
       const uploadQueueItems = fileInfo.map((f) => ({
         nodeUuid: currentObjectId!,
         path: f.path,
-        batchUid: batchUid,
+        batchUid: batchUid!,
         uploadType: f.uploadType,
       }));
       dispatch(setShowUploadPanel(true));
@@ -749,18 +753,22 @@ export const addFilesToDrive = createAsyncThunk(
         componentSubType,
         newFolderName,
         onProgress: (e) => {
+          if (batchUid === undefined) return;
           const perc = Math.ceil((e.loaded / e.total) * 100);
           const passedPerc = perc < 90 ? perc : 90;
-          if (batchUid)
-            dispatch(
-              updateBatchUploadProgress({ batchUid, progress: passedPerc })
-            );
+          dispatch(
+            updateBatchUploadProgress({
+              batchUid,
+              progress: passedPerc,
+            })
+          );
         },
       });
       if (error) console.error(`[addFilesToDrive] Error: ${error}`);
       if (onSuccess) onSuccess(updatedManifest);
-      if (batchUid! !== undefined)
+      if (batchUid !== undefined) {
         dispatch(removeBatchFromUploadQueue({ batchUid }));
+      }
       if (rootDataCid && updatedManifest && manifestCid) {
         const latestState = getState() as RootState;
         if (snapshotNodeUuid === latestState.nodes.nodeReader.currentObjectId) {
@@ -772,10 +780,10 @@ export const addFilesToDrive = createAsyncThunk(
         }
       }
     } catch (e) {
-      if (batchUid! !== undefined)
+      if (batchUid !== undefined) {
         dispatch(removeBatchFromUploadQueue({ batchUid }));
-      if (batchUid! !== undefined)
         dispatch(updateBatchUploadProgress({ batchUid, progress: -1 }));
+      }
       __log("PaneDrive::handleUpdate", files, e);
     }
   }

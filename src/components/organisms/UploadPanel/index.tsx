@@ -61,7 +61,6 @@ const UploadPanel: React.FC<UploadPanelProps> = ({ show }) => {
       const newUploadsTransitioned = Object.fromEntries(
         diffAdditions.map((e: UploadQueueItem) => [e.batchUid, false])
       );
-
       setUploadTransitioned((prev) => ({ ...prev, ...newUploadsTransitioned }));
       setLocalQueue((current) => [...current, ...diffAdditions]);
     }
@@ -74,6 +73,7 @@ const UploadPanel: React.FC<UploadPanelProps> = ({ show }) => {
   // );
 
   useEffect(() => {
+    // debugger;
     Object.entries(batchUploadProgress).forEach((kv) => {
       if (kv[1] === 100) {
         setTimeout(() => {
@@ -81,7 +81,6 @@ const UploadPanel: React.FC<UploadPanelProps> = ({ show }) => {
         }, 1500);
       }
     });
-    // debugger;
   }, [batchUploadProgress]);
 
   function close() {
@@ -150,7 +149,12 @@ const UploadPanel: React.FC<UploadPanelProps> = ({ show }) => {
                     data-type="info"
                     data-background-color="black"
                     onClick={() => {
-                      dispatch(navigateToDriveByPath({ path: qI.path }));
+                      dispatch(
+                        navigateToDriveByPath({
+                          path: qI.path,
+                          selectPath: qI.path,
+                        })
+                      );
                       if (componentStack.length) {
                         sessionStorage.removeItem(
                           SessionStorageKeys.lastDirUid

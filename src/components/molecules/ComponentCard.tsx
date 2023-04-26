@@ -180,7 +180,12 @@ const ComponentCard = (props: ComponentCardProps) => {
           //     path: DRIVE_NODE_ROOT_PATH + "/" + DRIVE_DATA_PATH,
           //   })
           // );
-          dispatch(navigateToDriveByPath(component.payload.path));
+          dispatch(
+            navigateToDriveByPath({
+              path: component.payload.path,
+              selectPath: component.payload.path,
+            })
+          );
           dispatch(setComponentStack([component]));
         } else {
           if (!isSelected) {
@@ -304,7 +309,12 @@ const ComponentCard = (props: ComponentCardProps) => {
                       className="p-0"
                       onClick={(e) => {
                         e!.stopPropagation();
-                        dispatch(navigateToDriveByPath(component.payload.path));
+                        dispatch(
+                          navigateToDriveByPath({
+                            path: component.payload.path,
+                            selectPath: component.payload.path,
+                          })
+                        );
                         if (
                           component.type === ResearchObjectComponentType.DATA ||
                           component.type === ResearchObjectComponentType.UNKNOWN
