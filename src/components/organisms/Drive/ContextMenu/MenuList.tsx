@@ -72,7 +72,7 @@ function MenuListItem({
 
   return (
     <li
-      className={`px-4 py-2 list-none flex items-center gap-4 ${
+      className={`px-3 text-xs py-2 list-none flex items-center gap-2 ${
         disabled
           ? "opacity-30"
           : "hover:bg-dark-gray dark:hover:bg-dark-gray cursor-pointer"

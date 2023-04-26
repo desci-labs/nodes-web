@@ -32,7 +32,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
         return (
           <li
             key={"ctx" + idx}
-            className={`grid grid-cols-[20px_1fr] font-medium whitespace-nowrap gap-2 py-2 px-3 hover:bg-neutrals-gray-2 first-of-type:rounded-t-md last-of-type:rounded-b-md ${item.labelClass}`}
+            className={`grid grid-cols-[20px_1fr] font-medium whitespace-nowrap gap-2 py-2 px-3 cursor-pointer hover:bg-neutrals-gray-2 first-of-type:rounded-t-md last-of-type:rounded-b-md ${item.labelClass}`}
             onClick={(e) => {
               e.stopPropagation();
               item.onClick();

@@ -20,6 +20,7 @@ import {
   ExternalCid,
   ExternalUrl,
 } from "@src/state/drive/types";
+import { arrayXor } from "@src/components/utils";
 export const SCIWEAVE_URL =
   process.env.REACT_APP_NODES_API || "http://localhost:5420";
 
@@ -366,6 +367,7 @@ export interface UpdateDag {
   componentSubType?: ResearchObjectComponentSubtypes;
   externalCids?: ExternalCid[];
   externalUrl?: ExternalUrl;
+  newFolderName?: string;
   onProgress?: (e: ProgressEvent) => void;
 }
 
@@ -382,19 +384,30 @@ export const updateDag = async ({
   componentSubType,
   externalCids,
   externalUrl,
+  newFolderName,
 }: UpdateDag) => {
-  if (files?.length && externalCids?.length)
-    return { error: "Cannot update DAG with both files and externalCids" };
+  if (
+    !arrayXor([
+      files?.length,
+      externalCids?.length,
+      externalUrl,
+      newFolderName?.length,
+    ])
+  )
+    return { error: "Can only update DAG using a single update method" };
   if (
     !files?.length &&
     !externalCids?.length &&
     !externalUrl?.path?.length &&
-    !externalUrl?.url?.length
+    !externalUrl?.url?.length &&
+    !newFolderName?.length
   )
     return { error: "Missing content, files, externalUrl or externalCid" };
+
   const formData = new FormData();
   formData.append("uuid", uuid);
   formData.append("manifest", JSON.stringify(manifest));
+  if (newFolderName) formData.append("newFolderName", newFolderName);
   if (componentType) formData.append("componentType", componentType);
   if (componentSubType) formData.append("componentSubType", componentSubType);
   if (externalCids?.length)
