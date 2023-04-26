@@ -53,12 +53,6 @@ export const getActionState = (action: Actions, file: DriveObject) => {
           file.componentType === ResearchObjectComponentType.CODE
         ),
       };
-    // case Actions.SET_NODE_COVER:
-    //   return {
-    //     disabled:
-    //       file.type === FileType.DIR ||
-    //       file.componentType !== ResearchObjectComponentType.PDF,
-    //   };
     default:
       return { disabled: true };
   }
@@ -81,7 +75,6 @@ export default function useActionHandler() {
     : history.length
     ? `v${history.length}`
     : 0;
-  
 
   async function preview(file: DriveObject) {
     if (
@@ -109,36 +102,6 @@ export default function useActionHandler() {
       }
     }
   }
-
-  // const setNodeCover = useCallback(
-  //   async (file: DriveObject) => {
-  //     if (isSettingCover) return;
-  //     if (
-  //       file.componentType === ResearchObjectComponentType.PDF &&
-  //       file.type !== FileType.DIR
-  //     ) {
-  //       const component = manifestData?.components.find(
-  //         (c: ResearchObjectV1Component) => c.payload.url === file.cid
-  //       );
-  //       if (component) {
-  //         setCover({
-  //           cid: component.payload.url!,
-  //           uuid: currentObjectId!,
-  //           version,
-  //         });
-  //       }
-  //     } else {
-  //       // show error toast or smth
-  //     }
-  //   },
-  //   [
-  //     currentObjectId,
-  //     isSettingCover,
-  //     manifestData?.components,
-  //     setCover,
-  //     version,
-  //   ]
-  // );
 
   async function remove(file: DriveObject) {
     if (mode !== "editor") return;
@@ -218,7 +181,6 @@ export default function useActionHandler() {
     REMOVE: remove,
     ASSIGN_TYPE: assignType,
     EDIT_METADATA: editMetadata,
-    // SET_NODE_COVER: setNodeCover,
   };
 
   return handler;
