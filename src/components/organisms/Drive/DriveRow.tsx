@@ -114,7 +114,7 @@ export default function DriveRow({
         />
       </li>
       <li
-        className={`${everyRow} !justify-start gap-1 cursor-pointer`}
+        className={`${everyRow} !justify-start gap-1 cursor-pointer text-xs`}
         onClick={(e) => {
           if (e.ctrlKey) return;
           if (
@@ -143,7 +143,9 @@ export default function DriveRow({
             </div>
           )}
         </div>
-        <span className="truncate max-w-sm">{file.name}</span>
+        <span className="truncate max-w-sm align-middle leading-loose">
+          {file.name}
+        </span>
       </li>
       <li className={`${everyRow} col-last-modified text-xs`}>
         {file.lastModified}
