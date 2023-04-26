@@ -14,6 +14,7 @@ import {
   IconInfo,
   IconPen,
   IconStar,
+  IconUnstar,
 } from "icons";
 import React, { useMemo, useState } from "react";
 // import ComponentRenamePopover from "./PopOver/ComponentRenamePopover";
@@ -27,6 +28,8 @@ import {
 } from "@src/state/nodes/viewer";
 import { useDrive } from "@src/state/drive/hooks";
 import ComponentRenamePopover from "@src/components/organisms/PopOver/ComponentRenamePopover";
+import { findDriveByPath } from "@src/state/drive/utils";
+import { starComponentThunk } from "@src/state/drive/driveSlice";
 
 export enum EditorHistoryType {
   ADD_ANNOTATION,
@@ -43,27 +46,22 @@ export interface EditorHistory {
 }
 
 const EditableHOC = (props: any) => {
-  const { children, isEditable, id } = props;
+  const { children, isEditable, component } = props;
+  const id = component.id;
   const dispatch = useSetter();
+  const { nodeTree } = useDrive();
   const { componentStack, manifest: manifestData } = useNodeReader();
   const [showRenameModal, setShowRenameModal] = useState<boolean>(false);
 
   const { dialogs, setDialogs } = useManuscriptController(["dialogs"]);
 
-  const doDelete = () => {
-    // console.log(componentStack);
+  const handleUnstar = () => {
+    const file = findDriveByPath(nodeTree!, component?.payload?.path);
+    if (file) {
+      dispatch(starComponentThunk({ item: file }));
+    }
     if (componentStack[componentStack.length - 1]?.id === id) {
       dispatch(popFromComponentStack());
-    }
-
-    if (manifestData) {
-      const index = manifestData.components.findIndex(
-        (c: ResearchObjectV1Component) => c.id === id
-      );
-      if (index > -1) {
-        dispatch(deleteComponent({ componentId: id }));
-        dispatch(saveManifestDraft({}));
-      }
     }
   };
 
@@ -96,7 +94,7 @@ const EditableHOC = (props: any) => {
               setShowRenameModal(true);
             }}
           >
-            <IconPen stroke="white" width={10} />
+            <IconPen stroke="white" width={12} />
           </div>
 
           <div
@@ -105,8 +103,8 @@ const EditableHOC = (props: any) => {
               setDialogs([
                 ...dialogs,
                 {
-                  title: "Are you sure?",
-                  message: "",
+                  title: "Unstar Component",
+                  message: "Are you sure you want to unstar this component?",
                   actions: ({ close }) => {
                     return (
                       <div className="flex gap-2 pt-4">
@@ -120,13 +118,13 @@ const EditableHOC = (props: any) => {
                         </button>
 
                         <button
-                          className="text-md cursor-pointer rounded-md shadow-sm text-white bg-red-700 px-3 py-1 hover:bg-neutrals-gray-3"
+                          className="text-md cursor-pointer rounded-md shadow-sm text-white bg-primary px-3 py-1 hover:bg-tint-primary"
                           onClick={() => {
-                            doDelete();
+                            handleUnstar();
                             close();
                           }}
                         >
-                          Delete
+                          Unstar
                         </button>
                       </div>
                     );
@@ -135,11 +133,7 @@ const EditableHOC = (props: any) => {
               ]);
             }}
           >
-            <IconDeleteForever
-              stroke="rgb(188,107,103)"
-              strokeWidth={4}
-              width={12}
-            />
+            <IconUnstar className="p-0 w-[14px] h-[14px]" />
           </div>
         </span>
       </div>
@@ -257,7 +251,7 @@ const ManuscriptComponentsSection = () => {
               (component: ResearchObjectV1Component, index: number) => (
                 <EditableHOC
                   key={`editable_hoc_${currentObjectId}_${component.id}`}
-                  id={component.id}
+                  component={component}
                   index={index}
                   isEditable={isEditable}
                 >
