@@ -13,6 +13,7 @@ import { cleanupManifestUrl } from "@src/components/utils";
 import { RootState } from "@src/store";
 import axios from "axios";
 import { DrivePath } from "../drive/types";
+import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "../drive/utils";
 
 export type ReaderMode = "reader" | "editor";
 
@@ -176,6 +177,10 @@ export const nodeReaderSlice = createSlice({
         ...state.manifest.components[payload.index],
         ...payload.update,
       };
+      const component = state.manifest.components[payload.index];
+      if (component.type === "link")
+        component.payload.path =
+          DRIVE_FULL_EXTERNAL_LINKS_PATH + "/" + component.name;
     },
     updatePendingAnnotations: (
       state,

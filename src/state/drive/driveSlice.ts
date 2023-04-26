@@ -37,6 +37,7 @@ import {
   getAncestorComponent,
   defaultSort,
   GENERIC_NEW_LINK_NAME,
+  DRIVE_FULL_EXTERNAL_LINKS_PATH,
 } from "./utils";
 import {
   AddFilesToDrivePayload,
@@ -476,11 +477,9 @@ export const addExternalLinkThunk = createAsyncThunk(
     const state = getState() as RootState;
 
     const { name, url, subtype } = payload;
-    const fullExternalLinksPath =
-      DRIVE_NODE_ROOT_PATH + "/" + DRIVE_EXTERNAL_LINKS_PATH;
     const externalLinksDrive = findDriveByPath(
       state.drive.nodeTree!,
-      fullExternalLinksPath
+      DRIVE_FULL_EXTERNAL_LINKS_PATH
     );
     const collisionArray =
       externalLinksDrive?.contains?.map((f) => f.name) || [];
@@ -495,7 +494,7 @@ export const addExternalLinkThunk = createAsyncThunk(
       subtype,
       payload: {
         url,
-        path: fullExternalLinksPath + "/" + uniqueName,
+        path: DRIVE_FULL_EXTERNAL_LINKS_PATH + "/" + uniqueName,
       },
       starred: true,
     };
