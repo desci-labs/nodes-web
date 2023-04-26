@@ -78,10 +78,12 @@ const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
        ** Metadata modals used throughout the app
        */}
       {fileMetadataBeingEdited &&
-        (fileMetadataBeingEdited.componentType ===
-          ResearchObjectComponentType.PDF ||
-          fileMetadataBeingEdited.componentType ===
-            ResearchObjectComponentType.CODE) && (
+        [
+          ResearchObjectComponentType.PDF,
+          ResearchObjectComponentType.CODE,
+        ].includes(
+          fileMetadataBeingEdited.componentType as ResearchObjectComponentType
+        ) && (
           <ComponentMetadataPopover
             isVisible={!!fileMetadataBeingEdited}
             onClose={() => {
