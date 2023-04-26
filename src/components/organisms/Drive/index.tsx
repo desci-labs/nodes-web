@@ -85,7 +85,7 @@ const DriveTable: React.FC = () => {
       {!publicView ? (
         <div className="w-full flex flex-row -mt-8">
           <div className="flex-grow"></div>
-          <div className="w-42 self-end relative">
+          <div className="w-42 self-end relative text-sm">
             {mode === "editor" && (
               <>
                 <ButtonSecondary
