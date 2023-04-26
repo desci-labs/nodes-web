@@ -98,12 +98,14 @@ const DocumentController = (props: DocumentControllerProps) => {
                     link.href = url2;
                     link.setAttribute(
                       "download",
-                      `${selectedComponent.name.replaceAll(
-                        " ",
-                        "_"
-                      )}__nodes.desci.com__${
+                      `${
+                        selectedComponent?.name ||
                         url.split("/")[url.split("/").length - 1]
-                      }.pdf`
+                      }${
+                        (selectedComponent?.name || "").endsWith(".pdf")
+                          ? ""
+                          : ".pdf"
+                      }`
                     ); //or any other extension
                     document.body.appendChild(link);
                     link.click();

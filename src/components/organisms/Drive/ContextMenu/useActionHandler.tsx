@@ -12,9 +12,13 @@ import {
   setManifestCid,
 } from "@src/state/nodes/viewer";
 import { useSetter } from "@src/store/accessors";
+import axios from "axios";
+import { AvailableUserActionLogTypes, postUserAction } from "@api/index";
+import { separateFileNameAndMimeType } from "@src/state/drive/utils";
 import {
   fetchTreeThunk,
   removeFileFromCurrentDrive,
+  setFileBeingRenamed,
   setFileMetadataBeingEdited,
 } from "@src/state/drive/driveSlice";
 import { setComponentTypeBeingAssignedTo } from "@src/state/drive/driveSlice";
@@ -34,7 +38,13 @@ export const getActionState = (action: Actions, file: DriveObject) => {
       };
     case Actions.RENAME:
       return {
-        disabled: true,
+        disabled: file?.path === DRIVE_FULL_EXTERNAL_LINKS_PATH,
+      };
+    case Actions.DOWNLOAD:
+      return {
+        disabled:
+          file.componentType === ResearchObjectComponentType.LINK ||
+          file.type === FileType.DIR,
       };
     case Actions.REMOVE:
       return {
@@ -142,18 +152,32 @@ export default function useActionHandler() {
 
   async function rename(file: DriveObject) {
     if (mode !== "editor") return;
-    //TODO: in the future a similar action as below may be required for code components, or any component where cid !== id
-    // if (
-    //   file.componentType === ResearchObjectComponentType.DATA &&
-    //   manifestData
-    // ) {
-    //   const comp = manifestData.components.find(
-    //     (c: ResearchObjectV1Component) => c.payload.cid === file.cid
-    //   );
-    //   if (comp) setRenameComponentId(comp.id);
-    //   return;
-    // }
-    // setRenameComponentId(file.cid);
+    dispatch(setFileBeingRenamed(file));
+  }
+
+  async function download(file: DriveObject) {
+    if (file.componentType === ResearchObjectComponentType.LINK) return;
+    postUserAction(
+      AvailableUserActionLogTypes.btnDownloadData,
+      JSON.stringify({ nodeUuid: currentObjectId, cid: file.cid })
+    );
+    const url = `${IPFS_URL}/${file.cid}`;
+    const { fileName, mimeType } = separateFileNameAndMimeType(file.name);
+    axios({
+      url,
+      method: "GET",
+      responseType: "blob", // important
+    }).then((response: any) => {
+      const url2 = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url2;
+      link.setAttribute(
+        "download",
+        `${fileName}${mimeType ? `.${mimeType}` : ""}`
+      );
+      document.body.appendChild(link);
+      link.click();
+    });
   }
 
   async function assignType(file: DriveObject) {
@@ -172,7 +196,7 @@ export default function useActionHandler() {
   > = {
     RENAME: rename,
     PREVIEW: preview,
-    DOWNLOAD: null,
+    DOWNLOAD: download,
     REMOVE: remove,
     ASSIGN_TYPE: assignType,
     EDIT_METADATA: editMetadata,

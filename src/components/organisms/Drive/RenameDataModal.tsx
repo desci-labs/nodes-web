@@ -1,121 +1,123 @@
-import {
-  ResearchObjectComponentType,
-  ResearchObjectV1,
-} from "@desci-labs/desci-models";
 import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
 import InsetLabelInput from "@src/components/molecules/FormInputs/InsetLabelInput";
 import Modal from "@src/components/molecules/Modal/Modal";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import { updateComponent, saveManifestDraft } from "@src/state/nodes/viewer";
+import {
+  updateComponent,
+  saveManifestDraft,
+  setManifest,
+  setManifestCid,
+} from "@src/state/nodes/viewer";
 import { useSetter } from "@src/store/accessors";
 import React, { useEffect, useState } from "react";
 import { DriveObject } from "./types";
+import {
+  fetchTreeThunk,
+  renameFileInCurrentDrive,
+  setFileBeingRenamed,
+} from "@src/state/drive/driveSlice";
+import { ResearchObjectComponentType } from "@desci-labs/desci-models";
+import { renameData } from "@src/api";
+import { useDrive } from "@src/state/drive/hooks";
 
 interface RenameDataModalProps {
-  renameComponentId: string | null;
-  setRenameComponentId: React.Dispatch<React.SetStateAction<string | null>>;
-  setDirectory: React.Dispatch<React.SetStateAction<DriveObject[]>>;
+  file: DriveObject;
 }
 
-export function getComponentString(
-  type: ResearchObjectComponentType | undefined
-) {
-  switch (type) {
-    case ResearchObjectComponentType.PDF:
-      return "Research Report";
-    case ResearchObjectComponentType.DATA:
-      return "Dataset";
-    case ResearchObjectComponentType.CODE:
-      return "Code Repo";
-    default:
-      return "Component";
-  }
-}
-
-const RenameDataModal: React.FC<RenameDataModalProps> = ({
-  renameComponentId,
-  setRenameComponentId,
-  setDirectory,
-}) => {
+const RenameDataModal: React.FC<RenameDataModalProps> = ({ file }) => {
   const dispatch = useSetter();
-  const { manifest: manifestData } = useNodeReader();
+  const {
+    manifest: manifestData,
+    manifestCid,
+    currentObjectId,
+  } = useNodeReader();
+  const { currentDrive } = useDrive();
   const [newName, setNewName] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [compType, setCompType] = useState<
-    ResearchObjectComponentType | undefined
-  >();
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-    if (!manifestData || !renameComponentId) return;
-    const comp = manifestData.components.find(
-      (c) => c.id === renameComponentId
-    );
-    if (comp) {
-      setCompType(comp.type);
-      setNewName(comp.name);
-    }
+    setNewName(file.name);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [renameComponentId]);
+  }, []);
 
   const handleSubmit = async () => {
     setLoading(true);
-    const manifestClone: ResearchObjectV1 = { ...manifestData! };
-    const datasetIdx = manifestClone.components!.findIndex(
-      (c) => c.id === renameComponentId
-    );
-    if (datasetIdx !== -1) {
-      dispatch(
-        updateComponent({
-          index: datasetIdx,
-          update: { ...manifestClone.components[datasetIdx], name: newName },
-        })
-      );
+    if (currentDrive?.contains!.some((f) => f.name === newName)) {
+      setError("File with this name already exists in current directory");
+      setLoading(false);
+      return;
     }
 
-    try {
-      dispatch(
-        saveManifestDraft({
-          onSucess: () => {
-            setLoading(false);
-            setDirectory((oldDir) => {
-              let compCid = renameComponentId;
-              const comp = manifestClone!.components![datasetIdx];
-              if (comp.type === ResearchObjectComponentType.DATA) {
-                //TODO: in the future a similar action as done in this block may be required for code components, or any component where cid !== id
-                compCid = comp.payload.cid;
-              }
-
-              const driveObjIdx = oldDir.findIndex(
-                (driveObj) => driveObj.cid === compCid
-              );
-              const newDir = [...oldDir];
-              newDir[driveObjIdx].name = newName;
-              return newDir;
-            });
-            setRenameComponentId(null);
-          },
-        })
+    dispatch(
+      renameFileInCurrentDrive({ filePath: file.path!, newName: newName })
+    );
+    if (file.componentType === ResearchObjectComponentType.LINK) {
+      const index = manifestData!.components.findIndex(
+        (c) => c.id === file.componentId
       );
+      if (index !== -1) {
+        const oldPathSplit = file.path!.split("/");
+        oldPathSplit.pop();
+        oldPathSplit.push(newName);
+        const newPath = oldPathSplit.join("/");
+        dispatch(
+          updateComponent({
+            index,
+            update: { name: newName, payload: { path: newPath } },
+          })
+        );
+        dispatch(saveManifestDraft({}));
+      }
+      close();
+    }
+
+    const snapshotManifest = { ...manifestData! };
+    const snapshotManifestCid = manifestCid;
+    const component = manifestData?.components?.find(
+      (c) => c.payload?.path === file.path
+    );
+    try {
+      const { manifestCid: newManifestCid, manifest: newManifest } =
+        await renameData(currentObjectId!, file.path!, newName);
+      if (newManifestCid && newManifest) {
+        dispatch(setManifest(newManifest));
+        dispatch(setManifestCid(newManifestCid));
+        dispatch(fetchTreeThunk());
+        close();
+      }
     } catch (e: any) {
-      console.log(`[DRIVE] Failed to update dataset name, error: ${e}`);
+      console.error(
+        "[DATA::RENAME] Failed to rename, error: ",
+        e,
+        "file: ",
+        file
+      );
+      if (component) {
+        dispatch(setManifest(snapshotManifest!));
+        dispatch(setManifestCid(snapshotManifestCid));
+      }
+      dispatch(fetchTreeThunk());
+      close();
     }
   };
 
-  const componentString = getComponentString(compType);
-
-  const close = () => setRenameComponentId(null);
+  const close = () => dispatch(setFileBeingRenamed(null));
   return (
     <Modal onDismiss={close} isOpen>
       <div className="py-3 px-6 !min-h-[70px] min-w-[400px]">
-        <Modal.Header onDismiss={close} title={`Rename ${componentString}`} />
+        <Modal.Header onDismiss={close} title={`Rename File`} />
         <div className="my-2">
           <InsetLabelInput
-            label={`${componentString} Name`}
+            label={`File Name`}
             value={newName}
             onChange={(e: any) => setNewName(e.target.value)}
             mandatory={true}
           />
         </div>
+        <p className="text-rose-400 text-xs">{error}</p>
       </div>
       <Modal.Footer>
         <PrimaryButton onClick={handleSubmit}>

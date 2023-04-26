@@ -125,7 +125,9 @@ const UploadPanel: React.FC<UploadPanelProps> = ({ show }) => {
             >
               <div className="flex items-center gap-2">
                 <span>{getIconForUploadType(qI.uploadType)}</span>
-                {qI.path.split("/").pop()}
+                <span className="truncate overflow-ellipsis w-64">
+                  {qI.path.split("/").pop()}
+                </span>
               </div>
               <aside>
                 {batchUploadProgress[qI.batchUid] === -1 ? (
