@@ -349,3 +349,25 @@ export function findUniqueName(name: string, existingNames: string[]) {
   }
   return newName;
 }
+
+/*
+ ** Sortations
+ */
+
+export const defaultSort = (a: DriveObject, b: DriveObject) => {
+  // Sorts by folders first, then by name in alphabetical order
+  const aIsDir = a.type === "dir";
+  const bIsDir = b.type === "dir";
+
+  if (aIsDir !== bIsDir) {
+    return bIsDir ? 1 : -1;
+  }
+
+  if (a.name < b.name) {
+    return -1;
+  }
+  if (a.name > b.name) {
+    return 1;
+  }
+  return 0;
+};

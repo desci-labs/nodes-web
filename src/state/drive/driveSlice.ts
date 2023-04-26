@@ -35,6 +35,7 @@ import {
   GENERIC_NEW_FOLDER_NAME,
   CID_PENDING,
   getAncestorComponent,
+  defaultSort,
 } from "./utils";
 import {
   AddFilesToDrivePayload,
@@ -75,6 +76,7 @@ export interface DriveState {
   fileBeingCited: DriveObject | null;
   fileBeingRenamed: DriveObject | null;
   breadCrumbs: BreadCrumb[];
+  sortingFunction: (a: DriveObject, b: DriveObject) => number;
 
   // drive picker state
   currentDrivePicker: DriveObject | null;
@@ -99,6 +101,7 @@ const initialState: DriveState = {
   breadCrumbs: [],
   breadCrumbsPicker: [],
   currentDrivePicker: null,
+  sortingFunction: defaultSort,
 };
 
 const navigateToDriveGeneric =
@@ -135,6 +138,7 @@ const navigateToDriveGeneric =
       return;
     }
     state[keyBreadcrumbs] = constructBreadCrumbs(driveFound.path!);
+    driveFound.contains?.sort(state.sortingFunction);
     state[keyCurrentDrive] = driveFound;
   };
 
@@ -293,6 +297,7 @@ export const driveSlice = createSlice({
       { payload }: PayloadAction<DriveObject>
     ) => {
       state.currentDrive?.contains?.push(payload);
+      state.currentDrive?.contains?.sort(state.sortingFunction);
     },
   },
   extraReducers: (builder) => {
@@ -310,6 +315,7 @@ export const driveSlice = createSlice({
             "[DRIVE]Deprecated node detected. Using old drive format."
           );
           state.deprecated = true;
+          tree.sort(state.sortingFunction) as DriveObject;
           state.nodeTree = tree as DriveObject;
           state.currentDrive = tree as DriveObject;
 
@@ -398,9 +404,11 @@ export const driveSlice = createSlice({
           ? driveBfsByPath(state.nodeTree!, state.currentDrive?.path!)
           : findDriveByPath(state.nodeTree!, state.currentDrive?.path!);
         if (driveFound) {
+          driveFound.contains?.sort(state.sortingFunction);
           state.currentDrive = driveFound;
         }
 
+        root.contains?.sort(state.sortingFunction);
         if (!state.currentDrive) {
           state.currentDrive = root;
         }

@@ -18,6 +18,7 @@ import ComponentUseModal from "@src/components/molecules/ComponentUseModal";
 import { useManuscriptController } from "../ManuscriptReader/ManuscriptController";
 import ContextMenu from "../ContextMenu";
 import { FolderAddIcon } from "@heroicons/react/solid";
+import { defaultSort } from "@src/state/drive/utils";
 
 const Empty = () => {
   return <div className="p-5 text-xs col-span-7">No files</div>;
