@@ -4,6 +4,8 @@ import { useRef } from "react";
 import { useDrag, useDrop } from "react-dnd";
 
 import { ResearchObjectV1Component } from "@desci-labs/desci-models";
+import EditableWrapper from "./EditableWrapper";
+import ComponentCard from "@src/components/molecules/ComponentCard";
 
 const style = {
   border: "1px dashed gray",
@@ -46,7 +48,7 @@ export const Card: FC<CardProps> = ({
     void,
     { handlerId: Identifier | null }
   >({
-    accept: "Component",
+    accept: "card",
     collect(monitor) {
       return {
         handlerId: monitor.getHandlerId(),
@@ -103,7 +105,7 @@ export const Card: FC<CardProps> = ({
   });
 
   const [{ isDragging }, drag] = useDrag({
-    type: "Component",
+    type: "card",
     item: () => {
       return { id, index };
     },
@@ -114,16 +116,23 @@ export const Card: FC<CardProps> = ({
 
   const opacity = isDragging ? 0 : 1;
   drag(drop(ref));
+
+  console.log("isDragging", isDragging, component.name)
   return (
-    <div ref={ref} style={{ opacity }} data-handler-id={handlerId}>
-      {/* {renderComponent({
-        component,
+    // <ComponentCard
+    //   ref={ref}
+    //   style={{ opacity }}
+    //   data-handler-id={handlerId}
+    //   component={component}
+    // />
+    <>
+      {renderComponent({
         index,
         ref,
-        handlerId,
         style: { opacity },
-      })} */}
-      <h2>{component.name}</h2>
-    </div>
+        handlerId,
+        component,
+      })}
+    </>
   );
 };

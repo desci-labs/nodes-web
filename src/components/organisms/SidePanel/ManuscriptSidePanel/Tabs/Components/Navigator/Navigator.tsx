@@ -85,7 +85,6 @@ const Navigator = () => {
     return components;
   }, [manifestData, deprecatedDrive]);
 
-
   return (
     <>
       <CollapsibleSection
@@ -136,7 +135,22 @@ const Navigator = () => {
         className="mb-4"
       >
         <div className="flex flex-col gap-3 py-2 px-0">
-          {cardComponents && cardComponents.length ? (
+          {isEditable &&
+            cardComponents &&
+            cardComponents.length &&
+            cardComponents.map(
+              (component: ResearchObjectV1Component, index: number) => (
+                <EditableWrapper
+                  key={`editable_hoc_${currentObjectId}_${component.id}`}
+                  id={component.id}
+                  index={index}
+                  isEditable={isEditable}
+                >
+                  <ComponentCard component={component} />
+                </EditableWrapper>
+              )
+            )}
+          {cardComponents && cardComponents.length && !isEditable ? (
             <DndProvider backend={HTML5Backend}>
               <Container
                 components={cardComponents}
@@ -147,21 +161,19 @@ const Navigator = () => {
                   handlerId,
                   style,
                 }) => (
-                  <EditableWrapper
+                  <ComponentCard
                     ref={ref}
                     style={style}
                     data-handler-id={handlerId}
-                    key={`editable_hoc_${currentObjectId}_${component.id}`}
-                    id={component.id}
-                    index={index}
-                    isEditable={isEditable}
-                  >
-                    <ComponentCard component={component} />
-                  </EditableWrapper>
+                    component={component}
+                  />
                 )}
               />
             </DndProvider>
           ) : (
+            <></>
+          )}
+          {cardComponents?.length === 0 && (
             <div className="text-[10px] text-neutrals-gray-6 flex flex-row gap-1 items-center">
               <IconStar width={12} className="fill-tint-primary-hover" />
               Star a component in Drive to see it here

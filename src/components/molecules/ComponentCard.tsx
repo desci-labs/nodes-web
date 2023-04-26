@@ -1,7 +1,6 @@
 import axios from "axios";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { CSSProperties, useCallback, useEffect, useMemo, useState } from "react";
 import styled, { StyledComponent } from "styled-components";
-import ButtonCopyLink from "@components/atoms/ButtonCopyLink";
 import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
 
 import AnnotationSwitcher from "@components/atoms/AnnotationSwitcher";
@@ -9,7 +8,6 @@ import {
   ExternalLinkComponent,
   PdfComponentPayload,
   ResearchObjectComponentType,
-  ResearchObjectV1,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 import { cleanupManifestUrl } from "@components/utils";
@@ -18,8 +16,6 @@ import ReactTooltip from "react-tooltip";
 import { findTarget } from "@components/organisms/ComponentLibrary";
 import ButtonFair from "@components/atoms/ButtonFair";
 import {
-  DRIVE_DATA_PATH,
-  DRIVE_NODE_ROOT_PATH,
   SessionStorageKeys,
 } from "../driveUtils";
 import { useSetter } from "@src/store/accessors";
@@ -28,7 +24,6 @@ import { updatePdfPreferences } from "@src/state/nodes/pdf";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import {
   navigateToDriveByPath,
-  setComponentTypeBeingAssignedTo,
   setFileBeingCited,
   setFileBeingUsed,
 } from "@src/state/drive/driveSlice";
@@ -82,6 +77,7 @@ export interface SectionCardProps {
 
 export interface ComponentCardProps extends SectionCardProps {
   component: ResearchObjectV1Component;
+  style?: CSSProperties
 }
 const labelFor = (component: ResearchObjectV1Component): string => {
   const obj = findTarget(component);
@@ -102,10 +98,10 @@ const iconFor = (
   return null;
 };
 
-const ComponentCard = (props: ComponentCardProps) => {
+const ComponentCard = React.forwardRef((props: ComponentCardProps, orderRef: any) => {
   const dispatch = useSetter();
   const { component } = props;
-  const { mode, componentStack, recentlyAddedComponent, manifest } =
+  const { componentStack, recentlyAddedComponent, manifest } =
     useNodeReader();
   const { nodeTree } = useDrive();
   /***
@@ -199,6 +195,7 @@ const ComponentCard = (props: ComponentCardProps) => {
     : "";
 
   if (component.type === ResearchObjectComponentType.LINK) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     copyLinkUrl = (component as ExternalLinkComponent).payload.url;
   }
 
@@ -209,14 +206,25 @@ const ComponentCard = (props: ComponentCardProps) => {
     (drive.accessStatus === AccessStatus.PUBLIC ||
       drive.accessStatus === AccessStatus.PARTIAL);
 
+      const handleRef = useCallback(
+        (node: HTMLDivElement) => {
+          if (orderRef && node) {
+            orderRef.current = node;
+          }
+        },
+        [orderRef]
+      );
+
   return (
     <CardWrapper
+      ref={handleRef}
       isSelected={isSelected}
       isHalfSelected={clicked}
       isRecentlyAdded={
         recentlyAddedComponent === component.payload?.path ?? false
       }
       onClick={handleComponentClick}
+      {...props}
     >
       <FlexColumn>
         <HeaderWrapper>
@@ -350,7 +358,7 @@ const ComponentCard = (props: ComponentCardProps) => {
                     <div
                       style={{
                         display:
-                          component.type == ResearchObjectComponentType.PDF
+                          component.type === ResearchObjectComponentType.PDF
                             ? ""
                             : "none",
                       }}
@@ -369,6 +377,6 @@ const ComponentCard = (props: ComponentCardProps) => {
       </FlexColumn>
     </CardWrapper>
   );
-};
+});
 
 export default React.memo(ComponentCard);
