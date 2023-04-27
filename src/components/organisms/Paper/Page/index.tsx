@@ -92,7 +92,7 @@ const PageComponent = React.memo((props: any) => {
   // if (!isRendered) {
   //   console.time(timeKey);
   // }
-  console.log(timeKey, isRendered);
+  // console.log(timeKey, isRendered);
 
   useEffect(() => {
     setTimeout(() => {
