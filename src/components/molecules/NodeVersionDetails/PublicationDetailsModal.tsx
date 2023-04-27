@@ -2,13 +2,16 @@ import PopOver from "@components/organisms/PopOver";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { BytesToHumanFileSize } from "@components/utils";
 import { IconX } from "@icons";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import Copier from "../Copier";
 import useVersionDetails from "./useVersionDetails";
 import { CHAINS } from "@connectors/../chains";
 import { DEFAULT_CHAIN } from "../ConnectWithSelect";
 import { useHistoryReader, useNodeReader } from "@src/state/nodes/hooks";
 import { LinkIcon } from "@heroicons/react/solid";
+import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
+import SlideDown from "react-slidedown";
+import AdvancedSlideDown from "@src/components/atoms/AdvancedSlideDown";
 
 const ACTIVE_CHAIN = CHAINS[DEFAULT_CHAIN] as any;
 const BLOCK_EXPLORER_URL = ACTIVE_CHAIN && ACTIVE_CHAIN.blockExplorerUrls[0];
@@ -19,11 +22,21 @@ export default function PublicationDetailsModal(props: any) {
   const { manifest: manifestData } = useNodeReader();
   const { selectedHistory } = useHistoryReader();
 
-  const { size, copies, node } = useVersionDetails(
+  const { size, copies, node, mirrors } = useVersionDetails(
     selectedHistory?.data?.transaction?.id ?? ""
   );
 
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (mirrors && mirrors.length > 0) {
+      setIsLoading(false);
+    }
+  }, [mirrors]);
+
+  const [closed, setClosed] = useState(false);
   const onClose = () => {
+    setClosed(false);
     setShowPublicationDetails(false);
   };
 
@@ -44,7 +57,7 @@ export default function PublicationDetailsModal(props: any) {
       onClose={onClose}
       isVisible={showPublicationDetails}
       displayCloseIcon={true}
-      className="transition-all rounded-lg bg-zinc-100 dark:bg-zinc-900 overflow-x-hidden max-w-[450px]"
+      className="transition-all rounded-lg bg-zinc-100 dark:bg-zinc-900 overflow-x-hidden max-w-[450px] select-none"
     >
       <div className="px-6 py-5 text-white" style={{ maxWidth: 600 }}>
         <div className="flex flex-row justify-between items-center mb-6">
@@ -71,14 +84,21 @@ export default function PublicationDetailsModal(props: any) {
         </div>
         <div className="py-4 flex flex-col gap-5">
           <Details
+            title="Node dPID"
+            subTitle={<Link href={dpidLink} />}
+            copy={dpidLink}
+          />
+          <Details
             title="Node Size"
             subTitle="Size of the stored data published on this version of your node."
             detail={BytesToHumanFileSize(size)}
+            isLoading={isLoading}
           />
           <Details
             title="Data Copies"
             subTitle="We've made several copies of your node so that you can always access your data."
             detail={(copies || 6).toString()}
+            isLoading={isLoading}
           />
         </div>
         <Divider />
@@ -88,26 +108,27 @@ export default function PublicationDetailsModal(props: any) {
             subTitle={<Link href="https://estuary.tech" />}
           />
         </div>
-        <Divider />
-        <div className="py-4 flex flex-col gap-5">
-          <Details
-            title="Node Root CID"
-            subTitle={
-              <Link href={`https://ipfs.io/ipfs/${node?.manifestUrl}`} />
-            }
-            copy={`https://ipfs.io/ipfs/${node?.manifestUrl}`}
-          />
-          <Details
-            title="Transaction Receipt"
-            subTitle={<Link href={transactionReceiptUrl} />}
-            copy={transactionReceiptUrl}
-          />
-          <Details
-            title="Node dPID"
-            subTitle={<Link href={dpidLink} />}
-            copy={dpidLink}
-          />
-        </div>
+        <AdvancedSlideDown
+          closed={closed}
+          setClosed={setClosed}
+          className="overflow-hidden"
+        >
+          <Divider />
+          <div className="py-4 flex flex-col gap-5 select-none">
+            <Details
+              title="Node Metadata"
+              subTitle={
+                <Link href={`https://ipfs.io/ipfs/${node?.manifestUrl}`} />
+              }
+              copy={`https://ipfs.io/ipfs/${node?.manifestUrl}`}
+            />
+            <Details
+              title="Transaction Receipt"
+              subTitle={<Link href={transactionReceiptUrl} />}
+              copy={transactionReceiptUrl}
+            />
+          </div>
+        </AdvancedSlideDown>
       </div>
     </PopOver>
   );
@@ -135,6 +156,7 @@ function Details(props: {
   subTitle: string | ReactNode;
   detail?: string;
   copy?: string;
+  isLoading?: boolean;
 }) {
   return (
     <div className="flex flex-col items-start justify-between gap-2">
@@ -150,7 +172,11 @@ function Details(props: {
         <div className="flex gap-2 flex-none">
           {props.detail && (
             <div className="flex-none text-xs text-white text-center font-bold border-2 border-neutrals-gray-3 bg-black min-w-16 w-24 px-2 py-2 rounded-xl">
-              {props.detail}
+              {props.isLoading ? (
+                <DefaultSpinner height={16} color="white" className="-ml-3" />
+              ) : (
+                props.detail
+              )}
             </div>
           )}
           {props.copy && (

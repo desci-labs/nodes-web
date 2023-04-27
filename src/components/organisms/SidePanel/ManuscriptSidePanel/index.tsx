@@ -194,14 +194,7 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
       dispatch(toggleResearchPanel(false));
       onClose();
     }
-  }, [
-    dispatch,
-    popFromComponentStack,
-    componentStack,
-    toggleResearchPanel,
-    onClose,
-    isCodeActive,
-  ]);
+  }, [dispatch, componentStack, onClose, isCodeActive]);
 
   return (
     <ManuscriptSidePanelContainer

@@ -11,7 +11,6 @@ import { useGetter, useSetter } from "@src/store/accessors";
 import { setHeaderHidden } from "@src/state/preferences/preferencesSlice";
 import DragDropZone from "../DragDropZone";
 import AddComponentPopOver from "../PopOver/AddComponentPopOver";
-import CitationPopover from "../PopOver/CitationPopover";
 import CommitSidePanel from "../SidePanel/CommitSidePanel";
 import ManuscriptSidePanel from "../SidePanel/ManuscriptSidePanel";
 import UploadPanel from "../UploadPanel";
@@ -68,7 +67,7 @@ export default function Editor({ isLoading }: ReaderViewerProps) {
       <ManuscriptSidePanel
         onClose={useCallback(() => {
           dispatch(setHeaderHidden(true));
-        }, [dispatch, setHeaderHidden])}
+        }, [dispatch])}
       />
 
       <>
@@ -79,16 +78,16 @@ export default function Editor({ isLoading }: ReaderViewerProps) {
         {componentStack.filter(
           (a) =>
             a &&
-            a.type != ResearchObjectComponentType.DATA &&
-            a.type != ResearchObjectComponentType.UNKNOWN &&
-            a.type != ResearchObjectComponentType.DATA_BUCKET
+            a.type !== ResearchObjectComponentType.DATA &&
+            a.type !== ResearchObjectComponentType.UNKNOWN &&
+            a.type !== ResearchObjectComponentType.DATA_BUCKET
         ).length > 0 ? (
           <FloatingActionBar />
         ) : null}
 
         <PopOverAlphaConsent />
 
-        <PublicationDetailsModal />
+        {/* <PublicationDetailsModal /> */}
 
         {(isAddingComponent || isAddingSubcomponent) && <ComponentAdd />}
         {componentTypeBeingAssignedTo && <AssignTypePane />}

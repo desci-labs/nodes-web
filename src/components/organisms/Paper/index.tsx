@@ -7,7 +7,7 @@ import "./style.scss";
 import { APPROXIMATED_HEADER_HEIGHT } from "@components/utils";
 import { ResearchObjectComponentAnnotation } from "@desci-labs/desci-models";
 import { useScrolling, useUpdateEffect } from "react-use";
-import { PageComponentHOC } from "./Page";
+import { PAGE_RENDER_DISTANCE, PageComponentHOC } from "./Page";
 
 import { useGesture } from "@use-gesture/react";
 import { useResponsive, useWindowDimensions } from "hooks";
@@ -57,9 +57,7 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
   const { isResearchPanelOpen, componentStack, pdfScrollOffsetTop } =
     useNodeReader();
   const { annotations } = payload;
-  const [pendingAnnotations, setPendingAnnotations] = useState<
-    ResearchObjectComponentAnnotation[]
-  >(annotations || []);
+
   const [pinching, setPinching] = useState<boolean>(false);
   // const [annotationsByPage, setAnnotationsByPage] = useState<any>([]);
   const { width: windowWidth } = useWindowDimensions();
@@ -418,6 +416,27 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
     ...options,
   });
 
+  const MAX_PAGE_BUFFER = 30;
+  const PAGE_BUFFER_INCREMENT = 1;
+  const PAGE_BUFFER_TIMEOUT = 2000;
+  const [pageBuffer, setPageBuffer] = useState(4);
+
+  useEffect(() => {
+    if (pageBuffer < MAX_PAGE_BUFFER) {
+      const timeout = setTimeout(() => {
+        setPageBuffer(pageBuffer + PAGE_BUFFER_INCREMENT);
+      }, PAGE_BUFFER_TIMEOUT);
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageBuffer]);
+
+  // useEffect(() => {
+  //   setPageBuffer(4);
+  // }, [zoom]);
+
   return (
     <>
       <div
@@ -438,11 +457,11 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
         }}
         onClick={onTextSelectCancel}
       >
-        <ManifestUpdater
+        {/* <ManifestUpdater
           componentId={id}
           pendingAnnotations={pendingAnnotations}
           setPendingAnnotations={setPendingAnnotations}
-        />
+        /> */}
 
         <div
           ref={gestureContainerRef}
@@ -614,16 +633,7 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
                   >
                     <div
                       key={`wrap_PageComponentHOC_${currentPdf}_${pageNum}`}
-                      className={`flex flex-row justify-center items-center ${
-                        isEditingAnnotation &&
-                        pendingAnnotations &&
-                        selectedAnnotationId !== undefined &&
-                        pendingAnnotations.filter(
-                          (a) => a.id === selectedAnnotationId
-                        )[0]?.pageIndex !== index
-                          ? ""
-                          : ""
-                      }`}
+                      className={`flex flex-row justify-center items-center`}
                       onMouseUp={handleTextSelect(
                         containerRef,
                         documentRef,
@@ -636,8 +646,6 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
                         key={`PageComponentHOC_${currentPdf}_${pageNum}`}
                         pageNumber={pageNum}
                         width={pageWidth}
-                        pageAnnotations={pendingAnnotations}
-                        setPageAnnotations={setPendingAnnotations}
                         dirtyComment={dirtyComment}
                         isActiveComponent={isActiveComponent}
                         isPinching={pinching}
@@ -653,7 +661,9 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
                         zoom={zoom}
                         selectedAnnotationId={selectedAnnotationId}
                         pageMetadata={pageMetadataItem}
-                        isIntersecting={visible}
+                        isIntersecting={
+                          Math.abs(rawIndex - pdfCurrentPage) <= pageBuffer
+                        }
                       />
                     </div>
                   </div>

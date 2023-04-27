@@ -11,6 +11,7 @@ import {
 import {
   IconData,
   IconDeleteForever,
+  IconHamburger,
   IconInfo,
   IconPen,
   IconStar,
@@ -196,6 +197,7 @@ const ManuscriptComponentsSection = () => {
     return components;
   }, [manifestData, deprecatedDrive]);
 
+  console.log(deprecatedDrive, cardComponents, manifestData?.components);
   return (
     <>
       <CollapsibleSection

@@ -16,6 +16,7 @@ interface AnnotationExpandedProps {
   annotation: Annotation;
   darkMode?: boolean;
   hideHeader?: boolean;
+  isOn?: boolean;
 }
 
 const AnnotationExpanded = ({
@@ -25,6 +26,7 @@ const AnnotationExpanded = ({
   annotation,
   darkMode,
   hideHeader,
+  isOn,
 }: AnnotationExpandedProps) => {
   const dispatch = useSetter();
 
@@ -73,13 +75,17 @@ const AnnotationExpanded = ({
     getCopyLink();
 
     setVisible(true);
-  }, []);
+  }, [componentStack, manifestData]);
 
   const isHovered = hoveredAnnotationId === annotation?.id;
   const isSelected = selectedAnnotationId === annotation?.id;
 
   return (
-    <div className={`${isHovered && !isSelected ? "cursor-pointer" : ""}`}>
+    <div
+      className={`z-10 ${
+        isHovered && !isSelected ? "cursor-pointer" : ""
+      } absolute -ml-4 md:ml-0 md:right-0`}
+    >
       <div
         className={`rounded-xl px-4 shadow-2xl annotation-item 
         ${isHovered && !isSelected ? "pointer-events-none" : ""} ${

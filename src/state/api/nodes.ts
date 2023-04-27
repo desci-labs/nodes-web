@@ -61,30 +61,7 @@ export const nodesApi = api.injectEndpoints({
         },
       }
     ),
-    setNodeCover: builder.mutation<
-      { url: string; ok: boolean },
-      { cid: string; nodeUuid: string }
-    >({
-      query: ({ cid, nodeUuid }: { cid: string; nodeUuid: string }) => {
-        return {
-          url: `${endpoints.v1.nodes.media.cover}${cid}?nodeUuid=${nodeUuid}`,
-          method: "POST",
-        };
-      },
-      async onQueryStarted(
-        args: { cid: string; nodeUuid: string },
-        { dispatch, queryFulfilled }
-      ) {
-        try {
-          const {
-            data: { url },
-          } = await queryFulfilled;
-          console.log("cover set", url);
-        } catch (error) {
-          console.log("Error setting node cover", args, error);
-        }
-      },
-    }),
+    
     revokeShareLink: builder.mutation<{ shareId: string; ok: boolean }, string>(
       {
         query: (shareId: string) => {
@@ -116,5 +93,4 @@ export const {
   usePrivateShareQuery,
   useRevokeShareLinkMutation,
   useCreateShareLinkMutation,
-  useSetNodeCoverMutation,
 } = nodesApi;
