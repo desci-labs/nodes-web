@@ -117,22 +117,25 @@ export const Card: FC<CardProps> = ({
   const opacity = isDragging ? 0 : 1;
   drag(drop(ref));
 
-  console.log("isDragging", isDragging, component.name)
+  console.log("isDragging", isDragging, component.name);
   return (
+    <div ref={ref} style={{ opacity }} data-handler-id={handlerId}>
+      {component.name}
+    </div>
     // <ComponentCard
     //   ref={ref}
     //   style={{ opacity }}
     //   data-handler-id={handlerId}
     //   component={component}
     // />
-    <>
-      {renderComponent({
-        index,
-        ref,
-        style: { opacity },
-        handlerId,
-        component,
-      })}
-    </>
+    // <>
+    //   {renderComponent({
+    //     index,
+    //     ref,
+    //     style: { opacity },
+    //     handlerId,
+    //     component,
+    //   })}
+    // </>
   );
 };

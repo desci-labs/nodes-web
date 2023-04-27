@@ -7,7 +7,7 @@ import SourceTab from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/
 import PerfectScrollbar from "react-perfect-scrollbar";
 import PanelCloseButton from "@components/atoms/PanelCloseButton";
 import ManuscriptAttributesSection from "@src/components/organisms/ManuscriptAttributesSection";
-import ManuscriptComponentsSection from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/Components/ManuscriptComponentsSection";
+// import ManuscriptComponentsSection from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/Components/ManuscriptComponentsSection";
 import {
   convertUUIDToHex,
   isWindows,

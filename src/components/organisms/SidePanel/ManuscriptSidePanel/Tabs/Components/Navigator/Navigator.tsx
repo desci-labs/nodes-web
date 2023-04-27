@@ -9,7 +9,7 @@ import {
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 import { IconData, IconInfo, IconStar } from "icons";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 // import ComponentRenamePopover from "./PopOver/ComponentRenamePopover";
@@ -20,6 +20,8 @@ import { useDrive } from "@src/state/drive/hooks";
 import { Container } from "./Container";
 import EditableWrapper from "./EditableWrapper";
 import ComponentCard from "@src/components/molecules/ComponentCard";
+import { useSetter } from "@src/store/accessors";
+import { reorderComponent, saveManifestDraft } from "@src/state/nodes/viewer";
 
 export enum EditorHistoryType {
   ADD_ANNOTATION,
@@ -42,6 +44,7 @@ const Navigator = () => {
   const { mode, manifest: manifestData, currentObjectId } = useNodeReader();
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const { deprecated: deprecatedDrive } = useDrive();
+  const dispatch = useSetter();
 
   /**
    * Hide component section if we don't have components
@@ -85,6 +88,25 @@ const Navigator = () => {
     return components;
   }, [manifestData, deprecatedDrive]);
 
+  const moveCard = useCallback(
+    (dragIndex: number, hoverIndex: number) => {
+      if (!cardComponents) return;
+      const draggedComponent = cardComponents[dragIndex];
+      const hoveredComponent = cardComponents[hoverIndex];
+      const indexToMove = manifestData?.components.findIndex(
+        (c) => c.id === draggedComponent.id
+      );
+      const indexToHover = manifestData?.components.findIndex(
+        (c) => c.id === hoveredComponent.id
+      );
+      if (!(indexToMove !== undefined && indexToHover !== undefined)) return;
+      dispatch(reorderComponent({ dragIndex: indexToMove, hoverIndex: indexToHover }))
+      dispatch(saveManifestDraft({}))
+    },
+    [cardComponents, dispatch, manifestData?.components]
+  );
+
+  console.log(cardComponents)
   return (
     <>
       <CollapsibleSection
@@ -153,6 +175,7 @@ const Navigator = () => {
           {cardComponents && cardComponents.length && !isEditable ? (
             <DndProvider backend={HTML5Backend}>
               <Container
+                moveCard={moveCard}
                 components={cardComponents}
                 renderComponent={({
                   component,
