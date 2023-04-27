@@ -195,7 +195,6 @@ export const nodeReaderSlice = createSlice({
           [payload.hoverIndex, 0, item as any],
         ],
       });
-      // console.log("inserted", state.manifest.components);
     },
     updatePendingAnnotations: (
       state,

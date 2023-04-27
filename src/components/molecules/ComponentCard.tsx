@@ -1,10 +1,7 @@
 import axios from "axios";
 import React, {
-  CSSProperties,
-  useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import styled, { StyledComponent } from "styled-components";
@@ -38,8 +35,6 @@ import { findDriveByPath } from "@src/state/drive/utils";
 import { useDrive } from "@src/state/drive/hooks";
 import { AccessStatus } from "../organisms/Drive";
 import { getLicenseShortName } from "../organisms/PopOver/ComponentMetadataPopover";
-import type { Identifier, XYCoord } from "dnd-core";
-import { useDrag, useDrop } from "react-dnd";
 
 const CardWrapper: StyledComponent<
   "div",

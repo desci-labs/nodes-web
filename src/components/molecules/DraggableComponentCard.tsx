@@ -24,8 +24,8 @@ import {
   setFileBeingCited,
   setFileBeingUsed,
 } from "@src/state/drive/driveSlice";
-import { GenericButton } from "../atoms/BlackGenericButton";
-import { IconDrive, IconPlayRounded, IconQuotes } from "@src/icons";
+import BlackGenericButton from "../atoms/BlackGenericButton";
+import { IconPlayRounded, IconQuotes } from "@src/icons";
 import { findDriveByPath } from "@src/state/drive/utils";
 import { useDrive } from "@src/state/drive/hooks";
 import { AccessStatus } from "../organisms/Drive";
@@ -76,18 +76,10 @@ export interface SectionCardProps {
 
 export interface ComponentCardProps extends SectionCardProps {
   id: any;
-  // style?: CSSProperties;
   component: ResearchObjectV1Component;
   index: number;
   moveCard?: (dragIndex: number, hoverIndex: number) => void;
 }
-// const labelFor = (component: ResearchObjectV1Component): string => {
-//   const obj = findTarget(component);
-//   if (obj) {
-//     return obj.title;
-//   }
-//   return "--";
-// };
 
 const iconFor = (
   component: ResearchObjectV1Component,
@@ -296,7 +288,7 @@ const ComponentCard = React.forwardRef(
     return (
       <CardWrapper
         ref={ref}
-        style={{ opacity }}
+        style={{ opacity, transform: "translateZ(0)" }}
         data-handler-id={handlerId}
         isSelected={isSelected}
         isHalfSelected={clicked}
@@ -329,95 +321,73 @@ const ComponentCard = React.forwardRef(
         </FlexColumn>
         <div
           style={{
-            height: 45,
+            height: isSelected ? 45 : 0,
             overflow: "hidden",
             transition: "height 0.1s ease-in",
-            // visibility: isSelected ? 'visible' : 'hidden'
+            visibility: isSelected ? "visible" : "hidden",
           }}
         >
-          <FlexRowSpaceBetween>
-            <div className="flex justify-between dark:bg-muted-700 px-3 py-2 w-full">
-              <>
-                <div className="flex gap-2 justify-between w-full">
-                  <div id="section-left">
-                    <ButtonFair
-                      isFair={false}
-                      component={component}
-                      text={getLicenseShortName(
-                        drive?.metadata.licenseType ||
-                          component.payload?.licenseType ||
-                          manifest?.defaultLicense
-                      )} //Should only ever hit unknown for deprecated tree
-                      classname="w-auto bg-neutrals-gray-2 px-2 font-medium text-xs h-7"
-                    />
-                  </div>
-                  <div id="section-right" className="flex gap-2">
-                    <GenericButton
-                      disabled={false}
-                      className="p-0"
-                      onClick={(e) => {
-                        e!.stopPropagation();
-                        dispatch(navigateToDriveByPath(component.payload.path));
-                        if (
-                          component.type === ResearchObjectComponentType.DATA ||
-                          component.type === ResearchObjectComponentType.UNKNOWN
-                        ) {
-                          dispatch(setComponentStack([component]));
-                        } else {
-                          dispatch(setComponentStack([]));
-                        }
-                      }}
-                    >
-                      <IconDrive className="p-0 min-w-[28px] scale-[1.2]" />
-                    </GenericButton>
-                    <GenericButton
-                      dataTip={"Cite"}
-                      dataFor={`cite_${component.id}`}
-                      className="w-7 h-7"
-                      disabled={!canCite}
-                      onClick={(e) => {
-                        e!.stopPropagation();
-                        dispatch(setFileBeingCited(drive));
-                      }}
-                    >
-                      <IconQuotes />
-                    </GenericButton>
-                    {[
-                      ResearchObjectComponentType.DATA,
-                      ResearchObjectComponentType.CODE,
-                      ResearchObjectComponentType.UNKNOWN,
-                    ].includes(component.type) ? (
-                      <GenericButton
-                        dataTip={"Methods"}
-                        dataFor={`use_${component.id}`}
-                        disabled={!drive}
-                        className="p-0 min-w-[28px] h-7"
-                        onClick={(e) => {
-                          e!.stopPropagation();
-                          dispatch(setFileBeingUsed(drive));
-                        }}
-                      >
-                        <IconPlayRounded className="p-0" />
-                      </GenericButton>
-                    ) : null}
-                    <div
-                      style={{
-                        display:
-                          component.type === ResearchObjectComponentType.PDF
-                            ? ""
-                            : "none",
-                      }}
-                    >
-                      <AnnotationSwitcher
-                        annotations={sortedAnnotations}
-                        handleComponentClick={handleComponentClick}
-                      />
-                    </div>
-                  </div>
+          <div className="flex justify-between dark:bg-muted-700 px-3 py-2 w-full">
+            <div className="flex gap-2 justify-between items-center w-full">
+              <div id="section-left">
+                <ButtonFair
+                  isFair={false}
+                  component={component}
+                  text={getLicenseShortName(
+                    drive?.metadata.licenseType ||
+                      component.payload?.licenseType ||
+                      manifest?.defaultLicense
+                  )} //Should only ever hit unknown for deprecated tree
+                  classname="w-auto bg-neutrals-gray-2 px-2 font-medium text-xs h-7"
+                />
+              </div>
+              <div id="section-right" className="flex gap-2">
+                <BlackGenericButton
+                  dataTip={"Cite"}
+                  dataFor={`cite_${component.id}`}
+                  className="w-7 h-7"
+                  disabled={!canCite}
+                  onClick={(e) => {
+                    e!.stopPropagation();
+                    dispatch(setFileBeingCited(drive));
+                  }}
+                >
+                  <IconQuotes />
+                </BlackGenericButton>
+                {[
+                  ResearchObjectComponentType.DATA,
+                  ResearchObjectComponentType.CODE,
+                  ResearchObjectComponentType.UNKNOWN,
+                ].includes(component.type) ? (
+                  <BlackGenericButton
+                    dataTip={"Methods"}
+                    dataFor={`use_${component.id}`}
+                    disabled={!drive}
+                    className="p-0 min-w-[28px] h-7"
+                    onClick={(e) => {
+                      e!.stopPropagation();
+                      dispatch(setFileBeingUsed(drive));
+                    }}
+                  >
+                    <IconPlayRounded className="p-0" />
+                  </BlackGenericButton>
+                ) : null}
+                <div
+                  style={{
+                    display:
+                      component.type === ResearchObjectComponentType.PDF
+                        ? ""
+                        : "none",
+                  }}
+                >
+                  <AnnotationSwitcher
+                    annotations={sortedAnnotations}
+                    handleComponentClick={handleComponentClick}
+                  />
                 </div>
-              </>
+              </div>
             </div>
-          </FlexRowSpaceBetween>
+          </div>
         </div>
       </CardWrapper>
     );
