@@ -45,7 +45,7 @@ const AnnotationEditCanvas: React.FC<
   const setAnnotations = (arg: any) => {
     // console.log("set annotations", arg);
 
-    dispatch(replaceAnnotations(arg));
+    dispatch(replaceAnnotations(arg || []));
   };
 
   const divRef = useRef<HTMLDivElement | null>(null);

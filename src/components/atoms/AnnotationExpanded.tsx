@@ -75,7 +75,7 @@ const AnnotationExpanded = ({
     getCopyLink();
 
     setVisible(true);
-  }, []);
+  }, [componentStack, manifestData]);
 
   const isHovered = hoveredAnnotationId === annotation?.id;
   const isSelected = selectedAnnotationId === annotation?.id;

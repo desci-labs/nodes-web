@@ -214,7 +214,7 @@ const AnnotationComponent = (props: AnnotationProps) => {
                 (a) => a.id === props.annotation.id
               );
               if (annotationIndex > -1) {
-                dispatch(replaceAnnotations(annotationsFromManifest));
+                dispatch(replaceAnnotations(annotationsFromManifest || []));
               } else {
                 dispatch(
                   deleteAnnotation({
@@ -225,6 +225,19 @@ const AnnotationComponent = (props: AnnotationProps) => {
               }
             });
           }
+        } else {
+          // no existing annotations, delete
+          dispatch(replaceAnnotations([]));
+          setTimeout(() => {
+            dispatch(setIsEditingAnnotation(false));
+
+            dispatch(
+              updatePdfPreferences({
+                hoveredAnnotationId: "",
+                selectedAnnotationId: "",
+              })
+            );
+          });
         }
       }
     }
@@ -252,9 +265,9 @@ const AnnotationComponent = (props: AnnotationProps) => {
         (c) => c.id === selectedComponent.id
       );
       if (index > -1) {
-        const annotationsFromManifest = (
-          manifestDataCopy.components[index] as PdfComponent
-        ).payload.annotations;
+        const annotationsFromManifest =
+          (manifestDataCopy.components[index] as PdfComponent).payload
+            .annotations || [];
         if (annotationsFromManifest) {
           const annotationIndex = annotationsFromManifest.findIndex(
             (a) => a.id === props.annotation.id

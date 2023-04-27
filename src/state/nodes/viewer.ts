@@ -98,7 +98,7 @@ export const nodeReaderSlice = createSlice({
       state,
       { payload }: PayloadAction<ResearchObjectComponentAnnotation[]>
     ) => {
-      if (payload && payload.length) {
+      if (payload) {
         const annotations = [...payload];
         state.annotations = annotations;
         state.annotationsByPage = annotations.reduce((acc, annotation) => {
@@ -137,7 +137,7 @@ export const nodeReaderSlice = createSlice({
         defaultComponent.type === ResearchObjectComponentType.PDF
       ) {
         nodeReaderSlice.caseReducers.replaceAnnotations(state, {
-          payload: defaultComponent.payload.annotations,
+          payload: defaultComponent.payload.annotations || [],
           type: "replaceAnnotations",
         });
       }
@@ -151,7 +151,7 @@ export const nodeReaderSlice = createSlice({
         defaultComponent.type === ResearchObjectComponentType.PDF
       ) {
         nodeReaderSlice.caseReducers.replaceAnnotations(state, {
-          payload: defaultComponent.payload.annotations,
+          payload: defaultComponent.payload.annotations || [],
           type: "replaceAnnotations",
         });
       }
@@ -266,7 +266,7 @@ export const nodeReaderSlice = createSlice({
           );
           if (componentDataFresh) {
             nodeReaderSlice.caseReducers.replaceAnnotations(state, {
-              payload: componentDataFresh.payload.annotations,
+              payload: componentDataFresh.payload.annotations || [],
               type: "replaceAnnotations",
             });
           }
@@ -287,7 +287,9 @@ export const nodeReaderSlice = createSlice({
         state.manifest.components = state.manifest.components.map(
           (component, idx) => {
             if (idx === payload.componentIndex) {
-              const updatedAnnotations = component.payload.annotations.map(
+              const updatedAnnotations = (
+                component.payload.annotations || []
+              ).map(
                 (
                   annotation: ResearchObjectComponentAnnotation,
                   idx: number
@@ -327,7 +329,7 @@ export const nodeReaderSlice = createSlice({
           );
           if (componentDataFresh) {
             nodeReaderSlice.caseReducers.replaceAnnotations(state, {
-              payload: componentDataFresh.payload.annotations,
+              payload: componentDataFresh.payload.annotations || [],
               type: "replaceAnnotations",
             });
           }
@@ -443,7 +445,7 @@ export const nodeReaderSlice = createSlice({
       ) {
         nodeReaderSlice.caseReducers.replaceAnnotations(
           state,
-          newTopComponent.payload.annotations
+          newTopComponent.payload.annotations || []
         );
       }
     },
@@ -470,7 +472,7 @@ export const nodeReaderSlice = createSlice({
       ) {
         nodeReaderSlice.caseReducers.replaceAnnotations(
           state,
-          newTopComponent.payload.annotations
+          newTopComponent.payload.annotations || []
         );
       }
     },
@@ -501,7 +503,7 @@ export const nodeReaderSlice = createSlice({
       ) {
         nodeReaderSlice.caseReducers.replaceAnnotations(
           state,
-          newTopComponent.payload.annotations
+          newTopComponent.payload.annotations || []
         );
       }
       return state;
