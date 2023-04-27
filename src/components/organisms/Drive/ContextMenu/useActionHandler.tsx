@@ -1,4 +1,4 @@
-import { DriveObject, FileType } from "../types";
+import { AccessStatus, DriveObject, FileType } from "../types";
 import { Actions } from "./types";
 import {
   ResearchObjectComponentType,
@@ -31,6 +31,7 @@ const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
 const PUB_IPFS_URL = process.env.REACT_APP_PUBLIC_IPFS_RESOLVER;
 
 export const getActionState = (action: Actions, file: DriveObject) => {
+  if (file.accessStatus === AccessStatus.UPLOADING) return { disabled: true };
   switch (action) {
     case Actions.PREVIEW:
       return {

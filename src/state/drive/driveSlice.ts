@@ -1,7 +1,11 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 import { getDatasetTree, updateDag } from "@src/api";
-import { DriveObject, FileType } from "@src/components/organisms/Drive";
+import {
+  AccessStatus,
+  DriveObject,
+  FileType,
+} from "@src/components/organisms/Drive";
 import { RequestStatus, RootState } from "@src/store";
 import {
   ExternalLinkComponent,
@@ -709,6 +713,7 @@ export const addFilesToDrive = createAsyncThunk(
         cid: CID_PENDING,
         type: FileType.DIR,
         contains: undefined,
+        accessStatus: AccessStatus.UPLOADING,
         path: [state.drive.currentDrive!.path!, newFolderName].join("/"),
       });
       dispatch(optimisticAddFileToCurrentDrive(optimisticNewFolder));
