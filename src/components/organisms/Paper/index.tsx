@@ -418,6 +418,27 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
     ...options,
   });
 
+  const MAX_PAGE_BUFFER = 30;
+  const PAGE_BUFFER_INCREMENT = 1;
+  const PAGE_BUFFER_TIMEOUT = 0;
+  const [pageBuffer, setPageBuffer] = useState(4);
+
+  useEffect(() => {
+    if (pageBuffer < MAX_PAGE_BUFFER) {
+      const timeout = setTimeout(() => {
+        setPageBuffer(pageBuffer + PAGE_BUFFER_INCREMENT);
+      }, PAGE_BUFFER_TIMEOUT);
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageBuffer]);
+
+  // useEffect(() => {
+  //   setPageBuffer(4);
+  // }, [zoom]);
+
   return (
     <>
       <div
@@ -654,7 +675,7 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
                         selectedAnnotationId={selectedAnnotationId}
                         pageMetadata={pageMetadataItem}
                         isIntersecting={
-                          Math.abs(rawIndex - pdfCurrentPage) <= 30
+                          Math.abs(rawIndex - pdfCurrentPage) <= pageBuffer
                         }
                       />
                     </div>

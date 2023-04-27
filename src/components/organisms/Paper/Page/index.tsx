@@ -21,11 +21,12 @@ import { Desktop } from "@hocs/ResponsiveHOCs";
 import AnnotationLayer from "./AnnotationLayer";
 import { IconAddComment } from "@icons";
 import toast from "react-hot-toast";
-import { PageMetadata } from "../usePageMetadata";
+import usePageMetadata, { PageMetadata } from "../usePageMetadata";
 import { HighlightCallbackProps } from "@components/textSelectUtils";
 import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
 import { setZoom } from "@src/state/nodes/pdf";
 import { useSetter } from "@src/store/accessors";
+import _ from "lodash";
 
 const pulse = keyframes`
 0%{
@@ -77,11 +78,13 @@ const PageComponent = React.memo((props: any) => {
     onLoadSuccess = EMPTY_FUNC,
     visible,
     cacheKey,
+    pageMetadata,
+    ratio,
   } = props;
 
   const [isRendered, setIsRendered] = useState<boolean>(false);
 
-  const [zoomChanged, setZoomChanged] = useState(true);
+  const [zoomChanged, setZoomChanged] = useState(false);
   const timeKey = `time_${cacheKey}`;
   const dispatch = useSetter();
   const { zoom } = usePdfReader();
@@ -91,21 +94,36 @@ const PageComponent = React.memo((props: any) => {
   // }
   console.log(timeKey, isRendered);
 
+  useEffect(() => {
+    setTimeout(() => {
+      setIsRendered(false);
+    });
+  }, [zoom]);
+
+  useEffect(() => {
+    if (!visible) {
+      setIsRendered(true);
+    }
+  }, [visible]);
+
   const renderSuccess = useCallback(() => {
-    if (isRendered && !zoomChanged) return;
+    if (!zoomChanged && isRendered) return;
     onRenderSuccess();
-    setIsRendered(true);
+
     setZoomChanged(false);
     // console.timeEnd(timeKey);
   }, [onRenderSuccess, zoomChanged, setZoomChanged, isRendered, setIsRendered]);
   const loading = useCallback(() => <></>, []);
-
+  const pageMetadataSafe = pageMetadata
+    ? pageMetadata
+    : { width: pageWidth, height: pageWidth * ratio };
   const RenderedPage = useMemo(() => {
     return (
       <Page
         canvasRef={canvasRef}
         renderMode={isRendered ? "none" : renderMode}
-        width={pageWidth}
+        width={pageMetadataSafe.width}
+        height={pageMetadataSafe.height}
         pageNumber={pageNumber}
         // @ts-ignore
         enhanceTextSelection={true}
@@ -123,15 +141,24 @@ const PageComponent = React.memo((props: any) => {
         // }}
       ></Page>
     );
-  }, [renderSuccess, loading, isRendered, zoom, canvasRef, zoomChanged]);
+  }, [
+    renderSuccess,
+    loading,
+    pageMetadata,
+    isRendered,
+    zoom,
+    canvasRef,
+    zoomChanged,
+    pageMetadataSafe,
+  ]);
 
   return (
     <div
       className="relative"
       key={`page_component_${cacheKey}`}
       style={{
-        width: pageWidth * zoom,
-        height: pageWidth * 1.294 * zoom,
+        width: pageMetadataSafe.width * zoom,
+        height: pageMetadataSafe.height * zoom,
       }}
     >
       {RenderedPage}
@@ -295,7 +322,9 @@ PageComponentHOCProps) => {
       // https://github.com/fserb/canvas2D/blob/master/spec/will-read-frequently.md
       const blob = canvasRef.current?.toDataURL();
       imageCache[cacheKey] = blob;
-      setImage(blob);
+      setTimeout(() => {
+        setImage(blob);
+      }, 50);
     }
     setOpacity(1);
   }, [image, setImage, setOpacity, canvasRef]);
@@ -306,8 +335,8 @@ PageComponentHOCProps) => {
         ref={pageRef}
         style={{
           position: "relative",
-          width: pageWidth * zoom,
-          height: pageWidth * (ratio || 1) * zoom,
+          width: pageMetadata.width * zoom,
+          height: pageMetadata.height * zoom,
 
           marginBottom: PDF_PAGE_SPACING,
         }}
@@ -321,8 +350,8 @@ PageComponentHOCProps) => {
           <Desktop>
             <PageAnnotations
               annotations={thisPageAnnotations}
-              pageHeight={pageWidth * ratio * zoom}
-              pageWidth={pageWidth}
+              pageHeight={pageMetadata.height * zoom}
+              pageWidth={pageMetadata.width * zoom}
               isActiveComponent={isActiveComponent}
             />
           </Desktop>
@@ -345,8 +374,8 @@ PageComponentHOCProps) => {
                 className={`pointer-events-none absolute top-0 left-0 right-0 bottom-0 ${
                   under ? "" : "z-[50]"
                 } w-full h-full ${
-                  image ? "opacity-100" : "opacity-0"
-                } transition-all z-[-10] duration-[0.2s]  ease-in`}
+                  1 // image ? "opacity-100" : "opacity-0"
+                } z-[-10]   ease-in`}
               />
 
               <div className={`z-back-on-annotate h-fit w-fit`}>
@@ -354,7 +383,7 @@ PageComponentHOCProps) => {
                   cacheKey={`pagecomponent_${cacheKey}`}
                   pageNumber={pageNumber}
                   canvasRef={canvasRef}
-                  pageWidth={pageWidth}
+                  pageWidth={pageMetadata.width}
                   isActiveComponent={isActiveComponent}
                   zoom={zoom}
                   ratio={ratio}
@@ -444,8 +473,8 @@ PageComponentHOCProps) => {
               <PaperLoader
                 className={`absolute top-0 left-0 right-0 bottom-0 shadow-2xl z-10`}
                 style={{
-                  width: pageWidth * zoom,
-                  height: pageWidth * ratio * zoom,
+                  width: pageMetadata.width * zoom,
+                  height: pageMetadata.height * zoom,
                 }}
               />
             ) : null}
