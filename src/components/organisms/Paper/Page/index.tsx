@@ -103,7 +103,9 @@ const PageComponent = React.memo((props: any) => {
   // INFO: may comment this for better performance
   useEffect(() => {
     if (!visible) {
-      setIsRendered(true);
+      setTimeout(() => {
+        setIsRendered(true);
+      }, 100);
     }
   }, [visible]);
 
@@ -190,9 +192,7 @@ interface PageComponentHOCProps {
   // setPageMetadata: (pm: PageMetadata) => void;
 }
 
-const imageCache: { [key: string]: string } = {};
-
-console.log("IMAGE CACHE", imageCache);
+(window as any).imageCache = {};
 
 const PageComponentHOC = ({
   width: pageWidth,
@@ -221,7 +221,9 @@ PageComponentHOCProps) => {
 
   const imageCacheKey = (pageNumber: number) => `${pageNumber}_${pdfUrl}`;
   const cacheKey: string = imageCacheKey(pageNumber);
-  const [image, setImage] = useState<string | undefined>(imageCache[cacheKey]);
+  const [image, setImage] = useState<string | undefined>(
+    (window as any).imageCache[cacheKey]
+  );
 
   // const dimData = cachedPageDimensions.get(pageNumber) || [1, 1];
   const ratio = pageMetadata.ratio;
@@ -322,7 +324,8 @@ PageComponentHOCProps) => {
       //FIXME add {willReadFrequently: true}
       // https://github.com/fserb/canvas2D/blob/master/spec/will-read-frequently.md
       const blob = canvasRef.current?.toDataURL();
-      imageCache[cacheKey] = blob;
+      (window as any).imageCache[cacheKey] = blob;
+      console.log("IMAGE CACHE", (window as any).imageCache);
       setTimeout(() => {
         setImage(blob);
       }, 50);
