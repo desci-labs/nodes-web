@@ -29,6 +29,7 @@ import { useGetNodesQuery } from "@src/state/api/nodes";
 import { useNodeReader, useNodeVersions } from "@src/state/nodes/hooks";
 import { useCopier } from "@src/components/molecules/Copier";
 import SlideDown from "react-slidedown";
+import AdvancedSlideDown from "@src/components/atoms/AdvancedSlideDown";
 
 function CopyButton(
   props: ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -185,24 +186,8 @@ const SharePublished = React.memo(() => {
               value={dpidLink}
             />
           </div>
-          <div
-            className="flex flex-rows text-xs gap-2 items-center justify-end cursor-pointer group hover:text-neutrals-gray-6 select-none"
-            onClick={() => setShowAdvanced(!showAdvanced)}
-          >
-            {showAdvanced ? (
-              <IconChevronUp
-                width={12}
-                className="fill-white group-hover:fill-neutrals-gray-6"
-              />
-            ) : (
-              <IconChevronDown
-                width={12}
-                className="fill-white group-hover:fill-neutrals-gray-6"
-              />
-            )}{" "}
-            Advanced
-          </div>
-          <SlideDown closed={!showAdvanced} className="overflow-hidden">
+
+          <AdvancedSlideDown closed={!showAdvanced} className="overflow-hidden">
             <div className="overflow-auto h-20">
               {versionCount ? (
                 <div className="pb-4 w-full">
@@ -290,7 +275,7 @@ const SharePublished = React.memo(() => {
                 </div>
               ) : null}
             </div>
-          </SlideDown>
+          </AdvancedSlideDown>
         </div>
       );
     } else {
