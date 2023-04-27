@@ -1,5 +1,12 @@
 import axios from "axios";
-import React, { CSSProperties, useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  CSSProperties,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import styled, { StyledComponent } from "styled-components";
 import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
 
@@ -15,9 +22,7 @@ import TooltipIcon from "@components/atoms/TooltipIcon";
 import ReactTooltip from "react-tooltip";
 import { findTarget } from "@components/organisms/ComponentLibrary";
 import ButtonFair from "@components/atoms/ButtonFair";
-import {
-  SessionStorageKeys,
-} from "../driveUtils";
+import { SessionStorageKeys } from "../driveUtils";
 import { useSetter } from "@src/store/accessors";
 import { setComponentStack } from "@src/state/nodes/viewer";
 import { updatePdfPreferences } from "@src/state/nodes/pdf";
@@ -33,6 +38,8 @@ import { findDriveByPath } from "@src/state/drive/utils";
 import { useDrive } from "@src/state/drive/hooks";
 import { AccessStatus } from "../organisms/Drive";
 import { getLicenseShortName } from "../organisms/PopOver/ComponentMetadataPopover";
+import type { Identifier, XYCoord } from "dnd-core";
+import { useDrag, useDrop } from "react-dnd";
 
 const CardWrapper: StyledComponent<
   "div",
@@ -77,8 +84,8 @@ export interface SectionCardProps {
 
 export interface ComponentCardProps extends SectionCardProps {
   component: ResearchObjectV1Component;
-  style?: CSSProperties
 }
+
 const labelFor = (component: ResearchObjectV1Component): string => {
   const obj = findTarget(component);
   if (obj) {
@@ -98,11 +105,10 @@ const iconFor = (
   return null;
 };
 
-const ComponentCard = React.forwardRef((props: ComponentCardProps, orderRef: any) => {
+const ComponentCard = ({ component }: ComponentCardProps) => {
   const dispatch = useSetter();
-  const { component } = props;
-  const { componentStack, recentlyAddedComponent, manifest } =
-    useNodeReader();
+  // const { component } = props;
+  const { componentStack, recentlyAddedComponent, manifest } = useNodeReader();
   const { nodeTree } = useDrive();
   /***
    * Use local click tracking for fast click response
@@ -206,25 +212,14 @@ const ComponentCard = React.forwardRef((props: ComponentCardProps, orderRef: any
     (drive.accessStatus === AccessStatus.PUBLIC ||
       drive.accessStatus === AccessStatus.PARTIAL);
 
-      const handleRef = useCallback(
-        (node: HTMLDivElement) => {
-          if (orderRef && node) {
-            orderRef.current = node;
-          }
-        },
-        [orderRef]
-      );
-
   return (
     <CardWrapper
-      ref={handleRef}
       isSelected={isSelected}
       isHalfSelected={clicked}
       isRecentlyAdded={
         recentlyAddedComponent === component.payload?.path ?? false
       }
       onClick={handleComponentClick}
-      {...props}
     >
       <FlexColumn>
         <HeaderWrapper>
@@ -377,6 +372,6 @@ const ComponentCard = React.forwardRef((props: ComponentCardProps, orderRef: any
       </FlexColumn>
     </CardWrapper>
   );
-});
+};
 
 export default React.memo(ComponentCard);

@@ -100,13 +100,15 @@ const Navigator = () => {
         (c) => c.id === hoveredComponent.id
       );
       if (!(indexToMove !== undefined && indexToHover !== undefined)) return;
-      dispatch(reorderComponent({ dragIndex: indexToMove, hoverIndex: indexToHover }))
-      dispatch(saveManifestDraft({}))
+      dispatch(
+        reorderComponent({ dragIndex: indexToMove, hoverIndex: indexToHover })
+      );
+      dispatch(saveManifestDraft({}));
     },
     [cardComponents, dispatch, manifestData?.components]
   );
 
-  console.log(cardComponents)
+  console.log(cardComponents);
   return (
     <>
       <CollapsibleSection
@@ -177,20 +179,20 @@ const Navigator = () => {
               <Container
                 moveCard={moveCard}
                 components={cardComponents}
-                renderComponent={({
-                  component,
-                  index,
-                  ref,
-                  handlerId,
-                  style,
-                }) => (
-                  <ComponentCard
-                    ref={ref}
-                    style={style}
-                    data-handler-id={handlerId}
-                    component={component}
-                  />
-                )}
+                // renderComponent={({
+                //   component,
+                //   index,
+                //   ref,
+                //   handlerId,
+                //   style,
+                // }) => (
+                //   <ComponentCard
+                //     ref={ref}
+                //     // style={style}
+                //     data-handler-id={handlerId}
+                //     component={component}
+                //   />
+                // )}
               />
             </DndProvider>
           ) : (

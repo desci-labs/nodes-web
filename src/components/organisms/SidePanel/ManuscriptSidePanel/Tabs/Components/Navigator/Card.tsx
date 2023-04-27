@@ -18,13 +18,13 @@ const style = {
 export interface CardProps {
   id: any;
   component: ResearchObjectV1Component;
-  renderComponent: (props: {
-    component: ResearchObjectV1Component;
-    index: number;
-    ref: any;
-    handlerId: Identifier | null;
-    style: CSSProperties;
-  }) => ReactNode;
+  // renderComponent: (props: {
+  //   component: ResearchObjectV1Component;
+  //   index: number;
+  //   ref: any;
+  //   handlerId: Identifier | null;
+  //   style: CSSProperties;
+  // }) => ReactNode;
   index: number;
   moveCard: (dragIndex: number, hoverIndex: number) => void;
 }
@@ -38,7 +38,7 @@ interface DragItem {
 export const Card: FC<CardProps> = ({
   id,
   component,
-  renderComponent,
+  // renderComponent,
   index,
   moveCard,
 }) => {

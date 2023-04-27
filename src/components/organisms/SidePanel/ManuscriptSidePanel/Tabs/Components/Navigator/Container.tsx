@@ -1,48 +1,35 @@
-import type { CSSProperties, FC, ReactNode } from "react";
+import type { FC } from "react";
 import { useCallback } from "react";
-import { Card } from "./Card";
 import { ResearchObjectV1Component } from "@src/../../nodes/desci-models/dist";
-import { Identifier } from "dnd-core";
-// import { useNodeReader } from "@src/state/nodes/hooks";
-
-// const style = {
-//   width: 400,
-// };
+import DraggableComponentCard from "@src/components/molecules/DraggableComponentCard";
 interface ContainerProps {
   components: ResearchObjectV1Component[];
-  renderComponent: (props: {
-    component: ResearchObjectV1Component;
-    index: number;
-    ref: any;
-    handlerId: Identifier | null;
-    style: CSSProperties;
-  }) => ReactNode;
   moveCard: (dragIndex: number, hoverIndex: number) => void;
 }
 export const Container: FC<ContainerProps> = ({
   components,
   moveCard,
-  renderComponent,
 }: ContainerProps) => {
   const renderCard = useCallback(
     (card: ResearchObjectV1Component, index: number) => {
       return (
-        <Card
+        <DraggableComponentCard
           key={card.id}
           index={index}
           id={card.id}
           component={card}
-          renderComponent={renderComponent}
           moveCard={moveCard}
         />
       );
     },
-    [moveCard, renderComponent]
+    [moveCard]
   );
 
   return (
     <>
-      <div>{components.map((card, i) => renderCard(card, i))}</div>
+      <div className="flex flex-col gap-2">
+        {components.map((card, i) => renderCard(card, i))}
+      </div>
     </>
   );
 };
