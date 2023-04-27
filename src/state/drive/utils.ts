@@ -331,14 +331,14 @@ export function constructBreadCrumbs(path: DrivePath): BreadCrumb[] {
   return result;
 }
 
-export function separateFileNameAndMimeType(fileName: string): {
+export function separateFileNameAndExtension(fileName: string): {
   fileName: string;
-  mimeType?: string;
+  extension?: string;
 } {
   const splitName = fileName.split(".");
-  const mimeType = splitName.length > 1 ? splitName.pop() : "";
+  const extension = splitName.length > 1 ? splitName.pop() : "";
   const name = splitName.join(".");
-  return { fileName: name, mimeType };
+  return { fileName: name, extension };
 }
 
 export function findUniqueName(name: string, existingNames: string[]) {

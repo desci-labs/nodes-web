@@ -14,7 +14,7 @@ import {
 import { useSetter } from "@src/store/accessors";
 import axios from "axios";
 import { AvailableUserActionLogTypes, postUserAction } from "@api/index";
-import { separateFileNameAndMimeType } from "@src/state/drive/utils";
+import { separateFileNameAndExtension } from "@src/state/drive/utils";
 import {
   fetchTreeThunk,
   removeFileFromCurrentDrive,
@@ -159,7 +159,7 @@ export default function useActionHandler() {
       JSON.stringify({ nodeUuid: currentObjectId, cid: file.cid })
     );
     const url = `${IPFS_URL}/${file.cid}`;
-    const { fileName, mimeType } = separateFileNameAndMimeType(file.name);
+    const { fileName, extension } = separateFileNameAndExtension(file.name);
     axios({
       url,
       method: "GET",
@@ -170,7 +170,7 @@ export default function useActionHandler() {
       link.href = url2;
       link.setAttribute(
         "download",
-        `${fileName}${mimeType ? `.${mimeType}` : ""}`
+        `${fileName}${extension ? `.${extension}` : ""}`
       );
       document.body.appendChild(link);
       link.click();

@@ -20,6 +20,7 @@ import {
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import { renameData } from "@src/api";
 import { useDrive } from "@src/state/drive/hooks";
+import ToggleSwitch from "@src/components/atoms/ToggleSwitch";
 
 interface RenameDataModalProps {
   file: DriveObject;
@@ -35,6 +36,8 @@ const RenameDataModal: React.FC<RenameDataModalProps> = ({ file }) => {
   const { currentDrive } = useDrive();
   const [newName, setNewName] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [renameComponentCard, setRenameComponentCard] =
+    useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -54,6 +57,7 @@ const RenameDataModal: React.FC<RenameDataModalProps> = ({ file }) => {
     dispatch(
       renameFileInCurrentDrive({ filePath: file.path!, newName: newName })
     );
+
     if (file.componentType === ResearchObjectComponentType.LINK) {
       const index = manifestData!.components.findIndex(
         (c) => c.id === file.componentId
@@ -81,7 +85,12 @@ const RenameDataModal: React.FC<RenameDataModalProps> = ({ file }) => {
     );
     try {
       const { manifestCid: newManifestCid, manifest: newManifest } =
-        await renameData(currentObjectId!, file.path!, newName);
+        await renameData(
+          currentObjectId!,
+          file.path!,
+          newName,
+          renameComponentCard
+        );
       if (newManifestCid && newManifest) {
         dispatch(setManifest(newManifest));
         dispatch(setManifestCid(newManifestCid));
@@ -107,9 +116,9 @@ const RenameDataModal: React.FC<RenameDataModalProps> = ({ file }) => {
   const close = () => dispatch(setFileBeingRenamed(null));
   return (
     <Modal onDismiss={close} isOpen>
-      <div className="py-3 px-6 !min-h-[70px] min-w-[400px]">
+      <div className="py-3 px-6 !min-h-[70px] min-w-[400px] text-white">
         <Modal.Header onDismiss={close} title={`Rename File`} />
-        <div className="my-2">
+        <div className="my-3">
           <InsetLabelInput
             label={`File Name`}
             value={newName}
@@ -117,7 +126,20 @@ const RenameDataModal: React.FC<RenameDataModalProps> = ({ file }) => {
             mandatory={true}
           />
         </div>
-        <p className="text-rose-400 text-xs">{error}</p>
+        {file.starred &&
+          file.componentType !== ResearchObjectComponentType.LINK && (
+            <div className="flex items-center gap-2">
+              <ToggleSwitch
+                isEnabled={() => renameComponentCard}
+                toggle={() => setRenameComponentCard(!renameComponentCard)}
+              />
+              <span className="text-sm">
+                Rename component card in navigate panel?
+              </span>
+            </div>
+          )}
+
+        <p className="text-rose-400 text-xs mt-2">{error}</p>
       </div>
       <Modal.Footer>
         <PrimaryButton onClick={handleSubmit}>
