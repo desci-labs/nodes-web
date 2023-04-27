@@ -100,6 +100,7 @@ const PageComponent = React.memo((props: any) => {
     });
   }, [zoom]);
 
+  // INFO: may comment this for better performance
   useEffect(() => {
     if (!visible) {
       setIsRendered(true);
