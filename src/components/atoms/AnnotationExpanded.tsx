@@ -84,7 +84,7 @@ const AnnotationExpanded = ({
     <div
       className={`z-10 ${
         isHovered && !isSelected ? "cursor-pointer" : ""
-      } !right-0 absolute`}
+      } absolute -ml-4 md:ml-0 md:right-0`}
     >
       <div
         className={`rounded-xl px-4 shadow-2xl annotation-item 
