@@ -24,10 +24,16 @@ import toast from "react-hot-toast";
 import usePageMetadata, { PageMetadata } from "../usePageMetadata";
 import { HighlightCallbackProps } from "@components/textSelectUtils";
 import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
-import { setSelectedAnnotationId, setZoom } from "@src/state/nodes/pdf";
+import {
+  setIsEditingAnnotation,
+  setSelectedAnnotationId,
+  setZoom,
+  updatePdfPreferences,
+} from "@src/state/nodes/pdf";
 import { useSetter } from "@src/store/accessors";
 import _ from "lodash";
 import { v4 as uuid } from "uuid";
+import { replaceAnnotations, saveAnnotation } from "@src/state/nodes/viewer";
 
 const pulse = keyframes`
 0%{
@@ -175,8 +181,7 @@ export const PAGE_RENDER_DISTANCE = 5;
 interface PageComponentHOCProps {
   width: number;
   pageNumber: number; // 1-based
-  pageAnnotations: ResearchObjectComponentAnnotation[];
-  setPageAnnotations: (anno: ResearchObjectComponentAnnotation[]) => void;
+
   dirtyComment?: boolean;
   onLoadSuccess?: any;
   isActiveComponent?: boolean;
@@ -198,8 +203,7 @@ interface PageComponentHOCProps {
 const PageComponentHOC = ({
   width: pageWidth,
   pageNumber,
-  pageAnnotations,
-  setPageAnnotations,
+
   dirtyComment,
   onLoadSuccess,
   isActiveComponent,
@@ -235,7 +239,7 @@ PageComponentHOCProps) => {
 
   const [isIntersectingAfterScroll, setIsIntersectingAfterScroll] =
     useState<boolean>(false);
-
+  const dispatch = useSetter();
   /**
    * When scrolling off the page, we don't want the original canvas (which might have the cursor on it)
    * to disappear. This will disrupt the scrolling event. So wait until scrolling is complete to update
@@ -246,6 +250,8 @@ PageComponentHOCProps) => {
       setIsIntersectingAfterScroll(isIntersecting);
     }
   }, [isIntersecting, isScrolling]);
+  const { annotations, annotationsByPage, manifest, componentStack } =
+    useNodeReader();
 
   const showCanvas = isIntersectingAfterScroll && !isPinching;
 
@@ -286,11 +292,16 @@ PageComponentHOCProps) => {
     }
   }, [selectedAnnotationId]);
 
-  const thisPageAnnotations = pageAnnotations?.filter((a: any) => {
-    return a.pageIndex == pageNumber - 1;
-  });
+  const thisPageAnnotations = annotationsByPage[pageNumber - 1];
 
   // __log("[Page.tsx] PageComponentHOC::render index=", pageNumber);
+
+  // console.log(
+  //   "ANNO BY PAGE",
+  //   annotationsByPage,
+  //   thisPageAnnotations,
+  //   pageNumber
+  // );
 
   const onPageClick: MouseEventHandler<HTMLDivElement> = useCallback(
     (e: MouseEvent<HTMLDivElement>) => {
@@ -355,7 +366,7 @@ PageComponentHOCProps) => {
         if (i === endIndex) {
           targetText = targetText.substring(0, highlightPrompt.endOffset);
         }
-        quoteText += targetText + " ";
+        quoteText += targetText + "\n>";
       }
       quoteText = `>${quoteText.trim()}`;
       const pageIndex = pageNumber - 1;
@@ -379,23 +390,52 @@ PageComponentHOCProps) => {
         id,
         highlightShapes: customHighlight,
         __client: { move: true, fresh: true },
-        text: quoteText,
+        text: `${quoteText}\n\n\n\nYour annotation here...`,
       };
 
       // pagesAnnotated = { [pageIndex]: obj };
+      // dispatch(saveAnnotation([...(annotations || []), obj]));
+      // const selectedComponent = componentStack[componentStack.length - 1];
+      // const componentIndex = manifest.components.findIndex(
+      //   (c) => c.id === selectedComponent.id
+      // );
+      // dispatch(
+      //   saveAnnotation({
+      //     componentIndex,
+      //     annotationIndex: -1,
+      //     annotation: {
+      //       ...obj,
+      //       title: undefined,
+      //       text: quoteText,
+      //     },
+      //   })
+      // );
+      dispatch(replaceAnnotations([...(annotations || []), obj]));
+
       setTimeout(() => {
-        setPageAnnotations([...(pageAnnotations || []), obj]);
-        setSelectedAnnotationId(id);
-        setHighlightPrompt(null);
+        // setSelectedAnnotationId(id);
+        dispatch(
+          updatePdfPreferences({
+            isAnnotating: false,
+            isEditingAnnotation: true,
+            selectedAnnotationId: id,
+          })
+        );
+        setIsEditingAnnotation(true);
+        setHighlightPrompt && setHighlightPrompt(null);
       });
 
-      console.log("startIndex", startIndex, quoteText);
+      // console.log("startIndex", obj, startIndex, quoteText);
     }
   }, [
+    // manifest,
+    // componentStack,
     highlightPrompt,
-    setPageAnnotations,
+    annotations,
+    setHighlightPrompt,
+    // setPageAnnotations,
     setSelectedAnnotationId,
-    pageAnnotations,
+    // pageAnnotations,
     pageNumber,
   ]);
 
@@ -416,7 +456,7 @@ PageComponentHOCProps) => {
         )}
         onClick={onPageClick}
       >
-        {isIntersecting && thisPageAnnotations.length ? (
+        {isIntersecting && thisPageAnnotations?.length ? (
           <Desktop>
             <PageAnnotations
               annotations={thisPageAnnotations}
@@ -433,8 +473,6 @@ PageComponentHOCProps) => {
           <>
             <AnnotationEditCanvas
               pageIndex={pageNumber - 1}
-              setAnnotations={setPageAnnotations}
-              annotations={pageAnnotations}
               className={`relative ${under ? "" : "z-50"} w-full h-full`}
             >
               <img
@@ -489,7 +527,7 @@ PageComponentHOCProps) => {
                 </div>
               </div>
 
-              {thisPageAnnotations.length > 0 ? (
+              {thisPageAnnotations?.length > 0 ? (
                 <AnnotationLayer
                   thisPageAnnotations={thisPageAnnotations}
                   under={under}

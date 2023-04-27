@@ -55,6 +55,8 @@ export interface NodeReaderPref {
   recentlyAddedComponent: DrivePath;
   annotationLinkConfig?: AnnotationLinkConfig | null;
   pdfScrollOffsetTop?: number;
+  annotations: ResearchObjectComponentAnnotation[];
+  annotationsByPage: Record<number, ResearchObjectComponentAnnotation[]>;
 }
 
 const initialState: NodeReaderPref = {
@@ -75,12 +77,42 @@ const initialState: NodeReaderPref = {
   recentlyAddedComponent: "",
   annotationLinkConfig: null,
   pdfScrollOffsetTop: 0,
+  annotations: [],
+  annotationsByPage: {},
+};
+
+export const getDefaultComponentForView = (manifest: ResearchObjectV1) => {
+  return manifest.components.filter(
+    (c) =>
+      c.type !== ResearchObjectComponentType.DATA &&
+      c.type !== ResearchObjectComponentType.UNKNOWN &&
+      c.type !== ResearchObjectComponentType.DATA_BUCKET
+  )[0];
 };
 
 export const nodeReaderSlice = createSlice({
   initialState,
   name: "nodeViewer",
   reducers: {
+    replaceAnnotations: (
+      state,
+      { payload }: PayloadAction<ResearchObjectComponentAnnotation[]>
+    ) => {
+      if (payload && payload.length) {
+        const annotations = [...payload];
+        state.annotations = annotations;
+        state.annotationsByPage = annotations.reduce((acc, annotation) => {
+          const pageIndex = annotation.pageIndex;
+          if (pageIndex !== undefined) {
+            if (!acc[pageIndex]) {
+              acc[pageIndex] = [];
+            }
+            acc[pageIndex].push(annotation);
+          }
+          return acc;
+        }, {} as Record<number, ResearchObjectComponentAnnotation[]>);
+      }
+    },
     resetNodeViewer: (state) => initialState,
     toggleMode: (state) => {
       state.mode = state.mode === "reader" ? "editor" : "reader";
@@ -98,10 +130,31 @@ export const nodeReaderSlice = createSlice({
       state.manifest = payload.manifest;
       state.manifestCid = payload.cid;
       state.manifestStatus = ManifestDataStatus.Idle;
+
+      const defaultComponent = getDefaultComponentForView(payload.manifest);
+      if (
+        defaultComponent &&
+        defaultComponent.type === ResearchObjectComponentType.PDF
+      ) {
+        nodeReaderSlice.caseReducers.replaceAnnotations(state, {
+          payload: defaultComponent.payload.annotations,
+          type: "replaceAnnotations",
+        });
+      }
     },
     setManifest: (state, { payload }: PayloadAction<ResearchObjectV1>) => {
       state.manifestStatus = ManifestDataStatus.Idle;
       state.manifest = payload;
+      const defaultComponent = getDefaultComponentForView(payload);
+      if (
+        defaultComponent &&
+        defaultComponent.type === ResearchObjectComponentType.PDF
+      ) {
+        nodeReaderSlice.caseReducers.replaceAnnotations(state, {
+          payload: defaultComponent.payload.annotations,
+          type: "replaceAnnotations",
+        });
+      }
     },
     addNodeAuthor: (
       state,
@@ -201,6 +254,23 @@ export const nodeReaderSlice = createSlice({
             return component;
           }
         );
+        const defaultComponent =
+          state.componentStack[state.componentStack.length - 1];
+
+        if (
+          defaultComponent &&
+          defaultComponent.type === ResearchObjectComponentType.PDF
+        ) {
+          const componentDataFresh = state.manifest.components.find(
+            (component) => component.id === defaultComponent.id
+          );
+          if (componentDataFresh) {
+            nodeReaderSlice.caseReducers.replaceAnnotations(state, {
+              payload: componentDataFresh.payload.annotations,
+              type: "replaceAnnotations",
+            });
+          }
+        }
       }
     },
     saveAnnotation: (
@@ -217,27 +287,51 @@ export const nodeReaderSlice = createSlice({
         state.manifest.components = state.manifest.components.map(
           (component, idx) => {
             if (idx === payload.componentIndex) {
+              const updatedAnnotations = component.payload.annotations.map(
+                (
+                  annotation: ResearchObjectComponentAnnotation,
+                  idx: number
+                ) => {
+                  if (idx === payload.annotationIndex) {
+                    return { ...payload.annotation, __client: undefined };
+                  }
+                  return annotation;
+                }
+              );
+              if (payload.annotationIndex === -1) {
+                updatedAnnotations.push({
+                  ...payload.annotation,
+                  __client: undefined,
+                });
+              }
               return {
                 ...component,
                 payload: {
                   ...component.payload,
-                  annotations: component.payload.annotations.map(
-                    (
-                      annotation: ResearchObjectComponentAnnotation,
-                      idx: number
-                    ) => {
-                      if (idx === payload.annotationIndex) {
-                        return { ...payload.annotation, __client: undefined };
-                      }
-                      return annotation;
-                    }
-                  ),
+                  annotations: updatedAnnotations,
                 },
               };
             }
             return component;
           }
         );
+        const defaultComponent =
+          state.componentStack[state.componentStack.length - 1];
+
+        if (
+          defaultComponent &&
+          defaultComponent.type === ResearchObjectComponentType.PDF
+        ) {
+          const componentDataFresh = state.manifest.components.find(
+            (component) => component.id === defaultComponent.id
+          );
+          if (componentDataFresh) {
+            nodeReaderSlice.caseReducers.replaceAnnotations(state, {
+              payload: componentDataFresh.payload.annotations,
+              type: "replaceAnnotations",
+            });
+          }
+        }
       }
     },
     deleteAnnotation: (
@@ -340,6 +434,18 @@ export const nodeReaderSlice = createSlice({
       }
       state.annotationLinkConfig = null;
       state.componentStack = payload;
+
+      // keep annotations in sync
+      const newTopComponent = payload[payload.length - 1];
+      if (
+        newTopComponent &&
+        newTopComponent.type === ResearchObjectComponentType.PDF
+      ) {
+        nodeReaderSlice.caseReducers.replaceAnnotations(
+          state,
+          newTopComponent.payload.annotations
+        );
+      }
     },
     pushToComponentStack: (
       state,
@@ -355,6 +461,18 @@ export const nodeReaderSlice = createSlice({
         };
       }
       state.componentStack.push(payload);
+
+      // keep annotations in sync
+      const newTopComponent = payload;
+      if (
+        newTopComponent &&
+        newTopComponent.type === ResearchObjectComponentType.PDF
+      ) {
+        nodeReaderSlice.caseReducers.replaceAnnotations(
+          state,
+          newTopComponent.payload.annotations
+        );
+      }
     },
     popFromComponentStack: (state) => {
       const value = state.componentStack;
@@ -373,6 +491,19 @@ export const nodeReaderSlice = createSlice({
         };
       }
       state.annotationLinkConfig = null;
+
+      // keep annotations in sync
+      const newTopComponent =
+        state.componentStack[state.componentStack.length - 1];
+      if (
+        newTopComponent &&
+        newTopComponent.type === ResearchObjectComponentType.PDF
+      ) {
+        nodeReaderSlice.caseReducers.replaceAnnotations(
+          state,
+          newTopComponent.payload.annotations
+        );
+      }
       return state;
     },
     addRecentlyAddedComponent: (
@@ -489,6 +620,7 @@ export const {
   pushToComponentStack,
   popFromComponentStack,
   updatePendingAnnotations,
+  replaceAnnotations,
   setStartedNewAnnotationViaButton,
   addComponent,
   addRecentlyAddedComponent,
