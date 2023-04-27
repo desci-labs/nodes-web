@@ -187,7 +187,11 @@ const SharePublished = React.memo(() => {
             />
           </div>
 
-          <AdvancedSlideDown closed={!showAdvanced} className="overflow-hidden">
+          <AdvancedSlideDown
+            closed={showAdvanced}
+            setClosed={setShowAdvanced}
+            className="overflow-hidden"
+          >
             <div className="overflow-auto h-20">
               {versionCount ? (
                 <div className="pb-4 w-full">
