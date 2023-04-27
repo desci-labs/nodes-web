@@ -10,6 +10,8 @@ import { DEFAULT_CHAIN } from "../ConnectWithSelect";
 import { useHistoryReader, useNodeReader } from "@src/state/nodes/hooks";
 import { LinkIcon } from "@heroicons/react/solid";
 import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
+import SlideDown from "react-slidedown";
+import AdvancedSlideDown from "@src/components/atoms/AdvancedSlideDown";
 
 const ACTIVE_CHAIN = CHAINS[DEFAULT_CHAIN] as any;
 const BLOCK_EXPLORER_URL = ACTIVE_CHAIN && ACTIVE_CHAIN.blockExplorerUrls[0];
@@ -32,7 +34,9 @@ export default function PublicationDetailsModal(props: any) {
     }
   }, [mirrors]);
 
+  const [closed, setClosed] = useState(false);
   const onClose = () => {
+    setClosed(false);
     setShowPublicationDetails(false);
   };
 
@@ -53,7 +57,7 @@ export default function PublicationDetailsModal(props: any) {
       onClose={onClose}
       isVisible={showPublicationDetails}
       displayCloseIcon={true}
-      className="transition-all rounded-lg bg-zinc-100 dark:bg-zinc-900 overflow-x-hidden max-w-[450px]"
+      className="transition-all rounded-lg bg-zinc-100 dark:bg-zinc-900 overflow-x-hidden max-w-[450px] select-none"
     >
       <div className="px-6 py-5 text-white" style={{ maxWidth: 600 }}>
         <div className="flex flex-row justify-between items-center mb-6">
@@ -80,6 +84,11 @@ export default function PublicationDetailsModal(props: any) {
         </div>
         <div className="py-4 flex flex-col gap-5">
           <Details
+            title="Node dPID"
+            subTitle={<Link href={dpidLink} />}
+            copy={dpidLink}
+          />
+          <Details
             title="Node Size"
             subTitle="Size of the stored data published on this version of your node."
             detail={BytesToHumanFileSize(size)}
@@ -99,26 +108,27 @@ export default function PublicationDetailsModal(props: any) {
             subTitle={<Link href="https://estuary.tech" />}
           />
         </div>
-        <Divider />
-        <div className="py-4 flex flex-col gap-5">
-          <Details
-            title="Node Root CID"
-            subTitle={
-              <Link href={`https://ipfs.io/ipfs/${node?.manifestUrl}`} />
-            }
-            copy={`https://ipfs.io/ipfs/${node?.manifestUrl}`}
-          />
-          <Details
-            title="Transaction Receipt"
-            subTitle={<Link href={transactionReceiptUrl} />}
-            copy={transactionReceiptUrl}
-          />
-          <Details
-            title="Node dPID"
-            subTitle={<Link href={dpidLink} />}
-            copy={dpidLink}
-          />
-        </div>
+        <AdvancedSlideDown
+          closed={closed}
+          setClosed={setClosed}
+          className="overflow-hidden"
+        >
+          <Divider />
+          <div className="py-4 flex flex-col gap-5 select-none">
+            <Details
+              title="Node Metadata"
+              subTitle={
+                <Link href={`https://ipfs.io/ipfs/${node?.manifestUrl}`} />
+              }
+              copy={`https://ipfs.io/ipfs/${node?.manifestUrl}`}
+            />
+            <Details
+              title="Transaction Receipt"
+              subTitle={<Link href={transactionReceiptUrl} />}
+              copy={transactionReceiptUrl}
+            />
+          </div>
+        </AdvancedSlideDown>
       </div>
     </PopOver>
   );
