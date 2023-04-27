@@ -2,13 +2,14 @@ import PopOver from "@components/organisms/PopOver";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { BytesToHumanFileSize } from "@components/utils";
 import { IconX } from "@icons";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import Copier from "../Copier";
 import useVersionDetails from "./useVersionDetails";
 import { CHAINS } from "@connectors/../chains";
 import { DEFAULT_CHAIN } from "../ConnectWithSelect";
 import { useHistoryReader, useNodeReader } from "@src/state/nodes/hooks";
 import { LinkIcon } from "@heroicons/react/solid";
+import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
 
 const ACTIVE_CHAIN = CHAINS[DEFAULT_CHAIN] as any;
 const BLOCK_EXPLORER_URL = ACTIVE_CHAIN && ACTIVE_CHAIN.blockExplorerUrls[0];
@@ -19,9 +20,17 @@ export default function PublicationDetailsModal(props: any) {
   const { manifest: manifestData } = useNodeReader();
   const { selectedHistory } = useHistoryReader();
 
-  const { size, copies, node } = useVersionDetails(
+  const { size, copies, node, mirrors } = useVersionDetails(
     selectedHistory?.data?.transaction?.id ?? ""
   );
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (mirrors && mirrors.length > 0) {
+      setIsLoading(false);
+    }
+  }, [mirrors]);
 
   const onClose = () => {
     setShowPublicationDetails(false);
@@ -74,11 +83,13 @@ export default function PublicationDetailsModal(props: any) {
             title="Node Size"
             subTitle="Size of the stored data published on this version of your node."
             detail={BytesToHumanFileSize(size)}
+            isLoading={isLoading}
           />
           <Details
             title="Data Copies"
             subTitle="We've made several copies of your node so that you can always access your data."
             detail={(copies || 6).toString()}
+            isLoading={isLoading}
           />
         </div>
         <Divider />
@@ -135,6 +146,7 @@ function Details(props: {
   subTitle: string | ReactNode;
   detail?: string;
   copy?: string;
+  isLoading?: boolean;
 }) {
   return (
     <div className="flex flex-col items-start justify-between gap-2">
@@ -150,7 +162,11 @@ function Details(props: {
         <div className="flex gap-2 flex-none">
           {props.detail && (
             <div className="flex-none text-xs text-white text-center font-bold border-2 border-neutrals-gray-3 bg-black min-w-16 w-24 px-2 py-2 rounded-xl">
-              {props.detail}
+              {props.isLoading ? (
+                <DefaultSpinner height={16} color="white" className="-ml-3" />
+              ) : (
+                props.detail
+              )}
             </div>
           )}
           {props.copy && (
