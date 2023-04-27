@@ -111,6 +111,9 @@ const ManuscriptAnnotation = (props: ManuscriptAnnotationProps) => {
   };
   useEffect(() => {
     window.addEventListener("resize", handleResize, false);
+    return () => {
+      window.removeEventListener("resize", handleResize, false);
+    };
   }, []);
   const [overflowNudge, setOverflowNudge] = useState(0);
   const [overflowNudgeY, setOverflowNudgeY] = useState(0);

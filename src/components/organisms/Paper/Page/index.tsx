@@ -366,7 +366,12 @@ PageComponentHOCProps) => {
         if (i === endIndex) {
           targetText = targetText.substring(0, highlightPrompt.endOffset);
         }
-        quoteText += targetText + "\n>";
+        quoteText += targetText;
+        if (targetText.trim().endsWith(".")) {
+          quoteText += "\n";
+        } else {
+          quoteText += " ";
+        }
       }
       quoteText = `>${quoteText.trim()}`;
       const pageIndex = pageNumber - 1;
