@@ -24,9 +24,10 @@ import toast from "react-hot-toast";
 import usePageMetadata, { PageMetadata } from "../usePageMetadata";
 import { HighlightCallbackProps } from "@components/textSelectUtils";
 import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
-import { setZoom } from "@src/state/nodes/pdf";
+import { setSelectedAnnotationId, setZoom } from "@src/state/nodes/pdf";
 import { useSetter } from "@src/store/accessors";
 import _ from "lodash";
+import { v4 as uuid } from "uuid";
 
 const pulse = keyframes`
 0%{
@@ -333,6 +334,71 @@ PageComponentHOCProps) => {
     setOpacity(1);
   }, [image, setImage, setOpacity, canvasRef]);
 
+  const onMouseDown = useCallback(() => {
+    if (highlightPrompt) {
+      const customHighlight = highlightPrompt.rects;
+      let quoteText = "";
+      let curContainer = highlightPrompt.startContainer;
+      const commonContainer = highlightPrompt.commonAncestorContainer;
+      const parentContainer = Array.from(
+        new Array(commonContainer.children)[0]
+      );
+      const startIndex = parentContainer.indexOf(curContainer.parentNode);
+      const endIndex = parentContainer.indexOf(
+        highlightPrompt.endContainer.parentNode
+      );
+      for (let i = startIndex; i <= endIndex; i++) {
+        let targetText = parentContainer[i].innerText;
+        if (i === startIndex) {
+          targetText = targetText.substring(highlightPrompt.startOffset);
+        }
+        if (i === endIndex) {
+          targetText = targetText.substring(0, highlightPrompt.endOffset);
+        }
+        quoteText += targetText + " ";
+      }
+      quoteText = `>${quoteText.trim()}`;
+      const pageIndex = pageNumber - 1;
+      const id = uuid();
+      const obj = {
+        startX:
+          parentContainer[startIndex].getBoundingClientRect().left /
+            commonContainer.getBoundingClientRect().width -
+          1,
+        startY:
+          parentContainer[endIndex].getBoundingClientRect().top /
+          commonContainer.getBoundingClientRect().height,
+        endX:
+          parentContainer[endIndex].getBoundingClientRect().right /
+            commonContainer.getBoundingClientRect().width -
+          1,
+        endY:
+          parentContainer[endIndex].getBoundingClientRect().bottom /
+          commonContainer.getBoundingClientRect().height,
+        pageIndex,
+        id,
+        highlightShapes: customHighlight,
+        __client: { move: true, fresh: true },
+        text: quoteText,
+      };
+
+      // pagesAnnotated = { [pageIndex]: obj };
+      setTimeout(() => {
+        setPageAnnotations([...(pageAnnotations || []), obj]);
+        setSelectedAnnotationId(id);
+        setHighlightPrompt(null);
+      });
+
+      console.log("startIndex", startIndex, quoteText);
+    }
+  }, [
+    highlightPrompt,
+    setPageAnnotations,
+    setSelectedAnnotationId,
+    pageAnnotations,
+    pageNumber,
+  ]);
+
   return (
     <>
       <PageWrapper
@@ -414,20 +480,7 @@ PageComponentHOCProps) => {
               >
                 <div
                   className="-mt-12 flex justify-center cursor-pointer group"
-                  onMouseDown={() => {
-                    if (highlightPrompt) {
-                      toast.error("Coming soon", {
-                        duration: 2000,
-                        position: "top-center",
-                        style: {
-                          marginTop: 60,
-                          borderRadius: "10px",
-                          background: "#111",
-                          color: "#fff",
-                        },
-                      });
-                    }
-                  }}
+                  onMouseDown={onMouseDown}
                 >
                   <div className="bg-neutrals-black w-[44px] h-[37px] flex items-center justify-center rounded-md shadow-xl drop-shadow-lg group-hover:bg-neutrals-gray-1">
                     <IconAddComment fill="#28AAC4" width={20} />
