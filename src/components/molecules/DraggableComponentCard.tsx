@@ -1,10 +1,5 @@
 import axios from "axios";
-import React, {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import styled, { StyledComponent } from "styled-components";
 import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
 
@@ -29,7 +24,7 @@ import {
   setFileBeingCited,
   setFileBeingUsed,
 } from "@src/state/drive/driveSlice";
-import BlackGenericButton from "../atoms/BlackGenericButton";
+import { GenericButton } from "../atoms/BlackGenericButton";
 import { IconDrive, IconPlayRounded, IconQuotes } from "@src/icons";
 import { findDriveByPath } from "@src/state/drive/utils";
 import { useDrive } from "@src/state/drive/hooks";
@@ -299,139 +294,132 @@ const ComponentCard = React.forwardRef(
     drag(drop(ref));
 
     return (
-        <CardWrapper
-          ref={ref}
-          style={{ opacity }}
-          data-handler-id={handlerId}
-          isSelected={isSelected}
-          isHalfSelected={clicked}
-          isRecentlyAdded={
-            recentlyAddedComponent === component.payload?.path ?? false
-          }
-          onClick={handleComponentClick}
+      <CardWrapper
+        ref={ref}
+        style={{ opacity }}
+        data-handler-id={handlerId}
+        isSelected={isSelected}
+        isHalfSelected={clicked}
+        isRecentlyAdded={
+          recentlyAddedComponent === component.payload?.path ?? false
+        }
+        onClick={handleComponentClick}
+      >
+        <FlexColumn>
+          <HeaderWrapper>
+            <span className="text-xs font-bold truncate">{component.name}</span>
+            <span className="flex flex-col items-center">
+              <div className="border-tint-primary border-[2px] p-1 rounded-full scale-75 block -my-1">
+                <span
+                  className={` cursor-pointer rounded-full overflow-hidden border-black p-4 w-7 h-7 flex justify-center items-center`}
+                  data-type={component.type}
+                  data-subtype={(component as any).subtype}
+                >
+                  {Icon ? (
+                    <button className="outline-none">
+                      <Icon />
+                    </button>
+                  ) : (
+                    <></>
+                  )}
+                </span>
+              </div>
+            </span>
+          </HeaderWrapper>
+        </FlexColumn>
+        <div
+          style={{
+            height: 45,
+            overflow: "hidden",
+            transition: "height 0.1s ease-in",
+            // visibility: isSelected ? 'visible' : 'hidden'
+          }}
         >
-          <FlexColumn>
-            <HeaderWrapper>
-              <span className="text-xs font-bold truncate">
-                {component.name}
-              </span>
-              <span className="flex flex-col items-center">
-                <div className="border-tint-primary border-[2px] p-1 rounded-full scale-75 block -my-1">
-                  <span
-                    className={` cursor-pointer rounded-full overflow-hidden border-black p-4 w-7 h-7 flex justify-center items-center`}
-                    data-type={component.type}
-                    data-subtype={(component as any).subtype}
-                  >
-                    {Icon ? (
-                      <button className="outline-none">
-                        <Icon />
-                      </button>
-                    ) : (
-                      <></>
-                    )}
-                  </span>
-                </div>
-              </span>
-            </HeaderWrapper>
-          </FlexColumn>
-          <div
-            style={{
-              height: isSelected ? 45 : 0,
-              overflow: "hidden",
-              transition: "height 0.1s ease-in",
-            }}
-          >
-            <FlexRowSpaceBetween>
-              <div className="flex justify-between dark:bg-muted-700 px-3 py-2 w-full">
-                <>
-                  <div className="flex gap-2 justify-between w-full">
-                    <div id="section-left">
-                      <ButtonFair
-                        isFair={false}
-                        component={component}
-                        text={getLicenseShortName(
-                          drive?.metadata.licenseType ||
-                            component.payload?.licenseType ||
-                            manifest?.defaultLicense
-                        )} //Should only ever hit unknown for deprecated tree
-                        classname="w-auto bg-neutrals-gray-2 px-2 font-medium text-xs h-7"
+          <FlexRowSpaceBetween>
+            <div className="flex justify-between dark:bg-muted-700 px-3 py-2 w-full">
+              <>
+                <div className="flex gap-2 justify-between w-full">
+                  <div id="section-left">
+                    <ButtonFair
+                      isFair={false}
+                      component={component}
+                      text={getLicenseShortName(
+                        drive?.metadata.licenseType ||
+                          component.payload?.licenseType ||
+                          manifest?.defaultLicense
+                      )} //Should only ever hit unknown for deprecated tree
+                      classname="w-auto bg-neutrals-gray-2 px-2 font-medium text-xs h-7"
+                    />
+                  </div>
+                  <div id="section-right" className="flex gap-2">
+                    <GenericButton
+                      disabled={false}
+                      className="p-0"
+                      onClick={(e) => {
+                        e!.stopPropagation();
+                        dispatch(navigateToDriveByPath(component.payload.path));
+                        if (
+                          component.type === ResearchObjectComponentType.DATA ||
+                          component.type === ResearchObjectComponentType.UNKNOWN
+                        ) {
+                          dispatch(setComponentStack([component]));
+                        } else {
+                          dispatch(setComponentStack([]));
+                        }
+                      }}
+                    >
+                      <IconDrive className="p-0 min-w-[28px] scale-[1.2]" />
+                    </GenericButton>
+                    <GenericButton
+                      dataTip={"Cite"}
+                      dataFor={`cite_${component.id}`}
+                      className="w-7 h-7"
+                      disabled={!canCite}
+                      onClick={(e) => {
+                        e!.stopPropagation();
+                        dispatch(setFileBeingCited(drive));
+                      }}
+                    >
+                      <IconQuotes />
+                    </GenericButton>
+                    {[
+                      ResearchObjectComponentType.DATA,
+                      ResearchObjectComponentType.CODE,
+                      ResearchObjectComponentType.UNKNOWN,
+                    ].includes(component.type) ? (
+                      <GenericButton
+                        dataTip={"Methods"}
+                        dataFor={`use_${component.id}`}
+                        disabled={!drive}
+                        className="p-0 min-w-[28px] h-7"
+                        onClick={(e) => {
+                          e!.stopPropagation();
+                          dispatch(setFileBeingUsed(drive));
+                        }}
+                      >
+                        <IconPlayRounded className="p-0" />
+                      </GenericButton>
+                    ) : null}
+                    <div
+                      style={{
+                        display:
+                          component.type === ResearchObjectComponentType.PDF
+                            ? ""
+                            : "none",
+                      }}
+                    >
+                      <AnnotationSwitcher
+                        annotations={sortedAnnotations}
+                        handleComponentClick={handleComponentClick}
                       />
                     </div>
-                    <div id="section-right" className="flex gap-2">
-                      <BlackGenericButton
-                        dataTip={"Show File Location"}
-                        dataFor={`drive_${component.id}`}
-                        disabled={false}
-                        className="p-0"
-                        onClick={(e) => {
-                          e!.stopPropagation();
-                          dispatch(
-                            navigateToDriveByPath(component.payload.path)
-                          );
-                          if (
-                            component.type ===
-                              ResearchObjectComponentType.DATA ||
-                            component.type ===
-                              ResearchObjectComponentType.UNKNOWN
-                          ) {
-                            dispatch(setComponentStack([component]));
-                          } else {
-                            dispatch(setComponentStack([]));
-                          }
-                        }}
-                      >
-                        <IconDrive className="p-0 min-w-[28px] scale-[1.2]" />
-                      </BlackGenericButton>
-                      <BlackGenericButton
-                        dataTip={"Cite"}
-                        dataFor={`cite_${component.id}`}
-                        className="w-7 h-7"
-                        disabled={!canCite}
-                        onClick={(e) => {
-                          e!.stopPropagation();
-                          dispatch(setFileBeingCited(drive));
-                        }}
-                      >
-                        <IconQuotes />
-                      </BlackGenericButton>
-                      {[
-                        ResearchObjectComponentType.DATA,
-                        ResearchObjectComponentType.CODE,
-                        ResearchObjectComponentType.UNKNOWN,
-                      ].includes(component.type) ? (
-                        <BlackGenericButton
-                          dataTip={"Methods"}
-                          dataFor={`use_${component.id}`}
-                          disabled={!drive}
-                          className="p-0 min-w-[28px] h-7"
-                          onClick={(e) => {
-                            e!.stopPropagation();
-                            dispatch(setFileBeingUsed(drive));
-                          }}
-                        >
-                          <IconPlayRounded className="p-0" />
-                        </BlackGenericButton>
-                      ) : null}
-                      <div
-                        style={{
-                          display:
-                            component.type === ResearchObjectComponentType.PDF
-                              ? ""
-                              : "none",
-                        }}
-                      >
-                        <AnnotationSwitcher
-                          annotations={sortedAnnotations}
-                          handleComponentClick={handleComponentClick}
-                        />
-                      </div>
-                    </div>
                   </div>
-                </>
-              </div>
-            </FlexRowSpaceBetween>
-          </div>
-        </CardWrapper>
+                </div>
+              </>
+            </div>
+          </FlexRowSpaceBetween>
+        </div>
+      </CardWrapper>
     );
   }
 );
