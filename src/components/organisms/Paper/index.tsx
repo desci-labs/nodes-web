@@ -420,7 +420,7 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
 
   const MAX_PAGE_BUFFER = 30;
   const PAGE_BUFFER_INCREMENT = 1;
-  const PAGE_BUFFER_TIMEOUT = 0;
+  const PAGE_BUFFER_TIMEOUT = 500;
   const [pageBuffer, setPageBuffer] = useState(4);
 
   useEffect(() => {
