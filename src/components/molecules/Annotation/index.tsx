@@ -345,27 +345,29 @@ const AnnotationComponent = (props: AnnotationProps) => {
           setAnnotationTitle={setAnnotationTitle}
         />
       ) : null}
-      {isExpanded ? (
-        <AnnotationExpanded
-          DURATION_BASE_MS={DURATION_BASE_MS}
-          annotation={annotation}
-          annotationText={annotationText}
-          annotationTitle={annotationTitle}
-        />
-      ) : !!selectedAnnotationId ? null : (
-        <AnnotationHidden
-          DURATION_BASE_MS={DURATION_BASE_MS}
-          isEditingAnnotation={isEditingAnnotation}
-          annotationTitle={annotationTitle}
-        />
-      )}
-      {/* {isAnnotationVisible ? (
+      <div className="absolute">
+        {isExpanded ? (
+          <AnnotationExpanded
+            DURATION_BASE_MS={DURATION_BASE_MS}
+            annotation={annotation}
+            annotationText={annotationText}
+            annotationTitle={annotationTitle}
+            isOn={isExpanded}
+          />
+        ) : null}
+        {/* {isAnnotationVisible ? (
         <AnnotationVisible
           DURATION_BASE_MS={DURATION_BASE_MS}
           annotationText={annotationText}
           annotationTitle={annotationTitle}
         />
-      ) : null} */}
+      ) : null} */}{" "}
+        <AnnotationHidden
+          DURATION_BASE_MS={DURATION_BASE_MS}
+          isEditingAnnotation={isEditingAnnotation}
+          annotationTitle={annotationTitle}
+        />
+      </div>
     </div>
   );
 };
