@@ -16,6 +16,7 @@ interface AnnotationExpandedProps {
   annotation: Annotation;
   darkMode?: boolean;
   hideHeader?: boolean;
+  isOn?: boolean;
 }
 
 const AnnotationExpanded = ({
@@ -25,6 +26,7 @@ const AnnotationExpanded = ({
   annotation,
   darkMode,
   hideHeader,
+  isOn,
 }: AnnotationExpandedProps) => {
   const dispatch = useSetter();
 
@@ -79,7 +81,11 @@ const AnnotationExpanded = ({
   const isSelected = selectedAnnotationId === annotation?.id;
 
   return (
-    <div className={`${isHovered && !isSelected ? "cursor-pointer" : ""}`}>
+    <div
+      className={`z-10 ${
+        isHovered && !isSelected ? "cursor-pointer" : ""
+      } !right-0 absolute`}
+    >
       <div
         className={`rounded-xl px-4 shadow-2xl annotation-item 
         ${isHovered && !isSelected ? "pointer-events-none" : ""} ${
