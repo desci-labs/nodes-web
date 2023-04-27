@@ -43,6 +43,8 @@ import {
 } from "@src/state/drive/driveSlice";
 import { useFileUpload } from "react-use-file-upload/dist/lib/useFileUpload";
 import { ExternalUrl } from "@src/state/drive/types";
+import { useDrive } from "@src/state/drive/hooks";
+import { findUniqueName } from "@src/state/drive/utils";
 
 export const componentData = {
   [ResearchObjectComponentType.PDF]: {
@@ -111,7 +113,7 @@ const AddComponentPopOver = (
   const [urlOrDoi, setUrlOrDoi] = useState<string>();
   const [error, setError] = useState<string>();
   const [customSubtype, setCustomSubtype] = useState<string>("");
-
+  const { nodeTree, currentDrive } = useDrive();
   // const [fileLink, setFileLink] = useState<string>();
   const { files, clearAllFiles, setFiles } = useFileUpload();
 
@@ -241,11 +243,18 @@ const AddComponentPopOver = (
       }
 
       let externalUrl;
-      if (addComponentType == ResearchObjectComponentType.CODE) {
-        if (urlOrDoi?.length) {
+      if (urlOrDoi?.length) {
+        if (addComponentType === ResearchObjectComponentType.CODE) {
           const extractedName = extractCodeRepoName(urlOrDoi);
           if (extractedName)
             externalUrl = { path: extractedName, url: urlOrDoi };
+        }
+        if (addComponentType === ResearchObjectComponentType.PDF) {
+          const nameCollisions = addFilesWithoutContext
+            ? nodeTree?.contains?.map((c) => c.name)
+            : currentDrive?.contains?.map((c) => c.name);
+          const name = findUniqueName("Research Report", nameCollisions || []);
+          externalUrl = { path: name, url: urlOrDoi };
         }
       }
 
