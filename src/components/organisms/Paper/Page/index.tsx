@@ -2,6 +2,7 @@ import React, {
   MouseEvent,
   MouseEventHandler,
   useCallback,
+  useMemo,
   useRef,
 } from "react";
 import { useEffect, useState } from "react";
@@ -22,7 +23,9 @@ import { IconAddComment } from "@icons";
 import toast from "react-hot-toast";
 import { PageMetadata } from "../usePageMetadata";
 import { HighlightCallbackProps } from "@components/textSelectUtils";
-import { useNodeReader } from "@src/state/nodes/hooks";
+import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
+import { setZoom } from "@src/state/nodes/pdf";
+import { useSetter } from "@src/store/accessors";
 
 const pulse = keyframes`
 0%{
@@ -69,40 +72,70 @@ const PageComponent = React.memo((props: any) => {
     renderMode = "canvas",
     canvasRef,
     pageWidth,
-    zoom,
+    // zoom,
     onRenderSuccess = EMPTY_FUNC,
     onLoadSuccess = EMPTY_FUNC,
     visible,
+    cacheKey,
   } = props;
 
-  const [isRendered, setIsRendered] = useState<boolean>(true);
+  const [isRendered, setIsRendered] = useState<boolean>(false);
+
+  const [zoomChanged, setZoomChanged] = useState(true);
+  const timeKey = `time_${cacheKey}`;
+  const dispatch = useSetter();
+  const { zoom } = usePdfReader();
+
+  // if (!isRendered) {
+  //   console.time(timeKey);
+  // }
+  console.log(timeKey, isRendered);
+
+  const renderSuccess = useCallback(() => {
+    if (isRendered && !zoomChanged) return;
+    onRenderSuccess();
+    setIsRendered(true);
+    setZoomChanged(false);
+    // console.timeEnd(timeKey);
+  }, [onRenderSuccess, zoomChanged, setZoomChanged, isRendered, setIsRendered]);
+  const loading = useCallback(() => <></>, []);
+
+  const RenderedPage = useMemo(() => {
+    return (
+      <Page
+        canvasRef={canvasRef}
+        renderMode={isRendered ? "none" : renderMode}
+        width={pageWidth}
+        pageNumber={pageNumber}
+        // @ts-ignore
+        enhanceTextSelection={true}
+        className={`!static ${visible ? "" : "invisible"} bg-transparent ${
+          props.className
+        }`}
+        onLoadSuccess={onLoadSuccess}
+        onRenderSuccess={renderSuccess}
+        renderTextLayer={true}
+        scale={zoom}
+        loading={loading}
+        renderInteractiveForms={false}
+        // customTextRenderer={(textItem: any) => {
+        //   return <div className="text-red-500"><textItem/></div>;
+        // }}
+      ></Page>
+    );
+  }, [renderSuccess, loading, isRendered, zoom, canvasRef, zoomChanged]);
 
   return (
-    <Page
-      key={`page_component_${pageNumber}`}
-      canvasRef={canvasRef}
-      renderMode={renderMode}
-      width={pageWidth}
-      pageNumber={pageNumber}
-      // @ts-ignore
-      enhanceTextSelection={isRendered}
-      className={`relative ${visible ? "" : "invisible"} bg-transparent ${
-        props.className
-      }`}
-      onLoadSuccess={onLoadSuccess}
-      onRenderSuccess={useCallback(() => {
-        setIsRendered(true);
-        onRenderSuccess();
-      }, [onRenderSuccess, setIsRendered])}
-      renderTextLayer={isRendered}
-      scale={zoom}
-      loading={useCallback(
-        () => (
-          <></>
-        ),
-        []
-      )}
-    ></Page>
+    <div
+      className="relative"
+      key={`page_component_${cacheKey}`}
+      style={{
+        width: pageWidth * zoom,
+        height: pageWidth * 1.294 * zoom,
+      }}
+    >
+      {RenderedPage}
+    </div>
   );
 });
 
@@ -133,297 +166,294 @@ const imageCache: { [key: string]: string } = {};
 
 console.log("IMAGE CACHE", imageCache);
 
-const PageComponentHOC = React.memo(
-  ({
-    width: pageWidth,
-    pageNumber,
-    pageAnnotations,
-    setPageAnnotations,
-    dirtyComment,
-    onLoadSuccess,
-    isActiveComponent,
-    isScrolling,
-    isPinching,
-    highlightPrompt,
-    setHighlightPrompt,
-    // cachedPageDimensions,
-    pageMetadata,
-    isIntersecting,
-    zoom,
-    selectedAnnotationId,
-    pdfUrl,
-  }: // setPageMetadata,
-  PageComponentHOCProps) => {
-    const pageRef = useRef<any>(null);
-    const canvasRef = useRef<any>(null);
-    const overlayRef = useRef<any>(null);
-    const [opacity, setOpacity] = useState<number>(0);
+const PageComponentHOC = ({
+  width: pageWidth,
+  pageNumber,
+  pageAnnotations,
+  setPageAnnotations,
+  dirtyComment,
+  onLoadSuccess,
+  isActiveComponent,
+  isScrolling,
+  isPinching,
+  highlightPrompt,
+  setHighlightPrompt,
+  // cachedPageDimensions,
+  pageMetadata,
+  isIntersecting,
+  zoom,
+  selectedAnnotationId,
+  pdfUrl,
+}: // setPageMetadata,
+PageComponentHOCProps) => {
+  const pageRef = useRef<any>(null);
+  const canvasRef = useRef<any>(null);
+  const overlayRef = useRef<any>(null);
+  const [opacity, setOpacity] = useState<number>(0);
 
-    const imageCacheKey = (pageNumber: number) => `${pageNumber}_${pdfUrl}`;
-    const cacheKey: string = imageCacheKey(pageNumber);
-    const [image, setImage] = useState<string | undefined>(
-      imageCache[cacheKey]
-    );
+  const imageCacheKey = (pageNumber: number) => `${pageNumber}_${pdfUrl}`;
+  const cacheKey: string = imageCacheKey(pageNumber);
+  const [image, setImage] = useState<string | undefined>(imageCache[cacheKey]);
 
-    // const dimData = cachedPageDimensions.get(pageNumber) || [1, 1];
-    const ratio = pageMetadata.ratio;
+  // const dimData = cachedPageDimensions.get(pageNumber) || [1, 1];
+  const ratio = pageMetadata.ratio;
 
-    const { isDesktop } = useResponsive();
+  const { isDesktop } = useResponsive();
 
-    const SCROLL_AWAY_PAGE_DISMISS_THRESHOLD = zoom < 1 ? 4 : 4;
+  const SCROLL_AWAY_PAGE_DISMISS_THRESHOLD = zoom < 1 ? 4 : 4;
 
-    const [isIntersectingAfterScroll, setIsIntersectingAfterScroll] =
-      useState<boolean>(false);
+  const [isIntersectingAfterScroll, setIsIntersectingAfterScroll] =
+    useState<boolean>(false);
 
-    /**
-     * When scrolling off the page, we don't want the original canvas (which might have the cursor on it)
-     * to disappear. This will disrupt the scrolling event. So wait until scrolling is complete to update
-     * setIsIntersectingAfterScroll.
-     */
-    useEffect(() => {
-      if (!isScrolling) {
-        setIsIntersectingAfterScroll(isIntersecting);
-      }
-    }, [isIntersecting, isScrolling]);
+  /**
+   * When scrolling off the page, we don't want the original canvas (which might have the cursor on it)
+   * to disappear. This will disrupt the scrolling event. So wait until scrolling is complete to update
+   * setIsIntersectingAfterScroll.
+   */
+  useEffect(() => {
+    if (!isScrolling) {
+      setIsIntersectingAfterScroll(isIntersecting);
+    }
+  }, [isIntersecting, isScrolling]);
 
-    const showCanvas = isIntersectingAfterScroll && !isPinching;
+  const showCanvas = isIntersectingAfterScroll && !isPinching;
 
-    // TODO: UNCOMMENT FOR SCROLL AWAY CODE
-    // useEffect(() => {
-    //   // if (intersection && intersection.isIntersecting && !isScrolling) {
-    //   if (isIntersecting) {
-    //     // setPdfCurrentPage(pageNumber);
-    //     // DISMISS any previously selected annotation if we scroll away 2 pages
-    //     if (selectedAnnotationId) {
-    //       const annotations =
-    //         componentStack[componentStack.length - 1].payload.annotations;
-    //       if (annotations) {
-    //         const selectedAnnotation = annotations.find(
-    //           (e: ResearchObjectComponentAnnotation) =>
-    //             e.id === selectedAnnotationId
-    //         );
-    //         if (
-    //           selectedAnnotation &&
-    //           Math.abs(selectedAnnotation.pageIndex! - pageNumber) >
-    //             SCROLL_AWAY_PAGE_DISMISS_THRESHOLD
-    //         ) {
-    //           console.log('setting annotation id to undefined now')
-    //           setHoveredAnnotationId(undefined);
-    //           setSelectedAnnotationId(undefined);
-    //         }
-    //       }
-    //     }
-    //   }
-    // }, [isIntersecting, isScrolling]);
+  // TODO: UNCOMMENT FOR SCROLL AWAY CODE
+  // useEffect(() => {
+  //   // if (intersection && intersection.isIntersecting && !isScrolling) {
+  //   if (isIntersecting) {
+  //     // setPdfCurrentPage(pageNumber);
+  //     // DISMISS any previously selected annotation if we scroll away 2 pages
+  //     if (selectedAnnotationId) {
+  //       const annotations =
+  //         componentStack[componentStack.length - 1].payload.annotations;
+  //       if (annotations) {
+  //         const selectedAnnotation = annotations.find(
+  //           (e: ResearchObjectComponentAnnotation) =>
+  //             e.id === selectedAnnotationId
+  //         );
+  //         if (
+  //           selectedAnnotation &&
+  //           Math.abs(selectedAnnotation.pageIndex! - pageNumber) >
+  //             SCROLL_AWAY_PAGE_DISMISS_THRESHOLD
+  //         ) {
+  //           console.log('setting annotation id to undefined now')
+  //           setHoveredAnnotationId(undefined);
+  //           setSelectedAnnotationId(undefined);
+  //         }
+  //       }
+  //     }
+  //   }
+  // }, [isIntersecting, isScrolling]);
 
-    const [under, setUnder] = useState(false);
-    useEffect(() => {
-      if (selectedAnnotationId) {
-        setUnder(true);
+  const [under, setUnder] = useState(false);
+  useEffect(() => {
+    if (selectedAnnotationId) {
+      setUnder(true);
+    } else {
+      setUnder(false);
+    }
+  }, [selectedAnnotationId]);
+
+  const thisPageAnnotations = pageAnnotations?.filter((a: any) => {
+    return a.pageIndex == pageNumber - 1;
+  });
+
+  // __log("[Page.tsx] PageComponentHOC::render index=", pageNumber);
+
+  const onPageClick: MouseEventHandler<HTMLDivElement> = useCallback(
+    (e: MouseEvent<HTMLDivElement>) => {
+      /**
+       * Handle external links in new browser tab
+       */
+      const target = e.target as HTMLAnchorElement;
+      if (target.tagName.toLowerCase() === "a") {
+        if (target.classList.contains("internalLink")) return;
+        e.preventDefault();
+        window.open(target.href);
       } else {
-        setUnder(false);
-      }
-    }, [selectedAnnotationId]);
-
-    const thisPageAnnotations = pageAnnotations?.filter((a: any) => {
-      return a.pageIndex == pageNumber - 1;
-    });
-
-    // __log("[Page.tsx] PageComponentHOC::render index=", pageNumber);
-
-    const onPageClick: MouseEventHandler<HTMLDivElement> = useCallback(
-      (e: MouseEvent<HTMLDivElement>) => {
         /**
-         * Handle external links in new browser tab
+         * Dismiss highlight prompt unless text is still selected
          */
-        const target = e.target as HTMLAnchorElement;
-        if (target.tagName.toLowerCase() === "a") {
-          if (target.classList.contains("internalLink")) return;
-          e.preventDefault();
-          window.open(target.href);
-        } else {
-          /**
-           * Dismiss highlight prompt unless text is still selected
-           */
 
-          e.stopPropagation();
-          setTimeout(() => {
-            const selection = window.getSelection()!;
+        e.stopPropagation();
+        setTimeout(() => {
+          const selection = window.getSelection()!;
 
-            if (selection.toString().trim() === "" && setHighlightPrompt) {
-              setHighlightPrompt(null);
-            }
-          }, 0);
-        }
-      },
-      [setHighlightPrompt]
-    );
-
-    const onRenderSuccess = useCallback(() => {
-      if (!image) {
-        //FIXME add {willReadFrequently: true}
-        // https://github.com/fserb/canvas2D/blob/master/spec/will-read-frequently.md
-        const blob = canvasRef.current?.toDataURL();
-        imageCache[cacheKey] = blob;
-        setImage(blob);
+          if (selection.toString().trim() === "" && setHighlightPrompt) {
+            setHighlightPrompt(null);
+          }
+        }, 0);
       }
-      setOpacity(1);
-    }, [image, setImage, setOpacity, canvasRef]);
+    },
+    [setHighlightPrompt]
+  );
 
-    return (
-      <>
-        <PageWrapper
-          ref={pageRef}
-          style={{
-            position: "relative",
-            width: pageWidth * zoom,
-            height: pageWidth * (ratio || 1) * zoom,
+  const onRenderSuccess = useCallback(() => {
+    if (!image) {
+      //FIXME add {willReadFrequently: true}
+      // https://github.com/fserb/canvas2D/blob/master/spec/will-read-frequently.md
+      const blob = canvasRef.current?.toDataURL();
+      imageCache[cacheKey] = blob;
+      setImage(blob);
+    }
+    setOpacity(1);
+  }, [image, setImage, setOpacity, canvasRef]);
 
-            marginBottom: PDF_PAGE_SPACING,
-          }}
-          onLoad={useCallback(
-            () => __log(`<PageWrapper> ${pageNumber} loaded`),
-            [pageNumber]
-          )}
-          onClick={onPageClick}
-        >
-          {isIntersecting && thisPageAnnotations.length ? (
-            <Desktop>
-              <PageAnnotations
-                annotations={thisPageAnnotations}
-                pageHeight={pageWidth * ratio * zoom}
-                pageWidth={pageWidth}
-                isActiveComponent={isActiveComponent}
-              />
-            </Desktop>
-          ) : null}
-          {/* {
+  return (
+    <>
+      <PageWrapper
+        ref={pageRef}
+        style={{
+          position: "relative",
+          width: pageWidth * zoom,
+          height: pageWidth * (ratio || 1) * zoom,
+
+          marginBottom: PDF_PAGE_SPACING,
+        }}
+        onLoad={useCallback(
+          () => __log(`<PageWrapper> ${pageNumber} loaded`),
+          [pageNumber]
+        )}
+        onClick={onPageClick}
+      >
+        {isIntersecting && thisPageAnnotations.length ? (
+          <Desktop>
+            <PageAnnotations
+              annotations={thisPageAnnotations}
+              pageHeight={pageWidth * ratio * zoom}
+              pageWidth={pageWidth}
+              isActiveComponent={isActiveComponent}
+            />
+          </Desktop>
+        ) : null}
+        {/* {
             Math.abs(pdfCurrentPage - pageNumber) < PAGE_RENDER_DISTANCE ? ( */}
 
-          {isIntersecting ? (
-            <>
-              <AnnotationEditCanvas
-                pageIndex={pageNumber - 1}
-                setAnnotations={setPageAnnotations}
-                annotations={pageAnnotations}
-                className={`relative ${under ? "" : "z-50"} w-full h-full`}
-              >
-                <img
-                  src={image}
-                  key={`img_${cacheKey}`}
-                  alt=""
-                  className={`pointer-events-none absolute top-0 left-0 right-0 bottom-0 ${
-                    under ? "" : "z-[50]"
-                  } w-full h-full ${
-                    image ? "opacity-100" : "opacity-0"
-                  } transition-all z-[-10] duration-[0.2s]  ease-in`}
+        {isIntersecting ? (
+          <>
+            <AnnotationEditCanvas
+              pageIndex={pageNumber - 1}
+              setAnnotations={setPageAnnotations}
+              annotations={pageAnnotations}
+              className={`relative ${under ? "" : "z-50"} w-full h-full`}
+            >
+              <img
+                src={image}
+                key={`img_${cacheKey}`}
+                alt=""
+                className={`pointer-events-none absolute top-0 left-0 right-0 bottom-0 ${
+                  under ? "" : "z-[50]"
+                } w-full h-full ${
+                  image ? "opacity-100" : "opacity-0"
+                } transition-all z-[-10] duration-[0.2s]  ease-in`}
+              />
+
+              <div className={`z-back-on-annotate h-fit w-fit`}>
+                <PageComponent
+                  cacheKey={`pagecomponent_${cacheKey}`}
+                  pageNumber={pageNumber}
+                  canvasRef={canvasRef}
+                  pageWidth={pageWidth}
+                  isActiveComponent={isActiveComponent}
+                  zoom={zoom}
+                  ratio={ratio}
+                  isScrolling={isScrolling}
+                  isPinching={isPinching}
+                  onRenderSuccess={onRenderSuccess}
+                  visible={!image || showCanvas}
                 />
-
-                <div className={`z-back-on-annotate h-fit w-fit`}>
-                  <PageComponent
-                    pageNumber={pageNumber}
-                    canvasRef={canvasRef}
-                    pageWidth={pageWidth}
-                    isActiveComponent={isActiveComponent}
-                    zoom={zoom}
-                    ratio={ratio}
-                    isScrolling={isScrolling}
-                    isPinching={isPinching}
-                    onRenderSuccess={onRenderSuccess}
-                    visible={!image || showCanvas}
-                  />
-                </div>
-                <div
-                  className={` z-50 absolute ${
-                    highlightPrompt ? "opacity-100" : "opacity-0"
-                  }`}
-                  style={
-                    highlightPrompt
-                      ? {
-                          top: highlightPrompt.boundingRect.top,
-                          left: highlightPrompt.rects[0].left - 22 + 3,
-                          height: 0,
-                          width: 44,
-                        }
-                      : {}
-                  }
-                >
-                  <div
-                    className="-mt-12 flex justify-center cursor-pointer group"
-                    onMouseDown={() => {
-                      if (highlightPrompt) {
-                        toast.error("Coming soon", {
-                          duration: 2000,
-                          position: "top-center",
-                          style: {
-                            marginTop: 60,
-                            borderRadius: "10px",
-                            background: "#111",
-                            color: "#fff",
-                          },
-                        });
+              </div>
+              <div
+                className={` z-50 absolute ${
+                  highlightPrompt ? "opacity-100" : "opacity-0"
+                }`}
+                style={
+                  highlightPrompt
+                    ? {
+                        top: highlightPrompt.boundingRect.top,
+                        left: highlightPrompt.rects[0].left - 22 + 3,
+                        height: 0,
+                        width: 44,
                       }
-                    }}
-                  >
-                    <div className="bg-neutrals-black w-[44px] h-[37px] flex items-center justify-center rounded-md shadow-xl drop-shadow-lg group-hover:bg-neutrals-gray-1">
-                      <IconAddComment fill="#28AAC4" width={20} />
-                    </div>
-                    <div className="bg-neutrals-black w-[12px] h-[12px] absolute bottom-2 rotate-45 rounded-sm shadow-xl drop-shadow-lg group-hover:bg-neutrals-gray-1"></div>
-                  </div>
-                </div>
-
-                {thisPageAnnotations.length > 0 ? (
-                  <AnnotationLayer
-                    thisPageAnnotations={thisPageAnnotations}
-                    under={under}
-                    isScrolling={isScrolling}
-                    isPinching={isPinching}
-                    pageRef={pageRef}
-                  />
-                ) : null}
-
-                {/*  Used as a cover on top of the page to capture gestures because the text on the
-          pdf stops event propagation so zooming can't occur when pinching on top of the text */}
-                {
-                  // !hasMouse ? (
-                  !isDesktop ? (
-                    <div
-                      ref={overlayRef}
-                      className={`absolute top-0 left-0 right-0 bottom-0 z-11 touch-pan-x touch-pan-y`}
-                      onClick={(e: React.MouseEvent) => {
-                        /**
-                         * Find the next element underneath this one at this coordinate and trigger a click event
-                         */
-                        const elements: Element[] = document.elementsFromPoint(
-                          e.nativeEvent.pageX,
-                          e.nativeEvent.pageY
-                        );
-                        // @ts-ignore
-                        if (elements[1] && elements[1].click) {
-                          // @ts-ignore
-                          elements[1].click();
-                        }
-                      }}
-                    />
-                  ) : null
+                    : {}
                 }
-              </AnnotationEditCanvas>
-
-              {!image ? (
-                <PaperLoader
-                  className={`absolute top-0 left-0 right-0 bottom-0 shadow-2xl z-10`}
-                  style={{
-                    width: pageWidth * zoom,
-                    height: pageWidth * ratio * zoom,
+              >
+                <div
+                  className="-mt-12 flex justify-center cursor-pointer group"
+                  onMouseDown={() => {
+                    if (highlightPrompt) {
+                      toast.error("Coming soon", {
+                        duration: 2000,
+                        position: "top-center",
+                        style: {
+                          marginTop: 60,
+                          borderRadius: "10px",
+                          background: "#111",
+                          color: "#fff",
+                        },
+                      });
+                    }
                   }}
+                >
+                  <div className="bg-neutrals-black w-[44px] h-[37px] flex items-center justify-center rounded-md shadow-xl drop-shadow-lg group-hover:bg-neutrals-gray-1">
+                    <IconAddComment fill="#28AAC4" width={20} />
+                  </div>
+                  <div className="bg-neutrals-black w-[12px] h-[12px] absolute bottom-2 rotate-45 rounded-sm shadow-xl drop-shadow-lg group-hover:bg-neutrals-gray-1"></div>
+                </div>
+              </div>
+
+              {thisPageAnnotations.length > 0 ? (
+                <AnnotationLayer
+                  thisPageAnnotations={thisPageAnnotations}
+                  under={under}
+                  isScrolling={isScrolling}
+                  isPinching={isPinching}
+                  pageRef={pageRef}
                 />
               ) : null}
-            </>
-          ) : null}
-        </PageWrapper>
-      </>
-    );
-  }
-);
+
+              {/*  Used as a cover on top of the page to capture gestures because the text on the
+          pdf stops event propagation so zooming can't occur when pinching on top of the text */}
+              {
+                // !hasMouse ? (
+                !isDesktop ? (
+                  <div
+                    ref={overlayRef}
+                    className={`absolute top-0 left-0 right-0 bottom-0 z-11 touch-pan-x touch-pan-y`}
+                    onClick={(e: React.MouseEvent) => {
+                      /**
+                       * Find the next element underneath this one at this coordinate and trigger a click event
+                       */
+                      const elements: Element[] = document.elementsFromPoint(
+                        e.nativeEvent.pageX,
+                        e.nativeEvent.pageY
+                      );
+                      // @ts-ignore
+                      if (elements[1] && elements[1].click) {
+                        // @ts-ignore
+                        elements[1].click();
+                      }
+                    }}
+                  />
+                ) : null
+              }
+            </AnnotationEditCanvas>
+
+            {!image ? (
+              <PaperLoader
+                className={`absolute top-0 left-0 right-0 bottom-0 shadow-2xl z-10`}
+                style={{
+                  width: pageWidth * zoom,
+                  height: pageWidth * ratio * zoom,
+                }}
+              />
+            ) : null}
+          </>
+        ) : null}
+      </PageWrapper>
+    </>
+  );
+};
 
 export { PageComponentHOC };

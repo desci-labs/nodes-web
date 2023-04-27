@@ -7,7 +7,7 @@ import "./style.scss";
 import { APPROXIMATED_HEADER_HEIGHT } from "@components/utils";
 import { ResearchObjectComponentAnnotation } from "@desci-labs/desci-models";
 import { useScrolling, useUpdateEffect } from "react-use";
-import { PageComponentHOC } from "./Page";
+import { PAGE_RENDER_DISTANCE, PageComponentHOC } from "./Page";
 
 import { useGesture } from "@use-gesture/react";
 import { useResponsive, useWindowDimensions } from "hooks";
@@ -653,7 +653,9 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
                         zoom={zoom}
                         selectedAnnotationId={selectedAnnotationId}
                         pageMetadata={pageMetadataItem}
-                        isIntersecting={visible}
+                        isIntersecting={
+                          Math.abs(rawIndex - pdfCurrentPage) <= 30
+                        }
                       />
                     </div>
                   </div>
