@@ -38,7 +38,7 @@ export interface UiComponentDefinition {
   ) => JSX.Element;
   title: string;
   componentType: ResearchObjectComponentType;
-  componentSubType?: ResearchObjectComponentSubtypes | undefined;
+  componentSubtype?: ResearchObjectComponentSubtypes | undefined;
   doNotRender?: boolean;
 }
 
@@ -78,7 +78,7 @@ export const COMPONENT_LIBRARY: UiComponentDefinition[] = [
     ),
     title: "Research Report",
     componentType: ResearchObjectComponentType.PDF,
-    componentSubType: ResearchObjectComponentDocumentSubtype.RESEARCH_ARTICLE,
+    componentSubtype: ResearchObjectComponentDocumentSubtype.RESEARCH_ARTICLE,
   },
   {
     icon: (props) => (
@@ -90,7 +90,7 @@ export const COMPONENT_LIBRARY: UiComponentDefinition[] = [
     ),
     title: "Pre-registered Report",
     componentType: ResearchObjectComponentType.PDF,
-    componentSubType:
+    componentSubtype:
       ResearchObjectComponentDocumentSubtype.PREREGISTERED_REPORT,
   },
   {
@@ -99,7 +99,7 @@ export const COMPONENT_LIBRARY: UiComponentDefinition[] = [
     ),
     title: "Pre-registered Analysis Plan",
     componentType: ResearchObjectComponentType.PDF,
-    componentSubType:
+    componentSubtype:
       ResearchObjectComponentDocumentSubtype.PREREGISTERED_ANALYSIS_PLAN,
   },
   {
@@ -112,7 +112,7 @@ export const COMPONENT_LIBRARY: UiComponentDefinition[] = [
     ),
     title: "Supplementary Information",
     componentType: ResearchObjectComponentType.PDF,
-    componentSubType:
+    componentSubtype:
       ResearchObjectComponentDocumentSubtype.SUPPLEMENTARY_INFORMATION,
   },
   {
@@ -125,7 +125,7 @@ export const COMPONENT_LIBRARY: UiComponentDefinition[] = [
     ),
     title: "Presentation Deck",
     componentType: ResearchObjectComponentType.PDF,
-    componentSubType: ResearchObjectComponentDocumentSubtype.PRESENTATION_DECK,
+    componentSubtype: ResearchObjectComponentDocumentSubtype.PRESENTATION_DECK,
   },
   {
     icon: (props) => <IconWrapper Icon={IconComponentCode} {...props} />,
@@ -168,7 +168,7 @@ export const EXTERNAL_COMPONENTS: UiComponentDefinition[] = [
     ),
     title: "Community Discussions",
     componentType: ResearchObjectComponentType.LINK,
-    componentSubType: ResearchObjectComponentLinkSubtype.COMMUNITY_DISCUSSION,
+    componentSubtype: ResearchObjectComponentLinkSubtype.COMMUNITY_DISCUSSION,
   },
   {
     icon: (props) => (
@@ -176,7 +176,7 @@ export const EXTERNAL_COMPONENTS: UiComponentDefinition[] = [
     ),
     title: "Video Resource",
     componentType: ResearchObjectComponentType.LINK,
-    componentSubType: ResearchObjectComponentLinkSubtype.VIDEO_RESOURCE,
+    componentSubtype: ResearchObjectComponentLinkSubtype.VIDEO_RESOURCE,
   },
   {
     icon: (props) => (
@@ -188,7 +188,7 @@ export const EXTERNAL_COMPONENTS: UiComponentDefinition[] = [
     ),
     title: "External API",
     componentType: ResearchObjectComponentType.LINK,
-    componentSubType: ResearchObjectComponentLinkSubtype.EXTERNAL_API,
+    componentSubtype: ResearchObjectComponentLinkSubtype.EXTERNAL_API,
   },
   {
     icon: (props) => (
@@ -200,13 +200,13 @@ export const EXTERNAL_COMPONENTS: UiComponentDefinition[] = [
     ),
     title: "Restricted Access Data",
     componentType: ResearchObjectComponentType.LINK,
-    componentSubType: ResearchObjectComponentLinkSubtype.RESTRICTED_DATA,
+    componentSubtype: ResearchObjectComponentLinkSubtype.RESTRICTED_DATA,
   },
   {
     icon: (props) => <IconWrapper Icon={IconComponentMisc} {...props} />,
     title: "Other Link",
     componentType: ResearchObjectComponentType.LINK,
-    componentSubType: ResearchObjectComponentLinkSubtype.OTHER,
+    componentSubtype: ResearchObjectComponentLinkSubtype.OTHER,
   },
 ];
 
@@ -243,13 +243,13 @@ const ComponentButton = ({
   title,
   icon,
   componentType,
-  componentSubType,
+  componentSubtype,
 }: UiComponentDefinition) => {
   const {
     setIsAddingSubcomponent,
     setIsAddingComponent,
     setAddComponentType,
-    setAddComponentSubType,
+    setAddComponentSubtype,
   } = useManuscriptController();
 
   return (
@@ -259,7 +259,7 @@ const ComponentButton = ({
         setIsAddingSubcomponent(true);
         setIsAddingComponent(false);
         setAddComponentType(componentType);
-        setAddComponentSubType(componentSubType || null);
+        setAddComponentSubtype(componentSubtype || null);
       }}
     >
       <div className="h-[120px] w-[120px] bg-neutrals-gray-2 text-xs flex rounded-xl shadow-lg border border-[#3C3C3C] cursor-pointer hover:bg-neutrals-gray-3 flex-col items-center gap-3 text-center pt-[18.5px]">
@@ -301,7 +301,7 @@ const ComponentLibrary = () => {
                 icon={c.icon}
                 title={c.title}
                 componentType={c.componentType}
-                componentSubType={c.componentSubType}
+                componentSubtype={c.componentSubtype}
               />
             ))}
           </div>
@@ -324,7 +324,7 @@ const ComponentLibrary = () => {
             icon={c.icon}
             title={c.title}
             componentType={c.componentType}
-            componentSubType={c.componentSubType}
+            componentSubtype={c.componentSubtype}
           />
         ))}
       </div>
@@ -341,9 +341,9 @@ export const findTarget = (
       const matchesType = target.componentType === componentType;
       switch (target.componentType) {
         case ResearchObjectComponentType.PDF:
-          return matchesType && componentSubtype === target.componentSubType;
+          return matchesType && componentSubtype === target.componentSubtype;
         case ResearchObjectComponentType.LINK:
-          return matchesType && componentSubtype === target.componentSubType;
+          return matchesType && componentSubtype === target.componentSubtype;
         default:
           return matchesType;
       }

@@ -99,15 +99,15 @@ const AddComponentPopOver = (
 ) => {
   const {
     addComponentType,
-    addComponentSubType,
+    addComponentSubtype,
     setIsAddingComponent,
     setIsAddingSubcomponent,
     setAddComponentType,
-    setAddComponentSubType,
+    setAddComponentSubtype,
     addFilesWithoutContext,
   } = useManuscriptController([
     "addComponentType",
-    "addComponentSubType",
+    "addComponentSubtype",
     "addFilesWithoutContext",
   ]);
 
@@ -129,7 +129,7 @@ const AddComponentPopOver = (
     setIsAddingComponent(false);
     setIsAddingSubcomponent(false);
     setAddComponentType(null);
-    setAddComponentSubType(null);
+    setAddComponentSubtype(null);
     setLoading(false);
     // setFileLink(undefined);
     props.onClose(force);
@@ -151,9 +151,9 @@ const AddComponentPopOver = (
       setError("Invalid Repo Link");
     }
 
-    if (!addComponentSubType) return customSubtype;
+    if (!addComponentSubtype) return customSubtype;
 
-    return addComponentSubType;
+    return addComponentSubtype;
   };
 
   const renderComponentFlow = () => {
@@ -161,8 +161,8 @@ const AddComponentPopOver = (
       case ResearchObjectComponentType.PDF:
         return (
           <AddDocumentComponent
-            subType={addComponentSubType}
-            setSubType={setAddComponentSubType}
+            subtype={addComponentSubtype}
+            setSubtype={setAddComponentSubtype}
             customSubtype={customSubtype}
             setCustomSubtype={setCustomSubtype}
             files={files}
@@ -190,8 +190,8 @@ const AddComponentPopOver = (
           <AddLinkComponent
             url={urlOrDoi}
             setUrl={setUrlOrDoi}
-            subType={addComponentSubType}
-            setSubType={setAddComponentSubType}
+            subtype={addComponentSubtype}
+            setSubtype={setAddComponentSubtype}
           />
         );
       default:
@@ -229,7 +229,7 @@ const AddComponentPopOver = (
         componentUrl: urlOrDoi! || files!,
         title: componentTitle,
         componentType: addComponentType!,
-        componentSubtype: addComponentSubType || undefined,
+        componentSubtype: addComponentSubtype || undefined,
       });
 
       if (addComponentType === ResearchObjectComponentType.LINK) {
@@ -237,7 +237,7 @@ const AddComponentPopOver = (
           addExternalLinkThunk({
             name: componentTitle!,
             url: urlOrDoi!,
-            subtype: addComponentSubType as ResearchObjectComponentLinkSubtype,
+            subtype: addComponentSubtype as ResearchObjectComponentLinkSubtype,
           })
         );
         const components = manifestData?.components!;
@@ -266,7 +266,7 @@ const AddComponentPopOver = (
         addFilesToDrive({
           ...(externalUrl ? { externalUrl } : { files }),
           componentType: addComponentType!,
-          componentSubType: addComponentSubType || undefined,
+          componentSubtype: addComponentSubtype || undefined,
           ...(addFilesWithoutContext ? { overwriteContext: "root" } : {}),
           onSuccess: (manifestData: ResearchObjectV1) => {
             /**

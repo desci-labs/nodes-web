@@ -20,7 +20,7 @@ const ComponentButton = ({
   title,
   icon,
   componentType,
-  componentSubType,
+  componentSubtype,
 }: UiComponentDefinition) => {
   const dispatch = useSetter();
   const { componentTypeBeingAssignedTo, nodeTree } = useDrive();
@@ -36,7 +36,7 @@ const ComponentButton = ({
           dispatch(
             assignTypeThunk({
               type: componentType,
-              ...(componentSubType && { subType: componentSubType }),
+              ...(componentSubtype && { subtype: componentSubtype }),
               item: driveItem,
             })
           );
@@ -112,7 +112,7 @@ const AssignTypePane = () => {
                     icon={c.icon()}
                     title={c.title}
                     componentType={c.componentType}
-                    componentSubType={c.componentSubType}
+                    componentSubtype={c.componentSubtype}
                   />
                 ))}
               </div>
