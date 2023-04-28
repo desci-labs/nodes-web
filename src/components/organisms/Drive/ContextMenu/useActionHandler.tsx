@@ -1,4 +1,4 @@
-import { DriveObject, FileType } from "../types";
+import { AccessStatus, DriveObject, FileType } from "../types";
 import { Actions } from "./types";
 import {
   ResearchObjectComponentType,
@@ -14,7 +14,7 @@ import {
 import { useSetter } from "@src/store/accessors";
 import axios from "axios";
 import { AvailableUserActionLogTypes, postUserAction } from "@api/index";
-import { separateFileNameAndMimeType } from "@src/state/drive/utils";
+import { separateFileNameAndExtension } from "@src/state/drive/utils";
 import {
   fetchTreeThunk,
   removeFileFromCurrentDrive,
@@ -31,6 +31,7 @@ const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
 const PUB_IPFS_URL = process.env.REACT_APP_PUBLIC_IPFS_RESOLVER;
 
 export const getActionState = (action: Actions, file: DriveObject) => {
+  if (file.accessStatus === AccessStatus.UPLOADING) return { disabled: true };
   switch (action) {
     case Actions.PREVIEW:
       return {
@@ -51,7 +52,9 @@ export const getActionState = (action: Actions, file: DriveObject) => {
         disabled: file?.path === DRIVE_FULL_EXTERNAL_LINKS_PATH,
       };
     case Actions.ASSIGN_TYPE:
-      return { disabled: false };
+      return {
+        disabled: file.componentType === ResearchObjectComponentType.LINK,
+      };
     case Actions.EDIT_METADATA:
       return {
         disabled: !(
@@ -156,7 +159,7 @@ export default function useActionHandler() {
       JSON.stringify({ nodeUuid: currentObjectId, cid: file.cid })
     );
     const url = `${IPFS_URL}/${file.cid}`;
-    const { fileName, mimeType } = separateFileNameAndMimeType(file.name);
+    const { fileName, extension } = separateFileNameAndExtension(file.name);
     axios({
       url,
       method: "GET",
@@ -167,7 +170,7 @@ export default function useActionHandler() {
       link.href = url2;
       link.setAttribute(
         "download",
-        `${fileName}${mimeType ? `.${mimeType}` : ""}`
+        `${fileName}${extension ? `.${extension}` : ""}`
       );
       document.body.appendChild(link);
       link.click();

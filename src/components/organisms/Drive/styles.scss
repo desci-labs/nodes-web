@@ -42,7 +42,7 @@ $columns: 7;
   }
 
   &:hover > li {
-    background: rgba(40, 169, 195, 0.75); //tint-primary
+    background: rgba(40, 169, 195, 0.75) !important; //tint-primary
   }
 }
 

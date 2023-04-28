@@ -49,11 +49,8 @@ export default function DriveRow({
   file,
   index,
   selected,
-  isMultiselecting,
   toggleSelected,
   exploreDirectory,
-  selectedFiles,
-  canEditMetadata,
   canUse,
   deprecated,
 }: DriveRowProps) {
@@ -84,7 +81,7 @@ export default function DriveRow({
       onClick={(e) => {
         if (e.ctrlKey) {
           e.stopPropagation();
-          toggleSelected(index, file.componentType);
+          toggleSelected(file.path!, file.componentType);
         }
       }}
     >
@@ -98,7 +95,10 @@ export default function DriveRow({
           e.stopPropagation();
         }}
         onClick={() => {
-          if (mode === "editor") {
+          if (
+            mode === "editor" &&
+            file.accessStatus !== AccessStatus.UPLOADING
+          ) {
             dispatch(starComponentThunk({ item: file }));
           }
         }}
@@ -150,7 +150,11 @@ export default function DriveRow({
       <li className={`${everyRow} col-last-modified text-xs`}>
         {file.lastModified}
       </li>
-      <li className={`${everyRow} col-status text-xs`}>{file.accessStatus}</li>
+      <li className={`${everyRow} col-status text-xs`}>
+        {file.accessStatus === AccessStatus.UPLOADING
+          ? "Private"
+          : file.accessStatus}
+      </li>
       <li
         onClick={() =>
           console.log(
@@ -180,7 +184,7 @@ export default function DriveRow({
       </li>
       <li className={`${everyRow}`}>
         <BlackGenericButton
-          disabled={!canUse}
+          disabled={!canUse || file.accessStatus === AccessStatus.UPLOADING}
           className="p-0 min-w-[28px] h-7"
           onClick={() => {
             dispatch(setFileBeingUsed(file));

@@ -44,7 +44,7 @@ const ComponentRenamePopover = (props: {
         dispatch(
           updateComponent({
             index,
-            update: { ...manifestData.components[index], name: componentName },
+            update: { name: componentName },
           })
         );
         dispatch(saveManifestDraft({}));

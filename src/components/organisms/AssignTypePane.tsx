@@ -77,7 +77,7 @@ const AssignTypePane = () => {
       >
         <div className="w-[calc(100%-320px)]">
           <div
-            className={`absolute left-6 rounded-full hover:bg-neutrals-gray-3 p-4 cursor-pointer z-10 ${
+            className={`absolute left-6 rounded-full hover:bg-primary p-3.5 cursor-pointer z-10 bg-tint-primary ${
               currentObjectId ? "" : "hidden"
             }`}
             onClick={() => {
@@ -86,7 +86,11 @@ const AssignTypePane = () => {
             }}
           >
             <span className="stroke-[#212121] dark:stroke-white">
-              <IconRemove />
+              <IconRemove
+                strokeWidth={2}
+                strokeLinecap="square"
+                className="w-[17px] h-[17px] stroke-neutrals-black"
+              />
             </span>
           </div>
           <div className="overflow-auto h-[calc(100vh-55px)] absolute top-0 pt-8 w-[calc(100%)] pr-8">

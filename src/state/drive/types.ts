@@ -8,6 +8,7 @@ import { DriveObject } from "@src/components/organisms/Drive";
 export interface NavigateToDriveByPathAction {
   payload: {
     path: string;
+    selectPath?: string;
   };
 }
 

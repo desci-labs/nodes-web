@@ -1,9 +1,12 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 import { getDatasetTree, updateDag } from "@src/api";
-import { DriveObject, FileType } from "@src/components/organisms/Drive";
+import {
+  AccessStatus,
+  DriveObject,
+  FileType,
+} from "@src/components/organisms/Drive";
 import { RequestStatus, RootState } from "@src/store";
-import toast from "react-hot-toast";
 import {
   ExternalLinkComponent,
   ResearchObjectComponentLinkSubtype,
@@ -36,6 +39,8 @@ import {
   CID_PENDING,
   getAncestorComponent,
   defaultSort,
+  GENERIC_NEW_LINK_NAME,
+  DRIVE_FULL_EXTERNAL_LINKS_PATH,
 } from "./utils";
 import {
   AddFilesToDrivePayload,
@@ -77,6 +82,7 @@ export interface DriveState {
   fileBeingRenamed: DriveObject | null;
   breadCrumbs: BreadCrumb[];
   sortingFunction: (a: DriveObject, b: DriveObject) => number;
+  selected: Record<DrivePath, ResearchObjectComponentType>;
 
   // drive picker state
   currentDrivePicker: DriveObject | null;
@@ -102,6 +108,7 @@ const initialState: DriveState = {
   breadCrumbsPicker: [],
   currentDrivePicker: null,
   sortingFunction: defaultSort,
+  selected: {},
 };
 
 const navigateToDriveGeneric =
@@ -115,14 +122,14 @@ const navigateToDriveGeneric =
       | "currentDrivePicker" = `currentDrive${key}`;
 
     if (state.status !== "succeeded" || !state.nodeTree!) return;
-    let path: any = action.payload;
-    if (path.path) {
-      path = path.path;
-    }
-
+    const { path, selectPath } = action.payload;
+    let fileSelectionType: ResearchObjectComponentType | undefined;
     let driveFound = state.deprecated
       ? driveBfsByPath(state.nodeTree!, path)
       : findDriveByPath(state.nodeTree!!, path);
+    if (driveFound)
+      fileSelectionType =
+        driveFound.componentType as ResearchObjectComponentType;
     if (driveFound && driveFound.type === FileType.FILE) {
       const pathSplit = path.split("/");
       pathSplit.pop();
@@ -137,6 +144,10 @@ const navigateToDriveGeneric =
       );
       return;
     }
+
+    state.selected =
+      selectPath && fileSelectionType ? { [path]: fileSelectionType } : {};
+
     state[keyBreadcrumbs] = constructBreadCrumbs(driveFound.path!);
     driveFound.contains?.sort(state.sortingFunction);
     state[keyCurrentDrive] = driveFound;
@@ -297,6 +308,21 @@ export const driveSlice = createSlice({
       state.currentDrive?.contains?.push(payload);
       state.currentDrive?.contains?.sort(state.sortingFunction);
     },
+    toggleSelectFileInCurrentDrive: (
+      state,
+      {
+        payload,
+      }: PayloadAction<{
+        path: string;
+        componentType: ResearchObjectComponentType;
+      }>
+    ) => {
+      if (payload.path in state.selected) delete state.selected[payload.path];
+      else state.selected[payload.path] = payload.componentType;
+    },
+    resetSelected: (state) => {
+      state.selected = {};
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -453,6 +479,8 @@ export const {
   setFileBeingRenamed,
   renameFileInCurrentDrive,
   optimisticAddFileToCurrentDrive,
+  toggleSelectFileInCurrentDrive,
+  resetSelected,
 } = driveSlice.actions;
 
 export interface FetchTreeThunkParams {
@@ -470,16 +498,27 @@ export const addExternalLinkThunk = createAsyncThunk(
     },
     { getState, dispatch }
   ) => {
-    // const state = getState() as RootState;
+    const state = getState() as RootState;
 
     const { name, url, subtype } = payload;
+    const externalLinksDrive = findDriveByPath(
+      state.drive.nodeTree!,
+      DRIVE_FULL_EXTERNAL_LINKS_PATH
+    );
+    const collisionArray =
+      externalLinksDrive?.contains?.map((f) => f.name) || [];
+
+    const uniqueName = name
+      ? findUniqueName(name, collisionArray)
+      : findUniqueName(GENERIC_NEW_LINK_NAME, collisionArray);
     const newComponent: ExternalLinkComponent = {
       id: uuidv4(),
-      name: name || "Link",
+      name: uniqueName,
       type: ResearchObjectComponentType.LINK,
       subtype,
       payload: {
         url,
+        path: DRIVE_FULL_EXTERNAL_LINKS_PATH + "/" + uniqueName,
       },
       starred: true,
     };
@@ -674,6 +713,7 @@ export const addFilesToDrive = createAsyncThunk(
         cid: CID_PENDING,
         type: FileType.DIR,
         contains: undefined,
+        accessStatus: AccessStatus.UPLOADING,
         path: [state.drive.currentDrive!.path!, newFolderName].join("/"),
       });
       dispatch(optimisticAddFileToCurrentDrive(optimisticNewFolder));
@@ -681,13 +721,13 @@ export const addFilesToDrive = createAsyncThunk(
 
     if (!fileInfo) return console.error("[AddFilesToDrive] fileInfo undefined");
 
-    let batchUid: string;
+    let batchUid: string | undefined;
     if (!newFolder) {
       batchUid = Date.now().toString();
       const uploadQueueItems = fileInfo.map((f) => ({
         nodeUuid: currentObjectId!,
         path: f.path,
-        batchUid: batchUid,
+        batchUid: batchUid!,
         uploadType: f.uploadType,
       }));
       dispatch(setShowUploadPanel(true));
@@ -716,18 +756,22 @@ export const addFilesToDrive = createAsyncThunk(
         componentSubType,
         newFolderName,
         onProgress: (e) => {
+          if (batchUid === undefined) return;
           const perc = Math.ceil((e.loaded / e.total) * 100);
           const passedPerc = perc < 90 ? perc : 90;
-          if (batchUid)
-            dispatch(
-              updateBatchUploadProgress({ batchUid, progress: passedPerc })
-            );
+          dispatch(
+            updateBatchUploadProgress({
+              batchUid,
+              progress: passedPerc,
+            })
+          );
         },
       });
       if (error) console.error(`[addFilesToDrive] Error: ${error}`);
       if (onSuccess) onSuccess(updatedManifest);
-      if (batchUid! !== undefined)
+      if (batchUid !== undefined) {
         dispatch(removeBatchFromUploadQueue({ batchUid }));
+      }
       if (rootDataCid && updatedManifest && manifestCid) {
         const latestState = getState() as RootState;
         if (snapshotNodeUuid === latestState.nodes.nodeReader.currentObjectId) {
@@ -739,10 +783,10 @@ export const addFilesToDrive = createAsyncThunk(
         }
       }
     } catch (e) {
-      if (batchUid! !== undefined)
+      if (batchUid !== undefined) {
         dispatch(removeBatchFromUploadQueue({ batchUid }));
-      if (batchUid! !== undefined)
         dispatch(updateBatchUploadProgress({ batchUid, progress: -1 }));
+      }
       __log("PaneDrive::handleUpdate", files, e);
     }
   }
