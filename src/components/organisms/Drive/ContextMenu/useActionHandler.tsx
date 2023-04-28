@@ -4,7 +4,7 @@ import {
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
-import { useNodeReader } from "@src/state/nodes/hooks";
+import {  useNodeReader } from "@src/state/nodes/hooks";
 import {
   saveManifestDraft,
   setComponentStack,
