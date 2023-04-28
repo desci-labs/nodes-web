@@ -37,10 +37,7 @@ import {
   toggleCommitPanel,
   toggleResearchPanel,
 } from "@src/state/nodes/viewer";
-import {
-  SwitchBar,
-  SwitchButton,
-} from "@src/components/atoms/SwitchBar/SwitchBar";
+import { SwitchBar, SwitchButton } from "@src/components/atoms/SwitchBar";
 
 const ManuscriptSidePanelContainer = styled(SidePanel).attrs({
   className: "bg-light-gray dark:bg-dark-gray text-black dark:text-white",

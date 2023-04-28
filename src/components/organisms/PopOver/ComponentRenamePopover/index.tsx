@@ -8,7 +8,7 @@ import {
   saveManifestDraft,
   updateComponent,
 } from "@src/state/nodes/viewer";
-import Modal from "@src/components/molecules/Modal/Modal";
+import Modal from "@src/components/molecules/Modal";
 
 const ComponentRenamePopover = (props: {
   isVisible: boolean;

@@ -1,6 +1,6 @@
 import WalletManager from "@components/organisms/WalletManager";
 import React, { useEffect } from "react";
-import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
+import Modal, { ModalProps } from "@src/components/molecules/Modal";
 
 const WalletManagerModal = (props: ModalProps) => {
   useEffect(() => {

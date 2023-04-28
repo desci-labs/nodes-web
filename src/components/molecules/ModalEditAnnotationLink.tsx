@@ -1,6 +1,6 @@
 import PopOver from "@src/components/organisms/PopOver";
 import PopOverBasic from "@src/components/atoms/PopOverBasic";
-import Modal from "./Modal/Modal";
+import Modal from "./Modal";
 import InsetLabelInput from "./FormInputs/InsetLabelInput";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
 import DefaultSpinner from "@src/components/atoms/DefaultSpinner";

@@ -1,4 +1,4 @@
-import { ResearchNodeIcon } from "@src/components/Icons";
+import { ResearchNodeIcon } from "@src/components/atoms/Icons";
 import { IconShare } from "@src/icons";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import useComponentDpid from "@components/organisms/Drive/hooks/useComponentDpid";

@@ -1,5 +1,5 @@
 import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
-import { ResearchObjectIcon, SVGIconProps } from "@src/components/Icons";
+import { ResearchObjectIcon, SVGIconProps } from "@src/components/atoms/Icons";
 import { app, site, web } from "@src/constants/routes";
 import { IconHamburger, IconX } from "@src/icons";
 import { useUser } from "@src/state/user/hooks";

@@ -35,7 +35,7 @@ import {
   setCurrentObjectId,
   setManifest,
 } from "@src/state/nodes/viewer";
-import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
+import Modal, { ModalProps } from "@src/components/molecules/Modal";
 import { useDispatch } from "react-redux";
 import {
   addExternalLinkThunk,

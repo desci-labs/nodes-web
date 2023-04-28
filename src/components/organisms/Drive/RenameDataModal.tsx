@@ -1,7 +1,7 @@
 import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
 import InsetLabelInput from "@src/components/molecules/FormInputs/InsetLabelInput";
-import Modal from "@src/components/molecules/Modal/Modal";
+import Modal from "@src/components/molecules/Modal";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import {
   updateComponent,

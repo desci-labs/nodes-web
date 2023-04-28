@@ -1,5 +1,5 @@
 import { memo } from "react";
-import UserAttestations from "./UserAttestations/UserAttestations";
+import UserAttestations from "@components/organisms/UserAttestations";
 import ProfileInfo from "./ProfileInfo";
 import Profiler from "./WrapperProfileModal";
 

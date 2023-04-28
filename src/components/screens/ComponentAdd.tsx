@@ -3,7 +3,7 @@ import { restoreScroll } from "@components/utils";
 import { IconRemove } from "@icons";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import * as React from "react";
-import { useManuscriptController } from "../../organisms/ManuscriptReader/ManuscriptController";
+import { useManuscriptController } from "@components/organisms/ManuscriptReader/ManuscriptController";
 
 const ComponentAdd = () => {
   const { setIsAddingComponent } = useManuscriptController([]);

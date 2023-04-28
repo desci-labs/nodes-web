@@ -33,7 +33,7 @@ import { setManifest } from "@src/state/nodes/viewer";
 import { setPendingCommits } from "@src/state/nodes/history";
 import { tags } from "@src/state/api/tags";
 import { nodesApi } from "@src/state/api/nodes";
-import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
+import Modal, { ModalProps } from "@src/components/molecules/Modal";
 import WalletManagerModal from "@src/components/molecules/WalletManagerModal";
 import { fetchTreeThunk } from "@src/state/drive/driveSlice";
 import { useNodesMediaCoverQuery } from "@src/state/api/media";

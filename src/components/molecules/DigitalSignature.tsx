@@ -6,7 +6,7 @@ import { IconCircleCheck, IconWallet } from "@icons";
 import { shortAccount } from "@components/utils";
 import { useUser } from "@src/state/user/hooks";
 import { useGetter } from "@src/store/accessors";
-import WalletManagerModal from "../WalletManagerModal";
+import WalletManagerModal from "@components/molecules/WalletManagerModal";
 
 const DigitalSignature = () => {
   const { account } = useWeb3React();
