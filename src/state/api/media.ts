@@ -14,9 +14,7 @@ export const nodesMediaApi = api.injectEndpoints({
         },
       ],
       query: ({ cid, uuid, version }: NodeCoverParams) =>
-        `${endpoints.v1.nodes.media.cover}${uuid}${
-          version ? `/${version}` : ""
-        }?cid=${cid}`,
+        `${endpoints.v1.nodes.media.cover}${uuid}${`/${version}`}?cid=${cid}`,
       async onQueryStarted(args, { dispatch, queryFulfilled }) {
         try {
           console.log("nodesMediaCover", args);
@@ -24,33 +22,7 @@ export const nodesMediaApi = api.injectEndpoints({
         } catch (error) {}
       },
     }),
-    setNodeCover: builder.mutation<
-      { url: string; ok: boolean },
-      NodeCoverParams
-    >({
-      query: ({ cid, uuid, version }: NodeCoverParams) => {
-        return {
-          url: `${endpoints.v1.nodes.media.cover}${uuid}${
-          version ? `/${version}` : ""
-        }?cid=${cid}`,
-          method: "POST",
-        };
-      },
-      async onQueryStarted(
-        args: NodeCoverParams,
-        { dispatch, queryFulfilled }
-      ) {
-        try {
-          const {
-            data: { url },
-          } = await queryFulfilled;
-          console.log("cover set", url);
-        } catch (error) {
-          console.log("Error setting node cover", args, error);
-        }
-      },
-    }),
   }),
 });
 
-export const { useNodesMediaCoverQuery, useSetNodeCoverMutation } = nodesMediaApi;
+export const { useNodesMediaCoverQuery } = nodesMediaApi;
