@@ -1,6 +1,7 @@
 import {
   CommonComponentPayload,
   DataComponentMetadata,
+  ResearchObjectComponentSubtypes,
   ResearchObjectComponentType,
 } from "@desci-labs/desci-models";
 
@@ -33,6 +34,7 @@ export interface DriveObject {
   name: string;
   lastModified: string; //date later
   componentType: ResearchObjectComponentType | DriveNonComponentTypes;
+  componentSubtype?: ResearchObjectComponentSubtypes;
   componentId?: string | undefined;
   accessStatus: AccessStatus;
   size: number;

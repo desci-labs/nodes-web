@@ -7,6 +7,7 @@ import AnnotationSwitcher from "@components/atoms/AnnotationSwitcher";
 import {
   ExternalLinkComponent,
   PdfComponentPayload,
+  ResearchObjectComponentSubtypes,
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
@@ -15,9 +16,7 @@ import TooltipIcon from "@components/atoms/TooltipIcon";
 import ReactTooltip from "react-tooltip";
 import { findTarget } from "@components/organisms/ComponentLibrary";
 import ButtonFair from "@components/atoms/ButtonFair";
-import {
-  SessionStorageKeys,
-} from "../driveUtils";
+import { SessionStorageKeys } from "../driveUtils";
 import { useSetter } from "@src/store/accessors";
 import { setComponentStack } from "@src/state/nodes/viewer";
 import { updatePdfPreferences } from "@src/state/nodes/pdf";
@@ -79,7 +78,11 @@ export interface ComponentCardProps extends SectionCardProps {
   component: ResearchObjectV1Component;
 }
 const labelFor = (component: ResearchObjectV1Component): string => {
-  const obj = findTarget(component);
+  const subtype =
+    "subtype" in component
+      ? (component["subtype"] as ResearchObjectComponentSubtypes)
+      : undefined;
+  const obj = findTarget(component.type, subtype);
   if (obj) {
     return obj.title;
   }
@@ -90,7 +93,11 @@ const iconFor = (
   component: ResearchObjectV1Component,
   primary: boolean | undefined
 ) => {
-  const obj = findTarget(component);
+  const subtype =
+    "subtype" in component
+      ? (component["subtype"] as ResearchObjectComponentSubtypes)
+      : undefined;
+  const obj = findTarget(component.type, subtype);
   if (obj) {
     return obj.icon;
   }
@@ -100,8 +107,7 @@ const iconFor = (
 const ComponentCard = (props: ComponentCardProps) => {
   const dispatch = useSetter();
   const { component } = props;
-  const { componentStack, recentlyAddedComponent, manifest } =
-    useNodeReader();
+  const { componentStack, recentlyAddedComponent, manifest } = useNodeReader();
   const { nodeTree } = useDrive();
   /***
    * Use local click tracking for fast click response

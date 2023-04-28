@@ -1,6 +1,7 @@
 import { getDatasetTree } from "@api/index";
 import {
   DataComponentMetadata,
+  ResearchObjectComponentSubtypes,
   ResearchObjectComponentType,
   ResearchObjectV1,
 } from "@desci-labs/desci-models";
@@ -29,6 +30,7 @@ export enum SessionStorageKeys {
 interface VirtualDriveArgs {
   name: string;
   componentType?: ResearchObjectComponentType | DriveNonComponentTypes;
+  componentSubtype?: ResearchObjectComponentSubtypes;
   componentId?: string;
   size?: number;
   contains?: Array<DriveObject>;
@@ -50,6 +52,7 @@ export function createVirtualDrive({
   contains,
   lastModified,
   accessStatus,
+  componentSubtype,
   metadata,
   cid,
   parent,
@@ -61,6 +64,7 @@ export function createVirtualDrive({
   return {
     name,
     componentType: componentType || ResearchObjectComponentType.UNKNOWN,
+    componentSubtype: componentSubtype || undefined,
     componentId: componentId || undefined,
     size: size || 0,
     contains: contains, // if we default to blank array External Links are treated as folders for file picker

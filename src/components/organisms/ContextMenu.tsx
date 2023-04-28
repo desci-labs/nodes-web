@@ -6,6 +6,7 @@ export interface ContextMenuOption {
   icon?: JSX.Element;
   labelClass?: string;
   onClick: () => void;
+  disabled?: boolean;
   //   show: boolean
 }
 
@@ -29,12 +30,18 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       className={`bg-neutrals-gray-1 text-white absolute drop-shadow-xl first-of-type:rounded-t-md last-of-type:rounded-b-md ${className}`}
     >
       {items.map((item, idx) => {
+        item.disabled = item.disabled ?? false;
         return (
           <li
             key={"ctx" + idx}
-            className={`grid grid-cols-[20px_1fr] font-medium whitespace-nowrap gap-2 py-2 px-3 cursor-pointer hover:bg-neutrals-gray-2 first-of-type:rounded-t-md last-of-type:rounded-b-md ${item.labelClass}`}
+            className={`grid grid-cols-[20px_1fr] font-medium whitespace-nowrap gap-2 py-2 px-3 cursor-pointer  first-of-type:rounded-t-md last-of-type:rounded-b-md ${
+              item.disabled
+                ? "!cursor-not-allowed opacity-30"
+                : "hover:bg-neutrals-gray-2"
+            } ${item.labelClass}`}
             onClick={(e) => {
               e.stopPropagation();
+              if (item.disabled) return;
               item.onClick();
               close();
             }}

@@ -18,6 +18,7 @@ import DriveBreadCrumbs from "@src/components/molecules/DriveBreadCrumbs";
 import { useManuscriptController } from "../ManuscriptReader/ManuscriptController";
 import ContextMenu from "../ContextMenu";
 import { FolderAddIcon } from "@heroicons/react/solid";
+import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
 
 const Empty = () => {
   return <div className="p-5 text-xs col-span-7">No files</div>;
@@ -60,6 +61,8 @@ const DriveTable: React.FC = () => {
   const canUse = useMemo(() => {
     return Object.keys(selected).length <= 1;
   }, [selected]);
+
+  const canAdd = currentDrive?.path !== DRIVE_FULL_EXTERNAL_LINKS_PATH;
 
   return (
     <div className="w-full h-full">
@@ -109,6 +112,7 @@ const DriveTable: React.FC = () => {
                           setAddFilesWithoutContext(false);
                           dispatch(addFilesToDrive({ newFolder: true }));
                         },
+                        disabled: !canAdd,
                       },
                     ]}
                     close={() => setShowAddBtnSelectMenu(false)}

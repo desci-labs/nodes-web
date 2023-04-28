@@ -33,14 +33,16 @@ import {
   COMPONENT_LIBRARY,
   EXTERNAL_COMPONENTS,
   UiComponentDefinition,
+  findTarget,
 } from "../ComponentLibrary";
+import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 
 function renderComponentIcon(file: DriveObject) {
-  const foundEntry = COMPONENT_LIBRARY.concat(EXTERNAL_COMPONENTS).find(
-    (target: UiComponentDefinition) => {
-      return target.componentType === file.componentType;
-    }
+  const foundEntry = findTarget(
+    file.componentType as ResearchObjectComponentType,
+    file.componentSubtype
   );
+
   const { icon } = foundEntry || { icon: () => <IconDirectory /> };
   return icon({ wrapperClassName: "scale-[0.85]" });
 }

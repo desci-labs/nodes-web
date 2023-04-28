@@ -10,6 +10,7 @@ import { RequestStatus, RootState } from "@src/store";
 import {
   ExternalLinkComponent,
   ResearchObjectComponentLinkSubtype,
+  ResearchObjectComponentSubtypes,
   ResearchObjectComponentType,
   ResearchObjectV1,
   ResearchObjectV1Component,
@@ -391,14 +392,20 @@ export const driveSlice = createSlice({
         });
         manifest.components.forEach((c: ResearchObjectV1Component) => {
           if (c.type === ResearchObjectComponentType.LINK) {
+            const subtype =
+              "subtype" in c
+                ? (c["subtype"] as ResearchObjectComponentSubtypes)
+                : undefined;
             externalLinks.contains!.push(
               createVirtualDrive({
                 name: c.name,
                 componentId: c.id,
                 componentType: ResearchObjectComponentType.LINK,
+                componentSubtype: subtype,
                 cid: c.payload.url || c.payload.cid,
                 type: FileType.FILE,
                 contains: undefined,
+                starred: c.starred,
                 path: [
                   DRIVE_NODE_ROOT_PATH,
                   DRIVE_EXTERNAL_LINKS_PATH,
@@ -842,7 +849,7 @@ export const assignTypeThunk = createAsyncThunk(
     const state = getState() as RootState;
     const { manifest } = state.nodes.nodeReader;
     const { deprecated } = state.drive;
-    const { item, type, subType } = payload;
+    const { item, type, subtype } = payload;
 
     //Deprecated type assignment unhandled, temporarily disabled to prevent errors
     if (!manifest || deprecated) return;
@@ -860,7 +867,7 @@ export const assignTypeThunk = createAsyncThunk(
           index: existingCompIdx,
           update: {
             type,
-            ...(subType ? { subType } : {}),
+            ...(subtype ? { subtype } : {}),
             payload: { ...urlOrCidProps },
           },
         })
@@ -870,7 +877,7 @@ export const assignTypeThunk = createAsyncThunk(
         id: uuidv4(),
         name: item.name,
         type: type,
-        ...(subType ? { subType } : {}),
+        ...(subtype ? { subtype } : {}),
         payload: {
           path: item.path,
           ...urlOrCidProps,
