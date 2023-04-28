@@ -28,6 +28,9 @@ import {
   PdfComponent,
   ExternalLinkComponent,
 } from "@desci-labs/desci-models";
+import { useDrive } from "@src/state/drive/hooks";
+import { renameFileInCurrentDrive } from "@src/state/drive/driveSlice";
+import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
 
 export interface UiComponentDefinition {
   icon: (
@@ -248,6 +251,7 @@ const ComponentButton = ({
     setAddComponentType,
     setAddComponentSubType,
   } = useManuscriptController();
+
   return (
     <button
       className=""
@@ -267,33 +271,42 @@ const ComponentButton = ({
 };
 
 const ComponentLibrary = () => {
+  const { currentDrive } = useDrive();
+  const { addFilesWithoutContext } = useManuscriptController();
+  const hideComponents =
+    currentDrive?.path === DRIVE_FULL_EXTERNAL_LINKS_PATH &&
+    !addFilesWithoutContext;
   return (
     <div className="flex flex-col max-w-2xl mx-auto pb-10">
       <Title
         text="Add Component"
         description="Choose the component you would like to add to your research node"
       />
-      <SectionHeading
-        icon={<IconIpfs width={40} height={46} />}
-        title="Component Library"
-        subtitle="The data and metadata from the following components are preserved on the prototype Open State Repository"
-      />
-      <div
-        className="grid gap-8 mb-8 mt-2 justify-center content-start"
-        style={{
-          gridTemplateColumns: "repeat(auto-fill, 120px)",
-        }}
-      >
-        {COMPONENT_LIBRARY.filter((c) => !c.doNotRender).map((c) => (
-          <ComponentButton
-            key={c.title}
-            icon={c.icon}
-            title={c.title}
-            componentType={c.componentType}
-            componentSubType={c.componentSubType}
+      {!hideComponents && (
+        <>
+          <SectionHeading
+            icon={<IconIpfs width={40} height={46} />}
+            title="Component Library"
+            subtitle="The data and metadata from the following components are preserved on the prototype Open State Repository"
           />
-        ))}
-      </div>
+          <div
+            className="grid gap-8 mb-8 mt-2 justify-center content-start"
+            style={{
+              gridTemplateColumns: "repeat(auto-fill, 120px)",
+            }}
+          >
+            {COMPONENT_LIBRARY.filter((c) => !c.doNotRender).map((c) => (
+              <ComponentButton
+                key={c.title}
+                icon={c.icon}
+                title={c.title}
+                componentType={c.componentType}
+                componentSubType={c.componentSubType}
+              />
+            ))}
+          </div>
+        </>
+      )}
       <SectionHeading
         icon={<IconExternalComponents width={100} height={46} />}
         title="External Components"

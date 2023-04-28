@@ -44,7 +44,11 @@ import {
 import { useFileUpload } from "react-use-file-upload/dist/lib/useFileUpload";
 import { ExternalUrl } from "@src/state/drive/types";
 import { useDrive } from "@src/state/drive/hooks";
-import { findUniqueName } from "@src/state/drive/utils";
+import {
+  DRIVE_FULL_EXTERNAL_LINKS_PATH,
+  findUniqueName,
+} from "@src/state/drive/utils";
+import toast from "react-hot-toast";
 
 export const componentData = {
   [ResearchObjectComponentType.PDF]: {
