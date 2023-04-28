@@ -17,7 +17,7 @@ interface ZoomParams {
 }
 
 type AnnotationSwitch = "next" | "prev" | null;
-interface PdfViewerState {
+export interface PdfViewerState {
   currentPdf: string;
   selectedAnnotationId: string;
   zoom: number;

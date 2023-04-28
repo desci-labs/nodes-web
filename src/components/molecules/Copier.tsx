@@ -21,13 +21,18 @@ export default function Copier(props: {
   text: string;
   classes?: string;
   icon?: FC<any>;
+  checkIcon?: FC<any>;
 }) {
   const { handleCopy, copied } = useCopier();
 
   return (
     <>
       {copied ? (
-        <CheckIcon className={`w-5 ${props.classes ?? ""}`} />
+        props?.checkIcon ? (
+          props.checkIcon
+        ) : (
+          <CheckIcon className={`w-5 ${props.classes ?? ""}`} />
+        )
       ) : (
         <>
           {props?.icon ? (

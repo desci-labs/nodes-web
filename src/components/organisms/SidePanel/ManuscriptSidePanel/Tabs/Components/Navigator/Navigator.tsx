@@ -1,6 +1,5 @@
 import ClickableAddIcon from "@components/atoms/ClickableIcon/ClickableAddIcon";
 import TooltipIcon from "@components/atoms/TooltipIcon";
-// import ComponentCard from "@components/molecules/ComponentCard";
 import CollapsibleSection from "@components/organisms/CollapsibleSection";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { lockScroll } from "@components/utils";
@@ -12,11 +11,8 @@ import { IconData, IconInfo, IconStar } from "icons";
 import React, { useCallback, useMemo, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-// import ComponentRenamePopover from "./PopOver/ComponentRenamePopover";
-// import useSaveManifest from "@src/hooks/useSaveManifest";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useDrive } from "@src/state/drive/hooks";
-// import EditableWrapper from "./EditableWrapper";
 import { Container } from "./Container";
 import EditableWrapper from "./EditableWrapper";
 import ComponentCard from "@src/components/molecules/ComponentCard";

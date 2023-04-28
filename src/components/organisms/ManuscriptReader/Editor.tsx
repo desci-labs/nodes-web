@@ -4,7 +4,6 @@ import IndicatorSaving from "@src/components/atoms/IndicatorSaving";
 import SavingIndicator from "@src/components/atoms/SavingIndicator";
 import DialogViewer from "@src/components/molecules/DialogViewer";
 import FloatingActionBar from "@src/components/molecules/FloatingActionBar";
-import PublicationDetailsModal from "@src/components/molecules/NodeVersionDetails/PublicationDetailsModal";
 import PopOverAlphaConsent from "@src/components/molecules/PopOverAlphaConsent";
 import ComponentAdd from "@src/components/screens/ComponentAdd";
 import { useGetter, useSetter } from "@src/store/accessors";
@@ -87,7 +86,7 @@ export default function Editor({ isLoading }: ReaderViewerProps) {
 
         <PopOverAlphaConsent />
 
-        <PublicationDetailsModal />
+        {/* <PublicationDetailsModal /> */}
 
         {(isAddingComponent || isAddingSubcomponent) && <ComponentAdd />}
         {componentTypeBeingAssignedTo && <AssignTypePane />}

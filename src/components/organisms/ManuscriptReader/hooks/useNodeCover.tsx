@@ -28,11 +28,10 @@ export default function useNodeCover() {
     (doc) =>
       doc.subtype === ResearchObjectComponentDocumentSubtype.RESEARCH_ARTICLE
   );
-  console.log("pdfs", pdfs, manifest?.components)
   const { isLoading, data, isSuccess } = useNodesMediaCoverQuery(
     { cid: pdf?.payload?.url!, uuid: currentObjectId!, version },
     {
-      skip: !pdf?.payload?.url || !currentObjectId,
+      skip: !currentObjectId,
     }
   );
 
@@ -42,7 +41,6 @@ export default function useNodeCover() {
     ]);
   }, [currentObjectId, version]);
 
-  // console.log("cover", isLoading, data, isSuccess, isError);
   return {
     cover: isSuccess ? data.url : "",
     isLoading,

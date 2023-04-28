@@ -19,7 +19,9 @@ import TooltipIcon from "@components/atoms/TooltipIcon";
 import ReactTooltip from "react-tooltip";
 import { findTarget } from "@components/organisms/ComponentLibrary";
 import ButtonFair from "@components/atoms/ButtonFair";
-import { SessionStorageKeys } from "../driveUtils";
+import {
+  SessionStorageKeys,
+} from "../driveUtils";
 import { useSetter } from "@src/store/accessors";
 import { setComponentStack } from "@src/state/nodes/viewer";
 import { updatePdfPreferences } from "@src/state/nodes/pdf";
@@ -102,7 +104,6 @@ const iconFor = (
 
 const ComponentCard = ({ component }: ComponentCardProps) => {
   const dispatch = useSetter();
-  // const { component } = props;
   const { componentStack, recentlyAddedComponent, manifest } = useNodeReader();
   const { nodeTree } = useDrive();
   /***

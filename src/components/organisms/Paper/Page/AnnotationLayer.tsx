@@ -6,6 +6,8 @@ import { useUpdateEffect } from "react-use";
 import { setSelectedAnnotationId } from "@src/state/nodes/pdf";
 import { useSetter } from "@src/store/accessors";
 
+const ZOOM_THRESHOLD = 3;
+
 const AnnotationBox = (props: any) => {
   const {
     annotation,
@@ -19,7 +21,7 @@ const AnnotationBox = (props: any) => {
   const { isDesktop } = useResponsive();
   const annotationRef = useRef<any>(null);
 
-  const showAnnotationTip = !isDesktop || zoom > 2;
+  const showAnnotationTip = !isDesktop || zoom > ZOOM_THRESHOLD;
 
   return (
     <div
@@ -43,7 +45,7 @@ const AnnotationBox = (props: any) => {
           (showAnnotationTip && !selectedAnnotationId) ||
           hoveredAnnotationId === annotation.id ||
           selectedAnnotationId === annotation.id ||
-          (isDesktop && zoom < 2 && annotation.__client?.move) // annotation.__client is deleted if saved to server, meaning if __client is present this annotation hasn't been saved to server yet
+          (isDesktop && zoom < ZOOM_THRESHOLD && annotation.__client?.move) // annotation.__client is deleted if saved to server, meaning if __client is present this annotation hasn't been saved to server yet
             ? 1
             : 0,
         transition: "opacity 0.5s ease-out",
@@ -82,7 +84,7 @@ const AnnotationLayer = React.memo((props: any) => {
    * If the user starts scrolling or pinching before the timer is up, cancel it
    */
   useUpdateEffect(() => {
-    if (!isDesktop || zoom > 2) {
+    if (!isDesktop || zoom > ZOOM_THRESHOLD) {
       if (isScrolling || isPinching) {
         setAnnotationsVisible(true);
       } else {
@@ -111,7 +113,7 @@ const AnnotationLayer = React.memo((props: any) => {
       style={{
         zIndex:
           isDesktop &&
-          zoom < 2 &&
+          zoom < ZOOM_THRESHOLD &&
           !(selectedAnnotationId || hoveredAnnotationId)
             ? -1
             : undefined,
