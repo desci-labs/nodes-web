@@ -87,7 +87,7 @@ export default function Editor({ isLoading }: ReaderViewerProps) {
 
         <PopOverAlphaConsent />
 
-        <PublicationDetailsModal />
+        {/* <PublicationDetailsModal /> */}
 
         {(isAddingComponent || isAddingSubcomponent) && <ComponentAdd />}
         {componentTypeBeingAssignedTo && <AssignTypePane />}

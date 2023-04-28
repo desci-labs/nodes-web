@@ -5,7 +5,7 @@ import ButtonCopyLink from "@components/atoms/ButtonCopyLink";
 import { IconLeftArrowThin, IconRightArrowThin } from "@icons";
 import AnnotationEditor from "@components/molecules/AnnotationEditor";
 import { getPublishedVersions } from "@api/index";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { setAnnotationSwitchCall } from "@src/state/nodes/pdf";
@@ -16,6 +16,7 @@ interface AnnotationExpandedProps {
   annotation: Annotation;
   darkMode?: boolean;
   hideHeader?: boolean;
+  isOn?: boolean;
 }
 
 const AnnotationExpanded = ({
@@ -25,6 +26,7 @@ const AnnotationExpanded = ({
   annotation,
   darkMode,
   hideHeader,
+  isOn,
 }: AnnotationExpandedProps) => {
   const dispatch = useSetter();
 
@@ -38,48 +40,64 @@ const AnnotationExpanded = ({
   const [copyLink, setCopyLink] = useState<string>("");
   const [visible, setVisible] = useState(hoveredAnnotationId != annotation?.id);
 
-  useEffect(() => {
-    const getCopyLink = async () => {
-      const selectedComponent = componentStack[0];
-      const componentIndex = manifestData?.components.findIndex(
-        (c) => c.id === selectedComponent?.id
-      );
+  const getCopyLink = useCallback(async () => {
+    const selectedComponent = componentStack[0];
+    const componentIndex = manifestData?.components.findIndex(
+      (c) => c.id === selectedComponent?.id
+    );
 
-      const annotationIndex = selectedComponent?.payload.annotations.findIndex(
-        (a: any) => a.id === annotation?.id
-      );
+    const annotationIndex = (
+      manifestData?.components[componentIndex!].payload.annotations || []
+    ).findIndex((a: any) => a.id === annotation?.id);
 
-      //default set the version to 0, assuming no version has yet been published
-      let ver: number = 0;
-      //if the user provides a desired version in the uri, set it to that version
-      const path = window.location.pathname.split("/");
-      console.log("path[1]: ", path[1]);
-      if (path.length > 1 && !isNaN(parseInt(path[1]))) {
-        ver = parseInt(path[1]);
-      } else {
-        //if desired version doesn't exist in path, try get the latest version and assign it if it exists
-        try {
-          const versionData = await getPublishedVersions(currentObjectId!);
-          if (versionData) ver = versionData.versions.length - 1;
-        } catch (e: any) {
-          console.log("unpublished");
-        }
+    //default set the version to 0, assuming no version has yet been published
+    let ver: number = 0;
+    //if the user provides a desired version in the uri, set it to that version
+    const path = window.location.pathname.split("/");
+    console.log("path[1]: ", path[1]);
+    if (path.length > 1 && !isNaN(parseInt(path[1]))) {
+      ver = parseInt(path[1]);
+    } else {
+      //if desired version doesn't exist in path, try get the latest version and assign it if it exists
+      try {
+        const versionData = await getPublishedVersions(currentObjectId!);
+        if (versionData) ver = versionData.versions.length - 1;
+      } catch (e: any) {
+        console.log("unpublished");
       }
-
       //version/componentIndex/a{annotationIndex}
       const link = `${window.location.protocol}//${window.location.host}/${currentObjectId}/${ver}/${componentIndex}/a${annotationIndex}`;
       setCopyLink(link);
-    };
+    }
+  }, [
+    currentObjectId,
+    componentStack,
+    manifestData,
+    annotation,
+    selectedAnnotationId,
+  ]);
+
+  useEffect(() => {
     getCopyLink();
 
     setVisible(true);
-  }, []);
+  }, [
+    currentObjectId,
+    componentStack,
+    manifestData,
+    annotation,
+    selectedAnnotationId,
+  ]);
 
   const isHovered = hoveredAnnotationId === annotation?.id;
   const isSelected = selectedAnnotationId === annotation?.id;
 
   return (
-    <div className={`${isHovered && !isSelected ? "cursor-pointer" : ""}`}>
+    <div
+      className={`z-10 ${
+        isHovered && !isSelected ? "cursor-pointer" : ""
+      } absolute -ml-4 md:ml-0 md:right-0`}
+    >
       <div
         className={`rounded-xl px-4 shadow-2xl annotation-item 
         ${isHovered && !isSelected ? "pointer-events-none" : ""} ${

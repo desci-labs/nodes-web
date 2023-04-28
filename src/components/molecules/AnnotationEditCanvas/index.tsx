@@ -1,20 +1,28 @@
 import { v4 as uuid } from "uuid";
-import React, { HTMLProps, useEffect, useRef, useState } from "react";
+import React, {
+  HTMLProps,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { ResearchObjectComponentAnnotation } from "@desci-labs/desci-models";
 import "./style.scss";
 import { __log } from "@components/utils";
-import { usePdfReader } from "@src/state/nodes/hooks";
+import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import {
   setAnnotatingViaButton,
   setIsAnnotating,
   updatePdfPreferences,
 } from "@src/state/nodes/pdf";
+import {
+  replaceAnnotations,
+  updatePendingAnnotations,
+} from "@src/state/nodes/viewer";
 
 interface AnnotationEditCanvasProps {
-  annotations: any;
   pageIndex: number;
-  setAnnotations: (data: any) => void;
 }
 
 let pagesAnnotated: any = {};
@@ -22,21 +30,23 @@ const AnnotationEditCanvas: React.FC<
   AnnotationEditCanvasProps & HTMLProps<HTMLDivElement>
 > = (props) => {
   const dispatch = useSetter();
+
   const { isAnnotating, startedNewAnnotationViaButton } = usePdfReader();
-  const {
-    annotations,
-    setAnnotations,
-    pageIndex,
-    children,
-    className,
-    ...rest
-  } = props;
+  const { pageIndex, children, className, ...rest } = props;
 
   const [dragStart, setDragStart] = useState([0, 0]);
   const [dragging, setDragging] = useState(false);
   const [currentAnnotationId, setCurrentAnnotationId] = useState<
     string | null
   >();
+
+  const { annotationsByPage, annotations } = useNodeReader();
+  // const annotations = annotationsByPage[pageIndex] || [];
+  const setAnnotations = (arg: any) => {
+    // console.log("set annotations", arg);
+
+    dispatch(replaceAnnotations(arg || []));
+  };
 
   const divRef = useRef<HTMLDivElement | null>(null);
   /**
@@ -130,97 +140,102 @@ const AnnotationEditCanvas: React.FC<
       setCurrentAnnotationId(id);
     }
   };
-  const mouseMove = (e: any) => {
-    if (isAnnotating && dragging) {
-      __log(
-        "AnnotationEditCanvas::mouseMove",
-        pageIndex,
-        currentAnnotationId,
-        JSON.stringify(annotations),
-        e.target
-      );
+  const mouseMove = useCallback(
+    (e: any) => {
+      if (isAnnotating && dragging) {
+        __log(
+          "AnnotationEditCanvas::mouseMove",
+          pageIndex,
+          currentAnnotationId,
+          JSON.stringify(annotations),
+          e.target
+        );
 
-      const lastAnnotation: ResearchObjectComponentAnnotation =
-        annotations.filter(
-          (a: ResearchObjectComponentAnnotation) => a.id === currentAnnotationId
-        )[0];
+        const lastAnnotation: ResearchObjectComponentAnnotation =
+          annotations.filter(
+            (a: ResearchObjectComponentAnnotation) =>
+              a.id === currentAnnotationId
+          )[0];
 
-      /**
-       * The saved rectangle (sx,sy,ex,ey) is a collection of start and end coordinates.
-       * Each coordinate component is a percentage represented as a decimal from 0 to 1 based on the height/width of the page
-       */
-      const startX = dragStart[0] / findTarget(e).clientWidth;
-      const startY = dragStart[1] / findTarget(e).clientHeight;
-      const endX = e.nativeEvent.offsetX / findTarget(e).clientWidth;
-      const endY = e.nativeEvent.offsetY / findTarget(e).clientHeight;
-
-      /**
-       * Ensure we support annotation rectangles drawn in any direction.
-       *
-       * Specifically supporting:
-       * 1) starting from top-left and ending bottom-right
-       * AND
-       * 2) starting from bottom-right and ending top-left
-       * AND
-       * 3) starting from bottom-left and ending to-right
-       * AND
-       * 4) starting from top-right and ending bottom-left
-       */
-      let startXNew = startX < endX ? startX : endX;
-      let startYNew = startY < endY ? startY : endY;
-      let endXNew = startX < endX ? endX : startX;
-      let endYNew = startY < endY ? endY : startY;
-
-      /**
-       * Clamp annotation rectangle to page bounds
-       */
-      if (startXNew < 0) {
-        startXNew = 0;
-      }
-      if (startYNew < 0) {
-        startYNew = 0;
-      }
-
-      if (endXNew > 1) {
-        endXNew = 1;
-      }
-      if (endYNew > 1) {
-        endYNew = 1;
-      }
-
-      __log(
-        `AnnotationEditCanvas::mouseMove[calc] ${startX},${startY} - ${endX},${endY} | ${startXNew},${startYNew} - ${endXNew},${endYNew}`
-      );
-      const finalPageIndex = lastAnnotation.pageIndex || pageIndex;
-      pagesAnnotated[finalPageIndex] = {
-        id: currentAnnotationId,
         /**
-         * `__client` field represents client-only data. this field is removed when the manifest is saved to server
+         * The saved rectangle (sx,sy,ex,ey) is a collection of start and end coordinates.
+         * Each coordinate component is a percentage represented as a decimal from 0 to 1 based on the height/width of the page
          */
-        __client: { move: true, fresh: true },
-        startX: startXNew,
-        startY: startYNew,
-        endX: endXNew,
-        endY: endYNew,
-        pageIndex: finalPageIndex,
-      };
+        const startX = dragStart[0] / findTarget(e).clientWidth;
+        const startY = dragStart[1] / findTarget(e).clientHeight;
+        const endX = e.nativeEvent.offsetX / findTarget(e).clientWidth;
+        const endY = e.nativeEvent.offsetY / findTarget(e).clientHeight;
 
-      setAnnotations([
-        ...annotations.filter(
-          (a: ResearchObjectComponentAnnotation) => a.id !== currentAnnotationId
-        ),
-        {
-          ...pagesAnnotated[finalPageIndex],
-        },
-      ]);
-    } else {
-      // if (e.altKey) {
-      //   dispatch(setIsAnnotating(true));
-      // } else {
-      //   dispatch(setIsAnnotating(false));
-      // }
-    }
-  };
+        /**
+         * Ensure we support annotation rectangles drawn in any direction.
+         *
+         * Specifically supporting:
+         * 1) starting from top-left and ending bottom-right
+         * AND
+         * 2) starting from bottom-right and ending top-left
+         * AND
+         * 3) starting from bottom-left and ending to-right
+         * AND
+         * 4) starting from top-right and ending bottom-left
+         */
+        let startXNew = startX < endX ? startX : endX;
+        let startYNew = startY < endY ? startY : endY;
+        let endXNew = startX < endX ? endX : startX;
+        let endYNew = startY < endY ? endY : startY;
+
+        /**
+         * Clamp annotation rectangle to page bounds
+         */
+        if (startXNew < 0) {
+          startXNew = 0;
+        }
+        if (startYNew < 0) {
+          startYNew = 0;
+        }
+
+        if (endXNew > 1) {
+          endXNew = 1;
+        }
+        if (endYNew > 1) {
+          endYNew = 1;
+        }
+
+        __log(
+          `AnnotationEditCanvas::mouseMove[calc] ${startX},${startY} - ${endX},${endY} | ${startXNew},${startYNew} - ${endXNew},${endYNew}`
+        );
+        const finalPageIndex = lastAnnotation.pageIndex || pageIndex;
+        pagesAnnotated[finalPageIndex] = {
+          id: currentAnnotationId,
+          /**
+           * `__client` field represents client-only data. this field is removed when the manifest is saved to server
+           */
+          __client: { move: true, fresh: true },
+          startX: startXNew,
+          startY: startYNew,
+          endX: endXNew,
+          endY: endYNew,
+          pageIndex: finalPageIndex,
+        };
+
+        setAnnotations([
+          ...annotations.filter(
+            (a: ResearchObjectComponentAnnotation) =>
+              a.id !== currentAnnotationId
+          ),
+          {
+            ...pagesAnnotated[finalPageIndex],
+          },
+        ]);
+      } else {
+        // if (e.altKey) {
+        //   dispatch(setIsAnnotating(true));
+        // } else {
+        //   dispatch(setIsAnnotating(false));
+        // }
+      }
+    },
+    [annotations, isAnnotating, dragging, pageIndex]
+  );
 
   const mouseUp = (e: any) => {
     if (isAnnotating && currentAnnotationId) {

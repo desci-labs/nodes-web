@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   APPROXIMATED_HEADER_HEIGHT,
   EMPTY_FUNC,
@@ -23,6 +23,7 @@ import {
   saveAnnotation,
   deleteAnnotation,
   saveManifestDraft,
+  replaceAnnotations,
 } from "@src/state/nodes/viewer";
 // import { saveManifestDraft } from "@src/state/nodes/saveManifestDraft";
 import {
@@ -75,7 +76,12 @@ const AnnotationComponent = (props: AnnotationProps) => {
     selectedAnnotationId,
     hoveredAnnotationId,
   } = usePdfReader();
-  const { mode, componentStack, manifest: manifestData } = useNodeReader();
+  const {
+    mode,
+    componentStack,
+    annotations,
+    manifest: manifestData,
+  } = useNodeReader();
 
   useClickAway(ref, (e: Event) => {
     __log("annotation click away");
@@ -149,22 +155,24 @@ const AnnotationComponent = (props: AnnotationProps) => {
     annotationText
   );
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     restoreScroll();
     dispatch(setKeepAnnotating(false));
 
     const selectedComponent = componentStack[0];
     const manifestDataCopy = Object.assign({}, manifestData);
+
     if (manifestDataCopy) {
       const index = manifestDataCopy.components.findIndex(
         (c) => c.id === selectedComponent.id
       );
 
       if (index > -1) {
-        const annotations = (manifestDataCopy.components[index] as PdfComponent)
-          .payload.annotations;
-        if (annotations) {
-          const annotationIndex = annotations.findIndex(
+        const annotationsFromManifest = (
+          manifestDataCopy.components[index] as PdfComponent
+        ).payload.annotations;
+        if (annotationsFromManifest) {
+          const annotationIndex = annotationsFromManifest.findIndex(
             (a) => a.id === props.annotation.id
           );
           // if this is a new annotation, delete, otherwise reset to old values
@@ -200,23 +208,54 @@ const AnnotationComponent = (props: AnnotationProps) => {
 
               dispatch(setIsEditingAnnotation(false));
 
-              dispatch(
-                deleteAnnotation({
-                  componentIndex: index,
-                  annotationId: props.annotation.id,
-                })
+              /// pendingAnnotations
+              //was a pending annotation
+              const annotationIndex = annotations.findIndex(
+                (a) => a.id === props.annotation.id
               );
+              if (annotationIndex > -1) {
+                dispatch(replaceAnnotations(annotationsFromManifest || []));
+              } else {
+                dispatch(
+                  deleteAnnotation({
+                    componentIndex: index,
+                    annotationId: props.annotation.id,
+                  })
+                );
+              }
             });
           }
+        } else {
+          // no existing annotations, delete
+          dispatch(replaceAnnotations([]));
+          setTimeout(() => {
+            dispatch(setIsEditingAnnotation(false));
+
+            dispatch(
+              updatePdfPreferences({
+                hoveredAnnotationId: "",
+                selectedAnnotationId: "",
+              })
+            );
+          });
         }
       }
     }
-  };
+  }, [
+    annotations,
+    replaceAnnotations,
+    dispatch,
+    manifestData,
+    componentStack,
+    isCode,
+    props.annotation.id,
+  ]);
 
   const handleSave = (obj: AnnotationUpdateProps) => {
     const annotationTitle = obj.title;
     const annotationText = obj.text;
     restoreScroll();
+
     const selectedComponent = [...componentStack]
       .reverse()
       .filter((a) => a.type === ResearchObjectComponentType.PDF)[0];
@@ -226,64 +265,69 @@ const AnnotationComponent = (props: AnnotationProps) => {
         (c) => c.id === selectedComponent.id
       );
       if (index > -1) {
-        const annotations = (manifestDataCopy.components[index] as PdfComponent)
-          .payload.annotations;
-        if (annotations) {
-          const annotationIndex = annotations.findIndex(
+        const annotationsFromManifest =
+          (manifestDataCopy.components[index] as PdfComponent).payload
+            .annotations || [];
+        if (annotationsFromManifest) {
+          const annotationIndex = annotationsFromManifest.findIndex(
             (a) => a.id === props.annotation.id
           );
-          if (annotationIndex > -1) {
-            setTimeout(() => {
-              dispatch(
-                updatePdfPreferences({
-                  hoveredAnnotationId: "",
-                  selectedAnnotationId: "",
-                  isEditingAnnotation: false,
-                })
+          const tempAnnotationIndex = annotations.findIndex(
+            (a) => a.id === props.annotation.id
+          );
+
+          setTimeout(() => {
+            dispatch(
+              updatePdfPreferences({
+                hoveredAnnotationId: "",
+                selectedAnnotationId: "",
+                isEditingAnnotation: false,
+              })
+            );
+            // setIsEditingAnnotation(false);
+            const annotationCopy: ResearchObjectComponentAnnotation =
+              Object.assign(
+                {},
+                annotationIndex > -1
+                  ? (manifestDataCopy.components[index] as PdfComponent).payload
+                      .annotations![annotationIndex]
+                  : annotations[tempAnnotationIndex]
               );
-              // setIsEditingAnnotation(false);
-              const annotationCopy: ResearchObjectComponentAnnotation =
-                Object.assign(
-                  {},
-                  (manifestDataCopy.components[index] as PdfComponent).payload
-                    .annotations![annotationIndex]
+
+            annotationCopy.title = annotationTitle;
+            annotationCopy.text = annotationText;
+
+            dispatch(
+              saveAnnotation({
+                componentIndex: index,
+                annotationIndex,
+                annotation: {
+                  ...annotationCopy,
+                  title: annotationTitle,
+                  text: annotationText,
+                },
+              })
+            );
+
+            /**
+             * If user selects "Add another annotation after" saving the current annotation, then set them up to close this freshly saved annotation and add another
+             */
+            if (keepAnnotating) {
+              __log("Annotation::keepAnnotating");
+
+              setTimeout(() => {
+                dispatch(
+                  updatePdfPreferences({
+                    hoveredAnnotationId: "",
+                    selectedAnnotationId: "",
+                    isAnnotating: true,
+                  })
                 );
+              }, 100);
+            }
 
-              annotationCopy.title = annotationTitle;
-              annotationCopy.text = annotationText;
-
-              dispatch(
-                saveAnnotation({
-                  componentIndex: index,
-                  annotationIndex,
-                  annotation: {
-                    ...annotationCopy,
-                    title: annotationTitle,
-                    text: annotationText,
-                  },
-                })
-              );
-
-              /**
-               * If user selects "Add another annotation after" saving the current annotation, then set them up to close this freshly saved annotation and add another
-               */
-              if (keepAnnotating) {
-                __log("Annotation::keepAnnotating");
-
-                setTimeout(() => {
-                  dispatch(
-                    updatePdfPreferences({
-                      hoveredAnnotationId: "",
-                      selectedAnnotationId: "",
-                      isAnnotating: true,
-                    })
-                  );
-                }, 100);
-              }
-
-              dispatch(saveManifestDraft({}));
-            });
-          }
+            dispatch(saveManifestDraft({}));
+          });
         }
       }
     }
@@ -345,27 +389,29 @@ const AnnotationComponent = (props: AnnotationProps) => {
           setAnnotationTitle={setAnnotationTitle}
         />
       ) : null}
-      {isExpanded ? (
-        <AnnotationExpanded
-          DURATION_BASE_MS={DURATION_BASE_MS}
-          annotation={annotation}
-          annotationText={annotationText}
-          annotationTitle={annotationTitle}
-        />
-      ) : !!selectedAnnotationId ? null : (
-        <AnnotationHidden
-          DURATION_BASE_MS={DURATION_BASE_MS}
-          isEditingAnnotation={isEditingAnnotation}
-          annotationTitle={annotationTitle}
-        />
-      )}
-      {/* {isAnnotationVisible ? (
+      <div className="absolute">
+        {isExpanded ? (
+          <AnnotationExpanded
+            DURATION_BASE_MS={DURATION_BASE_MS}
+            annotation={annotation}
+            annotationText={annotationText}
+            annotationTitle={annotationTitle}
+            isOn={isExpanded}
+          />
+        ) : null}
+        {/* {isAnnotationVisible ? (
         <AnnotationVisible
           DURATION_BASE_MS={DURATION_BASE_MS}
           annotationText={annotationText}
           annotationTitle={annotationTitle}
         />
-      ) : null} */}
+      ) : null} */}{" "}
+        <AnnotationHidden
+          DURATION_BASE_MS={DURATION_BASE_MS}
+          isEditingAnnotation={isEditingAnnotation}
+          annotationTitle={annotationTitle}
+        />
+      </div>
     </div>
   );
 };
