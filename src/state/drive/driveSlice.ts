@@ -399,6 +399,7 @@ export const driveSlice = createSlice({
                 cid: c.payload.url || c.payload.cid,
                 type: FileType.FILE,
                 contains: undefined,
+                starred: c.starred,
                 path: [
                   DRIVE_NODE_ROOT_PATH,
                   DRIVE_EXTERNAL_LINKS_PATH,
