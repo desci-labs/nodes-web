@@ -3,7 +3,7 @@ import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
 import { IconWarning } from "@src/icons";
 import React from "react";
-import Modal from "@src/components/molecules/Modal/Modal";
+import Modal from "@src/components/molecules/Modal";
 
 interface OverwriteMetadataDialogProps {
   setShowOverwriteDialog: React.Dispatch<React.SetStateAction<boolean>>;

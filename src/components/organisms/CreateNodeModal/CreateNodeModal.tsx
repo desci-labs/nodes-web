@@ -11,7 +11,7 @@ import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
 import PlaceholderInput from "@src/components/molecules/FormInputs/PlaceholderInput";
 import SelectList from "@src/components/molecules/FormInputs/SelectList";
-import Modal from "@src/components/molecules/Modal/Modal";
+import Modal from "@src/components/molecules/Modal";
 import { cleanupManifestUrl } from "@src/components/utils";
 import { app, site } from "@src/constants/routes";
 import { api } from "@src/state/api";

@@ -1,4 +1,4 @@
-import ClickableAddIcon from "@components/atoms/ClickableIcon/ClickableAddIcon";
+import ClickableAddIcon from "@components/atoms/ClickableAddIcon";
 import TooltipIcon from "@components/atoms/TooltipIcon";
 import ComponentCard from "@components/molecules/ComponentCard";
 import CollapsibleSection from "@components/organisms/CollapsibleSection";

@@ -1,8 +1,8 @@
 import cx from "classnames";
 import { __log } from "@components/utils";
-import { SkeletonOrcid } from "@components/atoms/Skeleton";
+import SkeletonOrcid from "@components/atoms/SkeletonOrcid";
 
-import OrcidLogo from "../../../images/orcid.png";
+import OrcidLogo from "@images/orcid.png";
 import { IconCircleCheck } from "@icons";
 import { useSetter } from "@src/store/accessors";
 import { setOrcid } from "@src/state/preferences/preferencesSlice";

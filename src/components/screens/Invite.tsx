@@ -1,5 +1,5 @@
 /* This example requires Tailwind CSS v2.0+ */
-import OrcidButton from "@src/components/molecules/OrcIdAuthButton/OrcIdAuthButton";
+import OrcidButton from "@src/components/molecules/OrcIdAuthButton";
 import { useNavigate } from "react-router-dom";
 import { useOrcidData } from "@src/state/preferences/hooks";
 

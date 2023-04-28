@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { termsConsent } from "@api/index";
 import PrimaryButton from "@components/atoms/PrimaryButton";
-import RadioButton from "@components/atoms/RadioButton";
+import RadioButton from "@components/atoms/RadioButton/RadioButton";
 import { FlexRowAligned } from "@components/styled";
 import { RadioGroup } from "@headlessui/react";
 import React, { useCallback, useImperativeHandle, useState } from "react";
@@ -9,7 +9,7 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import toast from "react-hot-toast";
 import SlideDown from "react-slidedown";
 import styled from "styled-components";
-import InsetLabelInput from "../../../molecules/FormInputs/InsetLabelInput";
+import InsetLabelInput from "@components/molecules/FormInputs/InsetLabelInput";
 import { SpinnerCircular } from "spinners-react";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
@@ -18,7 +18,7 @@ import {
   setResearchPanelTab,
   toggleResearchPanel,
 } from "@src/state/nodes/viewer";
-import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
+import Modal, { ModalProps } from "@src/components/molecules/Modal";
 
 // const GATEWAY_OPTIONS = [
 //   {

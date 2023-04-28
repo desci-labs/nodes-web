@@ -6,7 +6,7 @@ import { IconTriangleLeft } from "@icons";
 import FormLandingPage from "@src/components/molecules/FormLandingPage";
 import { app, site, web } from "@src/constants/routes";
 import { useGetUser } from "@src/hooks/useGetUser";
-import OrcidButton from "@src/components/molecules/OrcIdAuthButton/OrcIdAuthButton";
+import OrcidButton from "@src/components/molecules/OrcIdAuthButton";
 import MagicLinkExpired from "../../MagicLinkExpired";
 import MagicLink from "../../MagicLink";
 import LinkAuth from "../../LinkAuth";

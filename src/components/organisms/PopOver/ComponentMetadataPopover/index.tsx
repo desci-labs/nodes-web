@@ -32,7 +32,7 @@ import {
   addComponent,
 } from "@src/state/nodes/viewer";
 import SelectList from "@src/components/molecules/FormInputs/SelectList";
-import Modal from "@src/components/molecules/Modal/Modal";
+import Modal from "@src/components/molecules/Modal";
 import { useManuscriptController } from "../../ManuscriptReader/ManuscriptController";
 import { useDrive } from "@src/state/drive/hooks";
 import { v4 as uuidv4 } from "uuid";

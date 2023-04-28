@@ -1,4 +1,4 @@
-import { ModalProps } from "@src/components/molecules/Modal/Modal";
+import { ModalProps } from "@src/components/molecules/Modal";
 import { Controller, useFormContext } from "react-hook-form";
 import InsetLabelSmallInput from "@src/components/molecules/FormInputs/InsetLabelSmallInput";
 import DividerSimple from "@src/components/atoms/DividerSimple";
@@ -93,7 +93,11 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
             />
           )}
         />
-        {(errors.orcid?.message) ? (<span className="text-red-400 text-xs h-8 block">{errors.orcid?.message}</span>) : (
+        {errors.orcid?.message ? (
+          <span className="text-red-400 text-xs h-8 block">
+            {errors.orcid?.message}
+          </span>
+        ) : (
           <a
             className="flex flex-row gap-1 items-center h-8 text-md font-extrabold text-tint-primary hover:text-tint-primary-hover tracking-tight disabled:text-neutrals-gray-4"
             href={`${errors?.orcid ? "" : `${ORCID_SITE}${orcid}`}`}
@@ -125,4 +129,3 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
     </form>
   );
 }
-
