@@ -10,6 +10,7 @@ import { RequestStatus, RootState } from "@src/store";
 import {
   ExternalLinkComponent,
   ResearchObjectComponentLinkSubtype,
+  ResearchObjectComponentSubtypes,
   ResearchObjectComponentType,
   ResearchObjectV1,
   ResearchObjectV1Component,
@@ -391,11 +392,16 @@ export const driveSlice = createSlice({
         });
         manifest.components.forEach((c: ResearchObjectV1Component) => {
           if (c.type === ResearchObjectComponentType.LINK) {
+            const subtype =
+              "subtype" in c
+                ? (c["subtype"] as ResearchObjectComponentSubtypes)
+                : undefined;
             externalLinks.contains!.push(
               createVirtualDrive({
                 name: c.name,
                 componentId: c.id,
                 componentType: ResearchObjectComponentType.LINK,
+                componentSubtype: subtype,
                 cid: c.payload.url || c.payload.cid,
                 type: FileType.FILE,
                 contains: undefined,

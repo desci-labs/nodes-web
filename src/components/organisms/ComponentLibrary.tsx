@@ -333,23 +333,17 @@ const ComponentLibrary = () => {
 };
 
 export const findTarget = (
-  component: ResearchObjectV1Component
+  componentType: ResearchObjectComponentType,
+  componentSubtype?: ResearchObjectComponentSubtypes
 ): UiComponentDefinition | undefined => {
   const foundEntry = COMPONENT_LIBRARY.concat(EXTERNAL_COMPONENTS).find(
     (target) => {
-      const matchesType = target.componentType === component.type;
+      const matchesType = target.componentType === componentType;
       switch (target.componentType) {
         case ResearchObjectComponentType.PDF:
-          const documentPayload = component as PdfComponent;
-          return (
-            matchesType && documentPayload.subtype === target.componentSubType
-          );
+          return matchesType && componentSubtype === target.componentSubType;
         case ResearchObjectComponentType.LINK:
-          const externalLinkPayload = component as ExternalLinkComponent;
-          return (
-            matchesType &&
-            externalLinkPayload.subtype === target.componentSubType
-          );
+          return matchesType && componentSubtype === target.componentSubType;
         default:
           return matchesType;
       }

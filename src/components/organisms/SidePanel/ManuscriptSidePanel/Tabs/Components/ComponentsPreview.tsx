@@ -75,7 +75,11 @@ function ComponentPreview({
 }: {
   component: ResearchObjectV1Component;
 }) {
-  const target = findTarget(component);
+  const subtype =
+    "subtype" in component
+      ? (component["subtype"] as ResearchObjectComponentSubtypes)
+      : undefined;
+  const target = findTarget(component.type, subtype);
   const dispatch = useSetter();
   const { mode } = useNodeReader();
 
