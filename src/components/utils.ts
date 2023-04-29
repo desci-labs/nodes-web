@@ -280,11 +280,17 @@ export const filterForFirstPdf = (a: ResearchObjectV1Component) =>
   a.type !== ResearchObjectComponentType.DATA_BUCKET &&
   a.starred;
 
+export const filterForNonData = (a: ResearchObjectV1Component) =>
+  a &&
+  a.type !== ResearchObjectComponentType.DATA &&
+  a.type !== ResearchObjectComponentType.UNKNOWN &&
+  a.type !== ResearchObjectComponentType.DATA_BUCKET;
+
 export const getNonDataComponentsFromManifest = (
   manifestData: ResearchObjectV1
 ) => {
   const nonDataComponents = manifestData?.components
-    ? manifestData.components.filter(filterForFirstPdf)
+    ? manifestData.components.filter(filterForNonData)
     : [];
   return nonDataComponents;
 };

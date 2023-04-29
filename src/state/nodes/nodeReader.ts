@@ -9,7 +9,11 @@ import {
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { updateDraft } from "@src/api";
 import { AnnotationLinkConfig } from "@src/components/molecules/AnnotationEditor/components";
-import { cleanupManifestUrl, filterForFirstPdf } from "@src/components/utils";
+import {
+  cleanupManifestUrl,
+  filterForFirstPdf,
+  filterForNonData,
+} from "@src/components/utils";
 import { RootState } from "@src/store";
 import axios from "axios";
 import { DrivePath } from "../drive/types";

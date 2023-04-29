@@ -365,7 +365,7 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
   const onTextSelect = (select: HighlightCallbackProps) => {
     let rects: { [key: string]: LTWHP[] } = {};
     // only enable if mode is editor
-    debugger;
+    // debugger;
     if (mode !== "editor") {
       return;
     }

@@ -22,7 +22,7 @@ import { useDrive } from "@src/state/drive/hooks";
 import AssignTypePane from "../AssignTypePane";
 import { useCallback } from "react";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
-import { filterForFirstPdf } from "@src/components/utils";
+import { filterForFirstPdf, filterForNonData } from "@src/components/utils";
 
 interface ReaderViewerProps {
   isLoading: boolean;
@@ -76,7 +76,7 @@ export default function Editor({ isLoading }: ReaderViewerProps) {
         <DialogViewer />
 
         <ButtonMysterious />
-        {componentStack.filter(filterForFirstPdf).length > 0 ? (
+        {componentStack.filter(filterForNonData).length > 0 ? (
           <FloatingActionBar />
         ) : null}
 

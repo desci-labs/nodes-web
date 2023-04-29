@@ -71,7 +71,6 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
 
   const createCommit = useCallback(async () => {
     setLoading(true);
-    debugger;
     const modifiedObject = { cid: manifestCid, manifest: manifestData };
     try {
       setError(undefined);
