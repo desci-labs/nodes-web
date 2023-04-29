@@ -7,7 +7,7 @@ import {
   ManifestDataStatus,
   saveManifestDraft,
   updateComponent,
-} from "@src/state/nodes/viewer";
+} from "@src/state/nodes/nodeReader";
 import Modal from "@src/components/molecules/Modal";
 
 const ComponentRenamePopover = (props: {

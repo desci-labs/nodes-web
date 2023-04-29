@@ -29,7 +29,7 @@ import { SpinnerCircular } from "spinners-react";
 import { Wallet } from "@src/state/api/types";
 import { useHistoryReader, useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
-import { setManifest } from "@src/state/nodes/viewer";
+import { setManifest } from "@src/state/nodes/nodeReader";
 import { setPendingCommits } from "@src/state/nodes/history";
 import { tags } from "@src/state/api/tags";
 import { nodesApi } from "@src/state/api/nodes";

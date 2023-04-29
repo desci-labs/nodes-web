@@ -5,7 +5,7 @@ import DataUsage from "./DataUsage";
 import { getNonDataComponentsFromManifest } from "../utils";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
-import { setComponentStack } from "@src/state/nodes/viewer";
+import { setComponentStack } from "@src/state/nodes/nodeReader";
 import React from "react";
 
 const NodeDrive = ({ className }: ClassNameProp) => {

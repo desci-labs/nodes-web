@@ -33,7 +33,10 @@ import {
 import { useSetter } from "@src/store/accessors";
 import _ from "lodash";
 import { v4 as uuid } from "uuid";
-import { replaceAnnotations, saveAnnotation } from "@src/state/nodes/viewer";
+import {
+  replaceAnnotations,
+  saveAnnotation,
+} from "@src/state/nodes/nodeReader";
 
 const pulse = keyframes`
 0%{

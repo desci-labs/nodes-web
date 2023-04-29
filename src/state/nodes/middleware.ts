@@ -1,5 +1,5 @@
 import { createListenerMiddleware } from "@reduxjs/toolkit";
-import { selectNodeUuid, setCurrentObjectId } from "./viewer";
+import { selectNodeUuid, setCurrentObjectId } from "./nodeReader";
 import { RootState } from "@src/store";
 import { fetchTreeThunk, reset } from "../drive/driveSlice";
 

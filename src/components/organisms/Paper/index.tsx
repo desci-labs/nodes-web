@@ -74,6 +74,7 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
     selectedAnnotationId,
     centeredZoom,
     isEditingAnnotation,
+    mode,
     loadState: { loadPercent, loadProgressTaken },
   } = usePdfReader();
 
@@ -363,6 +364,10 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
 
   const onTextSelect = (select: HighlightCallbackProps) => {
     let rects: { [key: string]: LTWHP[] } = {};
+    // only enable if mode is editor
+    if (mode !== "editor") {
+      return;
+    }
     select.rects.forEach((r: LTWHP) => {
       const num = r.pageNumber! + "";
       if (!rects[num]) {

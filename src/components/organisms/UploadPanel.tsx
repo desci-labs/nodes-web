@@ -12,7 +12,7 @@ import ReactTooltip from "react-tooltip";
 import { SessionStorageKeys } from "@src/components/driveUtils";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
-import { setComponentStack } from "@src/state/nodes/viewer";
+import { setComponentStack } from "@src/state/nodes/nodeReader";
 import { useDrive } from "@src/state/drive/hooks";
 import {
   cleanupUploadProgressMap,

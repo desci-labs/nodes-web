@@ -26,7 +26,7 @@ import {
   deleteComponent,
   popFromComponentStack,
   saveManifestDraft,
-} from "@src/state/nodes/viewer";
+} from "@src/state/nodes/nodeReader";
 import { useDrive } from "@src/state/drive/hooks";
 import ComponentRenamePopover from "@src/components/organisms/PopOver/ComponentRenamePopover";
 import { findDriveByPath } from "@src/state/drive/utils";

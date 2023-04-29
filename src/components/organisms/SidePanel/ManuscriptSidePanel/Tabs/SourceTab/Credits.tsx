@@ -10,7 +10,7 @@ import { PropsWithChildren, useState } from "react";
 import CreditsModal from "@src/components/organisms/PopOver/CreditsModal/CreditsModal";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { useSetter } from "@src/store/accessors";
-import { removeAuthor, saveManifestDraft } from "@src/state/nodes/viewer";
+import { removeAuthor, saveManifestDraft } from "@src/state/nodes/nodeReader";
 import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
 
 interface CreditsProps {}

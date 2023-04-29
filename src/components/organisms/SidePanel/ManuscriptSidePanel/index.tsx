@@ -36,7 +36,7 @@ import {
   setResearchPanelTab,
   toggleCommitPanel,
   toggleResearchPanel,
-} from "@src/state/nodes/viewer";
+} from "@src/state/nodes/nodeReader";
 import { SwitchBar, SwitchButton } from "@src/components/atoms/SwitchBar";
 
 const ManuscriptSidePanelContainer = styled(SidePanel).attrs({

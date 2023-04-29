@@ -30,7 +30,7 @@ import {
   updateComponent,
   saveManifestDraft,
   addComponent,
-} from "@src/state/nodes/viewer";
+} from "@src/state/nodes/nodeReader";
 import SelectList from "@src/components/molecules/FormInputs/SelectList";
 import Modal from "@src/components/molecules/Modal";
 import { useManuscriptController } from "../../ManuscriptReader/ManuscriptController";

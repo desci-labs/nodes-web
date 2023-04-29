@@ -34,7 +34,7 @@ import {
   setComponentStack,
   setCurrentObjectId,
   setManifest,
-} from "@src/state/nodes/viewer";
+} from "@src/state/nodes/nodeReader";
 import Modal, { ModalProps } from "@src/components/molecules/Modal";
 import { useDispatch } from "react-redux";
 import {
