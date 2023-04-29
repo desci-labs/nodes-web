@@ -96,8 +96,17 @@ $columns: 7;
     }
     li:nth-child(2) {
       display: flex;
-      border-top-right-radius: var(--borderRadius);
-      border-top-left-radius: var(--borderRadius);
+    }
+
+    .singleRow:last-child {
+      & > li {
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+      }
+    }
+    .driveRowHeader {
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
     }
 
     grid-template-columns: $FILE_NAME;
