@@ -7,7 +7,7 @@ import {
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
-import { __log } from "@components/utils";
+import { __log, filterForFirstPdf } from "@components/utils";
 
 import tw from "tailwind-styled-components";
 import PaneDrive from "@components/organisms/PaneDrive";
@@ -82,13 +82,7 @@ const ComponentStackView = (props: ComponentStackViewProps) => {
        * When no components, show the drive
        */}
       {!componentStack ||
-      (componentStack.filter(
-        (a) =>
-          a &&
-          a.type !== ResearchObjectComponentType.DATA &&
-          a.type !== ResearchObjectComponentType.UNKNOWN &&
-          a.type !== ResearchObjectComponentType.DATA_BUCKET
-      ).length < 1 &&
+      (componentStack.filter(filterForFirstPdf).length < 1 &&
         !forceRefreshDrive &&
         manifestData) ? (
         <RenderedDrive />

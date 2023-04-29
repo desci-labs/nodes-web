@@ -9,7 +9,7 @@ import {
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { updateDraft } from "@src/api";
 import { AnnotationLinkConfig } from "@src/components/molecules/AnnotationEditor/components";
-import { cleanupManifestUrl } from "@src/components/utils";
+import { cleanupManifestUrl, filterForFirstPdf } from "@src/components/utils";
 import { RootState } from "@src/store";
 import axios from "axios";
 import { DrivePath } from "../drive/types";
@@ -83,12 +83,7 @@ const initialState: NodeReaderPref = {
 };
 
 export const getDefaultComponentForView = (manifest: ResearchObjectV1) => {
-  return manifest.components.filter(
-    (c) =>
-      c.type !== ResearchObjectComponentType.DATA &&
-      c.type !== ResearchObjectComponentType.UNKNOWN &&
-      c.type !== ResearchObjectComponentType.DATA_BUCKET
-  )[0];
+  return manifest.components.filter(filterForFirstPdf)[0];
 };
 
 export const nodeReaderSlice = createSlice({

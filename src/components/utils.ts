@@ -25,6 +25,7 @@ import {
   ResearchObject,
   ResearchObjectComponentType,
   ResearchObjectV1,
+  ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 
 export const KEY_METAMASK_RECONNECT = "metamask:reconnect";
@@ -272,16 +273,18 @@ export const isAbsoluteUrl = (url: string) => {
   return r.test(url);
 };
 
+export const filterForFirstPdf = (a: ResearchObjectV1Component) =>
+  a &&
+  a.type !== ResearchObjectComponentType.DATA &&
+  a.type !== ResearchObjectComponentType.UNKNOWN &&
+  a.type !== ResearchObjectComponentType.DATA_BUCKET &&
+  a.starred;
+
 export const getNonDataComponentsFromManifest = (
   manifestData: ResearchObjectV1
 ) => {
   const nonDataComponents = manifestData?.components
-    ? manifestData.components.filter(
-        (a) =>
-          a.type !== ResearchObjectComponentType.DATA &&
-          a.type !== ResearchObjectComponentType.DATA_BUCKET &&
-          a.type !== ResearchObjectComponentType.UNKNOWN
-      )
+    ? manifestData.components.filter(filterForFirstPdf)
     : [];
   return nonDataComponents;
 };
