@@ -74,9 +74,9 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
     selectedAnnotationId,
     centeredZoom,
     isEditingAnnotation,
-    mode,
     loadState: { loadPercent, loadProgressTaken },
   } = usePdfReader();
+  const { mode } = useNodeReader();
 
   const getPageZoomedOffset = usePageZoomedOffset();
 
@@ -365,6 +365,7 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
   const onTextSelect = (select: HighlightCallbackProps) => {
     let rects: { [key: string]: LTWHP[] } = {};
     // only enable if mode is editor
+    debugger;
     if (mode !== "editor") {
       return;
     }
