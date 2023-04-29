@@ -17,8 +17,10 @@ const DialogViewer = () => {
             className="modal-body w-80 h-36 bg-white shadow-sm rounded-md flex items-center flex-col justify-center left-[calc(50vw-10rem)] absolute top-32"
             key={d.title}
           >
-            <h1>{d.title}</h1>
-            <div>{d.message}</div>
+            <h1 className="font-bold">{d.title}</h1>
+            <div className="flex justify-center items-center w-full text-center">
+              {d.message}
+            </div>
             <div>
               {d.actions({
                 close: () => {

@@ -12,7 +12,7 @@ import { api } from "@src/state/api";
 import { tags } from "@src/state/api/tags";
 import { useUser } from "@src/state/user/hooks";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import { setComponentStack, toggleMode } from "@src/state/nodes/viewer";
+import { setComponentStack, toggleMode } from "@src/state/nodes/nodeReader";
 
 export default function useReaderEffects(publicView: boolean = false) {
   const cid = useParseObjectID();

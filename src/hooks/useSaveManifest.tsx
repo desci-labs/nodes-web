@@ -3,7 +3,7 @@ import { updateDraft } from "@src/api";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { cleanupManifestUrl } from "@src/components/utils";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import { setManifest, setManifestCid } from "@src/state/nodes/viewer";
+import { setManifest, setManifestCid } from "@src/state/nodes/nodeReader";
 import { useSetter } from "@src/store/accessors";
 import axios from "axios";
 import { useState } from "react";

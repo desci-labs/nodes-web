@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import { useCallback } from "react";
-import { ResearchObjectV1Component } from "@src/../../nodes/desci-models/dist";
+import { ResearchObjectV1Component } from "@desci-labs/desci-models";
 import DraggableComponentCard from "@src/components/molecules/DraggableComponentCard";
 interface ContainerProps {
   components: ResearchObjectV1Component[];

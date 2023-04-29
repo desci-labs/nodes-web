@@ -29,18 +29,9 @@ import {
   usePdfReader,
 } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
-import {
-  popFromComponentStack,
-  ResearchTabs,
-  setResearchPanelTab,
-  toggleCommitPanel,
-  toggleResearchPanel,
-} from "@src/state/nodes/viewer";
-import {
-  SwitchBar,
-  SwitchButton,
-} from "@src/components/atoms/SwitchBar/SwitchBar";
 import Navigator from "./Tabs/Components/Navigator/Navigator";
+import { SwitchBar, SwitchButton } from "@src/components/atoms/SwitchBar";
+import { ResearchTabs, popFromComponentStack, setResearchPanelTab, toggleCommitPanel, toggleResearchPanel } from "@src/state/nodes/nodeReader";
 
 const ManuscriptSidePanelContainer = styled(SidePanel).attrs({
   className: "bg-light-gray dark:bg-dark-gray text-black dark:text-white",

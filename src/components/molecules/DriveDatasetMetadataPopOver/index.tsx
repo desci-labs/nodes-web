@@ -9,7 +9,7 @@ import {
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 
-import { DatasetMetadataForm } from "./DatasetMetadataForm";
+import { DatasetMetadataForm } from "../DatasetMetadataForm";
 import { OverwriteMetadataForm } from "./OverwriteMetadataDialog";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import {
@@ -17,9 +17,9 @@ import {
   removeComponentMetadata,
   saveManifestDraft,
   updateComponent,
-} from "@src/state/nodes/viewer";
+} from "@src/state/nodes/nodeReader";
 import { useSetter } from "@src/store/accessors";
-import Modal from "../Modal/Modal";
+import Modal from "../Modal";
 import { FormProvider, useForm } from "react-hook-form";
 import { DriveMetadata } from "@src/components/organisms/Drive/types";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";

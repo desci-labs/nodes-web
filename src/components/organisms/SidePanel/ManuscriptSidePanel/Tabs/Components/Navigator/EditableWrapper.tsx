@@ -7,7 +7,7 @@ import {
   deleteComponent,
   popFromComponentStack,
   saveManifestDraft,
-} from "@src/state/nodes/viewer";
+} from "@src/state/nodes/nodeReader";
 import ComponentRenamePopover from "@src/components/organisms/PopOver/ComponentRenamePopover";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 

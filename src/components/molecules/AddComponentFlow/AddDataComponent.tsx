@@ -15,7 +15,7 @@ import { useDrive } from "@src/state/drive/hooks";
 interface Props {
   close: () => void;
   directory?: boolean;
-  id: string;
+  id?: string;
 }
 
 export const ButtonAddData = ({ close, directory, id }: Props) => {

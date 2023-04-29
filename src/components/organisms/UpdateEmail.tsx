@@ -2,9 +2,9 @@ import { Controller, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { memo, useEffect } from "react";
 
-import IconSubTextHeader from "@src/components/molecules/IconSubTextHeader/IconSubTextHeader";
+import IconSubTextHeader from "@src/components/molecules/IconSubTextHeader";
 import { IconInfo } from "@src/icons";
-import useProfileSubmit from "../Profile/useProfileSubmit";
+import useProfileSubmit from "./Profile/useProfileSubmit";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
 import { isMaybeValidEmail } from "@src/lib/validation";
 import { site } from "@src/constants/routes";

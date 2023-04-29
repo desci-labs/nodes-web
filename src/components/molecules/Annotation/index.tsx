@@ -24,7 +24,7 @@ import {
   deleteAnnotation,
   saveManifestDraft,
   replaceAnnotations,
-} from "@src/state/nodes/viewer";
+} from "@src/state/nodes/nodeReader";
 // import { saveManifestDraft } from "@src/state/nodes/saveManifestDraft";
 import {
   setIsEditingAnnotation,

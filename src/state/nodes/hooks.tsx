@@ -2,7 +2,7 @@ import { useManuscriptController } from "@src/components/organisms/ManuscriptRea
 import { PDF_PAGE_SPACING } from "@src/components/organisms/Paper/constants";
 import { useGetter } from "@src/store/accessors";
 import { useCallback, useMemo } from "react";
-import { ManifestDataStatus, NodeReaderPref } from "./viewer";
+import { ManifestDataStatus, NodeReaderPref } from "./nodeReader";
 import { PdfViewerState } from "./pdf";
 
 export const useNodeReader = (): NodeReaderPref => {

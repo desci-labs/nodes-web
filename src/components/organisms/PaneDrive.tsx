@@ -14,6 +14,7 @@ import { useSetter } from "@src/store/accessors";
 import { useDrive } from "@src/state/drive/hooks";
 import { addFilesToDrive } from "@src/state/drive/driveSlice";
 import { isMobile } from "react-device-detect";
+import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
 
 const PaneDrive = () => {
   const {
@@ -25,7 +26,7 @@ const PaneDrive = () => {
   const dispatch = useSetter();
   const { isDraggingFiles } = useNodeReader();
 
-  const { status } = useDrive();
+  const { status, currentDrive } = useDrive();
 
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -53,6 +54,22 @@ const PaneDrive = () => {
 
     try {
       if (droppedFileList || droppedTransferItemList) {
+        if (currentDrive?.path === DRIVE_FULL_EXTERNAL_LINKS_PATH) {
+          toast.error("Unable to add items to external links directory.", {
+            position: "top-center",
+            duration: 5000,
+            style: {
+              marginTop: 55,
+              borderRadius: "10px",
+              background: "#111",
+              color: "#fff",
+              zIndex: 150,
+            },
+          });
+          setDroppedFileList(null);
+          setDroppedTransferItemList(null);
+          return;
+        }
         if (droppedFileList) {
           if (droppedFileList instanceof FileList) {
             dispatch(addFilesToDrive({ files: droppedFileList }));

@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { app, site } from "@src/constants/routes";
 import ContextMenu from "../organisms/ContextMenu";
 import { useSetter } from "@src/store/accessors";
-import { setEditNodeId, setPublicView } from "@src/state/nodes/viewer";
+import { setEditNodeId, setPublicView } from "@src/state/nodes/nodeReader";
 
 export interface NodeProps {
   id?: number;

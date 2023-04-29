@@ -22,7 +22,7 @@ import {
 import PoiLookup from "@src/components/screens/PoiLookup";
 import Nodes, { manuscriptLoader } from "@src/components/screens/Nodes";
 import Profile from "@src/components/organisms/PaneUserProfile";
-import UpdateEmailScreen from "@src/components/organisms/UpdateEmail/UpdateEmailScreen";
+import UpdateEmailScreen from "@src/components/organisms/UpdateEmail";
 import AdminAnalyticsScreen from "@src/components/screens/adminAnalyticsScreen";
 import PaneHelp from "@src/components/organisms/PaneHelp";
 import AppWrapper from "@src/App/Providers/AppWrapper";

@@ -9,7 +9,7 @@ import CollapsibleSection from "@components/organisms/CollapsibleSection";
 import { SearchIcon } from "@heroicons/react/solid";
 import useNodeDiff from "./useNodeDiff";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import Modal from "@src/components/molecules/Modal/Modal";
+import Modal from "@src/components/molecules/Modal";
 
 const ChangeNameTitle = styled.p.attrs({
   className: `text-xs`,

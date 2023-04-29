@@ -11,6 +11,7 @@ import AnnotationSwitcher from "@components/atoms/AnnotationSwitcher";
 import {
   ExternalLinkComponent,
   PdfComponentPayload,
+  ResearchObjectComponentSubtypes,
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
@@ -19,11 +20,9 @@ import TooltipIcon from "@components/atoms/TooltipIcon";
 import ReactTooltip from "react-tooltip";
 import { findTarget } from "@components/organisms/ComponentLibrary";
 import ButtonFair from "@components/atoms/ButtonFair";
-import {
-  SessionStorageKeys,
-} from "../driveUtils";
+import { SessionStorageKeys } from "../driveUtils";
 import { useSetter } from "@src/store/accessors";
-import { setComponentStack } from "@src/state/nodes/viewer";
+import { setComponentStack } from "@src/state/nodes/nodeReader";
 import { updatePdfPreferences } from "@src/state/nodes/pdf";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import {
@@ -84,7 +83,11 @@ export interface ComponentCardProps extends SectionCardProps {
 }
 
 const labelFor = (component: ResearchObjectV1Component): string => {
-  const obj = findTarget(component);
+  const subtype =
+    "subtype" in component
+      ? (component["subtype"] as ResearchObjectComponentSubtypes)
+      : undefined;
+  const obj = findTarget(component.type, subtype);
   if (obj) {
     return obj.title;
   }
@@ -95,7 +98,11 @@ const iconFor = (
   component: ResearchObjectV1Component,
   primary: boolean | undefined
 ) => {
-  const obj = findTarget(component);
+  const subtype =
+    "subtype" in component
+      ? (component["subtype"] as ResearchObjectComponentSubtypes)
+      : undefined;
+  const obj = findTarget(component.type, subtype);
   if (obj) {
     return obj.icon;
   }
@@ -178,7 +185,12 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
           //     path: DRIVE_NODE_ROOT_PATH + "/" + DRIVE_DATA_PATH,
           //   })
           // );
-          dispatch(navigateToDriveByPath(component.payload.path));
+          dispatch(
+            navigateToDriveByPath({
+              path: component.payload.path,
+              selectPath: component.payload.path,
+            })
+          );
           dispatch(setComponentStack([component]));
         } else {
           if (!isSelected) {
@@ -303,7 +315,12 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                       className="p-0"
                       onClick={(e) => {
                         e!.stopPropagation();
-                        dispatch(navigateToDriveByPath(component.payload.path));
+                        dispatch(
+                          navigateToDriveByPath({
+                            path: component.payload.path,
+                            selectPath: component.payload.path,
+                          })
+                        );
                         if (
                           component.type === ResearchObjectComponentType.DATA ||
                           component.type === ResearchObjectComponentType.UNKNOWN

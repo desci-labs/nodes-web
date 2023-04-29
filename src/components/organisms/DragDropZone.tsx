@@ -1,6 +1,6 @@
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import { setIsDraggingFiles } from "@src/state/nodes/viewer";
+import { setIsDraggingFiles } from "@src/state/nodes/nodeReader";
 import { useSetter } from "@src/store/accessors";
 import { flatten } from "lodash";
 import { useEffect, DragEvent } from "react";

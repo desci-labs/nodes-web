@@ -1,4 +1,4 @@
-import { ResearchNodeIcon } from "@src/components/Icons";
+import { ResearchNodeIcon } from "@src/components/atoms/Icons";
 import { IconShare } from "@src/icons";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import useComponentDpid from "@components/organisms/Drive/hooks/useComponentDpid";
@@ -57,7 +57,7 @@ export default function Header() {
     <animated.div
       className="min-h-[320px] w-full p-2 relative flex items-end overflow-hidden shrink-0"
       style={{
-        height: height.height.get(),
+        height: expanded ? 500 : 250,
         backgroundImage: `linear-gradient(
           180deg,
           rgba(2, 0, 36, 0.015865721288515378) 0%,
@@ -78,20 +78,16 @@ export default function Header() {
         className="absolute top-3 right-3"
         onClick={onHandleShare}
       />
-      <div
-        className="px-4 flex gap-3 items-center"
+      <button
+        className="px-4 flex gap-3 items-center text-left w-full"
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
 
-          // window.getnext;
-          if (!expanded) {
-            api.start({ height: 500, immediate: true });
-            setExpanded(true);
-          } else {
-            api.start({ height: 250, immediate: true });
-            setExpanded(false);
-          }
+          setExpanded(!expanded);
+        }}
+        onBlur={() => {
+          setExpanded(false);
         }}
       >
         <div className="shrink-0 w-fit">
@@ -105,7 +101,7 @@ export default function Header() {
             {manifest?.title || ""}
           </span>
         </div>
-      </div>
+      </button>
       <Helmet>
         <title>{manifest?.title || "Research Node"}</title>
         {/* Default tags */}

@@ -9,7 +9,7 @@ import {
   toggleToolbar,
 } from "@src/state/preferences/preferencesSlice";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import { toggleResearchPanel } from "@src/state/nodes/viewer";
+import { toggleResearchPanel } from "@src/state/nodes/nodeReader";
 
 const NodeLogo = () => {
   const { isResearchPanelOpen, componentStack } = useNodeReader();

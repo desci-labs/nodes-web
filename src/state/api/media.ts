@@ -14,9 +14,7 @@ export const nodesMediaApi = api.injectEndpoints({
         },
       ],
       query: ({ cid, uuid, version }: NodeCoverParams) =>
-        `${endpoints.v1.nodes.media.cover}${uuid}${
-          version ? `/${version}` : ""
-        }?cid=${cid}`,
+        `${endpoints.v1.nodes.media.cover}${uuid}${`/${version}`}?cid=${cid}`,
       async onQueryStarted(args, { dispatch, queryFulfilled }) {
         try {
           console.log("nodesMediaCover", args);

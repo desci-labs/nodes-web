@@ -16,7 +16,7 @@ import { findTarget } from "@components/organisms/ComponentLibrary";
 import ButtonFair from "@components/atoms/ButtonFair";
 import { SessionStorageKeys } from "../driveUtils";
 import { useSetter } from "@src/store/accessors";
-import { setComponentStack } from "@src/state/nodes/viewer";
+import { setComponentStack } from "@src/state/nodes/nodeReader";
 import { updatePdfPreferences } from "@src/state/nodes/pdf";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import {
@@ -85,7 +85,7 @@ const iconFor = (
   component: ResearchObjectV1Component,
   primary: boolean | undefined
 ) => {
-  const obj = findTarget(component);
+  const obj = findTarget(component.type);
   if (obj) {
     return obj.icon;
   }
@@ -174,11 +174,6 @@ const ComponentCard = React.forwardRef(
             component.type === ResearchObjectComponentType.UNKNOWN
           ) {
             sessionStorage.removeItem(SessionStorageKeys.lastDirUid);
-            // dispatch(
-            //   navigateToDriveByPath({
-            //     path: DRIVE_NODE_ROOT_PATH + "/" + DRIVE_DATA_PATH,
-            //   })
-            // );
             dispatch(navigateToDriveByPath(component.payload.path));
             dispatch(setComponentStack([component]));
           } else {
@@ -186,9 +181,6 @@ const ComponentCard = React.forwardRef(
               dispatch(setComponentStack([component]));
             }
           }
-          // if (component.type === ResearchObjectComponentType.UNKNOWN) {
-          //   dispatch(setComponentTypeBeingAssignedTo(component.payload.path));
-          // }
         }
       }, 50);
     };

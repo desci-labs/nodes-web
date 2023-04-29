@@ -14,7 +14,7 @@ import {
   setCurrentObjectId,
   setPublicView,
   toggleResearchPanel,
-} from "@src/state/nodes/viewer";
+} from "@src/state/nodes/nodeReader";
 import CreateNodeModal from "./CreateNodeModal/CreateNodeModal";
 import PerfectScrollbar from "react-perfect-scrollbar";
 export interface EditNodeInfo {

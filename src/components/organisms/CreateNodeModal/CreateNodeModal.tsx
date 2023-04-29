@@ -11,7 +11,7 @@ import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
 import PlaceholderInput from "@src/components/molecules/FormInputs/PlaceholderInput";
 import SelectList from "@src/components/molecules/FormInputs/SelectList";
-import Modal from "@src/components/molecules/Modal/Modal";
+import Modal from "@src/components/molecules/Modal";
 import { cleanupManifestUrl } from "@src/components/utils";
 import { app, site } from "@src/constants/routes";
 import { api } from "@src/state/api";
@@ -24,7 +24,7 @@ import {
   setCurrentObjectId,
   setManifest,
   setPublicView,
-} from "@src/state/nodes/viewer";
+} from "@src/state/nodes/nodeReader";
 import { toggleToolbar } from "@src/state/preferences/preferencesSlice";
 import { useSetter } from "@src/store/accessors";
 import axios from "axios";

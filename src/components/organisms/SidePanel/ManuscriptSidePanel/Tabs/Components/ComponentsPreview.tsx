@@ -8,7 +8,7 @@ import EmptyPreview from "@src/components/molecules/EmptyPreview";
 import { findTarget } from "@src/components/organisms/ComponentLibrary";
 import { IconData } from "@src/icons";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import { setComponentStack, toggleMode } from "@src/state/nodes/viewer";
+import { setComponentStack, toggleMode } from "@src/state/nodes/nodeReader";
 import { setShowComponentStack } from "@src/state/preferences/preferencesSlice";
 import { useSetter } from "@src/store/accessors";
 import { useMemo } from "react";
@@ -75,7 +75,11 @@ function ComponentPreview({
 }: {
   component: ResearchObjectV1Component;
 }) {
-  const target = findTarget(component);
+  const subtype =
+    "subtype" in component
+      ? (component["subtype"] as ResearchObjectComponentSubtypes)
+      : undefined;
+  const target = findTarget(component.type, subtype);
   const dispatch = useSetter();
   const { mode } = useNodeReader();
 

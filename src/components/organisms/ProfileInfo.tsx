@@ -1,7 +1,7 @@
 import { IconAuthor } from "@icons";
-import IconSubTextHeader from "@components/molecules/IconSubTextHeader/IconSubTextHeader";
-import DigitalSignature from "@components/molecules/DigitalSignature/DigitalSignature";
-import OrcidButton from "@src/components/molecules/OrcIdAuthButton/OrcIdAuthButton";
+import IconSubTextHeader from "@components/molecules/IconSubTextHeader";
+import DigitalSignature from "@components/molecules/DigitalSignature";
+import OrcidButton from "@src/components/molecules/OrcIdAuthButton";
 import DividerSimple from "@components/atoms/DividerSimple";
 import UserProfileForm from "./UserProfileForm";
 import { memo, useEffect } from "react";

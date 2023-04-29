@@ -21,7 +21,7 @@ import {
   getFormatter,
 } from "@src/helper/citation";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
+import Modal, { ModalProps } from "@src/components/molecules/Modal";
 import SelectList from "@src/components/molecules/FormInputs/SelectList";
 import { useDrive } from "@src/state/drive/hooks";
 import { setFileBeingCited } from "@src/state/drive/driveSlice";

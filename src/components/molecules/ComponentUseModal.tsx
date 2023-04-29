@@ -2,7 +2,7 @@ import CopyBox, { CodeBox } from "@components/atoms/CopyBox";
 import PrimaryButton from "@components/atoms/PrimaryButton";
 import { IconWarning } from "@src/icons";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
+import Modal, { ModalProps } from "@src/components/molecules/Modal";
 import WarningSign from "@src/components/atoms/warning-sign";
 import DividerSimple from "@src/components/atoms/DividerSimple";
 import ButtonSecondary from "@src/components/atoms/ButtonSecondary";

@@ -1,4 +1,5 @@
 import {
+  ResearchObjectComponentSubtypes,
   ResearchObjectComponentType,
   ResearchObjectV1,
   ResearchObjectV1Component,
@@ -18,6 +19,7 @@ import { BreadCrumb, DrivePath } from "./types";
 import { __log } from "@src/components/utils";
 
 export const GENERIC_NEW_FOLDER_NAME = "New Folder";
+export const GENERIC_NEW_LINK_NAME = "Link";
 export const CID_PENDING = "Pending";
 
 export function neutralizePath(path: DrivePath) {
@@ -186,6 +188,13 @@ export function convertIpfsTreeToDriveObjectTree(
       ancestorComponent?.type ||
       ResearchObjectComponentType.UNKNOWN;
 
+    if (component) {
+      const subtype =
+        "subtype" in component
+          ? (component["subtype"] as ResearchObjectComponentSubtypes)
+          : undefined;
+      if (subtype) branch.componentSubtype = subtype;
+    }
     // useful for annotation insert on file tree under a code component for example (refer to component id later)
     branch.componentId = component?.id || ancestorComponent?.id;
     branch.accessStatus = fileDirBranch.published
@@ -330,14 +339,14 @@ export function constructBreadCrumbs(path: DrivePath): BreadCrumb[] {
   return result;
 }
 
-export function separateFileNameAndMimeType(fileName: string): {
+export function separateFileNameAndExtension(fileName: string): {
   fileName: string;
-  mimeType?: string;
+  extension?: string;
 } {
   const splitName = fileName.split(".");
-  const mimeType = splitName.length > 1 ? splitName.pop() : "";
+  const extension = splitName.length > 1 ? splitName.pop() : "";
   const name = splitName.join(".");
-  return { fileName: name, mimeType };
+  return { fileName: name, extension };
 }
 
 export function findUniqueName(name: string, existingNames: string[]) {
