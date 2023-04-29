@@ -9,7 +9,10 @@ import VSCodeViewer from "@src/components/organisms/VSCodeViewer";
 import ComponentStackView from "@src/components/organisms/ManuscriptReader/ComponentStackView";
 import Placeholder from "@src/components/organisms/ManuscriptReader/Placeholder";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import { setPublicView, toggleResearchPanel } from "@src/state/nodes/viewer";
+import {
+  setPublicView,
+  toggleResearchPanel,
+} from "@src/state/nodes/nodeReader";
 
 interface ReaderViewerProps {
   isLoading: boolean;

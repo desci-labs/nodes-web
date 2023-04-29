@@ -1,6 +1,6 @@
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
 import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
-import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
+import Modal, { ModalProps } from "@src/components/molecules/Modal";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   AuthorFormValues,

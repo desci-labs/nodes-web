@@ -1,6 +1,7 @@
 import {
   CommonComponentPayload,
   DataComponentMetadata,
+  ResearchObjectComponentSubtypes,
   ResearchObjectComponentType,
 } from "@desci-labs/desci-models";
 
@@ -33,6 +34,7 @@ export interface DriveObject {
   name: string;
   lastModified: string; //date later
   componentType: ResearchObjectComponentType | DriveNonComponentTypes;
+  componentSubtype?: ResearchObjectComponentSubtypes;
   componentId?: string | undefined;
   accessStatus: AccessStatus;
   size: number;
@@ -63,28 +65,11 @@ export interface DriveRowProps {
   ) => void;
   index: number;
   selected: boolean;
-  isMultiselecting: boolean;
   toggleSelected: (
-    index: number,
+    path: string,
     componentType: ResearchObjectComponentType | DriveNonComponentTypes
   ) => void;
-  selectedFiles: Record<
-    number,
-    ResearchObjectComponentType | DriveNonComponentTypes
-  >;
   canEditMetadata: boolean;
   canUse: boolean;
   deprecated?: boolean;
-}
-
-export interface DriveJumpingParams {
-  targetUid?: string;
-  targetPath?: string; //fallback
-  itemUid?: string;
-  itemPath?: string; //fallback
-}
-
-export interface oldComponentMetadata {
-  componentId: string;
-  cb: () => void;
 }

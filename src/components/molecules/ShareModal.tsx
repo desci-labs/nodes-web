@@ -1,10 +1,7 @@
 import React, { ButtonHTMLAttributes, useEffect, useState } from "react";
-import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
+import Modal, { ModalProps } from "@src/components/molecules/Modal";
 import { useNodeReader, useNodeVersions } from "@src/state/nodes/hooks";
-import {
-  SwitchBar,
-  SwitchButton,
-} from "@src/components/atoms/SwitchBar/SwitchBar";
+import { SwitchBar, SwitchButton } from "@src/components/atoms/SwitchBar";
 import NodeInvite from "@src/components/molecules/NodeShare/Invite/Invite";
 import SharePublished from "@src/components/molecules/NodeShare/SharePublished/SharePublished";
 import {

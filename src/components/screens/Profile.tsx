@@ -7,7 +7,7 @@ import ProfileInfo from "@src/components/organisms/ProfileInfo";
 import Profiler, {
   ProfileValues,
 } from "@src/components/organisms/WrapperProfileModal";
-import Modal from "@src/components/molecules/Modal/Modal";
+import Modal from "@src/components/molecules/Modal";
 
 export interface ProfilePopOverProps {
   onClose: () => void;

@@ -468,7 +468,8 @@ export const deleteData = async (uuid: string, path: string) => {
 export const renameData = async (
   uuid: string,
   path: string,
-  newName: string
+  newName: string,
+  renameComponent?: boolean
 ) => {
   const { data } = await axios.post(
     `${SCIWEAVE_URL}/v1/data/rename`,
@@ -476,6 +477,7 @@ export const renameData = async (
       uuid,
       path,
       newName,
+      renameComponent,
     },
     config()
   );

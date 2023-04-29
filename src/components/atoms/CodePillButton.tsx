@@ -12,7 +12,7 @@ import {
   popFromComponentStack,
   pushToComponentStack,
   setAnnotationLinkConfig,
-} from "@src/state/nodes/viewer";
+} from "@src/state/nodes/nodeReader";
 import { parseAnnotationLink } from "../molecules/AnnotationEditor/components";
 let execCount = 1;
 const CodePillButton = ({

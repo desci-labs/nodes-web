@@ -6,7 +6,7 @@ import {
   setHeaderHidden,
 } from "@src/state/preferences/preferencesSlice";
 import { useEffect, useState } from "react";
-import { resetManuscriptController } from "../../organisms/ManuscriptReader/ManuscriptController";
+import { resetManuscriptController } from "@components/organisms/ManuscriptReader/ManuscriptController";
 
 const AdminPanel = () => {
   const dispatch = useSetter();

@@ -34,8 +34,8 @@ import {
   setComponentStack,
   setCurrentObjectId,
   setManifest,
-} from "@src/state/nodes/viewer";
-import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
+} from "@src/state/nodes/nodeReader";
+import Modal, { ModalProps } from "@src/components/molecules/Modal";
 import { useDispatch } from "react-redux";
 import {
   addExternalLinkThunk,
@@ -43,6 +43,12 @@ import {
 } from "@src/state/drive/driveSlice";
 import { useFileUpload } from "react-use-file-upload/dist/lib/useFileUpload";
 import { ExternalUrl } from "@src/state/drive/types";
+import { useDrive } from "@src/state/drive/hooks";
+import {
+  DRIVE_FULL_EXTERNAL_LINKS_PATH,
+  findUniqueName,
+} from "@src/state/drive/utils";
+import toast from "react-hot-toast";
 
 export const componentData = {
   [ResearchObjectComponentType.PDF]: {
@@ -93,15 +99,15 @@ const AddComponentPopOver = (
 ) => {
   const {
     addComponentType,
-    addComponentSubType,
+    addComponentSubtype,
     setIsAddingComponent,
     setIsAddingSubcomponent,
     setAddComponentType,
-    setAddComponentSubType,
+    setAddComponentSubtype,
     addFilesWithoutContext,
   } = useManuscriptController([
     "addComponentType",
-    "addComponentSubType",
+    "addComponentSubtype",
     "addFilesWithoutContext",
   ]);
 
@@ -111,7 +117,7 @@ const AddComponentPopOver = (
   const [urlOrDoi, setUrlOrDoi] = useState<string>();
   const [error, setError] = useState<string>();
   const [customSubtype, setCustomSubtype] = useState<string>("");
-
+  const { nodeTree, currentDrive } = useDrive();
   // const [fileLink, setFileLink] = useState<string>();
   const { files, clearAllFiles, setFiles } = useFileUpload();
 
@@ -123,7 +129,7 @@ const AddComponentPopOver = (
     setIsAddingComponent(false);
     setIsAddingSubcomponent(false);
     setAddComponentType(null);
-    setAddComponentSubType(null);
+    setAddComponentSubtype(null);
     setLoading(false);
     // setFileLink(undefined);
     props.onClose(force);
@@ -145,9 +151,9 @@ const AddComponentPopOver = (
       setError("Invalid Repo Link");
     }
 
-    if (!addComponentSubType) return customSubtype;
+    if (!addComponentSubtype) return customSubtype;
 
-    return addComponentSubType;
+    return addComponentSubtype;
   };
 
   const renderComponentFlow = () => {
@@ -155,8 +161,8 @@ const AddComponentPopOver = (
       case ResearchObjectComponentType.PDF:
         return (
           <AddDocumentComponent
-            subType={addComponentSubType}
-            setSubType={setAddComponentSubType}
+            subtype={addComponentSubtype}
+            setSubtype={setAddComponentSubtype}
             customSubtype={customSubtype}
             setCustomSubtype={setCustomSubtype}
             files={files}
@@ -184,8 +190,8 @@ const AddComponentPopOver = (
           <AddLinkComponent
             url={urlOrDoi}
             setUrl={setUrlOrDoi}
-            subType={addComponentSubType}
-            setSubType={setAddComponentSubType}
+            subtype={addComponentSubtype}
+            setSubtype={setAddComponentSubtype}
           />
         );
       default:
@@ -223,7 +229,7 @@ const AddComponentPopOver = (
         componentUrl: urlOrDoi! || files!,
         title: componentTitle,
         componentType: addComponentType!,
-        componentSubtype: addComponentSubType || undefined,
+        componentSubtype: addComponentSubtype || undefined,
       });
 
       if (addComponentType === ResearchObjectComponentType.LINK) {
@@ -231,7 +237,7 @@ const AddComponentPopOver = (
           addExternalLinkThunk({
             name: componentTitle!,
             url: urlOrDoi!,
-            subtype: addComponentSubType as ResearchObjectComponentLinkSubtype,
+            subtype: addComponentSubtype as ResearchObjectComponentLinkSubtype,
           })
         );
         const components = manifestData?.components!;
@@ -241,11 +247,18 @@ const AddComponentPopOver = (
       }
 
       let externalUrl;
-      if (addComponentType == ResearchObjectComponentType.CODE) {
-        if (urlOrDoi?.length) {
+      if (urlOrDoi?.length) {
+        if (addComponentType === ResearchObjectComponentType.CODE) {
           const extractedName = extractCodeRepoName(urlOrDoi);
           if (extractedName)
             externalUrl = { path: extractedName, url: urlOrDoi };
+        }
+        if (addComponentType === ResearchObjectComponentType.PDF) {
+          const nameCollisions = addFilesWithoutContext
+            ? nodeTree?.contains?.map((c) => c.name)
+            : currentDrive?.contains?.map((c) => c.name);
+          const name = findUniqueName("Research Report", nameCollisions || []);
+          externalUrl = { path: name, url: urlOrDoi };
         }
       }
 
@@ -253,7 +266,7 @@ const AddComponentPopOver = (
         addFilesToDrive({
           ...(externalUrl ? { externalUrl } : { files }),
           componentType: addComponentType!,
-          componentSubType: addComponentSubType || undefined,
+          componentSubtype: addComponentSubtype || undefined,
           ...(addFilesWithoutContext ? { overwriteContext: "root" } : {}),
           onSuccess: (manifestData: ResearchObjectV1) => {
             /**

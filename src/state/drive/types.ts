@@ -8,6 +8,7 @@ import { DriveObject } from "@src/components/organisms/Drive";
 export interface NavigateToDriveByPathAction {
   payload: {
     path: string;
+    selectPath?: string;
   };
 }
 
@@ -17,7 +18,7 @@ export interface AddFilesToDrivePayload {
   externalUrl?: ExternalUrl;
   overwritePathContext?: string;
   componentType?: ResearchObjectComponentType;
-  componentSubType?: ResearchObjectComponentSubtypes;
+  componentSubtype?: ResearchObjectComponentSubtypes;
   newFolder?: boolean;
   onSuccess?: (manifest: ResearchObjectV1) => void;
 }
@@ -57,7 +58,7 @@ export interface StarComponentThunkPayload {
 export interface AssignTypeThunkPayload {
   item: DriveObject;
   type: ResearchObjectComponentType;
-  subType?: ResearchObjectComponentSubtypes;
+  subtype?: ResearchObjectComponentSubtypes;
 }
 
 export type DrivePath = string;

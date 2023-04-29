@@ -1,4 +1,4 @@
-import Modal, { ModalProps } from "@src/components/molecules/Modal/Modal";
+import Modal, { ModalProps } from "@src/components/molecules/Modal";
 import ComponentStackView from "@src/components/organisms/ManuscriptReader/ComponentStackView";
 import { IconX } from "@src/icons";
 

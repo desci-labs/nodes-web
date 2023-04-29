@@ -7,8 +7,8 @@ import {
   ManifestDataStatus,
   saveManifestDraft,
   updateComponent,
-} from "@src/state/nodes/viewer";
-import Modal from "@src/components/molecules/Modal/Modal";
+} from "@src/state/nodes/nodeReader";
+import Modal from "@src/components/molecules/Modal";
 
 const ComponentRenamePopover = (props: {
   isVisible: boolean;
@@ -44,7 +44,7 @@ const ComponentRenamePopover = (props: {
         dispatch(
           updateComponent({
             index,
-            update: { ...manifestData.components[index], name: componentName },
+            update: { name: componentName },
           })
         );
         dispatch(saveManifestDraft({}));

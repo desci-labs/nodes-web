@@ -1,5 +1,5 @@
 import { ResearchObjectV1Component } from "@desci-labs/desci-models";
-import { IconDeleteForever, IconPen } from "icons";
+import { IconDeleteForever, IconPen, IconUnstar } from "icons";
 import { forwardRef, useCallback, useState } from "react";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
@@ -7,32 +7,29 @@ import {
   deleteComponent,
   popFromComponentStack,
   saveManifestDraft,
-} from "@src/state/nodes/viewer";
+} from "@src/state/nodes/nodeReader";
 import ComponentRenamePopover from "@src/components/organisms/PopOver/ComponentRenamePopover";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
+import { findDriveByPath } from "@src/components/driveUtils";
+import { starComponentThunk } from "@src/state/drive/driveSlice";
+import { useDrive } from "@src/state/drive/hooks";
 
 const EditableWrapper = forwardRef((props: any, cardRef: any) => {
-  const { children, isEditable, id } = props;
+  const { children, isEditable, id, component } = props;
   const dispatch = useSetter();
+  const { nodeTree } = useDrive();
   const { componentStack, manifest: manifestData } = useNodeReader();
   const [showRenameModal, setShowRenameModal] = useState<boolean>(false);
 
   const { dialogs, setDialogs } = useManuscriptController(["dialogs"]);
 
-  const doDelete = () => {
-    // console.log(componentStack);
+  const handleUnstar = () => {
+    const file = findDriveByPath(nodeTree!, component?.payload?.path);
+    if (file) {
+      dispatch(starComponentThunk({ item: file }));
+    }
     if (componentStack[componentStack.length - 1]?.id === id) {
       dispatch(popFromComponentStack());
-    }
-
-    if (manifestData) {
-      const index = manifestData.components.findIndex(
-        (c: ResearchObjectV1Component) => c.id === id
-      );
-      if (index > -1) {
-        dispatch(deleteComponent({ componentId: id }));
-        dispatch(saveManifestDraft({}));
-      }
     }
   };
 
@@ -83,8 +80,8 @@ const EditableWrapper = forwardRef((props: any, cardRef: any) => {
               setDialogs([
                 ...dialogs,
                 {
-                  title: "Are you sure?",
-                  message: "",
+                  title: "Unstar Component",
+                  message: "Are you sure you want to unstar this component?",
                   actions: ({ close }) => {
                     return (
                       <div className="flex gap-2 pt-4">
@@ -98,13 +95,13 @@ const EditableWrapper = forwardRef((props: any, cardRef: any) => {
                         </button>
 
                         <button
-                          className="text-md cursor-pointer rounded-md shadow-sm text-white bg-red-700 px-3 py-1 hover:bg-neutrals-gray-3"
+                          className="text-md cursor-pointer rounded-md shadow-sm text-white bg-primary px-3 py-1 hover:bg-tint-primary"
                           onClick={() => {
-                            doDelete();
+                            handleUnstar();
                             close();
                           }}
                         >
-                          Delete
+                          Unstar
                         </button>
                       </div>
                     );
@@ -113,11 +110,7 @@ const EditableWrapper = forwardRef((props: any, cardRef: any) => {
               ]);
             }}
           >
-            <IconDeleteForever
-              stroke="rgb(188,107,103)"
-              strokeWidth={4}
-              width={12}
-            />
+            <IconUnstar className="p-0 w-[14px] h-[14px]" />
           </div>
         </span>
       </div>

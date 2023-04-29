@@ -16,7 +16,7 @@ import NodeMetadata from "./NodeMetadata";
 import { lockScroll, restoreScroll } from "@src/components/utils";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
-import { toggleCommitPanel } from "@src/state/nodes/viewer";
+import { toggleCommitPanel } from "@src/state/nodes/nodeReader";
 import { animated, useTransition } from "react-spring";
 
 // @ts-ignore

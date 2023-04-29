@@ -13,7 +13,7 @@ import PrimaryButton from "@components/atoms/PrimaryButton";
 import { ReferralItem } from "@components/molecules/ReferAFriend/ReferralItem";
 import { ReferralSuccess } from "@components/molecules/ReferAFriend/ReferralSuccess";
 import { isMaybeValidEmail } from "@src/lib/validation";
-import Modal from "@src/components/molecules/Modal/Modal";
+import Modal from "@src/components/molecules/Modal";
 import { useAppPreferences } from "@src/state/preferences/hooks";
 
 export const ReferAFriendModal = React.memo(

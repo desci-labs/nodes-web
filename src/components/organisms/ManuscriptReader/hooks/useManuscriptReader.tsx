@@ -28,7 +28,7 @@ import {
   setManifestCid,
   setResearchPanelTab,
   toggleMode,
-} from "@src/state/nodes/viewer";
+} from "@src/state/nodes/nodeReader";
 import { useSetter } from "@src/store/accessors";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import useParseObjectID from "@src/components/organisms/ManuscriptReader/useParseObjectID";

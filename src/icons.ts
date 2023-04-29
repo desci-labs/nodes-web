@@ -136,6 +136,7 @@ import { ReactComponent as IconQuotes } from "@images/icons/quotes.svg";
 import { ReactComponent as IconPlayRounded } from "@images/icons/play.svg";
 import { ReactComponent as IconAssignType } from "@images/icons/assign-type-icon.svg";
 import { ReactComponent as IconDrive } from "@images/icons/drive.svg";
+import { ReactComponent as IconUnstar } from "@images/icons/unstar.svg";
 
 export type SvgIconProps = FC<
   React.SVGProps<SVGSVGElement> & {
@@ -148,6 +149,7 @@ const IconZoomIn = React.memo(IconZoomInBase);
 const IconZoomOut = React.memo(IconZoomOutBase);
 
 export {
+  IconUnstar,
   IconDrive,
   IconAssignType,
   IconPlayRounded,

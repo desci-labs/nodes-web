@@ -19,7 +19,7 @@ import {
 import {
   replaceAnnotations,
   updatePendingAnnotations,
-} from "@src/state/nodes/viewer";
+} from "@src/state/nodes/nodeReader";
 
 interface AnnotationEditCanvasProps {
   pageIndex: number;

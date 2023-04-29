@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { IconHorizontalExpand, IconVerticalExpand } from "@icons";
 import { DEFAULT_HEIGHT, DEFAULT_WIDTH } from "@components/organisms/Paper";
 import { useSetter } from "@src/store/accessors";
-import { toggleResearchPanel } from "@src/state/nodes/viewer";
+import { toggleResearchPanel } from "@src/state/nodes/nodeReader";
 import { usePdfReader } from "@src/state/nodes/hooks";
 import { setCenteredZoom } from "@src/state/nodes/pdf";
 

@@ -3,7 +3,7 @@ import PopOver from "@components/organisms/PopOver";
 import { useState } from "react";
 import { useSetter } from "@src/store/accessors";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import { setIsNew } from "@src/state/nodes/viewer";
+import { setIsNew } from "@src/state/nodes/nodeReader";
 
 const PopOverAlphaConsent = (props: any) => {
   const dispatch = useSetter();

@@ -1,4 +1,4 @@
-import ClickableAddIcon from "@components/atoms/ClickableIcon/ClickableAddIcon";
+import ClickableAddIcon from "@components/atoms/ClickableAddIcon";
 import TooltipIcon from "@components/atoms/TooltipIcon";
 import CollapsibleSection from "@components/organisms/CollapsibleSection";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
@@ -17,7 +17,7 @@ import { Container } from "./Container";
 import EditableWrapper from "./EditableWrapper";
 import ComponentCard from "@src/components/molecules/ComponentCard";
 import { useSetter } from "@src/store/accessors";
-import { reorderComponent, saveManifestDraft } from "@src/state/nodes/viewer";
+import { reorderComponent, saveManifestDraft } from "@src/state/nodes/nodeReader";
 
 export enum EditorHistoryType {
   ADD_ANNOTATION,
@@ -165,6 +165,7 @@ const Navigator = () => {
                   id={component.id}
                   index={index}
                   isEditable={isEditable}
+                  component={component}
                 >
                   <ComponentCard component={component} />
                 </EditableWrapper>
@@ -175,20 +176,6 @@ const Navigator = () => {
               <Container
                 moveCard={moveCard}
                 components={cardComponents}
-                // renderComponent={({
-                //   component,
-                //   index,
-                //   ref,
-                //   handlerId,
-                //   style,
-                // }) => (
-                //   <ComponentCard
-                //     ref={ref}
-                //     // style={style}
-                //     data-handler-id={handlerId}
-                //     component={component}
-                //   />
-                // )}
               />
             </DndProvider>
           ) : (

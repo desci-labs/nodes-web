@@ -1,20 +1,20 @@
-import { DriveObject, FileType } from "../types";
+import { AccessStatus, DriveObject, FileType } from "../types";
 import { Actions } from "./types";
 import {
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
-import { useNodeReader } from "@src/state/nodes/hooks";
+import {  useNodeReader } from "@src/state/nodes/hooks";
 import {
   saveManifestDraft,
   setComponentStack,
   setManifest,
   setManifestCid,
-} from "@src/state/nodes/viewer";
+} from "@src/state/nodes/nodeReader";
 import { useSetter } from "@src/store/accessors";
 import axios from "axios";
 import { AvailableUserActionLogTypes, postUserAction } from "@api/index";
-import { separateFileNameAndMimeType } from "@src/state/drive/utils";
+import { separateFileNameAndExtension } from "@src/state/drive/utils";
 import {
   fetchTreeThunk,
   removeFileFromCurrentDrive,
@@ -24,13 +24,14 @@ import {
 import { setComponentTypeBeingAssignedTo } from "@src/state/drive/driveSlice";
 import { deleteData } from "@src/api";
 import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
-import { deleteComponent } from "@src/state/nodes/viewer";
+import { deleteComponent } from "@src/state/nodes/nodeReader";
 import { useDrive } from "@src/state/drive/hooks";
 
 const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
 const PUB_IPFS_URL = process.env.REACT_APP_PUBLIC_IPFS_RESOLVER;
 
 export const getActionState = (action: Actions, file: DriveObject) => {
+  if (file.accessStatus === AccessStatus.UPLOADING) return { disabled: true };
   switch (action) {
     case Actions.PREVIEW:
       return {
@@ -51,7 +52,9 @@ export const getActionState = (action: Actions, file: DriveObject) => {
         disabled: file?.path === DRIVE_FULL_EXTERNAL_LINKS_PATH,
       };
     case Actions.ASSIGN_TYPE:
-      return { disabled: false };
+      return {
+        disabled: file.componentType === ResearchObjectComponentType.LINK,
+      };
     case Actions.EDIT_METADATA:
       return {
         disabled: !(
@@ -156,7 +159,7 @@ export default function useActionHandler() {
       JSON.stringify({ nodeUuid: currentObjectId, cid: file.cid })
     );
     const url = `${IPFS_URL}/${file.cid}`;
-    const { fileName, mimeType } = separateFileNameAndMimeType(file.name);
+    const { fileName, extension } = separateFileNameAndExtension(file.name);
     axios({
       url,
       method: "GET",
@@ -167,7 +170,7 @@ export default function useActionHandler() {
       link.href = url2;
       link.setAttribute(
         "download",
-        `${fileName}${mimeType ? `.${mimeType}` : ""}`
+        `${fileName}${extension ? `.${extension}` : ""}`
       );
       document.body.appendChild(link);
       link.click();

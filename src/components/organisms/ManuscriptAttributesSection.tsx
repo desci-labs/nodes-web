@@ -14,7 +14,7 @@ import IconAcmFunctionalSmall from "@images/icons/acm/acm-functional-hex.png";
 import IconAcmFunctionalFull from "@images/icons/acm/acm-functional-full.png";
 import IconAcmReusableSmall from "@images/icons/acm/acm-reusable-hex.png";
 import IconAcmReusableFull from "@images/icons/acm/acm-reusable-full.png";
-import ClickableAddIcon from "@components/atoms/ClickableIcon/ClickableAddIcon";
+import ClickableAddIcon from "@components/atoms/ClickableAddIcon";
 import { ResearchObjectAttributeKey } from "@desci-labs/desci-models";
 import { __log } from "@components/utils";
 import { useNodeReader } from "@src/state/nodes/hooks";

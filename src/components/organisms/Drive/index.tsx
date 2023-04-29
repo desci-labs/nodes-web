@@ -1,6 +1,6 @@
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import React, { useMemo, useRef, useState } from "react";
-import { DriveNonComponentTypes, DriveObject, FileDir } from "./types";
+import { DriveObject, FileDir } from "./types";
 import DriveRow from "./DriveRow";
 import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
 import { IconCirclePlus, IconStar } from "@src/icons";
@@ -10,15 +10,15 @@ import { useDrive } from "@src/state/drive/hooks";
 import {
   addFilesToDrive,
   navigateToDriveByPath,
+  toggleSelectFileInCurrentDrive,
 } from "@src/state/drive/driveSlice";
 import { useSetter } from "@src/store/accessors";
 import "./styles.scss";
 import DriveBreadCrumbs from "@src/components/molecules/DriveBreadCrumbs";
-import ComponentUseModal from "@src/components/molecules/ComponentUseModal";
 import { useManuscriptController } from "../ManuscriptReader/ManuscriptController";
 import ContextMenu from "../ContextMenu";
 import { FolderAddIcon } from "@heroicons/react/solid";
-import { defaultSort } from "@src/state/drive/utils";
+import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
 
 const Empty = () => {
   return <div className="p-5 text-xs col-span-7">No files</div>;
@@ -32,17 +32,13 @@ const DriveTable: React.FC = () => {
   const { publicView, mode } = useNodeReader();
   const { setAddFilesWithoutContext, setIsAddingComponent } =
     useManuscriptController();
-  const { currentDrive, deprecated, breadCrumbs, fileBeingRenamed } =
+  const { currentDrive, deprecated, breadCrumbs, fileBeingRenamed, selected } =
     useDrive();
 
   const [showAddBtnSelectMenu, setShowAddBtnSelectMenu] =
     useState<boolean>(false);
 
   const dispatch = useSetter();
-
-  const [selected, setSelected] = useState<
-    Record<number, ResearchObjectComponentType | DriveNonComponentTypes>
-  >({});
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -51,25 +47,10 @@ const DriveTable: React.FC = () => {
     drive: DriveObject
   ) {
     dispatch(navigateToDriveByPath({ path: drive.path! }));
-    setSelected({});
   }
 
   function eatBreadCrumb(index: number) {
     dispatch(navigateToDriveByPath({ path: breadCrumbs[index].path! }));
-    setSelected({});
-  }
-
-  function toggleSelected(
-    index: number,
-    componentType: ResearchObjectComponentType | DriveNonComponentTypes
-  ) {
-    const newSelected = { ...selected };
-    if (selected[index]) {
-      delete newSelected[index];
-    } else {
-      newSelected[index] = componentType;
-    }
-    setSelected(newSelected);
   }
 
   //checks if selected is of the same type
@@ -80,6 +61,8 @@ const DriveTable: React.FC = () => {
   const canUse = useMemo(() => {
     return Object.keys(selected).length <= 1;
   }, [selected]);
+
+  const canAdd = currentDrive?.path !== DRIVE_FULL_EXTERNAL_LINKS_PATH;
 
   return (
     <div className="w-full h-full">
@@ -129,6 +112,7 @@ const DriveTable: React.FC = () => {
                           setAddFilesWithoutContext(false);
                           dispatch(addFilesToDrive({ newFolder: true }));
                         },
+                        disabled: !canAdd,
                       },
                     ]}
                     close={() => setShowAddBtnSelectMenu(false)}
@@ -187,10 +171,16 @@ const DriveTable: React.FC = () => {
                   file={f}
                   exploreDirectory={exploreDirectory}
                   index={idx}
-                  selected={!!selected[idx]}
-                  toggleSelected={toggleSelected}
-                  isMultiselecting={!!Object.keys(selected).length}
-                  selectedFiles={selected}
+                  selected={!!selected[f.path!]}
+                  toggleSelected={() =>
+                    dispatch(
+                      toggleSelectFileInCurrentDrive({
+                        path: f.path!,
+                        componentType:
+                          f.componentType as ResearchObjectComponentType,
+                      })
+                    )
+                  }
                   canEditMetadata={canEditMetadata}
                   canUse={canUse}
                   deprecated={deprecated}
