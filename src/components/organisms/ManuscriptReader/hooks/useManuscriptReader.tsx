@@ -17,6 +17,7 @@ import {
   setSelectedAnnotationId,
 } from "@src/state/nodes/pdf";
 import {
+  getDefaultComponentForView,
   pushToComponentStack,
   ResearchTabs,
   resetNodeViewer,
@@ -49,7 +50,7 @@ export default function useManuscriptReader(publicView: boolean = false) {
     "isAddingSubcomponent",
   ]);
 
-  console.log("Parsed Manusciprt", parsedManuscript);
+  console.log("Parsed Manuscript", parsedManuscript);
   const initPrivateReader = async (cid: string) => {
     if (
       !publicView &&
@@ -83,9 +84,9 @@ export default function useManuscriptReader(publicView: boolean = false) {
       );
       dispatch(setManifestCid(manifestCidOnly));
 
-      const firstNonDataComponent = getNonDataComponentsFromManifest(
+      const firstNonDataComponent = getDefaultComponentForView(
         parsedManuscript.manifest
-      )[0];
+      );
 
       dispatch(setComponentStack([firstNonDataComponent]));
       triggerTooltips();
@@ -105,8 +106,8 @@ export default function useManuscriptReader(publicView: boolean = false) {
       const currentId = uuid;
 
       if ("manifest" in parsedManuscript && !!parsedManuscript.manifest) {
-        const defaultComponent = parsedManuscript.manifest.components.find(
-          (c) => c.type === ResearchObjectComponentType.PDF
+        const defaultComponent = getDefaultComponentForView(
+          parsedManuscript.manifest
         );
         let targetComponent =
           defaultComponent ?? parsedManuscript.manifest.components[0];

@@ -35,9 +35,13 @@ $columns: 7;
   --borderRadius: 8px;
   & > li {
     background: rgba(40, 169, 195, 0.5) !important; //tint-primary
-    &:last-of-type {
-      border-bottom-right-radius: var(--borderRadius);
+  }
+  &:last-child {
+    & > li:first-child {
       border-bottom-left-radius: var(--borderRadius);
+    }
+    & > li:last-child {
+      border-bottom-right-radius: var(--borderRadius);
     }
   }
 
@@ -92,8 +96,17 @@ $columns: 7;
     }
     li:nth-child(2) {
       display: flex;
-      border-top-right-radius: var(--borderRadius);
-      border-top-left-radius: var(--borderRadius);
+    }
+
+    .singleRow:last-child {
+      & > li {
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+      }
+    }
+    .driveRowHeader {
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
     }
 
     grid-template-columns: $FILE_NAME;

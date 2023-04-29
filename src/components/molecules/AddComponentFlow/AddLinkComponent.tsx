@@ -5,15 +5,15 @@ import { ResearchObjectComponentSubtypes } from "@desci-labs/desci-models";
 interface Props {
   url: string | undefined;
   setUrl: React.Dispatch<React.SetStateAction<string | undefined>>;
-  subType: ResearchObjectComponentSubtypes | null;
-  setSubType: React.Dispatch<any>;
+  subtype: ResearchObjectComponentSubtypes | null;
+  setSubtype: React.Dispatch<any>;
 }
 
 const AddLinkComponent: React.FC<Props> = ({
   url,
   setUrl,
-  subType,
-  setSubType,
+  subtype,
+  setSubtype,
 }) => {
   return (
     <div className="py-3 flex flex-col gap-6 items-center">
