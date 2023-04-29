@@ -64,7 +64,7 @@ import {
   setManifest,
   setManifestCid,
   updateComponent,
-} from "../nodes/viewer";
+} from "../nodes/nodeReader";
 
 export interface DriveState {
   status: RequestStatus;

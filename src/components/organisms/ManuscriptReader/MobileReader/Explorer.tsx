@@ -1,5 +1,5 @@
 import PerfectScrollbar from "react-perfect-scrollbar";
-import { ResearchTabs, setResearchPanelTab } from "@src/state/nodes/viewer";
+import { ResearchTabs, setResearchPanelTab } from "@src/state/nodes/nodeReader";
 import { SwitchBar, SwitchButton } from "@src/components/atoms/SwitchBar";
 import { useSetter } from "@src/store/accessors";
 import { useHistoryReader, useNodeReader } from "@src/state/nodes/hooks";

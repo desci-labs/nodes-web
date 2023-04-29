@@ -3,7 +3,7 @@ import {
   addNodeAuthor,
   saveManifestDraft,
   updateNodeAuthor,
-} from "@src/state/nodes/viewer";
+} from "@src/state/nodes/nodeReader";
 import { useSetter } from "@src/store/accessors";
 
 export default function useCreditsForm({

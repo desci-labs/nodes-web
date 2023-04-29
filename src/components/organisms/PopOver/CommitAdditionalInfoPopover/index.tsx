@@ -17,7 +17,7 @@ import {
   ResearchTabs,
   setResearchPanelTab,
   toggleResearchPanel,
-} from "@src/state/nodes/viewer";
+} from "@src/state/nodes/nodeReader";
 import Modal, { ModalProps } from "@src/components/molecules/Modal";
 
 // const GATEWAY_OPTIONS = [

@@ -17,7 +17,7 @@ import {
   removeComponentMetadata,
   saveManifestDraft,
   updateComponent,
-} from "@src/state/nodes/viewer";
+} from "@src/state/nodes/nodeReader";
 import { useSetter } from "@src/store/accessors";
 import Modal from "../Modal";
 import { FormProvider, useForm } from "react-hook-form";

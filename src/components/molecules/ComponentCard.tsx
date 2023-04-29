@@ -18,7 +18,7 @@ import { findTarget } from "@components/organisms/ComponentLibrary";
 import ButtonFair from "@components/atoms/ButtonFair";
 import { SessionStorageKeys } from "../driveUtils";
 import { useSetter } from "@src/store/accessors";
-import { setComponentStack } from "@src/state/nodes/viewer";
+import { setComponentStack } from "@src/state/nodes/nodeReader";
 import { updatePdfPreferences } from "@src/state/nodes/pdf";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import {

@@ -10,7 +10,7 @@ import {
   setComponentStack,
   setManifest,
   setManifestCid,
-} from "@src/state/nodes/viewer";
+} from "@src/state/nodes/nodeReader";
 import { useSetter } from "@src/store/accessors";
 import axios from "axios";
 import { AvailableUserActionLogTypes, postUserAction } from "@api/index";
@@ -24,7 +24,7 @@ import {
 import { setComponentTypeBeingAssignedTo } from "@src/state/drive/driveSlice";
 import { deleteData } from "@src/api";
 import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
-import { deleteComponent } from "@src/state/nodes/viewer";
+import { deleteComponent } from "@src/state/nodes/nodeReader";
 import { useDrive } from "@src/state/drive/hooks";
 
 const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;

@@ -24,7 +24,7 @@ import {
   setCurrentObjectId,
   setManifest,
   setPublicView,
-} from "@src/state/nodes/viewer";
+} from "@src/state/nodes/nodeReader";
 import { toggleToolbar } from "@src/state/preferences/preferencesSlice";
 import { useSetter } from "@src/store/accessors";
 import axios from "axios";

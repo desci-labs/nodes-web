@@ -4,7 +4,7 @@ import Control from "./Control";
 import PaginationControl from "./Control/PaginationControl";
 import ZoomControl from "./Control/ZoomControl";
 import { IconDownloadPdf } from "@icons";
-import FitToButton from "@components/molecules/FitToButton";
+import FitToButton from "@src/components/molecules/FitToButton";
 
 import {
   PdfComponent,
@@ -16,7 +16,7 @@ import ReactTooltip from "react-tooltip";
 import { AvailableUserActionLogTypes, postUserAction } from "@api/index";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
-import { toggleMode, toggleResearchPanel } from "@src/state/nodes/viewer";
+import { toggleMode, toggleResearchPanel } from "@src/state/nodes/nodeReader";
 
 const Wrapper = styled.div.attrs({
   className: "flex items-center relative",

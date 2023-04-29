@@ -4,7 +4,7 @@ import PanelButton from "./PanelButton";
 // import { useManuscriptController } from "../organisms/ManuscriptReader/ManuscriptController";
 import { IconDesciNodes } from "@src/icons";
 import { useSetter } from "@src/store/accessors";
-import { toggleResearchPanel } from "@src/state/nodes/viewer";
+import { toggleResearchPanel } from "@src/state/nodes/nodeReader";
 
 const ButtonMysterious = () => {
   const { isPortrait } = useResponsive();
