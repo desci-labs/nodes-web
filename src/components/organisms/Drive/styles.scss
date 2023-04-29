@@ -35,9 +35,13 @@ $columns: 7;
   --borderRadius: 8px;
   & > li {
     background: rgba(40, 169, 195, 0.5) !important; //tint-primary
-    &:last-of-type {
-      border-bottom-right-radius: var(--borderRadius);
+  }
+  &:last-child {
+    & > li:first-child {
       border-bottom-left-radius: var(--borderRadius);
+    }
+    & > li:last-child {
+      border-bottom-right-radius: var(--borderRadius);
     }
   }
 
