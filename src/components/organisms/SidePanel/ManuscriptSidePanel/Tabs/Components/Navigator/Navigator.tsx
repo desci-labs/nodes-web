@@ -13,11 +13,14 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useDrive } from "@src/state/drive/hooks";
-import { Container } from "./Container";
 import EditableWrapper from "./EditableWrapper";
 import ComponentCard from "@src/components/molecules/ComponentCard";
 import { useSetter } from "@src/store/accessors";
-import { reorderComponent, saveManifestDraft } from "@src/state/nodes/nodeReader";
+import {
+  reorderComponent,
+  saveManifestDraft,
+} from "@src/state/nodes/nodeReader";
+import MiniComponentCard from "@src/components/molecules/MiniComponentCard";
 
 export enum EditorHistoryType {
   ADD_ANNOTATION,
@@ -155,38 +158,40 @@ const Navigator = () => {
         className="mb-4"
       >
         <div className="flex flex-col gap-3 py-2 px-0">
-          {isEditable &&
-            cardComponents &&
-            cardComponents.length &&
-            cardComponents.map(
-              (component: ResearchObjectV1Component, index: number) => (
-                <EditableWrapper
-                  key={`editable_hoc_${currentObjectId}_${component.id}`}
-                  id={component.id}
-                  index={index}
-                  isEditable={isEditable}
-                  component={component}
-                >
-                  <ComponentCard component={component} />
-                </EditableWrapper>
-              )
+          <DndProvider backend={HTML5Backend}>
+            {cardComponents &&
+              cardComponents.length &&
+              cardComponents.map(
+                (component: ResearchObjectV1Component, index: number) => (
+                  <EditableWrapper
+                    key={`editable_hoc_${currentObjectId}_${component.id}`}
+                    id={component.id}
+                    index={index}
+                    isEditable={isEditable}
+                    component={component}
+                    moveCard={moveCard}
+                  >
+                    {isEditable ? (
+                      <MiniComponentCard
+                        key={component.id}
+                        index={index}
+                        id={component.id}
+                        component={component}
+                        moveCard={moveCard}
+                      />
+                    ) : (
+                      <ComponentCard component={component} />
+                    )}
+                  </EditableWrapper>
+                )
+              )}
+            {cardComponents?.length === 0 && (
+              <div className="text-[10px] text-neutrals-gray-6 flex flex-row gap-1 items-center">
+                <IconStar width={12} className="fill-tint-primary-hover" />
+                Star a component in Drive to see it here
+              </div>
             )}
-          {cardComponents && cardComponents.length && !isEditable ? (
-            <DndProvider backend={HTML5Backend}>
-              <Container
-                moveCard={moveCard}
-                components={cardComponents}
-              />
-            </DndProvider>
-          ) : (
-            <></>
-          )}
-          {cardComponents?.length === 0 && (
-            <div className="text-[10px] text-neutrals-gray-6 flex flex-row gap-1 items-center">
-              <IconStar width={12} className="fill-tint-primary-hover" />
-              Star a component in Drive to see it here
-            </div>
-          )}
+          </DndProvider>
         </div>
       </CollapsibleSection>
     </>

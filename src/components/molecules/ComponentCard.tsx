@@ -232,7 +232,6 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
       <FlexColumn>
         <HeaderWrapper>
           <span className="text-xs font-bold truncate">{component.name}</span>
-          {/* {headerRight} */}
           <span className="flex flex-col items-center">
             <div className="border-tint-primary border-[2px] p-1 rounded-full scale-75 block -my-1">
               <span
