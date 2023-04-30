@@ -559,7 +559,7 @@ export const fetchTreeThunk = createAsyncThunk(
       const { tree } = await getDatasetTree(
         rootCid,
         currentObjectId!,
-        publicView,
+        publicView || state.nodes.nodeReader.mode === "reader",
         shareId
       );
       return { tree, manifest };
