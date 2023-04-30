@@ -26,18 +26,11 @@ import {
   setFileBeingCited,
   setFileBeingUsed,
 } from "@src/state/drive/driveSlice";
-import BlackGenericButton from "@components/atoms/BlackGenericButton";
 import { IconDrive, IconPlayRounded, IconQuotes } from "@src/icons";
 import { findDriveByPath } from "@src/state/drive/utils";
 import { useDrive } from "@src/state/drive/hooks";
 import { AccessStatus } from "@components/organisms/Drive";
 import { getLicenseShortName } from "@components/organisms/PopOver/ComponentMetadataPopover";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@components/atoms/tooltip";
 import TooltipButton from "../atoms/TooltipButton";
 
 const CardWrapper: StyledComponent<
@@ -114,8 +107,7 @@ const iconFor = (
 
 const ComponentCard = ({ component }: ComponentCardProps) => {
   const dispatch = useSetter();
-  const { componentStack, recentlyAddedComponent, manifest, mode } =
-    useNodeReader();
+  const { componentStack, recentlyAddedComponent, manifest } = useNodeReader();
   const { nodeTree } = useDrive();
   /***
    * Use local click tracking for fast click response
@@ -146,7 +138,7 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
         }
       }, 1000);
     }
-    ReactTooltip.rebuild();
+    // ReactTooltip.rebuild();
   }, [component]);
 
   const isSelected =
@@ -290,11 +282,9 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                     />
                   </div>
                   <div id="section-right" className="flex gap-2">
-                    <BlackGenericButton
-                      dataTip={"Show File Location"}
-                      dataFor={`drive_${component.id}`}
+                    <TooltipButton
+                      className="py-[7px] px-[1px] rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray disabled:bg-opacity-25 disabled:cursor-not-allowed"
                       disabled={false}
-                      className="p-0"
                       onClick={(e) => {
                         e!.stopPropagation();
                         dispatch(
@@ -312,13 +302,15 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                           dispatch(setComponentStack([]));
                         }
                       }}
+                      tooltipContent={<>Show File Location</>}
                     >
                       <IconDrive className="p-0 min-w-[28px] scale-[1.2]" />
-                    </BlackGenericButton>
-                    <BlackGenericButton
-                      dataTip={"Cite"}
-                      dataFor={`cite_${component.id}`}
-                      className="w-7 h-7"
+                    </TooltipButton>
+                    <TooltipButton
+                      tooltipContent={"Cite"}
+                      side="top"
+                      // dataFor={`cite_${component.id}`}
+                      className="`p-2 rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray  disabled:bg-opacity-25 disabled:cursor-not-allowed w-7 h-7"
                       disabled={!canCite}
                       onClick={(e) => {
                         e!.stopPropagation();
@@ -326,24 +318,26 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                       }}
                     >
                       <IconQuotes />
-                    </BlackGenericButton>
+                    </TooltipButton>
                     {[
                       ResearchObjectComponentType.DATA,
                       ResearchObjectComponentType.CODE,
                       ResearchObjectComponentType.UNKNOWN,
                     ].includes(component.type) ? (
-                      <BlackGenericButton
-                        dataTip={"Methods"}
-                        dataFor={`use_${component.id}`}
+                      <TooltipButton
+                        tooltipContent={"Methods"}
+                        // dataFor={`use_${component.id}`}
+                        side="top"
                         disabled={!drive}
-                        className="p-0 min-w-[28px] h-7"
+                        className="p-0 min-w-[28px] h-7 `p-2 rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray 
+      disabled:bg-opacity-25 disabled:cursor-not-allowed"
                         onClick={(e) => {
                           e!.stopPropagation();
                           dispatch(setFileBeingUsed(drive));
                         }}
                       >
                         <IconPlayRounded className="p-0" />
-                      </BlackGenericButton>
+                      </TooltipButton>
                     ) : null}
                     <div
                       style={{
@@ -365,28 +359,6 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
           </FlexRowSpaceBetween>
         </div>
       </FlexColumn>
-
-      {/* <ReactTooltip
-        backgroundColor="black"
-        effect="solid"
-        id={`fair_${component.id}`}
-        className="bg-white"
-      /> */}
-      <ReactTooltip
-        backgroundColor="black"
-        effect="solid"
-        id={`drive_${component.id}`}
-      />
-      <ReactTooltip
-        backgroundColor="black"
-        effect="solid"
-        id={`cite_${component.id}`}
-      />
-      <ReactTooltip
-        backgroundColor="black"
-        effect="solid"
-        id={`use_${component.id}`}
-      />
     </CardWrapper>
   );
 };

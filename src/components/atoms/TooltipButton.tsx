@@ -1,17 +1,27 @@
-import { Tooltip, TooltipContent, TooltipTrigger } from "@components/atoms/tooltip";
+import {
+  Side,
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  TooltipTrigger,
+} from "@components/atoms/tooltip";
 
 interface TooltipButtonProps extends React.ComponentPropsWithRef<"button"> {
   tooltipContent: React.ReactNode;
+  side?: Side
 }
 
 const TooltipButton = (props: TooltipButtonProps) => {
   const { tooltipContent, children, ...buttonProps } = props;
   return (
-    <Tooltip>
+    <Tooltip delayDuration={0}>
       <TooltipTrigger>
         <button {...buttonProps}>{children}</button>
       </TooltipTrigger>
-      <TooltipContent>{tooltipContent}</TooltipContent>
+        <TooltipContent side={props.side}>
+            {tooltipContent}
+            <TooltipArrow height={5} />
+        </TooltipContent>
     </Tooltip>
   );
 };

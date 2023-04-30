@@ -107,7 +107,31 @@ const Navigator = () => {
     [cardComponents, dispatch, manifestData?.components]
   );
 
-  console.log(cardComponents);
+  const renderEditableComponents = (components: ResearchObjectV1Component[]) => {
+    return (
+      <>
+        {components.map(
+          (component: ResearchObjectV1Component, index: number) => (
+            <EditableWrapper
+              key={`editable_hoc_${currentObjectId}_${component.id}`}
+              id={component.id}
+              index={index}
+              isEditable={isEditable}
+              component={component}
+              moveCard={moveCard}
+            >
+              {isEditable ? (
+                <MiniComponentCard key={component.id} component={component} />
+              ) : (
+                <ComponentCard component={component} />
+              )}
+            </EditableWrapper>
+          )
+        )}
+      </>
+    );
+  };
+
   return (
     <>
       <CollapsibleSection
@@ -158,37 +182,17 @@ const Navigator = () => {
         className="mb-4"
       >
         <div className="flex flex-col gap-3 py-2 px-0">
-          <DndProvider backend={HTML5Backend}>
-            {cardComponents &&
-              cardComponents.length &&
-              cardComponents.map(
-                (component: ResearchObjectV1Component, index: number) => (
-                  <EditableWrapper
-                    key={`editable_hoc_${currentObjectId}_${component.id}`}
-                    id={component.id}
-                    index={index}
-                    isEditable={isEditable}
-                    component={component}
-                    moveCard={moveCard}
-                  >
-                    {isEditable ? (
-                      <MiniComponentCard
-                        key={component.id}
-                        component={component}
-                      />
-                    ) : (
-                      <ComponentCard component={component} />
-                    )}
-                  </EditableWrapper>
-                )
-              )}
-            {cardComponents?.length === 0 && (
-              <div className="text-[10px] text-neutrals-gray-6 flex flex-row gap-1 items-center">
-                <IconStar width={12} className="fill-tint-primary-hover" />
-                Star a component in Drive to see it here
-              </div>
-            )}
-          </DndProvider>
+          {cardComponents && cardComponents.length && (
+            <DndProvider backend={HTML5Backend}>
+              {renderEditableComponents(cardComponents)}
+            </DndProvider>
+          )}
+          {cardComponents?.length === 0 && (
+            <div className="text-[10px] text-neutrals-gray-6 flex flex-row gap-1 items-center">
+              <IconStar width={12} className="fill-tint-primary-hover" />
+              Star a component in Drive to see it here
+            </div>
+          )}
         </div>
       </CollapsibleSection>
     </>

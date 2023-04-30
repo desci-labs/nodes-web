@@ -23,11 +23,11 @@ const FairBtn: React.FC<FairBtnProps> = ({
 
   return (
     <Tooltip>
-      <TooltipTrigger>
+      <TooltipTrigger asChild>
         <button
-          data-tip={mode === "editor" ? "Edit Metadata" : "View Metadata"}
-          data-place={"bottom"}
-          data-for={`fair_${component.id}`}
+          // data-tip={mode === "editor" ? "Edit Metadata" : "View Metadata"}
+          // data-place={"bottom"}
+          // data-for={`fair_${component.id}`}
           className={`bg-black select-none hover:bg-neutrals-gray-3 active:bg-black w-8 h-7 flex justify-center items-center rounded-lg ${classname}`}
           onClick={(e: React.MouseEvent) => {
             dispatch(showMetadataForComponent(component));

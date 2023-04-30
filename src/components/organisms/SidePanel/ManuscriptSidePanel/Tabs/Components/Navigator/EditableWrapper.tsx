@@ -134,7 +134,7 @@ const EditableWrapper = forwardRef(
 
     return (
       <div
-        className="flex flex-row"
+        className="flex flex-row transition-all duration-200"
         ref={ref}
         style={{ opacity, transform: "translateZ(0)" }}
         data-handler-id={handlerId}

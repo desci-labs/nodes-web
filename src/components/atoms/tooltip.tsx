@@ -5,11 +5,30 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
 import { cn } from "@src/lib/utils";
 
+const SIDE_OPTIONS: readonly ["top", "right", "bottom", "left"] = [
+  "top",
+  "right",
+  "bottom",
+  "left",
+];
+const ALIGN_OPTIONS: readonly ["start", "center", "end"] = [
+  "start",
+  "center",
+  "end",
+];
+
+export type Side = (typeof SIDE_OPTIONS)[number];
+export type Align = (typeof ALIGN_OPTIONS)[number];
+
 const TooltipProvider = TooltipPrimitive.Provider;
+const TooltipPortal = TooltipPrimitive.Portal;
+const TooltipRoot = TooltipPrimitive.Root;
 
 const Tooltip = TooltipPrimitive.Root;
 
 const TooltipTrigger = TooltipPrimitive.Trigger;
+
+const TooltipArrow = TooltipPrimitive.Arrow;
 
 const TooltipContent = React.forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,
@@ -27,5 +46,12 @@ const TooltipContent = React.forwardRef<
 ));
 TooltipContent.displayName = TooltipPrimitive.Content.displayName;
 
-
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider };
+export {
+  Tooltip,
+  TooltipRoot,
+  TooltipArrow,
+  TooltipPortal,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+};
