@@ -63,10 +63,7 @@ export interface SectionCardProps {
 }
 
 export interface MiniComponentCardProps extends SectionCardProps {
-  id: any;
   component: ResearchObjectV1Component;
-  index: number;
-  moveCard?: (dragIndex: number, hoverIndex: number) => void;
 }
 
 const iconFor = (
@@ -81,7 +78,7 @@ const iconFor = (
 };
 
 const MiniComponentCard = React.forwardRef(
-  ({ id, index, moveCard, component }: MiniComponentCardProps, orderRef: any) => {
+  ({ component }: MiniComponentCardProps, orderRef: any) => {
     const dispatch = useSetter();
     const { componentStack, recentlyAddedComponent } =
       useNodeReader();

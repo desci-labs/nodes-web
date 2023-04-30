@@ -174,10 +174,7 @@ const Navigator = () => {
                     {isEditable ? (
                       <MiniComponentCard
                         key={component.id}
-                        index={index}
-                        id={component.id}
                         component={component}
-                        moveCard={moveCard}
                       />
                     ) : (
                       <ComponentCard component={component} />

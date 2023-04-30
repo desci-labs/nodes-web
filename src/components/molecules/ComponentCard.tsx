@@ -1,9 +1,5 @@
 import axios from "axios";
-import React, {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styled, { StyledComponent } from "styled-components";
 import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
 
@@ -30,12 +26,19 @@ import {
   setFileBeingCited,
   setFileBeingUsed,
 } from "@src/state/drive/driveSlice";
-import BlackGenericButton from "../atoms/BlackGenericButton";
+import BlackGenericButton from "@components/atoms/BlackGenericButton";
 import { IconDrive, IconPlayRounded, IconQuotes } from "@src/icons";
 import { findDriveByPath } from "@src/state/drive/utils";
 import { useDrive } from "@src/state/drive/hooks";
-import { AccessStatus } from "../organisms/Drive";
-import { getLicenseShortName } from "../organisms/PopOver/ComponentMetadataPopover";
+import { AccessStatus } from "@components/organisms/Drive";
+import { getLicenseShortName } from "@components/organisms/PopOver/ComponentMetadataPopover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@components/atoms/tooltip";
+import TooltipButton from "../atoms/TooltipButton";
 
 const CardWrapper: StyledComponent<
   "div",
@@ -111,7 +114,8 @@ const iconFor = (
 
 const ComponentCard = ({ component }: ComponentCardProps) => {
   const dispatch = useSetter();
-  const { componentStack, recentlyAddedComponent, manifest } = useNodeReader();
+  const { componentStack, recentlyAddedComponent, manifest, mode } =
+    useNodeReader();
   const { nodeTree } = useDrive();
   /***
    * Use local click tracking for fast click response
@@ -260,27 +264,6 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                 />
               </span>
             </div>
-
-            <ReactTooltip
-              backgroundColor="black"
-              effect="solid"
-              id={`fair_${component.id}`}
-            />
-            <ReactTooltip
-              backgroundColor="black"
-              effect="solid"
-              id={`drive_${component.id}`}
-            />
-            <ReactTooltip
-              backgroundColor="black"
-              effect="solid"
-              id={`cite_${component.id}`}
-            />
-            <ReactTooltip
-              backgroundColor="black"
-              effect="solid"
-              id={`use_${component.id}`}
-            />
           </span>
         </HeaderWrapper>
         <div
@@ -382,6 +365,28 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
           </FlexRowSpaceBetween>
         </div>
       </FlexColumn>
+
+      {/* <ReactTooltip
+        backgroundColor="black"
+        effect="solid"
+        id={`fair_${component.id}`}
+        className="bg-white"
+      /> */}
+      <ReactTooltip
+        backgroundColor="black"
+        effect="solid"
+        id={`drive_${component.id}`}
+      />
+      <ReactTooltip
+        backgroundColor="black"
+        effect="solid"
+        id={`cite_${component.id}`}
+      />
+      <ReactTooltip
+        backgroundColor="black"
+        effect="solid"
+        id={`use_${component.id}`}
+      />
     </CardWrapper>
   );
 };
