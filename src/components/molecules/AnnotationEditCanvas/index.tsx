@@ -32,6 +32,7 @@ const AnnotationEditCanvas: React.FC<
   const dispatch = useSetter();
 
   const { isAnnotating, startedNewAnnotationViaButton } = usePdfReader();
+  const { mode } = useNodeReader();
   const { pageIndex, children, className, ...rest } = props;
 
   const [dragStart, setDragStart] = useState([0, 0]);
@@ -58,6 +59,7 @@ const AnnotationEditCanvas: React.FC<
     }
     const el = divRef.current;
     const handleAnnotationTrigger = (ev: MouseEvent) => {
+      if (mode === "reader") return;
       if (ev.altKey) {
         if (!isAnnotating) {
           dispatch(setIsAnnotating(true));
@@ -81,7 +83,7 @@ const AnnotationEditCanvas: React.FC<
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [divRef, startedNewAnnotationViaButton, isAnnotating]);
+  }, [divRef, startedNewAnnotationViaButton, isAnnotating, mode]);
 
   /**
    * This is the default size of the annotation rectangle when the user starts dragging
@@ -112,6 +114,8 @@ const AnnotationEditCanvas: React.FC<
   };
 
   const mouseDown = (e: any) => {
+    debugger;
+    if (mode === "reader") return;
     if (isAnnotating || e.altKey) {
       __log(
         "AnnotationEditCanvas::mouseDown",
@@ -142,6 +146,7 @@ const AnnotationEditCanvas: React.FC<
   };
   const mouseMove = useCallback(
     (e: any) => {
+      if (mode === "reader") return;
       if (isAnnotating && dragging) {
         __log(
           "AnnotationEditCanvas::mouseMove",
@@ -238,6 +243,7 @@ const AnnotationEditCanvas: React.FC<
   );
 
   const mouseUp = (e: any) => {
+    if (mode === "view") return;
     if (isAnnotating && currentAnnotationId) {
       __log(
         "AnnotationEditCanvas::mouseUp",
