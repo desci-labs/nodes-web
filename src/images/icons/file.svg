@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 12 12" fill="currentColor" stroke="currentColor">
+  <g stroke-width="1" stroke-linejoin="round" fill="none" stroke-linecap="round" class="nc-icon-wrapper">
+    <polygon points="10.5 11.5 1.5 11.5 1.5 0.5 7.5 0.5 10.5 3.5 10.5 11.5"></polygon>
+    <polyline points="7.5 0.5 7.5 3.5 10.5 3.5"></polyline>
+    <polygon points="7.5 0.5 7.5 3.5 10.5 3.5 7.5 0.5" stroke="none"></polygon>
+  </g>
+</svg>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script type="text/javascript">
+      if (
+        localStorage.theme === "dark" ||
+        (!("theme" in localStorage) &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    </script>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+
+    <meta
+      name="description"
+      content="DeSci Nodes enables the creation and validation of Research Objects on an open state repository. Combine research manuscripts with code, data, videos, and more following FAIR data principles."
+    />
+
+    <!-- Google / Search Engine Tags -->
+    <meta itemprop="name" content="DeSci Nodes: Elevate your Research" />
+    <meta
+      itemprop="description"
+      content="DeSci Nodes enables the creation and validation of Research Objects on an open state repository. Combine research manuscripts with code, data, videos, and more following FAIR data principles."
+    />
+    <meta
+      itemprop="image"
+      content="http://d3ibh1pfr1vlpk.cloudfront.net/desci-nodes-preview.jpg"
+    />
+    <meta property="og:site_name" content="DeSci Nodes" />
+
+    <!-- Facebook Meta Tags -->
+    <meta property="og:url" content="https://nodes.desci.com" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="DeSci Nodes: Elevate your Research" />
+    <meta
+      property="og:description"
+      content="DeSci Nodes enables the creation and validation of Research Objects on an open state repository. Combine research manuscripts with code, data, videos, and more following FAIR data principles."
+    />
+    <meta
+      property="og:image"
+      content="http://d3ibh1pfr1vlpk.cloudfront.net/desci-nodes-preview.jpg"
+    />
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="DeSci Nodes: Elevate your Research" />
+    <meta property="twitter:url" content="https://nodes.desci.com" />
+    <meta
+      name="twitter:description"
+      content="DeSci Nodes enables the creation and validation of Research Objects on an open state repository. Combine research manuscripts with code, data, videos, and more following FAIR data principles."
+    />
+    <meta
+      name="twitter:image"
+      content="http://d3ibh1pfr1vlpk.cloudfront.net/desci-nodes-preview.jpg"
+    />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com/" />
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Bitter:wght@200;300;400;600;700;800&family=Mulish:wght@400;500;600&family=Karla:wght@400;500&family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="preload"
+      as="image"
+      href="https://d3ibh1pfr1vlpk.cloudfront.net/spin-fast.png"
+    />
+    <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <script src="https://unpkg.com/@toruslabs/torus-embed@1.35.5/dist/torus.umd.min.js"></script>
+    <!--
+      Notice the use of %PUBLIC_URL% in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
+
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+    <title>DeSci Nodes</title>
+    <!-- Marker.io bug report -->
+    <script>
+      window.markerConfig = {
+        destination: "63e8a41a7f429375537b5be4",
+        source: "snippet",
+        keyboardShortcuts: false,
+        silent: true,
+      };
+    </script>
+
+    <script>
+      !(function (e, r, a) {
+        if (!e.__Marker) {
+          e.__Marker = {};
+          var t = [],
+            n = { __cs: t };
+          [
+            "show",
+            "hide",
+            "isVisible",
+            "capture",
+            "cancelCapture",
+            "unload",
+            "reload",
+            "isExtensionInstalled",
+            "setReporter",
+            "setCustomData",
+            "on",
+            "off",
+          ].forEach(function (e) {
+            n[e] = function () {
+              var r = Array.prototype.slice.call(arguments);
+              r.unshift(e), t.push(r);
+            };
+          }),
+            (e.Marker = n);
+          var s = r.createElement("script");
+          (s.async = 1), (s.src = "https://edge.marker.io/latest/shim.js");
+          var i = r.getElementsByTagName("script")[0];
+          i.parentNode.insertBefore(s, i);
+        }
+      })(window, document);
+    </script>
+
+    <!-- Hotjar Tracking Code for https://nodes.desci.com -->
+    <script>
+      (function (h, o, t, j, a, r) {
+        h.hj =
+          h.hj ||
+          function () {
+            (h.hj.q = h.hj.q || []).push(arguments);
+          };
+        h._hjSettings = { hjid: 3123780, hjsv: 6 };
+        a = o.getElementsByTagName("head")[0];
+        r = o.createElement("script");
+        r.async = 1;
+        r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
+        a.appendChild(r);
+      })(window, document, "https://static.hotjar.com/c/hotjar-", ".js?sv=");
+    </script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-6J07R2L4ZL"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-6J07R2L4ZL");
+    </script>
+  </head>
+
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
+
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
+
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    -->
+  </body>
+</html>

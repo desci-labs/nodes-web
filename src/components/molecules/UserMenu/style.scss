@@ -1,0 +1,9 @@
+.user-menu {
+  position: relative;
+  .submenu {
+    position: absolute;
+    background: red;
+    width: 100px;
+    height: 100px;
+  }
+}

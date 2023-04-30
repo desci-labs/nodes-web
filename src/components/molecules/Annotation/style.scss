@@ -1,0 +1,16 @@
+.annotation-item {
+  // force light mode for annotation pills
+  .dark\:bg-zinc-500 {
+    background-color: rgb(212 212 216);
+  }
+  // body links for annotation
+  .react-slidedown {
+    a {
+      color: teal;
+      text-decoration: underline;
+      &:hover {
+        color: darken(teal, 15%);
+      }
+    }
+  }
+}

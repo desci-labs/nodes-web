@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" height="16" width="24" viewBox="0 0 16 16">
+	<g class="nc-icon-wrapper">
+		<rect width="16" height="2" y="2.5">
+		</rect>
+		<rect data-color="color-2" y="7.5" width="16" height="2">
+		</rect>
+		<rect y="12.5" width="16" height="2">
+		</rect>
+	</g>
+</svg>

@@ -1,0 +1,117 @@
+$columns: 7;
+
+.driveRowHeader {
+  --borderRadius: 8px;
+  &:first-of-type {
+    border-top-left-radius: var(--borderRadius);
+  }
+  &:nth-of-type(#{$columns}) {
+    border-top-right-radius: var(--borderRadius);
+  }
+}
+
+.singleRow {
+  --borderRadius: 8px;
+  &:last-of-type {
+    border-bottom-right-radius: var(--borderRadius);
+    border-bottom-left-radius: var(--borderRadius);
+
+    & > li {
+      border-bottom: none;
+    }
+    &:hover > li:first-child {
+      border-bottom-left-radius: var(--borderRadius) !important;
+    }
+    &:hover > li:last-child {
+      border-bottom-right-radius: var(--borderRadius) !important;
+    }
+  }
+  &:hover > li {
+    background: #333;
+  }
+}
+
+.singleRowSelected {
+  --borderRadius: 8px;
+  & > li {
+    background: rgba(40, 169, 195, 0.5) !important; //tint-primary
+  }
+  &:last-child {
+    & > li:first-child {
+      border-bottom-left-radius: var(--borderRadius);
+    }
+    & > li:last-child {
+      border-bottom-right-radius: var(--borderRadius);
+    }
+  }
+
+  &:hover > li {
+    background: rgba(40, 169, 195, 0.75) !important; //tint-primary
+  }
+}
+
+.drive-row-container {
+  $STARRED: 50px;
+  $FILE_NAME: 2fr;
+  $LAST_MODIFIED: minmax(auto, 1fr);
+  $STATUS: minmax(auto, 1fr);
+  $FILE_SIZE: minmax(auto, 1fr);
+  $CITE: 50px;
+  $USE: 50px;
+
+  grid-template-columns: $STARRED $FILE_NAME $LAST_MODIFIED $STATUS $FILE_SIZE $CITE $USE;
+
+  &.deprecated {
+    grid-template-columns: $FILE_NAME $LAST_MODIFIED $STATUS $FILE_SIZE $CITE $USE;
+  }
+
+  // drop file date
+  @media (max-width: 1333px) {
+    .col-last-modified {
+      display: none;
+    }
+    grid-template-columns: $STARRED $FILE_NAME $STATUS $FILE_SIZE $CITE $USE;
+    &.deprecated {
+      grid-template-columns: $FILE_NAME $STATUS $FILE_SIZE $CITE $USE;
+    }
+  }
+
+  // drop status
+  @media (max-width: 1275px) {
+    .col-last-modified {
+      display: none;
+    }
+    .col-status {
+      display: none;
+    }
+    grid-template-columns: $STARRED $FILE_NAME $FILE_SIZE $CITE $USE;
+    &.deprecated {
+      grid-template-columns: $FILE_NAME $FILE_SIZE $CITE $USE;
+    }
+  }
+  // drop all
+  @media (max-width: 1214px) {
+    li {
+      display: none;
+    }
+    li:nth-child(2) {
+      display: flex;
+    }
+
+    .singleRow:last-child {
+      & > li {
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+      }
+    }
+    .driveRowHeader {
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+
+    grid-template-columns: $FILE_NAME;
+    &.deprecated {
+      grid-template-columns: $FILE_NAME;
+    }
+  }
+}
