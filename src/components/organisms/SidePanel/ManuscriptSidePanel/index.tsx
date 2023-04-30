@@ -39,6 +39,7 @@ const ManuscriptSidePanelContainer = styled(SidePanel).attrs({
 const ContentWrapper = styled(FlexColumn)`
   position: relative;
   height: 100%;
+  padding-bottom: 30px;
 `;
 const ManuscriptHeader = styled(FlexRowSpaceBetween)`
   padding: 0.6rem 1.625rem;

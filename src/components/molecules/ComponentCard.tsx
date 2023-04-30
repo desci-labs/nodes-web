@@ -13,7 +13,6 @@ import {
 } from "@desci-labs/desci-models";
 import { cleanupManifestUrl } from "@components/utils";
 import TooltipIcon from "@components/atoms/TooltipIcon";
-import ReactTooltip from "react-tooltip";
 import { findTarget } from "@components/organisms/ComponentLibrary";
 import ButtonFair from "@components/atoms/ButtonFair";
 import { SessionStorageKeys } from "../driveUtils";
@@ -278,7 +277,7 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                           component.payload?.licenseType ||
                           manifest?.defaultLicense
                       )} //Should only ever hit unknown for deprecated tree
-                      classname="w-auto bg-neutrals-gray-2 px-2 font-medium text-xs h-7"
+                      classname="w-auto bg-black hover:bg-neutrals-gray-2 text-white px-2 font-medium text-xs h-7"
                     />
                   </div>
                   <div id="section-right" className="flex gap-2">

@@ -1,5 +1,4 @@
 import ClickableAddIcon from "@components/atoms/ClickableAddIcon";
-import TooltipIcon from "@components/atoms/TooltipIcon";
 import CollapsibleSection from "@components/organisms/CollapsibleSection";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { lockScroll } from "@components/utils";
@@ -21,6 +20,12 @@ import {
   saveManifestDraft,
 } from "@src/state/nodes/nodeReader";
 import MiniComponentCard from "@src/components/molecules/MiniComponentCard";
+import {
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  TooltipTrigger,
+} from "@src/components/atoms/tooltip";
 
 export enum EditorHistoryType {
   ADD_ANNOTATION,
@@ -107,7 +112,9 @@ const Navigator = () => {
     [cardComponents, dispatch, manifestData?.components]
   );
 
-  const renderEditableComponents = (components: ResearchObjectV1Component[]) => {
+  const renderEditableComponents = (
+    components: ResearchObjectV1Component[]
+  ) => {
     return (
       <>
         {components.map(
@@ -138,47 +145,44 @@ const Navigator = () => {
         forceExpand={mode === "editor"}
         startExpanded={true}
         title={
-          <div className="flex w-full justify-between">
-            <div className="flex items-end">
+          <div className="flex w-full justify-between items-center">
+            <div className="flex items-center gap-1">
               <span>Navigate</span>
               {mode === "editor" ? (
-                <span
-                  className="text-xs text-tint-primary hover:text-tint-primary-hover cursor-pointer ml-1 mb-0.5 font-bold"
-                  onClick={(e: React.MouseEvent<HTMLSpanElement>) => {
+                <ClickableAddIcon
+                  onClick={(e: React.MouseEvent<HTMLElement>) => {
                     e.stopPropagation();
-                    setIsEditable(!isEditable);
+                    lockScroll();
+                    setIsAddingComponent(true);
                   }}
-                >
-                  {isEditable ? "Done" : "Edit"}
-                </span>
-              ) : null}
+                />
+              ) : (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <IconInfo className="fill-black dark:fill-[white] w-5" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Documents, code, data, videos, etc</p>
+                    <TooltipArrow height={5} />
+                  </TooltipContent>
+                </Tooltip>
+              )}
             </div>
-            {mode === "reader" ? (
-              <TooltipIcon
-                icon={<IconInfo className="fill-black dark:fill-[white]" />}
-                id="manuscript-components"
-                tooltip="Documents, code, data, videos, etc"
-                placement={"left"}
-                tooltipProps={{ "data-background-color": "black" }}
-              />
-            ) : null}
           </div>
         }
-        collapseIconComponent={
-          mode === "editor"
-            ? () => {
-                return (
-                  <ClickableAddIcon
-                    onClick={(e: React.MouseEvent<HTMLElement>) => {
-                      e.stopPropagation();
-                      lockScroll();
-                      setIsAddingComponent(true);
-                    }}
-                  />
-                );
-              }
-            : undefined
-        }
+        collapseIconComponent={() => {
+          return mode === "editor" ? (
+            <span
+              className="text-xs text-tint-primary hover:text-tint-primary-hover cursor-pointer ml-1 mb-0.5 font-bold"
+              onClick={(e: React.MouseEvent<HTMLSpanElement>) => {
+                e.stopPropagation();
+                setIsEditable(!isEditable);
+              }}
+            >
+              {isEditable ? "Done" : "Edit"}
+            </span>
+          ) : null;
+        }}
         className="mb-4"
       >
         <div className="flex flex-col gap-3 py-2 px-0">
