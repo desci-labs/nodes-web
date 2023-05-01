@@ -55,7 +55,7 @@ const EditableWrapper = forwardRef(
     };
 
     const ref = useRef<HTMLDivElement>(null);
-    const [{ handlerId, offset }, drop] = useDrop<
+    const [{ handlerId }, drop] = useDrop<
       DragItem,
       void,
       { handlerId: Identifier | null; offset: XYCoord | null }
@@ -125,7 +125,6 @@ const EditableWrapper = forwardRef(
         return { id, index };
       },
       collect: (monitor: any) => {
-        // console.log("dragging", monitor);
         return {
           isDragging: monitor.isDragging(),
         };
@@ -134,19 +133,16 @@ const EditableWrapper = forwardRef(
 
     drag(isEditable ? drop(ref) : null);
 
-    console.log("drop offset ", handlerId, offset);
 
     const droppableStyles = useSpring({
-      config: { ...config.gentle },
+      config: { ...config.stiff, duration: 150, },
       from: {
         opacity: 0,
         transform: `translate3d(0px, ${index * 80}px, 0px) scale(1)`,
       },
       to: {
         opacity: isDragging ? 0 : 1,
-        transform: `translate3d(0px, ${index * 80}px, 0px) scale(${
-          isDragging ? 1.2 : 1
-        })`,
+        transform: `translate3d(0px, ${index * 80}px, 0px) scale(${isDragging ? 1.1 : 1})`,
       },
     });
 
