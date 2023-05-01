@@ -1,6 +1,7 @@
 import {
   CodeComponent,
   ExternalLinkComponent,
+  ResearchObjectComponentSubtypes,
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";

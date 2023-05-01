@@ -8,7 +8,7 @@ import {
 import { PageMetadata } from "@components/organisms/Paper/usePageMetadata";
 import { DriveObject } from "@components/organisms/Drive";
 import { Wallet } from "@src/state/api/types";
-import { EditorHistory } from "../SidePanel/ManuscriptSidePanel/Tabs/Components/ManuscriptComponentsSection";
+import { EditorHistory } from "../SidePanel/ManuscriptSidePanel/Tabs/Components/Navigator/Navigator";
 /* ########################### Customizable options ################################ */
 
 interface Dialog {

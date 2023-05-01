@@ -25,7 +25,7 @@ const ComponentRenamePopover = (props: {
       (c) => c.id === props.componentId
     );
     /**
-     * extra protection because we can have a virtual component for data (see ManuscriptComponentsSection.tsx componentsWithOneData.push)
+     * extra protection because we can have a virtual component for data (see Navigator.tsx componentsWithOneData.push)
      */
     const component = manifestData?.components[index];
     if (component) {
