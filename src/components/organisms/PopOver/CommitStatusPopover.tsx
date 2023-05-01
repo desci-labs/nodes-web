@@ -29,7 +29,7 @@ import { SpinnerCircular } from "spinners-react";
 import { Wallet } from "@src/state/api/types";
 import { useHistoryReader, useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
-import { setManifest } from "@src/state/nodes/nodeReader";
+import { setManifest, setManifestCid } from "@src/state/nodes/nodeReader";
 import { setPendingCommits } from "@src/state/nodes/history";
 import { tags } from "@src/state/api/tags";
 import { nodesApi } from "@src/state/api/nodes";
@@ -71,7 +71,6 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
 
   const createCommit = useCallback(async () => {
     setLoading(true);
-
     const modifiedObject = { cid: manifestCid, manifest: manifestData };
     try {
       setError(undefined);
@@ -158,12 +157,14 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
             modifiedObject.cid = hash;
             modifiedObject.manifest = retrievedManifestData;
             dispatch(setManifest(retrievedManifestData));
+            dispatch(setManifestCid(hash));
           } else {
             const newManifestUrl = cleanupManifestUrl(uri || manifestUrl);
             const { data } = await axios.get(newManifestUrl);
             modifiedObject.cid = hash;
             modifiedObject.manifest = data;
             dispatch(setManifest(data));
+            dispatch(setManifestCid(hash));
           }
         }
         // console.log("GOT COUNT", resp);

@@ -16,9 +16,9 @@ export default function Footer() {
             />
           </div>
           <div className="flex flex-col items-start justify-around flex-wrap">
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center text-sm lg:text-base">
               <TextLink
-                className="text-white inline-block m-2 font-bold"
+                className="text-white m-2 font-bold hidden lg:inline-block"
                 title="DeSci Labs"
                 url="https://desci.com"
               />
@@ -32,8 +32,13 @@ export default function Footer() {
                 title="FAQ"
                 url="https://docs.desci.com/find-help/faq"
               />
+              <TextLink
+                className="text-white inline-block m-2 font-bold"
+                title="Service Status"
+                url="https://status.desci.com"
+              />
             </div>
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center text-sm">
               {/**No NavLink here -- needs to scroll to top */}
               <a
                 href="/terms"

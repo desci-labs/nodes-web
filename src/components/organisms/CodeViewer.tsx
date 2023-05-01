@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import irBlack from "react-syntax-highlighter/dist/esm/styles/hljs/ir-black";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import Terminal from "../Terminal";
+import Terminal from "./Terminal";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { IconX } from "@icons";
 import axios from "axios";

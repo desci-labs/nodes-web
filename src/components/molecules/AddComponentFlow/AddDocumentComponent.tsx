@@ -10,8 +10,8 @@ import {
   ResearchObjectComponentSubtypes,
 } from "@desci-labs/desci-models";
 interface Props {
-  subType: ResearchObjectComponentSubtypes | null;
-  setSubType: React.Dispatch<any>;
+  subtype: ResearchObjectComponentSubtypes | null;
+  setSubtype: React.Dispatch<any>;
   customSubtype: string;
   setCustomSubtype: (value: React.SetStateAction<string>) => void;
   // setFileLink: React.Dispatch<React.SetStateAction<string | undefined>>;
@@ -23,8 +23,8 @@ interface Props {
 }
 
 const AddDocumentComponent: React.FC<Props> = ({
-  subType,
-  setSubType,
+  subtype,
+  setSubtype,
   customSubtype,
   setCustomSubtype,
   files,
@@ -53,10 +53,10 @@ const AddDocumentComponent: React.FC<Props> = ({
     <div>
       <div className="my-3">
         <span className="text-xs text-neutrals-gray-5 block">
-          {subType ? subType.split("-").map(capitalize).join(" ") : ""}
+          {subtype ? subtype.split("-").map(capitalize).join(" ") : ""}
         </span>
       </div>
-      {subType === ResearchObjectComponentDocumentSubtype.OTHER && (
+      {subtype === ResearchObjectComponentDocumentSubtype.OTHER && (
         <div className="my-3">
           <InsetLabelInput
             label="Custom Title"
@@ -65,7 +65,7 @@ const AddDocumentComponent: React.FC<Props> = ({
           />
         </div>
       )}
-      {subType ? (
+      {subtype ? (
         <div className="flex flex-col gap-6 items-center">
           <UploadPDF
             files={files}

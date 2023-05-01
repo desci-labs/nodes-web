@@ -56,7 +56,7 @@ interface State {
   droppedFileList: FileList | null;
   droppedTransferItemList: FileSystemEntry[] | null;
   addComponentType: ResearchObjectComponentType | null;
-  addComponentSubType: ResearchObjectComponentSubtypes | null;
+  addComponentSubtype: ResearchObjectComponentSubtypes | null;
   // selectedHistory: HistoryEntryProps | null;
   showPublicationDetails: boolean;
   showProfileUpdater: boolean;
@@ -108,7 +108,7 @@ export const initialState: State = {
   pageMetadata: [],
   componentToUse: null,
   addComponentType: null,
-  addComponentSubType: null,
+  addComponentSubtype: null,
   showPublicationDetails: false,
   showProfileUpdater: false,
   forceRefreshDrive: false,

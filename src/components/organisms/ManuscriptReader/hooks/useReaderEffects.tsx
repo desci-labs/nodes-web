@@ -13,6 +13,7 @@ import { tags } from "@src/state/api/tags";
 import { useUser } from "@src/state/user/hooks";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { setComponentStack, toggleMode } from "@src/state/nodes/nodeReader";
+import { filterForFirstPdf, filterForNonData } from "@src/components/utils";
 
 export default function useReaderEffects(publicView: boolean = false) {
   const cid = useParseObjectID();
@@ -128,12 +129,7 @@ export default function useReaderEffects(publicView: boolean = false) {
    */
   useEffect(() => {
     const nonDataComponents = manifestData?.components
-      ? manifestData.components.filter(
-          (a) =>
-            a.type !== ResearchObjectComponentType.DATA &&
-            a.type !== ResearchObjectComponentType.DATA_BUCKET &&
-            a.type !== ResearchObjectComponentType.UNKNOWN
-        )
+      ? manifestData.components.filter(filterForNonData)
       : [];
 
     if (nonDataComponents.length < 1 && componentStack.length > 0) {
