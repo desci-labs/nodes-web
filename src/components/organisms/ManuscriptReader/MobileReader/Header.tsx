@@ -18,10 +18,12 @@ export default function Header() {
   const { dpid } = useComponentDpid();
   const { cover } = useNodeCover();
   const headerRef = useRef<HTMLDivElement>();
+
   const [height, api] = useSpring(() => ({
     from: { height: 0 },
     to: { height: 250 },
   }));
+  
   const [expanded, setExpanded] = React.useState(false);
 
   const url = dpid || window.location.href;

@@ -1,13 +1,14 @@
 import Modal, { ModalProps } from "@src/components/molecules/Modal";
 import ComponentStackView from "@src/components/organisms/ManuscriptReader/ComponentStackView";
 import { IconX } from "@src/icons";
+import PerfectScrollbar from "react-perfect-scrollbar";
 
 export default function ComponentStackModal(props: ModalProps) {
   return (
     <Modal
       {...props}
       onDismiss={props.onDismiss}
-      $scrollOverlay={true}
+      $scrollOverlay={false}
       $minHeight={100}
       $maxHeight={100}
       $padOverlay={false}
@@ -21,8 +22,10 @@ export default function ComponentStackModal(props: ModalProps) {
             <IconX />
           </button>
         </div>
-        <div className="max-h-[70vh]">
-          <ComponentStackView />
+        <div className="max-h-[90vh] overflow-hidden">
+          <PerfectScrollbar className="overflow-auto text-white pb-0 w-full max-h-[90vh] overflow-x-hidden">
+            <ComponentStackView />
+          </PerfectScrollbar>
         </div>
       </div>
     </Modal>

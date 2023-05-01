@@ -164,7 +164,7 @@ const DriveTable: React.FC = () => {
           <li className={`${everyRow} ${headerRow}`}>Cite</li>
           <li className={`${everyRow} ${headerRow}`}>Use</li>
           {currentDrive?.contains?.length ? (
-            currentDrive.contains.map((f: DriveObject, idx: number) => {
+            currentDrive?.contains.map((f: DriveObject, idx: number) => {
               return (
                 <DriveRow
                   key={`drive_row_${f.path + f.cid + idx || idx}`}
