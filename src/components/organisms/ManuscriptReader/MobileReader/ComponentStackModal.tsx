@@ -12,7 +12,7 @@ export default function ComponentStackModal(props: ModalProps) {
       $maxHeight={100}
       $padOverlay={false}
     >
-      <div className="w-full h-screen overflow-hidden">
+      <div className="w-full h-screen">
         <div className="mb-2 p-2 w-full flex justify-end">
           <button
             className="cursor-pointer p-3 stroke-black dark:stroke-white hover:stroke-muted-300 hover:dark:stroke-muted-300"
