@@ -142,18 +142,18 @@ const EditableWrapper = forwardRef(
       },
       to: {
         opacity: isDragging ? 0 : 1,
-        transform: `translate3d(0px, ${index * 80}px, 0px) scale(${isDragging ? 1.1 : 1})`,
+        transform: `translate3d(0px, ${index * 80}px, 0px) scale(${isDragging ? 1 : 1})`,
       },
     });
 
     return (
       <animated.div
         className={`flex flex-row ${
-          isEditable ? "absolute left-0 w-full" : ""
+          isEditable ? "absolute left-0 w-full" : "relative"
         }`}
         ref={ref}
         style={{
-          ...(isEditable && {...droppableStyles}),
+          ...(!isEditable ? { transform: "none" } : droppableStyles),
           background: isDragging ? "transparent" : "",
         }}
         data-handler-id={handlerId}
