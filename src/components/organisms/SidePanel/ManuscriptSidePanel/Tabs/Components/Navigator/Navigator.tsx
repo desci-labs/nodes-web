@@ -107,7 +107,6 @@ const Navigator = () => {
       dispatch(
         reorderComponent({ dragIndex: indexToMove, hoverIndex: indexToHover })
       );
-      dispatch(saveManifestDraft({}));
     },
     [cardComponents, dispatch, manifestData?.components]
   );
@@ -176,6 +175,9 @@ const Navigator = () => {
               className="text-xs text-tint-primary hover:text-tint-primary-hover cursor-pointer ml-1 mb-0.5 font-bold"
               onClick={(e: React.MouseEvent<HTMLSpanElement>) => {
                 e.stopPropagation();
+                if (isEditable) {
+                  dispatch(saveManifestDraft({}));
+                }
                 setIsEditable(!isEditable);
               }}
             >
