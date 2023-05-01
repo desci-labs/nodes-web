@@ -6,7 +6,7 @@ import useNodeCover from "@components/organisms/ManuscriptReader/hooks/useNodeCo
 import React, { useCallback, useRef } from "react";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import { Helmet } from "react-helmet";
-import { useSpring } from "react-spring";
+// import { useSpring } from "react-spring";
 import { animated } from "@react-spring/web";
 
 const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
@@ -18,10 +18,12 @@ export default function Header() {
   const { dpid } = useComponentDpid();
   const { cover } = useNodeCover();
   const headerRef = useRef<HTMLDivElement>();
-  const [height, api] = useSpring(() => ({
-    from: { height: 0 },
-    to: { height: 250 },
-  }));
+
+  // const [height, api] = useSpring(() => ({
+  //   from: { height: 0 },
+  //   to: { height: 250 },
+  // }));
+
   const [expanded, setExpanded] = React.useState(false);
 
   const url = dpid || window.location.href;

@@ -185,7 +185,15 @@ const Navigator = () => {
         }}
         className="mb-4"
       >
-        <div className="flex flex-col gap-3 py-2 px-0">
+        <div
+          className="flex flex-col gap-3 py-2 px-0"
+          style={{
+            ...(isEditable && {
+              height: (cardComponents?.length || 1) * 80,
+              position: "relative",
+            }),
+          }}
+        >
           {cardComponents && cardComponents.length && (
             <DndProvider backend={HTML5Backend}>
               {renderEditableComponents(cardComponents)}

@@ -2,7 +2,6 @@ import { IconHamburger, IconPen, IconUnstar } from "icons";
 import {
   ReactNode,
   forwardRef,
-  // useCallback,
   useRef,
   useState,
 } from "react";
@@ -17,6 +16,9 @@ import { useDrive } from "@src/state/drive/hooks";
 import { ResearchObjectV1Component } from "@desci-labs/desci-models";
 import type { Identifier, XYCoord } from "dnd-core";
 import { useDrag, useDrop } from "react-dnd";
+import { animated } from "@react-spring/web";
+import { useSpring, config } from "react-spring";
+
 interface EditableWrapperProps {
   id: string;
   isEditable: boolean;
@@ -53,15 +55,17 @@ const EditableWrapper = forwardRef(
     };
 
     const ref = useRef<HTMLDivElement>(null);
-    const [{ handlerId }, drop] = useDrop<
+    const [{ handlerId, offset }, drop] = useDrop<
       DragItem,
       void,
-      { handlerId: Identifier | null }
+      { handlerId: Identifier | null; offset: XYCoord | null }
     >({
       accept: "card",
       collect(monitor) {
+        // console.log("dropping", monitor);
         return {
           handlerId: monitor.getHandlerId(),
+          offset: monitor.getClientOffset(),
         };
       },
       hover(item: DragItem, monitor) {
@@ -120,23 +124,42 @@ const EditableWrapper = forwardRef(
       item: () => {
         return { id, index };
       },
-      collect: (monitor: any) => ({
-        isDragging: monitor.isDragging(),
-      }),
+      collect: (monitor: any) => {
+        // console.log("dragging", monitor);
+        return {
+          isDragging: monitor.isDragging(),
+        };
+      },
     });
 
-    const opacity = isDragging ? 0 : 1;
+    drag(isEditable ? drop(ref) : null);
 
-    // eslint-disable-next-line no-lone-blocks
-    {
-      drag( isEditable ? drop(ref) : null);
-    }
+    console.log("drop offset ", handlerId, offset);
+
+    const droppableStyles = useSpring({
+      config: { ...config.gentle },
+      from: {
+        opacity: 0,
+        transform: `translate3d(0px, ${index * 80}px, 0px) scale(1)`,
+      },
+      to: {
+        opacity: isDragging ? 0 : 1,
+        transform: `translate3d(0px, ${index * 80}px, 0px) scale(${
+          isDragging ? 1.2 : 1
+        })`,
+      },
+    });
 
     return (
-      <div
-        className="flex flex-row transition-all duration-200"
+      <animated.div
+        className={`flex flex-row ${
+          isEditable ? "absolute left-0 w-full" : ""
+        }`}
         ref={ref}
-        style={{ opacity, transform: "translateZ(0)" }}
+        style={{
+          ...(isEditable && {...droppableStyles}),
+          background: isDragging ? "transparent" : "",
+        }}
         data-handler-id={handlerId}
       >
         <div
@@ -211,7 +234,7 @@ const EditableWrapper = forwardRef(
             componentId={id}
           />
         )}
-      </div>
+      </animated.div>
     );
   }
 );
