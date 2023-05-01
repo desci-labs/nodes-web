@@ -4,7 +4,7 @@ import {
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
-import {  useNodeReader } from "@src/state/nodes/hooks";
+import { useNodeReader } from "@src/state/nodes/hooks";
 import {
   saveManifestDraft,
   setComponentStack,
@@ -39,7 +39,7 @@ export const getActionState = (action: Actions, file: DriveObject) => {
       };
     case Actions.RENAME:
       return {
-        disabled: file?.path === DRIVE_FULL_EXTERNAL_LINKS_PATH,
+        disabled: true, //file?.path === DRIVE_FULL_EXTERNAL_LINKS_PATH,
       };
     case Actions.DOWNLOAD:
       return {
