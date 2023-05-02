@@ -118,13 +118,15 @@ export default function Header() {
   return (
     <animated.div
       className="min-h-[320px] w-full p-2 relative flex items-end overflow-hidden shrink-0"
-      {...bind()}
       style={{
         ...bgStyles(cover),
         height: y,
+        touchAction: 'none',
       }}
       ref={handleRef}
       onClick={onHandleClick}
+      {...bind()}
+      
     >
       <IconShare
         width={30}
