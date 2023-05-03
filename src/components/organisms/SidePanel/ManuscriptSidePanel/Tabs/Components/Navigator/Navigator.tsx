@@ -188,10 +188,10 @@ const Navigator = () => {
         className="mb-4"
       >
         <div
-          className="flex flex-col gap-3 py-2 px-0"
+          className="flex flex-col gap-3 py-2 px-0 h-full"
           style={{
             ...(isEditable && {
-              height: (cardComponents?.length || 1) * 80,
+              minHeight: (cardComponents?.length || 1) * 80,
               position: "relative",
             }),
           }}
