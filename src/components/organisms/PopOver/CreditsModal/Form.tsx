@@ -2,12 +2,12 @@ import { ModalProps } from "@src/components/molecules/Modal";
 import { Controller, useFormContext } from "react-hook-form";
 import InsetLabelSmallInput from "@src/components/molecules/FormInputs/InsetLabelSmallInput";
 import DividerSimple from "@src/components/atoms/DividerSimple";
-import { AuthorFormValues, CreditModalProps } from "./schema";
+import { AuthorFormValues, CreditModalProps, ORCID_PATTERN } from "./schema";
 import useCreditsForm from "./useCreditsForm";
 import SelectList from "@src/components/molecules/FormInputs/SelectList";
 import { ResearchObjectV1AuthorRole } from "@desci-labs/desci-models";
-import { PatternFormat } from "react-number-format";
 import { ExternalLinkIcon } from "@heroicons/react/solid";
+import formatString from "format-string-by-pattern";
 
 const authorRoles = Object.values(ResearchObjectV1AuthorRole).map(
   (role, idx) => ({
@@ -50,9 +50,9 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
         render={({ field, value, fieldState }: any) => (
           <InsetLabelSmallInput
             label="Full Name"
-            field={field}
             optional={false}
             className="my-6 w-full"
+            {...field}
           />
         )}
       />
@@ -84,12 +84,19 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
           name="orcid"
           control={control}
           render={({ field }: any) => (
-            <PatternFormat
-              value={orcid}
+            <InsetLabelSmallInput
               placeholder="0000-0000-0000-0000"
-              format="####-####-####-####"
-              className="bg-transparent relative block w-full my-2 font-medium text-gray-900 dark:text-white focus:ring-0 outline-none focus:outline-none border border-transparent border-b border-b-[#969696] focus:border-0 focus:border-b-tint-primary-hover focus:border-b focus-within:border-b-tint-primary-hover px-3 py-2 shadow-sm bg-white dark:bg-[#272727]"
               {...field}
+              onChange={(e: any) => {
+                const val = e.target.value;
+                const parse = formatString(ORCID_PATTERN);
+                const formatted = parse(val);
+                setValue("orcid", formatted, {
+                  shouldValidate: true,
+                  shouldDirty: true,
+                });
+              }}
+              className="my-6 w-full"
             />
           )}
         />
@@ -116,7 +123,7 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
           render={({ field }) => (
             <InsetLabelSmallInput
               label="Google Scholar Profile"
-              field={field}
+              {...field}
               ref={register("googleScholar").ref}
               optional={true}
             />
