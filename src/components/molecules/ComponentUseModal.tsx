@@ -10,7 +10,7 @@ import { DriveObject, FileType } from "@src/components/organisms/Drive";
 import useComponentDpid from "@src/components/organisms/Drive/hooks/useComponentDpid";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import useActionHandler from "@src/components/organisms/Drive/ContextMenu/useActionHandler";
-import { useEffect, useRef, useState } from "react";
+// import { useEffect, useRef, useState } from "react";
 import {
   setFileBeingUsed,
   setFileMetadataBeingEdited,
@@ -26,7 +26,7 @@ const ComponentUseModal = ({
   ...restProps
 }: ModalProps & ComponentUseModalProps) => {
   const { manifest: manifestData } = useNodeReader();
-  const { dpid, fqi, license } = useComponentDpid(file);
+  const { dpid, cid, license } = useComponentDpid(file);
   const handler = useActionHandler();
   const dispatch = useSetter();
 
@@ -41,9 +41,9 @@ const ComponentUseModal = ({
 
   const isDpidSupported = !!manifestData?.dpid;
 
-  const pythonImport = file
-    ? `with desci.fetch([('${file.name}.py', '${file.name}')], "${fqi}"):`
-    : "";
+  // const pythonImport = file
+  //   ? `with desci.fetch([('${file.name}.py', '${file.name}')], "${fqi}"):`
+  //   : "";
 
   const canPreview =
     file &&
@@ -65,11 +65,11 @@ const ComponentUseModal = ({
             subTitle="You can use the granular dPID of the file you have selected interact with the associated data."
             onDismiss={close}
           />
-          <div className="w-full grid grid-cols-1 lg:grid-cols-2 place-content-center gap-4 justify-items-center mt-8 overflow-hidden overflow-x-auto">
-            <section className="hidden max-h-[700px] lg:block max-w-[512px]">
-              {/* Max height should roughly match the right side of this modal */}
+          <div className="w-full grid grid-cols-1 lg:grid-cols-1 place-content-center gap-4 justify-items-center mt-8 overflow-hidden overflow-x-auto">
+            {/* <section className="hidden max-h-[700px] lg:block max-w-[512px]">
+              {/* Max height should roughly match the right side of this modal }
               <VideoAnimation />
-            </section>
+            </section> */}
             <section id="cid-use" className="max-w-[600px]">
               <div className="lg:hidden">
                 <CodeBox
@@ -104,9 +104,17 @@ const ComponentUseModal = ({
                 >
                   <>{dpid}</>
                 </CopyBox>
+                <CopyBox
+                  title="CID"
+                  copyButtonText="Copy CID"
+                  className="my-6 w-full overflow-hidden pr-2"
+                  copyText={cid || ""}
+                >
+                  <>{cid}</>
+                </CopyBox>
                 <DividerSimple />
               </div>
-              <div className="my-6">
+              {/* <div className="my-6">
                 <h1 className="font-bold">Import Locally</h1>
                 <span className="text-neutrals-gray-4">
                   Copy the syntax below to import the selected file via DeSci
@@ -129,7 +137,7 @@ const ComponentUseModal = ({
                   <>{pythonImport}</>
                 </CopyBox>
                 <DividerSimple />
-              </div>
+              </div> */}
               <div className="my-6">
                 <h2>Preview in Nodes IDE</h2>
                 <span className="text-neutrals-gray-4">
@@ -195,73 +203,73 @@ const ComponentUseModal = ({
   );
 };
 
-const VideoAnimation = () => {
-  const refVideo = useRef(null);
-  const [loaded, setLoaded] = useState(false);
+// const VideoAnimation = () => {
+//   const refVideo = useRef(null);
+//   const [loaded, setLoaded] = useState(false);
 
-  const [isMounted, setIsMounted] = useState(false);
+//   const [isMounted, setIsMounted] = useState(false);
 
-  useEffect(() => {
-    setTimeout(() => {
-      setIsMounted(true);
-    });
+//   useEffect(() => {
+//     setTimeout(() => {
+//       setIsMounted(true);
+//     });
 
-    return () => setIsMounted(false);
-  }, []);
+//     return () => setIsMounted(false);
+//   }, []);
 
-  return (
-    <div
-      className={`overflow-hidden relative w-full h-full flex items-center justify-center  ${
-        isMounted ? "!opacity-100" : "!opacity-0"
-      }  transition-opacity delay-[0s] duration-[2s] ease-in`}
-    >
-      <div
-        className="absolute top-0 w-full h-full left-0 z-50"
-        style={{
-          backgroundImage:
-            "radial-gradient(50.00% 50.77% at 50% 50%, rgba(0, 0, 0, 0) 59.77%, rgb(25, 27, 28) 100%)",
-        }}
-      ></div>
-      {/* This cover image needs replacement, flip the loaded booleans around to test */}
-      <img
-        src="https://desci-labs-public.s3.amazonaws.com/node-front-preview.png"
-        alt="desci nodes use animation poster"
-        className={`w-full h-full absolute top-0 left-0 object-cover`}
-        style={{
-          objectFit: "cover",
-          // overflow: "hidden",
-          visibility: !loaded ? "visible" : "hidden",
-          width: 1920,
-          height: 1080,
-          top: -190,
-          transform: "scale(0.825)",
-          // transform: "scaleX(3.1) scaleY(0.83)",
-        }}
-      />
-      <video
-        loop
-        ref={refVideo}
-        onLoadedData={(e) => {
-          setLoaded(true);
-        }}
-        playsInline
-        autoPlay
-        key={`cube-panel`}
-        muted
-        className="object-cover max-w-none max-h-[900px]"
-        style={{
-          visibility: loaded ? "visible" : "hidden",
-        }}
-        src={`https://desci-labs-public.s3.amazonaws.com/node-front.mp4`}
-        preload="metadata"
-        poster="https://desci-labs-public.s3.amazonaws.com/node-front-preview.png"
-      >
-        <source
-          src="https://desci-labs-public.s3.amazonaws.com/node-front.mp4#t=0.1"
-          type="video/mp4"
-        />
-      </video>
-    </div>
-  );
-};
+//   return (
+//     <div
+//       className={`overflow-hidden relative w-full h-full flex items-center justify-center  ${
+//         isMounted ? "!opacity-100" : "!opacity-0"
+//       }  transition-opacity delay-[0s] duration-[2s] ease-in`}
+//     >
+//       <div
+//         className="absolute top-0 w-full h-full left-0 z-50"
+//         style={{
+//           backgroundImage:
+//             "radial-gradient(50.00% 50.77% at 50% 50%, rgba(0, 0, 0, 0) 59.77%, rgb(25, 27, 28) 100%)",
+//         }}
+//       ></div>
+//       {/* This cover image needs replacement, flip the loaded booleans around to test */}
+//       <img
+//         src="https://desci-labs-public.s3.amazonaws.com/node-front-preview.png"
+//         alt="desci nodes use animation poster"
+//         className={`w-full h-full absolute top-0 left-0 object-cover`}
+//         style={{
+//           objectFit: "cover",
+//           // overflow: "hidden",
+//           visibility: !loaded ? "visible" : "hidden",
+//           width: 1920,
+//           height: 1080,
+//           top: -190,
+//           transform: "scale(0.825)",
+//           // transform: "scaleX(3.1) scaleY(0.83)",
+//         }}
+//       />
+//       <video
+//         loop
+//         ref={refVideo}
+//         onLoadedData={(e) => {
+//           setLoaded(true);
+//         }}
+//         playsInline
+//         autoPlay
+//         key={`cube-panel`}
+//         muted
+//         className="object-cover max-w-none max-h-[900px]"
+//         style={{
+//           visibility: loaded ? "visible" : "hidden",
+//         }}
+//         src={`https://desci-labs-public.s3.amazonaws.com/node-front.mp4`}
+//         preload="metadata"
+//         poster="https://desci-labs-public.s3.amazonaws.com/node-front-preview.png"
+//       >
+//         <source
+//           src="https://desci-labs-public.s3.amazonaws.com/node-front.mp4#t=0.1"
+//           type="video/mp4"
+//         />
+//       </video>
+//     </div>
+//   );
+// };
 export default ComponentUseModal;
