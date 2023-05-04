@@ -441,11 +441,7 @@ export const nodeReaderSlice = createSlice({
         ) {
           const lastScrollTop = state.lastScrollTop[newComponent.payload.url];
           state.pdfScrollOffsetTop = lastScrollTop;
-          // if (lastScrollTop) {
-          //   setTimeout(() => {
-          //     document.scrollingElement!.scrollTop = lastScrollTop!;
-          //   }, 500);
-          // }
+          
         }
       }
       state.annotationLinkConfig = null;
