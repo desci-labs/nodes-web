@@ -12,9 +12,8 @@ import "react-pdf/dist/umd/Page/AnnotationLayer.css";
 import "./style.scss";
 
 import { APPROXIMATED_HEADER_HEIGHT } from "@components/utils";
-import { ResearchObjectComponentAnnotation } from "@desci-labs/desci-models";
 import { useScrolling, useUpdateEffect } from "react-use";
-import { PAGE_RENDER_DISTANCE, PageComponentHOC } from "./Page";
+import { PageComponentHOC } from "./Page";
 
 import { useGesture } from "@use-gesture/react";
 import { useResponsive, useWindowDimensions } from "hooks";
@@ -31,7 +30,6 @@ import {
 import { LTWHP } from "lib/highlight-types";
 import usePageMetadata, { PageMetadata } from "./usePageMetadata";
 import React from "react";
-import ManifestUpdater from "@components/atoms/ManifestUpdater";
 import {
   DEFAULT_WIDTH,
   PDF_PAGE_SPACING,
@@ -455,30 +453,29 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
   const restoreScrollPosition = useCallback(() => {
     const lastScroll = pdfScrollOffsetTop;
     if (lastScroll) {
-      const times = [0, 50, 100, 500, 1000];
+      const times = [0, 50, 100, 300];
       times.forEach((dur) => {
         setTimeout(() => {
           window.document.scrollingElement!.scrollTop = lastScroll;
         }, dur);
       });
     }
-  }, [pdfScrollOffsetTop])
+  }, [pdfScrollOffsetTop]);
 
   useLayoutEffect(() => {
     if (onLoadRef.current === false) {
       scrollRestoredRef.current = false;
-      return;
     }
-
     if (onLoadRef.current === true && scrollRestoredRef.current === false) {
-      restoreScrollPosition()
+      restoreScrollPosition();
       scrollRestoredRef.current = true;
     }
     return () => {
       scrollRestoredRef.current = false;
     };
-  }, [restoreScrollPosition, pdfScrollOffsetTop]);
-  
+
+  }, [restoreScrollPosition,  componentStack]);
+
   return (
     <>
       <div
@@ -540,11 +537,11 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
                   debounceUpdate(pct);
                 }
               },
-              [debounceUpdate, loadPercent, viewLoading, setLoadState]
+              [dispatch, loadPercent, viewLoading, debounceUpdate]
             )}
             onSourceSuccess={useCallback(() => {
               dispatch(setViewLoading(true));
-            }, [])}
+            }, [dispatch])}
             onLoadSuccess={useCallback(
               (document: PDFDocumentProxy) => {
                 const { numPages } = document;
@@ -567,9 +564,8 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
 
                 onLoadRef.current = true;
                 restoreScrollPosition();
-                
               },
-              [debounceUpdate, updatePdfPreferences, componentStack]
+              [dispatch, debounceUpdate, restoreScrollPosition]
             )}
             onLoadError={useCallback(() => {
               // setLoadProgressTaken(false);
@@ -633,7 +629,7 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
               new Array(pageCount).fill(1).map((e, rawIndex: number) => {
                 const pageNum = rawIndex + 1;
                 const index = pageNum - 1;
-                const visible = intersectingPagesWithPaddingLookup[pageNum];
+                // const visible = intersectingPagesWithPaddingLookup[pageNum];
 
                 // console.log(
                 //   "PAGE intersectingPagesWithPaddingLookup",
