@@ -42,9 +42,9 @@ export default function Header() {
       config: {
         ...config.gentle,
         velocity,
-        tension: 800,
+        tension: 700,
         friction: 20,
-        mass: 1
+        mass: 0.1,
       },
     });
   };
@@ -58,14 +58,14 @@ export default function Header() {
         movement: [, my],
       } = state;
       if (dy < 0) return close(vy);
-      // if user drags down passed a threashold, then we cancel the drag
+      // if user drags down passed a threshold, then we cancel the drag
       // so that the header resets to its open position
       if (y.get() > height * 1.2)
         api.start({
           from: { height: y.get() },
           to: { height: y.get() + my * 0.1 },
           immediate: true,
-          config: { ...config.stiff, friction: 10, tension: 200 },
+          config: { ...config.stiff, friction: 5, tension: 10 },
         });
 
       if (last) {
@@ -75,7 +75,7 @@ export default function Header() {
           from: { height: y.get() },
           to: { height: y.get() + my * 0.05 },
           immediate: true,
-          config: { ...config.stiff, velocity: vy, tension: 100 },
+          config: { ...config.stiff, velocity: vy, tension: 40 },
         });
     },
     {
@@ -121,19 +121,15 @@ export default function Header() {
       style={{
         ...bgStyles(cover),
         height: y,
-        touchAction: 'none',
+        touchAction: "none",
       }}
       ref={handleRef}
       onClick={onHandleClick}
       {...bind()}
-      
     >
-      <IconShare
-        width={30}
-        color="white"
-        className="absolute top-3 right-3"
-        onClick={onHandleShare}
-      />
+      <div className="absolute top-0 right-0 p-3" onClick={onHandleShare}>
+        <IconShare width={30} color="white" />
+      </div>
       <button className="px-4 flex gap-3 items-center text-left w-full">
         <div className="shrink-0 w-fit">
           <ResearchNodeIcon width={40} className="" />
