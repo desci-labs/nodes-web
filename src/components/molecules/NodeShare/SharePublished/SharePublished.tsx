@@ -28,7 +28,7 @@ import { CheckIcon } from "@heroicons/react/outline";
 import { useGetNodesQuery } from "@src/state/api/nodes";
 import { useNodeReader, useNodeVersions } from "@src/state/nodes/hooks";
 import { useCopier } from "@src/components/molecules/Copier";
-import SlideDown from "react-slidedown";
+import PerfectScrollbar from "react-perfect-scrollbar";
 import AdvancedSlideDown from "@src/components/atoms/AdvancedSlideDown";
 
 function CopyButton(
@@ -190,9 +190,10 @@ const SharePublished = React.memo(() => {
           <AdvancedSlideDown
             closed={showAdvanced}
             setClosed={setShowAdvanced}
-            className="overflow-hidden"
+            className="overflow-hidden mt-5"
           >
-            <div className="overflow-auto h-20">
+
+            <PerfectScrollbar className="overflow-auto h-full max-h-96">
               {versionCount ? (
                 <div className="pb-4 w-full">
                   {manifestData?.components.map(
@@ -278,7 +279,7 @@ const SharePublished = React.memo(() => {
                   )}
                 </div>
               ) : null}
-            </div>
+            </PerfectScrollbar>
           </AdvancedSlideDown>
         </div>
       );
