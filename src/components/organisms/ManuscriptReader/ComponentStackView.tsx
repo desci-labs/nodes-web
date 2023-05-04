@@ -7,7 +7,7 @@ import {
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
-import { __log, filterForFirstPdf, filterForNonData } from "@components/utils";
+import { __log, filterForNonData } from "@components/utils";
 
 import tw from "tailwind-styled-components";
 import PaneDrive from "@components/organisms/PaneDrive";

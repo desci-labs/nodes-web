@@ -2,6 +2,7 @@
 import React, { useEffect } from "react";
 import "react-pdf/dist/umd/Page/AnnotationLayer.css";
 import styled from "styled-components";
+import PerfectScrollbar from "react-perfect-scrollbar";
 import { AvailableUserActionLogTypes, postUserAction } from "@api/index";
 import useManuscriptReader from "@components/organisms/ManuscriptReader/hooks/useManuscriptReader";
 import useReaderEffects from "@components/organisms/ManuscriptReader/hooks/useReaderEffects";
@@ -27,10 +28,11 @@ const MobileWrapper = styled(FlexColumn)`
   left: 0;
   top: 0;
   background-color: #1e1e1e;
-  position: relative;
+  position: fixed;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  overflow-y: scroll
 `;
 
 interface ManuscriptReaderProps {
@@ -71,18 +73,20 @@ const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
   }, [dispatch, isMobileView]);
 
   return (
-    <MobileWrapper>
-      <Header />
-      {isLoading && <Placeholder isLoading={true} fullHeight />}
-      <Explorer />
-      {showMobileComponentStack && (
-        <ComponentStackModal
-          isOpen={true}
-          onDismiss={() => dispatch(setShowComponentStack(false))}
-        />
-      )}
-      <MobileWarning />
-    </MobileWrapper>
+    <PerfectScrollbar className="overflow-auto text-white pb-4 w-full overflow-x-hidden">
+      <MobileWrapper>
+        <Header />
+        {isLoading && <Placeholder isLoading={true} fullHeight />}
+        <Explorer />
+        {showMobileComponentStack && (
+          <ComponentStackModal
+            isOpen={true}
+            onDismiss={() => dispatch(setShowComponentStack(false))}
+          />
+        )}
+        <MobileWarning />
+      </MobileWrapper>
+    </PerfectScrollbar>
   );
 };
 
@@ -92,7 +96,7 @@ const MobileWarning = () => {
 
   return (
     <div
-      className={`absolute bottom-0 mb-5 w-full bg-transparent px-4 pb-4 animate-slideFromBottom h-30 ${
+      className={`fixed bottom-0 mb-8 w-full bg-transparent px-4 pb-4 animate-slideFromBottom h-30 ${
         !mobileViewWarning ? "hidden" : ""
       }`}
     >

@@ -10,6 +10,7 @@ export default function CreditsPreview() {
       <EmptyPreview
         title="No Credited Authors"
         message="To access the data of this node, please view it on a desktop browser."
+        className="h-fit min-h-[25vh]"
       />
     );
   }
