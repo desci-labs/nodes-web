@@ -16,8 +16,9 @@ import {
 
 interface ReaderViewerProps {
   isLoading: boolean;
+  isError: boolean;
 }
-export default function Reader({ isLoading }: ReaderViewerProps) {
+export default function Reader({ isLoading, isError }: ReaderViewerProps) {
   const dispatch = useSetter();
   const { manifest: manifestData, componentStack } = useNodeReader();
 
@@ -36,7 +37,7 @@ export default function Reader({ isLoading }: ReaderViewerProps) {
   return (
     <>
       {isLoading && <Placeholder isLoading />}
-      {!isLoading && !manifestData ? <Placeholder isLoading={false} /> : ""}
+      {isError ? <Placeholder isError={isError} isLoading={false} /> : ""}
       {!isLoading && manifestData ? (
         <>
           <ComponentStackView />
