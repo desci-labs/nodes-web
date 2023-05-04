@@ -1,12 +1,23 @@
 import { IconChevronDown, IconChevronUp } from "@src/icons";
-import { PropsWithChildren, useState } from "react";
+import { PropsWithChildren } from "react";
 import SlideDown from "react-slidedown";
 
-const AdvancedSlideDown = ({ children, ...rest }: PropsWithChildren<any>) => {
+type AdvancedSlideDownProps = {
+  closed: boolean;
+  className?: string;
+  setClosed: (value: boolean) => void;
+};
+const AdvancedSlideDown = ({
+  children,
+  className,
+  ...rest
+}: PropsWithChildren<AdvancedSlideDownProps>) => {
   return (
     <>
       <div
-        className="flex flex-rows text-xs gap-2 items-center justify-end cursor-pointer group hover:text-neutrals-gray-6 select-none overflow-hidden"
+        className={`flex flex-rows text-xs gap-2 items-center justify-end cursor-pointer group hover:text-neutrals-gray-6 select-none overflow-hidden ${
+          className ? className : ""
+        }`}
         onClick={() => rest.setClosed(!rest.closed)}
       >
         {rest.closed ? (

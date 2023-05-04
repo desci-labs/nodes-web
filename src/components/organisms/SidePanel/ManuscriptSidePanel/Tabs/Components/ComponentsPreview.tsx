@@ -8,6 +8,7 @@ import {
 import EmptyPreview from "@src/components/molecules/EmptyPreview";
 import { findTarget } from "@src/components/organisms/ComponentLibrary";
 import { IconData } from "@src/icons";
+import { useDrive } from "@src/state/drive/hooks";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { setComponentStack, toggleMode } from "@src/state/nodes/nodeReader";
 import { setShowComponentStack } from "@src/state/preferences/preferencesSlice";
@@ -25,6 +26,7 @@ const isDriveComponent = (component: ResearchObjectV1Component) =>
 
 export default function ComponentsPreview() {
   const { manifest: manifestData } = useNodeReader();
+  const { currentDrive } = useDrive();
 
   const components = useMemo(() => {
     const hasDataComponent =
@@ -40,18 +42,20 @@ export default function ComponentsPreview() {
         (c) => c.type !== ResearchObjectComponentType.DATA
       );
 
-      componentsWithOneData?.push({
-        name: "Node Data",
-        id: "__virtual_node_data",
-        payload: {},
-        type: ResearchObjectComponentType.DATA,
-        icon: IconData,
-      });
+      if (currentDrive) {
+        componentsWithOneData?.push({
+          name: "Node Data",
+          id: "__virtual_node_data",
+          payload: {},
+          type: ResearchObjectComponentType.DATA,
+          icon: IconData,
+        });
+      }
     }
 
     // Remove the default 3 (data, code, reports) added components
     return componentsWithOneData?.filter(isDriveComponent);
-  }, [manifestData]);
+  }, [currentDrive, manifestData]);
 
   if (!components?.length || components?.length > 7) {
     return (

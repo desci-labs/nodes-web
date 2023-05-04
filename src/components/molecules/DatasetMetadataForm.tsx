@@ -59,8 +59,8 @@ export const DatasetMetadataForm = React.forwardRef(
               <InsetLabelSmallInput
                 label="Open Access Data Title"
                 labelClassName="text-xs"
+                {...field}
                 value={value}
-                field={field}
                 fieldState={fieldState}
                 mandatory={true}
               />
@@ -79,7 +79,7 @@ export const DatasetMetadataForm = React.forwardRef(
                 multiline
                 labelClassName="text-xs"
                 value={value}
-                field={field}
+                {...field}
                 fieldState={fieldState}
                 mandatory={true}
               />
@@ -118,7 +118,7 @@ export const DatasetMetadataForm = React.forwardRef(
                 label="Ontology PURL"
                 labelClassName="text-xs"
                 value={value}
-                field={field}
+                {...field}
                 fieldState={fieldState}
                 mandatory={false}
                 optional
