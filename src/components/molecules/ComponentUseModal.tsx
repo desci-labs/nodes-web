@@ -181,7 +181,8 @@ const ComponentUseModal = ({
               <WarningSign width={25} />{" "}
               <span className="text-sm">
                 These content identifiers refer to the latest committed Node
-                state. Uncommitted files are not included.
+                state.
+                <br /> Uncommitted files are not included.
               </span>
             </div>
             <span className="text-sm gap-2 hidden lg:flex">
