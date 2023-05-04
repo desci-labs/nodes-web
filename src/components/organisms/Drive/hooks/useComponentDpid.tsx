@@ -22,7 +22,7 @@ export default function useComponentDpid(componentToUse?: DriveObject) {
     () =>
       isDpidSupported
         ? `https://${
-            manifestData?.dpid?.prefix ? manifestData?.dpid?.prefix + "." : ""
+            manifestData?.dpid?.prefix ? manifestData.dpid.prefix + "." : ""
           }dpid.org/${manifestData?.dpid?.id}/v${version}`
         : "",
     [
@@ -36,6 +36,7 @@ export default function useComponentDpid(componentToUse?: DriveObject) {
   const resolveDpid = useCallback((): {
     dpid: string;
     fqi: string;
+    cid?: string;
     license: string;
   } => {
     const umbrellaLicense =
@@ -44,7 +45,7 @@ export default function useComponentDpid(componentToUse?: DriveObject) {
       ...DEFAULT_VALUE,
       license: umbrellaLicense,
     };
-    if (!componentToUse) return { ...DEFAULT_WITH_LICENSE, dpid: dpidLink };
+    if (!componentToUse) return { ...DEFAULT_WITH_LICENSE, dpid: dpidLink, };
 
     const component =
       componentToUse.type === FileType.DIR
@@ -113,7 +114,7 @@ export default function useComponentDpid(componentToUse?: DriveObject) {
         : link
       : "";
 
-    return { dpid, fqi, license };
+    return { dpid, fqi, license, cid: component.cid };
   }, [
     componentToUse,
     currentObjectId,
