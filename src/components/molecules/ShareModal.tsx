@@ -1,4 +1,9 @@
-import React, { ButtonHTMLAttributes, useEffect, useMemo, useState } from "react";
+import React, {
+  ButtonHTMLAttributes,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import Modal, { ModalProps } from "@src/components/molecules/Modal";
 import { useNodeReader, useNodeVersions } from "@src/state/nodes/hooks";
 import { SwitchBar, SwitchButton } from "@src/components/atoms/SwitchBar";
@@ -79,7 +84,7 @@ const ShareModal = React.memo((props: ModalProps) => {
           title="Share Research Node"
           onDismiss={props?.onDismiss}
         />
-        {canSharePublished ? (
+        {canSharePublished && canSendInvite ? (
           <div className="flex items-center justify-center w-full">
             <SwitchBar
               style={{ margin: "1rem 0 1rem 0", height: 35, maxWidth: 400 }}
