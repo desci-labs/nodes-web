@@ -95,12 +95,24 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
 
   const { scrollRef, scrollToPage$ } = manuscriptControllerObj;
 
+  const adjustScroll = useCallback(() => {
+    const lastScroll = pdfScrollOffsetTop;
+    if (lastScroll) {
+      const times = [0, 50, 100, 300];
+      times.forEach((dur) => {
+        setTimeout(() => {
+          window.document.scrollingElement!.scrollTop = lastScroll;
+        }, dur);
+      });
+    }
+  }, [pdfScrollOffsetTop]);
+
+
   const { pageMetadata, intersectingPages } = usePageMetadata(
     documentRef?.current,
     pageWidth,
     pinching
   );
-
   const PAGE_BUFFER = 5;
   const intersectingPagesWithPadding = [...intersectingPages].sort(
     (a: number, b: number) => a - b
@@ -450,31 +462,19 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
   //   setPageBuffer(4);
   // }, [zoom]);
 
-  const restoreScrollPosition = useCallback(() => {
-    const lastScroll = pdfScrollOffsetTop;
-    if (lastScroll) {
-      const times = [0, 50, 100, 300];
-      times.forEach((dur) => {
-        setTimeout(() => {
-          window.document.scrollingElement!.scrollTop = lastScroll;
-        }, dur);
-      });
-    }
-  }, [pdfScrollOffsetTop]);
-
   useLayoutEffect(() => {
     if (onLoadRef.current === false) {
       scrollRestoredRef.current = false;
     }
     if (onLoadRef.current === true && scrollRestoredRef.current === false) {
-      restoreScrollPosition();
+      adjustScroll();
       scrollRestoredRef.current = true;
     }
     return () => {
       scrollRestoredRef.current = false;
     };
 
-  }, [restoreScrollPosition,  componentStack]);
+  }, [adjustScroll,  componentStack]);
 
   return (
     <>
@@ -563,9 +563,9 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
                 );
 
                 onLoadRef.current = true;
-                restoreScrollPosition();
+                adjustScroll();
               },
-              [dispatch, debounceUpdate, restoreScrollPosition]
+              [dispatch, debounceUpdate, adjustScroll]
             )}
             onLoadError={useCallback(() => {
               // setLoadProgressTaken(false);
