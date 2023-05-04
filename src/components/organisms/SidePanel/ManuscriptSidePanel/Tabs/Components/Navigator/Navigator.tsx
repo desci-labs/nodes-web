@@ -111,7 +111,7 @@ const Navigator = () => {
     [cardComponents, dispatch, manifestData?.components]
   );
 
-  const renderEditableComponents = (
+  const renderEditableComponents = useCallback((
     components: ResearchObjectV1Component[]
   ) => {
     return (
@@ -136,7 +136,7 @@ const Navigator = () => {
         )}
       </>
     );
-  };
+  }, [currentObjectId, isEditable, moveCard]);
 
   return (
     <>
@@ -187,27 +187,27 @@ const Navigator = () => {
         }}
         className="mb-4"
       >
-        <div
-          className="flex flex-col gap-3 py-2 px-0 h-full"
-          style={{
-            ...(isEditable && {
-              minHeight: (cardComponents?.length || 1) * 80,
-              position: "relative",
-            }),
-          }}
-        >
-          {cardComponents && cardComponents.length && (
-            <DndProvider backend={HTML5Backend}>
-              {renderEditableComponents(cardComponents)}
-            </DndProvider>
-          )}
-          {cardComponents?.length === 0 && (
-            <div className="text-[10px] text-neutrals-gray-6 flex flex-row gap-1 items-center">
-              <IconStar width={12} className="fill-tint-primary-hover" />
-              Star a component in Drive to see it here
-            </div>
-          )}
-        </div>
+        <DndProvider backend={HTML5Backend}>
+          <div
+            className="flex flex-col gap-3 py-2 px-0"
+            style={{
+              ...(isEditable && {
+                height: (cardComponents?.length || 1) * 80,
+                position: "relative",
+              }),
+            }}
+          >
+            {cardComponents && cardComponents.length && (
+              <>{renderEditableComponents(cardComponents)}</>
+            )}
+            {cardComponents?.length === 0 && (
+              <div className="text-[10px] text-neutrals-gray-6 flex flex-row gap-1 items-center">
+                <IconStar width={12} className="fill-tint-primary-hover" />
+                Star a component in Drive to see it here
+              </div>
+            )}
+          </div>
+        </DndProvider>
       </CollapsibleSection>
     </>
   );
