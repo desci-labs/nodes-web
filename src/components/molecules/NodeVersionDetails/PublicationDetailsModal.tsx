@@ -47,6 +47,21 @@ export default function PublicationDetailsModal(props: any) {
   const transactionReceiptUrl = `${
     BLOCK_EXPLORER_URL || "https://etherscan.io"
   }/tx/${selectedHistory?.data.transaction?.id}`;
+
+  const PRELOAD_CACHE: { [k: string]: any } = {
+    "46": {
+      2: { size: 8779600000000 },
+    },
+  };
+
+  const preloadCacheResult =
+    manifestData &&
+    manifestData.dpid &&
+    manifestData.dpid.id &&
+    selectedHistory &&
+    selectedHistory.index &&
+    PRELOAD_CACHE[manifestData!.dpid.id]?.[selectedHistory?.index]?.size;
+
   return (
     <PopOver
       {...props}
@@ -91,13 +106,13 @@ export default function PublicationDetailsModal(props: any) {
           <Details
             title="Node Size"
             subTitle="Size of the stored data published on this version of your node."
-            detail={BytesToHumanFileSize(size)}
+            detail={BytesToHumanFileSize(preloadCacheResult || size)}
             isLoading={isLoading}
           />
           <Details
             title="Data Copies"
             subTitle="We've made several copies of your node so that you can always access your data."
-            detail={(copies || 6).toString()}
+            detail={(6).toString()}
             isLoading={isLoading}
           />
         </div>
