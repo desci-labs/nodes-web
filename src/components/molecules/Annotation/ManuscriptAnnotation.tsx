@@ -223,7 +223,9 @@ const ManuscriptAnnotation = (props: ManuscriptAnnotationProps) => {
       : annotationWithLayoutMeta.data.startY * pageHeight)
   }px) `;
 
-  const UNSELECTED_ANNOTATION_TRANSFORM = `translateX(0px) translateY(${annotationWithLayoutMeta.top}px)`;
+  const UNSELECTED_ANNOTATION_TRANSFORM = `translateX(calc(-0.5rem${
+    zoom < 0.7 ? `` : ` + ${overflowNudge}px`
+  })) translateY(${annotationWithLayoutMeta.top}px)`;
 
   const PDF_VIEW_ANNOTATION_POSITION: CSSProperties = {
     transitionDelay: "0s",
@@ -231,7 +233,9 @@ const ManuscriptAnnotation = (props: ManuscriptAnnotationProps) => {
     right: 0,
     top: 0,
     transformOrigin: "center right",
-    transform: `scale(${zoom < 1 ? zoom : 1}) ${SELECTED_ANNOTATION_TRANSFORM}`,
+    transform: `scale(${
+      zoom < 1 ? zoom : 1
+    }) ${UNSELECTED_ANNOTATION_TRANSFORM}`,
     zIndex:
       selectedAnnotationId != annotationWithLayoutMeta.data.id &&
       hoveredAnnotationId != annotationWithLayoutMeta.data.id
