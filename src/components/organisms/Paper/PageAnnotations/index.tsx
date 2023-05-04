@@ -31,7 +31,7 @@ const PageAnnotations = (props: PageAnnotationsProps) => {
     useList<AnnotationWithLayoutMeta>([]);
   const { zoom } = usePdfReader();
 
-  const BASE_ANNOTATION_HEIGHT = 30;
+  const BASE_ANNOTATION_HEIGHT = 40;
   const ANNOTATION_COLLAPSED_HEIGHT =
     BASE_ANNOTATION_HEIGHT * (zoom < 1 ? zoom : 1);
   // const EXPANDED_ANNOTATION_HEIGHT = 90;

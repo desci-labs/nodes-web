@@ -219,13 +219,13 @@ export const capitalize = (str: string) => {
 export const restoreScroll = (nudgeForWindows?: boolean) => {
   // debugger;
 
-  // FIXED_ELEMENTS.forEach((a) => {
-  //   const el = document.querySelector(a.selector) as HTMLElement;
-  //   if (!el) {
-  //     return;
-  //   }
-  //   (el.style as any)[a.strategy] = "0px";
-  // });
+  FIXED_ELEMENTS.forEach((a) => {
+    const el = document.querySelector(a.selector) as HTMLElement;
+    if (!el) {
+      return;
+    }
+    (el.style as any)[a.strategy] = "0px";
+  });
 
   document.body.style.overflowY = "scroll";
 };
@@ -233,18 +233,27 @@ export const restoreScroll = (nudgeForWindows?: boolean) => {
 export const lockScroll = (nudgeForWindows?: boolean) => {
   // debugger;
   const appEl = document.body;
-  const scrollWidth = appEl.scrollWidth - appEl.clientWidth;
+  const scrollWidth = getScrollBarWidth(); //appEl.scrollWidth - appEl.clientWidth;
 
-  document.body.style.overflowY = "scroll";
+  document.body.style.overflowY = "hidden";
 
-  // FIXED_ELEMENTS.forEach((a) => {
-  //   const el = document.querySelector(a.selector) as HTMLElement;
-  //   if (!el) {
-  //     return;
-  //   }
-  //   (el.style as any)[a.strategy] = `${scrollWidth}px`;
-  // });
+  FIXED_ELEMENTS.forEach((a) => {
+    const el = document.querySelector(a.selector) as HTMLElement;
+    if (!el) {
+      return;
+    }
+    (el.style as any)[a.strategy] = `${scrollWidth}px`;
+  });
 };
+
+function getScrollBarWidth() {
+  let el = document.createElement("div");
+  el.style.cssText = "overflow:scroll; visibility:hidden; position:absolute;";
+  document.body.appendChild(el);
+  let width = el.offsetWidth - el.clientWidth;
+  el.remove();
+  return width;
+}
 
 export const getChainInfo = () => {
   console.log(CHAIN_DEPLOYMENT);

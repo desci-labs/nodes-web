@@ -407,6 +407,7 @@ const AnnotationComponent = (props: AnnotationProps) => {
         />
       ) : null} */}{" "}
         <AnnotationHidden
+          // annotation={annotation}
           DURATION_BASE_MS={DURATION_BASE_MS}
           isEditingAnnotation={isEditingAnnotation}
           annotationTitle={annotationTitle}

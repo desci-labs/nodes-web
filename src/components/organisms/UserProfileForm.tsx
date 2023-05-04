@@ -95,7 +95,7 @@ const UserProfileForm = (props: ProfileFormProps) => {
             render={({ field }: any) => (
               <InsetLabelSmallInput
                 label="Full Name"
-                field={field}
+                {...field}
                 optional={false}
                 className="my-6"
               />
@@ -108,7 +108,7 @@ const UserProfileForm = (props: ProfileFormProps) => {
               render={({ field }) => (
                 <InsetLabelSmallInput
                   label="Google Scholar Profile"
-                  field={field}
+                  {...field}
                   optional={true}
                 />
               )}

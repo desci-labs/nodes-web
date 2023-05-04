@@ -1,4 +1,9 @@
-import React, { ButtonHTMLAttributes, useEffect, useState } from "react";
+import React, {
+  ButtonHTMLAttributes,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import Modal, { ModalProps } from "@src/components/molecules/Modal";
 import { useNodeReader, useNodeVersions } from "@src/state/nodes/hooks";
 import { SwitchBar, SwitchButton } from "@src/components/atoms/SwitchBar";
@@ -7,6 +12,7 @@ import SharePublished from "@src/components/molecules/NodeShare/SharePublished/S
 import {
   nodesApi,
   useCreateShareLinkMutation,
+  useGetNodesQuery,
   usePrivateShareQuery,
   useRevokeShareLinkMutation,
 } from "@src/state/api/nodes";
@@ -17,6 +23,7 @@ import { useSetter } from "@src/store/accessors";
 import { tags } from "@src/state/api/tags";
 import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
+import { useUser } from "@src/state/user/hooks";
 
 enum ShareTabs {
   Invite = "Invite",
@@ -24,9 +31,9 @@ enum ShareTabs {
 }
 
 const ShareModal = React.memo((props: ModalProps) => {
-  // const user = useUser();
+  const user = useUser();
   const dispatch = useSetter();
-  // const { data: nodes } = useGetNodesQuery();
+  const { data: nodes } = useGetNodesQuery();
   const { currentObjectId, publicView } = useNodeReader();
   const versions = useNodeVersions(currentObjectId);
   const { data: shareId } = usePrivateShareQuery(currentObjectId!, {
@@ -45,15 +52,15 @@ const ShareModal = React.memo((props: ModalProps) => {
     );
   }, [currentObjectId, dispatch, shareId]);
 
-  // const canSendInvite = useMemo(() => {
-  //   if (publicView || !user) return false;
+  const canSendInvite = useMemo(() => {
+    if (publicView || !user) return false;
 
-  //   // TODO: in future add more sophisticated check for user permissions
-  //   const isOwner = nodes?.find(
-  //     (n) => n.uuid === currentObjectId && n?.ownerId === user.userId
-  //   );
-  //   return !!isOwner;
-  // }, [publicView, user, nodes, currentObjectId]);
+    // TODO: in future add more sophisticated check for user permissions
+    const isOwner = nodes?.find(
+      (n) => n.uuid === currentObjectId && n?.ownerId === user.userId
+    );
+    return !!isOwner;
+  }, [publicView, user, nodes, currentObjectId]);
 
   const canSharePublished = publicView || !!versions;
 
@@ -71,13 +78,13 @@ const ShareModal = React.memo((props: ModalProps) => {
       <div
         className={`px-6 py-5 text-white relative min-w-[600px] ${
           canSharePublished ? "min-h-[400px]" : "min-h-[200px]"
-        } h-0`}
+        }`}
       >
         <Modal.Header
           title="Share Research Node"
           onDismiss={props?.onDismiss}
         />
-        {canSharePublished ? (
+        {canSharePublished && canSendInvite ? (
           <div className="flex items-center justify-center w-full">
             <SwitchBar
               style={{ margin: "1rem 0 1rem 0", height: 35, maxWidth: 400 }}
@@ -93,7 +100,8 @@ const ShareModal = React.memo((props: ModalProps) => {
               </SwitchButton>
               <SwitchButton
                 isSelected={currentTab === ShareTabs.Invite}
-                onClick={() => setCurrentTab(ShareTabs.Invite)}
+                onClick={() => canSendInvite && setCurrentTab(ShareTabs.Invite)}
+                disabled={!canSendInvite}
               >
                 <p className="text-xs flex justify-center items-center h-full capitalize">
                   Invite Collaborator
@@ -117,7 +125,7 @@ const ShareModal = React.memo((props: ModalProps) => {
           </div>
         </Modal.Footer>
       )}
-      {currentTab === ShareTabs.Invite && (
+      {currentTab === ShareTabs.Invite && canSendInvite && (
         <Modal.Footer>
           <div className="flex items-center justify-end w-full gap-2">
             {!shareId && (

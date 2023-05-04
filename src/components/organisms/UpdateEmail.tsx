@@ -95,7 +95,7 @@ export const UpdateEmailScreen = memo(() => {
                     <div className="my-6">
                       <InsetLabelSmallInput
                         label="Email"
-                        field={field}
+                        {...field}
                         mandatory={true}
                       />
                       <p className="mt-1 text-red-400 text-xs">
