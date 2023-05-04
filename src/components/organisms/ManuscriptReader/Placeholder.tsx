@@ -6,6 +6,7 @@ import { ViewWrapper } from "./ComponentStackView";
 
 export default function Placeholder(props: {
   isLoading: boolean;
+  isError?: boolean;
   fullHeight?: boolean;
 }) {
   const navigate = useNavigate();
@@ -16,12 +17,13 @@ export default function Placeholder(props: {
           props.fullHeight ? "h-screen" : " h-[calc(100vh-56px)]"
         }`}
       >
-        {props.isLoading ? (
+        {props.isLoading && (
           <>
             <SpinnerCircular size={50} color="#28AAC4" />
             <h1 className="text-xl font-bold text-white">Loading...</h1>
           </>
-        ) : (
+        )}
+        {!props.isLoading && props.isError && (
           <div className="flex flex-col gap-8">
             {/* Placeholder avatar or image */}
             <h1 className="text-4xl font-semibold text-white">

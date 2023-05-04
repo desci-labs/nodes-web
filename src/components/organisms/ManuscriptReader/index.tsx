@@ -46,7 +46,7 @@ const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
   __log("Render manuscript reader", publicView);
   const { currentObjectId } = useNodeReader();
   const { fileMetadataBeingEdited, fileBeingUsed, fileBeingCited } = useDrive();
-  const { isLoading } = useManuscriptReader(publicView);
+  const { isLoading, isError } = useManuscriptReader(publicView);
 
   // trigger Reader side effects
   useReaderEffects(publicView);
@@ -70,7 +70,7 @@ const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
     <ManuscriptWrapper>
       <LoadProgressManager />
       <CurrentPdfManager />
-      {publicView && <Reader isLoading={isLoading} />}
+      {publicView && <Reader isError={isError} isLoading={isLoading} />}
       {!publicView && <Editor isLoading={isLoading} />}
       <PublicationDetailsModal />
 
