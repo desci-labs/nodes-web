@@ -34,7 +34,8 @@ export default function ComponentsPreview() {
       manifestData.components.filter(
         (c) => c.type === ResearchObjectComponentType.DATA
       ).length;
-    const components = manifestData && manifestData.components;
+    const components =
+      manifestData && manifestData.components.filter((a) => a.starred);
     let componentsWithOneData = components;
 
     if (hasDataComponent) {
@@ -138,7 +139,7 @@ function ComponentPreview({
         wrapperClassName="w-[30px] h-[30px]"
         className="p-[3px] fill-white stroke-white"
       />
-      <span className="font-bold capitalize w-[calc(100%-80px)] truncate overflow-ellipsis">
+      <span className="font-bold w-[calc(100%-80px)] truncate overflow-ellipsis">
         {component.name}
       </span>
     </div>
