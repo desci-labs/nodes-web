@@ -441,6 +441,7 @@ export const nodeReaderSlice = createSlice({
         ) {
           const lastScrollTop = state.lastScrollTop[newComponent.payload.url];
           state.pdfScrollOffsetTop = lastScrollTop;
+          // debugger;
           // if (lastScrollTop) {
           //   setTimeout(() => {
           //     document.scrollingElement!.scrollTop = lastScrollTop!;
@@ -462,6 +463,7 @@ export const nodeReaderSlice = createSlice({
           newTopComponent.payload.annotations || []
         );
       }
+      return state;
     },
     pushToComponentStack: (
       state,
