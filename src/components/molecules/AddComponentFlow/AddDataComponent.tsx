@@ -192,7 +192,7 @@ const AddDataComponent = ({ close }: Props) => {
               className="w-[270px]"
               label="External CID Name"
               value={externalCidName}
-              onChange={(e) => {
+              onChange={(e: any) => {
                 const value = e.target.value;
                 const lastChar = value[value.length - 1];
                 if (lastChar !== "/") {
@@ -206,7 +206,7 @@ const AddDataComponent = ({ close }: Props) => {
               className="w-full"
               label="External CID"
               value={externalCid}
-              onChange={(e) => {
+              onChange={(e: any) => {
                 setExternalCid(e.target.value);
                 if (!strIsCid(e.target.value))
                   setExternalCidError("Invalid CID provided");

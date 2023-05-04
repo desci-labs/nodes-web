@@ -52,6 +52,7 @@ const GOOGLE_SCHOLAR_URL_SCHEMA = Yup.string()
     },
   });
 
+export const ORCID_PATTERN = "XXXX-XXXX-XXXX-XXXX";
 const ORCID_SCHEMA = Yup.string()
   .optional()
   .test({
@@ -60,13 +61,16 @@ const ORCID_SCHEMA = Yup.string()
     test: (value = "", ctx) => {
       if (value === "") return true;
 
-      let invalid = value
-        .split("-")
+      let cids = value.split('-');
+      
+      let invalid = cids
         .map((data, index) => {
+          if (index === cids.length - 1) {
+            return data.length === 4 && /^\d{3}[a-zA-Z0-9]{1}$/.test(data) ? data : ""
+          }
           return /^\d+$/.test(data) && data.length === 4 ? data : "";
         })
         .filter(Boolean);
-
       if (invalid.length !== 4) return false;
       return true;
     },
