@@ -88,12 +88,29 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
 
   const { scrollRef, scrollToPage$, lastScrollTop } = manuscriptControllerObj;
 
+  const adjustScroll = useCallback(() => {
+    const lastScroll = pdfScrollOffsetTop;
+    if (lastScroll) {
+      const times = [0, 50, 100, 500, 1000];
+      times.forEach((dur) => {
+        setTimeout(() => {
+          window.document.scrollingElement!.scrollTop = lastScroll;
+        }, dur);
+      });
+    }
+  }, [pdfScrollOffsetTop]);
+
+  useEffect(() => {
+    if (pdfScrollOffsetTop) {
+      adjustScroll();
+    }
+  }, [pdfScrollOffsetTop, componentStack]);
+
   const { pageMetadata, intersectingPages } = usePageMetadata(
     documentRef?.current,
     pageWidth,
     pinching
   );
-
   const PAGE_BUFFER = 5;
   const intersectingPagesWithPadding = [...intersectingPages].sort(
     (a: number, b: number) => a - b
@@ -542,15 +559,7 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
                   })
                 );
 
-                const lastScroll = pdfScrollOffsetTop;
-                if (lastScroll) {
-                  const times = [0, 50, 100, 500, 1000];
-                  times.forEach((dur) => {
-                    setTimeout(() => {
-                      window.document.scrollingElement!.scrollTop = lastScroll;
-                    }, dur);
-                  });
-                }
+                adjustScroll();
               },
               [debounceUpdate, updatePdfPreferences, componentStack]
             )}
