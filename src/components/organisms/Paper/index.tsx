@@ -1,13 +1,19 @@
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Document } from "react-pdf/dist/esm/entry.webpack5";
 import "react-pdf/dist/umd/Page/AnnotationLayer.css";
 import "./style.scss";
 
 import { APPROXIMATED_HEADER_HEIGHT } from "@components/utils";
-import { ResearchObjectComponentAnnotation } from "@desci-labs/desci-models";
 import { useScrolling, useUpdateEffect } from "react-use";
-import { PAGE_RENDER_DISTANCE, PageComponentHOC } from "./Page";
+import { PageComponentHOC } from "./Page";
 
 import { useGesture } from "@use-gesture/react";
 import { useResponsive, useWindowDimensions } from "hooks";
@@ -24,7 +30,6 @@ import {
 import { LTWHP } from "lib/highlight-types";
 import usePageMetadata, { PageMetadata } from "./usePageMetadata";
 import React from "react";
-import ManifestUpdater from "@components/atoms/ManifestUpdater";
 import {
   DEFAULT_WIDTH,
   PDF_PAGE_SPACING,
@@ -57,6 +62,8 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
   const { isResearchPanelOpen, componentStack, pdfScrollOffsetTop } =
     useNodeReader();
   const { annotations } = payload;
+  const onLoadRef = useRef(false);
+  const scrollRestoredRef = useRef(false);
 
   const [pinching, setPinching] = useState<boolean>(false);
   // const [annotationsByPage, setAnnotationsByPage] = useState<any>([]);
@@ -86,12 +93,12 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
     "lastScrollTop",
   ]);
 
-  const { scrollRef, scrollToPage$, lastScrollTop } = manuscriptControllerObj;
+  const { scrollRef, scrollToPage$ } = manuscriptControllerObj;
 
   const adjustScroll = useCallback(() => {
     const lastScroll = pdfScrollOffsetTop;
     if (lastScroll) {
-      const times = [0, 50, 100, 500, 1000];
+      const times = [0, 50, 100, 300];
       times.forEach((dur) => {
         setTimeout(() => {
           window.document.scrollingElement!.scrollTop = lastScroll;
@@ -100,11 +107,6 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
     }
   }, [pdfScrollOffsetTop]);
 
-  useEffect(() => {
-    if (pdfScrollOffsetTop) {
-      adjustScroll();
-    }
-  }, [pdfScrollOffsetTop, componentStack]);
 
   const { pageMetadata, intersectingPages } = usePageMetadata(
     documentRef?.current,
@@ -460,6 +462,20 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
   //   setPageBuffer(4);
   // }, [zoom]);
 
+  useLayoutEffect(() => {
+    if (onLoadRef.current === false) {
+      scrollRestoredRef.current = false;
+    }
+    if (onLoadRef.current === true && scrollRestoredRef.current === false) {
+      adjustScroll();
+      scrollRestoredRef.current = true;
+    }
+    return () => {
+      scrollRestoredRef.current = false;
+    };
+
+  }, [adjustScroll,  componentStack]);
+
   return (
     <>
       <div
@@ -480,12 +496,6 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
         }}
         onClick={onTextSelectCancel}
       >
-        {/* <ManifestUpdater
-          componentId={id}
-          pendingAnnotations={pendingAnnotations}
-          setPendingAnnotations={setPendingAnnotations}
-        /> */}
-
         <div
           ref={gestureContainerRef}
           onClick={openLinkInNewTab}
@@ -527,20 +537,16 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
                   debounceUpdate(pct);
                 }
               },
-              [debounceUpdate, loadPercent, viewLoading, setLoadState]
+              [dispatch, loadPercent, viewLoading, debounceUpdate]
             )}
             onSourceSuccess={useCallback(() => {
               dispatch(setViewLoading(true));
-            }, [])}
+            }, [dispatch])}
             onLoadSuccess={useCallback(
               (document: PDFDocumentProxy) => {
                 const { numPages } = document;
                 documentRef.current = document;
-                // cachePageDimensions(document);
-                // console.log("REST", rest);
-                // setViewLoading(false);
                 dispatch(setViewLoading(false));
-                // setLoadProgressTaken(false);
                 dispatch(
                   setLoadState({
                     loadProgressTaken: true,
@@ -548,9 +554,6 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
                 );
 
                 debounceUpdate(0);
-                // setNumPages(numPages);
-                // setPdfTotalPages(numPages);
-                // resetPdfCurrentPage();
 
                 dispatch(
                   updatePdfPreferences({
@@ -559,9 +562,10 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
                   })
                 );
 
+                onLoadRef.current = true;
                 adjustScroll();
               },
-              [debounceUpdate, updatePdfPreferences, componentStack]
+              [dispatch, debounceUpdate, adjustScroll]
             )}
             onLoadError={useCallback(() => {
               // setLoadProgressTaken(false);
@@ -625,7 +629,7 @@ const Paper = ({ id, options, dirtyComment, payload }: any) => {
               new Array(pageCount).fill(1).map((e, rawIndex: number) => {
                 const pageNum = rawIndex + 1;
                 const index = pageNum - 1;
-                const visible = intersectingPagesWithPaddingLookup[pageNum];
+                // const visible = intersectingPagesWithPaddingLookup[pageNum];
 
                 // console.log(
                 //   "PAGE intersectingPagesWithPaddingLookup",

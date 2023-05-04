@@ -340,7 +340,7 @@ PageComponentHOCProps) => {
       // https://github.com/fserb/canvas2D/blob/master/spec/will-read-frequently.md
       const blob = canvasRef.current?.toDataURL();
       (window as any).imageCache[cacheKey] = blob;
-      console.log("IMAGE CACHE", (window as any).imageCache);
+      // console.log("IMAGE CACHE", (window as any).imageCache);
       setTimeout(() => {
         setImage(blob);
       }, 50);
