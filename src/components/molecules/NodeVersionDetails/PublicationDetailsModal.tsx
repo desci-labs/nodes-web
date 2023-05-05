@@ -50,9 +50,9 @@ export default function PublicationDetailsModal(props: any) {
 
   const PRELOAD_CACHE: { [k: string]: any } = {
     "46": {
-      2: { size: 2654400000 },
-      3: { size: 8779600000 },
-      4: { size: 8779600000 },
+      2: { size: 265440000 },
+      3: { size: 877960000 },
+      4: { size: 877960000 },
     },
   };
 
