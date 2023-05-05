@@ -150,11 +150,11 @@ export default function Header() {
             key={attr.key}
             className={`flex items-center gap-2 ${
               i > 0 ? "-ml-2" : ""
-            } -mt-2 bg-white bg-opacity-10 rounded-full px-2 py-1`}
+            } -mt-2  rounded-full px-2 py-1`}
           >
             <img
               className={`cursor-pointer ${attr.value ? "" : "opacity-20"}`}
-              src={((BADGE_INFO as any)[attr.key] as any).small}
+              src={((BADGE_INFO as any)[attr.key] as any)?.small}
               key={attr.key}
               style={{ width: 30 }}
               alt=""
