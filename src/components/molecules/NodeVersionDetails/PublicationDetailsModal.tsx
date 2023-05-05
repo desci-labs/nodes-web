@@ -36,6 +36,7 @@ export default function PublicationDetailsModal(props: any) {
 
   const [closed, setClosed] = useState(false);
   const onClose = () => {
+    setIsLoading(true);
     setClosed(false);
     setShowPublicationDetails(false);
   };
@@ -47,6 +48,7 @@ export default function PublicationDetailsModal(props: any) {
   const transactionReceiptUrl = `${
     BLOCK_EXPLORER_URL || "https://etherscan.io"
   }/tx/${selectedHistory?.data.transaction?.id}`;
+  // debugger;
 
   const PRELOAD_CACHE: { [k: string]: any } = {
     "46": {
@@ -131,20 +133,28 @@ export default function PublicationDetailsModal(props: any) {
           className="overflow-hidden"
         >
           <Divider />
-          <div className="py-4 flex flex-col gap-5 select-none">
-            <Details
-              title="Node Metadata"
-              subTitle={
-                <Link href={`https://ipfs.io/ipfs/${node?.manifestUrl}`} />
-              }
-              copy={`https://ipfs.io/ipfs/${node?.manifestUrl}`}
-            />
-            <Details
-              title="Transaction Receipt"
-              subTitle={<Link href={transactionReceiptUrl} />}
-              copy={transactionReceiptUrl}
-            />
-          </div>
+          {isLoading ? (
+            <>
+              <DefaultSpinner size={32} color="white" />
+            </>
+          ) : (
+            <div className="py-4 flex flex-col gap-5 select-none">
+              <Details
+                title="Node Metadata"
+                subTitle={
+                  <Link
+                    href={`https://ipfs.io/ipfs/${selectedHistory?.data?.transaction?.cid}`}
+                  />
+                }
+                copy={`https://ipfs.io/ipfs/${selectedHistory?.data?.transaction?.cid}`}
+              />
+              <Details
+                title="Transaction Receipt"
+                subTitle={<Link href={transactionReceiptUrl} />}
+                copy={transactionReceiptUrl}
+              />
+            </div>
+          )}
         </AdvancedSlideDown>
       </div>
     </PopOver>

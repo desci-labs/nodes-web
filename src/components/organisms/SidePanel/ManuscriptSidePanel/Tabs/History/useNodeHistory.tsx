@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./history.scss";
-import {
-  ResearchObjectV1History,
-} from "@desci-labs/desci-models";
+import { ResearchObjectV1History } from "@desci-labs/desci-models";
 import { CHAIN_DEPLOYMENT } from "@components/../chains";
 import { ethers } from "ethers";
 import { getResearchObjectVersions } from "@src/api";
@@ -12,6 +10,8 @@ import { useSetter } from "@src/store/accessors";
 import { setNodeHistory, setPendingCommits } from "@src/state/nodes/history";
 import { tags } from "@src/state/api/tags";
 import { publishApi } from "@src/state/api/publish";
+import CID from "cids";
+import { convertHexToCID } from "@src/components/utils";
 
 // const LS_HISTORY_MAP = "DESCI::node-version-history";
 
@@ -34,13 +34,20 @@ export default function useNodeHistory() {
   const [isFetching, setIsFetching] = useState(false);
 
   const transformVersions = (vr: VersionResponse): ResearchObjectV1History[] =>
-    vr.versions.map((v) => ({
-      author: { id: vr.owner, name: "" },
-      content: "",
-      title: "Published",
-      date: parseInt(v.time) * 1000,
-      transaction: { id: v.id },
-    }));
+    vr.versions.map((v) => {
+      let cid = v.cid;
+      debugger;
+      if (cid) {
+        cid = convertHexToCID(cid);
+      }
+      return {
+        author: { id: vr.owner, name: "" },
+        content: "",
+        title: "Published",
+        date: parseInt(v.time) * 1000,
+        transaction: { id: v.id, cid },
+      };
+    });
 
   const updatePendingCommits = useCallback(
     (update: ResearchObjectV1History[]) => {
@@ -77,6 +84,7 @@ export default function useNodeHistory() {
       const versions = await getResearchObjectVersions(currentObjectId);
       const currentHistory = transformVersions(versions);
       if (history.length === currentHistory.length) return;
+      debugger;
 
       dispatch(
         setNodeHistory({ id: currentObjectId, history: currentHistory })
@@ -92,7 +100,7 @@ export default function useNodeHistory() {
       setIsFetching(false);
       setLoadingChain(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentObjectId]);
 
   useEffect(() => {
