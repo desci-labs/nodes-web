@@ -156,7 +156,7 @@ export default function Header() {
               className={`cursor-pointer ${attr.value ? "" : "opacity-20"}`}
               src={((BADGE_INFO as any)[attr.key] as any)?.small}
               key={attr.key}
-              style={{ width: 30 }}
+              style={{ width: 40 }}
               alt=""
               onClick={() => {
                 setIsOpen(true);

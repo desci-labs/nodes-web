@@ -55,6 +55,9 @@ export default function PublicationDetailsModal(props: any) {
       2: { size: 265440000 },
       3: { size: 877960000 },
       4: { size: 877960000 },
+      5: { size: 877960000 },
+      6: { size: 877960000 },
+      7: { size: 877960000 },
     },
   };
 

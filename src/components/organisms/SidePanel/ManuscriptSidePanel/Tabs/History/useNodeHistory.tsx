@@ -36,7 +36,7 @@ export default function useNodeHistory() {
   const transformVersions = (vr: VersionResponse): ResearchObjectV1History[] =>
     vr.versions.map((v) => {
       let cid = v.cid;
-      debugger;
+      // debugger;
       if (cid) {
         cid = convertHexToCID(cid);
       }
@@ -84,7 +84,7 @@ export default function useNodeHistory() {
       const versions = await getResearchObjectVersions(currentObjectId);
       const currentHistory = transformVersions(versions);
       if (history.length === currentHistory.length) return;
-      debugger;
+      // debugger;
 
       dispatch(
         setNodeHistory({ id: currentObjectId, history: currentHistory })
