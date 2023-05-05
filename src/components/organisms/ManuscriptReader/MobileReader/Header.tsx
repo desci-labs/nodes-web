@@ -28,7 +28,7 @@ const bgStyles: (url: string) => CSSProperties = (cover: string) => ({
         ), url(${cover})`,
   backgroundRepeat: "no-repeat",
   backgroundPosition: "center top",
-  backgroundSize: "cover",
+  backgroundSize: "contain",
 });
 
 export default function Header() {
