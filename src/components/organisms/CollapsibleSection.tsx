@@ -13,7 +13,7 @@ const ContentWrapper = tw(SlideDown)`
 `;
 
 interface CollapsibleSectionProps {
-  title: string | React.ReactElement;
+  title: string | React.ReactElement | null;
   expandable?: boolean;
   startExpanded?: boolean;
   forceExpand?: boolean;
@@ -53,37 +53,40 @@ const CollapsibleSection = (
   const [expanded, setExpanded] = useState<boolean>(startExpanded || false);
   return (
     <Section className={className} style={{ ...containerStyle }}>
-      <SectionHeader
-        onClick={() => {
-          if (expandable && !forceExpand) {
-            setExpanded(!expanded);
-          }
-        }}
-        style={{
-          cursor: expandable ? "pointer" : "default",
-          padding: "0.75rem 1rem",
-          ...headerStyle,
-        }}
-        className={headerClass}
-      >
-        <SectionTitle>
-          <div className="flex-row flex-nowrap flex w-full gap-1 items-center">
-            <div className="flex" style={{ width: "100%" }}>
-              <span className="text-[14px] font-bold select-none w-full">
-                {title}
-              </span>
-            </div>
-            {expandable ? (
-              <div className="flex">
-                {forceExpand || expanded || !forceExpand
-                  ? collapseIconComponent({ expanded })
-                  : null}
+      {title ? (
+        <SectionHeader
+          onClick={() => {
+            if (expandable && !forceExpand) {
+              setExpanded(!expanded);
+            }
+          }}
+          style={{
+            cursor: expandable ? "pointer" : "default",
+            padding: "0.75rem 1rem",
+            ...headerStyle,
+          }}
+          className={headerClass}
+        >
+          <SectionTitle>
+            <div className="flex-row flex-nowrap flex w-full gap-1 items-center">
+              <div className="flex" style={{ width: "100%" }}>
+                <span className="text-[14px] font-bold select-none w-full">
+                  {title}
+                </span>
               </div>
-            ) : null}
-          </div>
-        </SectionTitle>
-      </SectionHeader>
-
+              {expandable ? (
+                <div className="flex">
+                  {forceExpand || expanded || !forceExpand
+                    ? collapseIconComponent({ expanded })
+                    : null}
+                </div>
+              ) : null}
+            </div>
+          </SectionTitle>
+        </SectionHeader>
+      ) : (
+        <div className="pt-2"></div>
+      )}
       {!hideWrapper || forceExpand ? (
         <ContentWrapper>
           {expanded || forceExpand ? (

@@ -144,31 +144,7 @@ const ManuscriptAttributesSection = () => {
   return (
     <CollapsibleSection
       forceExpand={true}
-      title={
-        <div className="flex w-full justify-between">
-          <div className="flex items-end">
-            <span>Attestations</span>
-            {mode === "editor" ? (
-              <span
-                className="text-sm text-[#65C3CA] cursor-pointer ml-1 mb-0.5 font-bold"
-                onClick={(e: React.MouseEvent<HTMLSpanElement>) => {
-                  e.stopPropagation();
-                  setIsEditable(!isEditable);
-                }}
-              >
-                {isEditable ? "Done" : "Edit"}
-              </span>
-            ) : null}
-          </div>
-          {mode === "reader" ? (
-            <TooltipIcon
-              icon={<IconInfo className="fill-black dark:fill-[white]" />}
-              id="manuscript-attributes"
-              tooltip="Verified Badges"
-            />
-          ) : null}
-        </div>
-      }
+      title={null}
       collapseIconComponent={
         mode === "editor"
           ? () => {

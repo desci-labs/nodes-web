@@ -114,7 +114,7 @@ const AnnotationEditCanvas: React.FC<
   };
 
   const mouseDown = (e: any) => {
-    debugger;
+    // debugger;
     if (mode === "reader") return;
     if (isAnnotating || e.altKey) {
       __log(
