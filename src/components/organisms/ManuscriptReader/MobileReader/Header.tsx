@@ -3,11 +3,16 @@ import { IconShare } from "@src/icons";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import useComponentDpid from "@components/organisms/Drive/hooks/useComponentDpid";
 import useNodeCover from "@components/organisms/ManuscriptReader/hooks/useNodeCover";
-import React, { CSSProperties, useCallback, useRef } from "react";
+import React, { CSSProperties, useCallback, useRef, useState } from "react";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import { Helmet } from "react-helmet";
 import { animated, useSpring, config } from "@react-spring/web";
 import { useDrag } from "@use-gesture/react";
+import {
+  ATTESTATION_PRELOAD_CACHE,
+  BADGE_INFO,
+} from "../../ManuscriptAttributesSection";
+import AttributePopOver from "../../PopOver/AttributePopOver";
 
 const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
 const DEFAULT_URL =
@@ -27,10 +32,16 @@ const bgStyles: (url: string) => CSSProperties = (cover: string) => ({
 });
 
 export default function Header() {
-  const { manifest } = useNodeReader();
+  const { manifest: manifestData } = useNodeReader();
   const { dpid } = useComponentDpid();
   const { cover } = useNodeCover();
   const headerRef = useRef<HTMLDivElement>();
+
+  const manifest = { ...manifestData };
+  const dpidIndex = manifestData?.dpid?.id || "-1";
+  if (ATTESTATION_PRELOAD_CACHE[dpidIndex]) {
+    manifest.attributes = ATTESTATION_PRELOAD_CACHE[dpidIndex];
+  }
 
   const [{ height: y }, api] = useSpring(() => ({ height: 320 }));
 
@@ -43,7 +54,7 @@ export default function Header() {
         ...config.gentle,
         velocity,
         tension: 700,
-        friction: 20,
+        friction: 80,
         mass: 0.1,
       },
     });
@@ -89,6 +100,11 @@ export default function Header() {
   const url = dpid || window.location.href;
   const description = `Have a look at this Research Node published with DeSci Nodes.\n${dpid}`;
 
+  //**Attestation start */
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedBadge, setSelectedBadge] = useState("");
+  //**Attestation end */
+
   const onHandleShare = async () => {
     try {
       await navigator.share({
@@ -127,6 +143,31 @@ export default function Header() {
       onClick={onHandleClick}
       {...bind()}
     >
+      {/** Attestation Start */}
+      <div className="absolute top-0 left-0 p-3 flex">
+        {manifest?.attributes?.map((attr, i) => (
+          <div
+            key={attr.key}
+            className={`flex items-center gap-2 ${
+              i > 0 ? "-ml-2" : ""
+            } -mt-2 bg-white bg-opacity-10 rounded-full px-2 py-1`}
+          >
+            <img
+              className={`cursor-pointer ${attr.value ? "" : "opacity-20"}`}
+              src={((BADGE_INFO as any)[attr.key] as any).small}
+              key={attr.key}
+              style={{ width: 30 }}
+              alt=""
+              onClick={() => {
+                setIsOpen(true);
+                setSelectedBadge(attr.key);
+                // setValue(attr.value);
+              }}
+            />
+          </div>
+        ))}
+      </div>
+      {/** Attestation End */}
       <div className="absolute top-0 right-0 p-3" onClick={onHandleShare}>
         <IconShare width={30} color="white" />
       </div>
@@ -168,6 +209,26 @@ export default function Header() {
         <meta name="twitter:description" content={description} />
         <meta name="twitter:image" content={cover || DEFAULT_URL} />
       </Helmet>
+      <AttributePopOver
+        isVisible={isOpen}
+        key={selectedBadge}
+        value={true}
+        data={(BADGE_INFO as any)[selectedBadge]}
+        onClose={() => setIsOpen(false)}
+        containerStyle={{
+          marginTop: -60,
+          width: "100%",
+        }}
+        style={{
+          width: "100%",
+          margin: 0,
+          marginTop: -55,
+          paddingBottom: 120,
+          overflow: "hidden",
+          height: "calc(100%+220px)",
+        }}
+        className="absolute top-0 left-0 w-full h-full rounded-lg"
+      />
     </animated.div>
   );
 }
