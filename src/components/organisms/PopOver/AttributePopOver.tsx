@@ -59,12 +59,14 @@ const AttributePopOver = (props: any) => {
         width: 600,
         margin: "3rem 0.75rem",
         overflow: "auto",
+        ...props.style,
       }}
       containerStyle={{
         backgroundColor: "#3A3A3ABF",
+        ...props.containerStyle,
       }}
       displayCloseIcon={false}
-      className="rounded-lg bg-zinc-100 dark:bg-zinc-900"
+      className="rounded-lg bg-zinc-100 dark:bg-zinc-900  w-full"
     >
       <div className="py-3 px-6">
         <div className="flex flex-row justify-between items-center">
@@ -75,41 +77,47 @@ const AttributePopOver = (props: any) => {
             <IconX />
           </div>
         </div>
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center h-full">
           <span className="relative my-4 pt-4">
             <img
               src={props.data.full}
-              className={`w-[120px] h-[120px] ${
+              className={`w-[120px] min-h-[120px] ${
                 props.value ? "" : "opacity-20"
               }`}
             />
-            {props.value ? (
+            {/* {props.value ? (
               <IconCheckShieldDark
                 className="absolute top-2 -right-4 fill-black dark:fill-white"
                 style={{ width: 38 }}
               />
             ) : (
               <></>
-            )}
+            )} */}
           </span>
-          <span className="text-2xl dark:text-zinc-100 font-bold">
-            {props.data.title}:{" "}
-            {props.value ? (
-              <span className="text-teal">Verified</span>
-            ) : (
-              <span className="text-gray-500">Not Verified</span>
-            )}
+          <span className="text-xl pb-3 dark:text-zinc-100 font-bold">
+            {props.data.title}
           </span>
           <span
-            className={`text-md text-center ${
-              !props.value
-                ? "dark:text-gray-500 text-gray-500"
-                : "text-gray-700 dark:text-zinc-300"
-            }   w-11/12 block py-4`}
-          >
-            {props.data.description}
-          </span>
-          <ArtifactGrid className="py-4 px-8">
+            className={`text-neutrals-gray-5
+            text-xs h-full  w-11/12 block py-4`}
+            dangerouslySetInnerHTML={{
+              __html: props.data.description.replaceAll(/\n/g, "<br/>"),
+            }}
+          ></span>
+          <div className="text-neutrals-gray-5 text-[10px] py-5">
+            This badge has been awarded by{" "}
+            <a
+              href="https://descifoundation.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-tint-primary"
+            >
+              DeSci Foundation
+            </a>
+          </div>
+        </div>
+      </div>
+      {/* <ArtifactGrid className="py-4 px-8">
             {ARTIFACTS.map((artifact: any, index: number) => (
               <ArtifactGridItems
                 key={artifact.name}
@@ -138,7 +146,7 @@ const AttributePopOver = (props: any) => {
           leftIcon={() => <span className="text-xs">Txn</span>}
           link="https://etherscan.io/tx/0x67f67e49e2514da6f28af6c012db495b09ead9f9d6b325eece03752c953bcfd1"
         />
-      </div>
+      </div> */}
     </PopOver>
   );
 };
