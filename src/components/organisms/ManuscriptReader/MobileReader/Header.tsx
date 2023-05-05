@@ -222,7 +222,7 @@ export default function Header() {
         style={{
           width: "100%",
           margin: 0,
-          marginTop: -55,
+          marginTop: 0,
           paddingBottom: 120,
           overflow: "hidden",
           height: "calc(100%+220px)",
