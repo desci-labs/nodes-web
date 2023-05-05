@@ -50,7 +50,9 @@ export default function PublicationDetailsModal(props: any) {
 
   const PRELOAD_CACHE: { [k: string]: any } = {
     "46": {
-      2: { size: 8779600000000 },
+      2: { size: 2654400 },
+      3: { size: 8779600 },
+      4: { size: 8779600 },
     },
   };
 
@@ -116,13 +118,13 @@ export default function PublicationDetailsModal(props: any) {
             isLoading={isLoading}
           />
         </div>
-        <Divider />
+        {/* <Divider />
         <div className="py-4 flex flex-col gap-5">
           <Details
             title="Storage Service"
             subTitle={<Link href="https://estuary.tech" />}
           />
-        </div>
+        </div> */}
         <AdvancedSlideDown
           closed={closed}
           setClosed={setClosed}

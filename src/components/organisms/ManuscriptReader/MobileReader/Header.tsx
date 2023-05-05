@@ -28,7 +28,7 @@ const bgStyles: (url: string) => CSSProperties = (cover: string) => ({
         ), url(${cover})`,
   backgroundRepeat: "no-repeat",
   backgroundPosition: "center top",
-  backgroundSize: "contain",
+  backgroundSize: "100%",
 });
 
 export default function Header() {
@@ -222,7 +222,7 @@ export default function Header() {
         style={{
           width: "100%",
           margin: 0,
-          marginTop: 20,
+          marginTop: 40,
           paddingBottom: 120,
           overflow: "hidden",
           height: "calc(100%+220px)",
