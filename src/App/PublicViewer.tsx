@@ -19,10 +19,13 @@ export default function PublicViewer() {
 
   useEffect(() => {
     if (auth) {
-      if (user) {
+      if (user && user.userId > 0) {
         if (location.pathname === "/" || location.pathname === "web/magic") {
           navigate(`${site.app}${app.nodes}`);
         }
+      } else {
+        navigate(`${site.web}${location.search}`);
+        localStorage.removeItem("auth")
       }
     } else if (location.pathname === "/") {
       navigate(`${site.web}${location.search}`);
