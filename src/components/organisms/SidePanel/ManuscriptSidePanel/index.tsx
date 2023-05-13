@@ -21,7 +21,7 @@ import {
   ResearchObjectV1,
 } from "@desci-labs/desci-models";
 import { useEffectOnce } from "react-use";
-import NodeDrive from "@components/molecules/NodeDrive";
+import NodeDrive, { DriveToggleButton } from "@components/molecules/NodeDrive";
 import useSaveManifest from "@src/hooks/useSaveManifest";
 import { useUser } from "@src/state/user/hooks";
 import {
@@ -310,7 +310,11 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
             {researchPanelTab === ResearchTabs.current ? (
               <>
                 <ManuscriptAttributesSection />
-                {/* <ManuscriptValidationSection /> */}
+                {(publicView || !userProfile.userId) && (
+                  <div className="mb-4">
+                    <DriveToggleButton />
+                  </div>
+                )}
                 <ManuscriptComponentsSection />
               </>
             ) : null}
