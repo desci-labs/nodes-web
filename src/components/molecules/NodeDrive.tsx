@@ -8,7 +8,7 @@ import { useSetter } from "@src/store/accessors";
 import { setComponentStack } from "@src/state/nodes/nodeReader";
 import React from "react";
 
-const NodeDrive = ({ className }: ClassNameProp) => {
+export const DriveToggleButton = () => {
   const { setIsAddingComponent } = useManuscriptController();
   const dispatch = useSetter();
   const { componentStack, manifest: manifestData } = useNodeReader();
@@ -17,6 +17,30 @@ const NodeDrive = ({ className }: ClassNameProp) => {
   const nonDataComponents = manifestData
     ? getNonDataComponentsFromManifest(manifestData)
     : [];
+
+  return (
+    <ButtonSecondary
+      onClick={() => {
+        if (shouldShowDrive) {
+          dispatch(setComponentStack([]));
+        } else {
+          const firstComponent = nonDataComponents[0]!;
+
+          if (!firstComponent) {
+            setIsAddingComponent(true);
+          } else {
+            dispatch(setComponentStack([firstComponent]));
+          }
+        }
+      }}
+      className="w-full"
+    >
+      {shouldShowDrive ? "View Node Drive" : "Hide Node Drive"}
+    </ButtonSecondary>
+  );
+};
+
+const NodeDrive = ({ className }: ClassNameProp) => {
   return (
     <div className={`px-4 mb-4 ${className}`}>
       <div
@@ -28,28 +52,9 @@ const NodeDrive = ({ className }: ClassNameProp) => {
             Your private drive space is freed when you publish
           </p>
         </div>
-        {nonDataComponents.length > 0 ? (
-          <div className="px-4 pt-4 border-t dark:border-muted-900">
-            <ButtonSecondary
-              onClick={() => {
-                if (shouldShowDrive) {
-                  dispatch(setComponentStack([]));
-                } else {
-                  const firstComponent = nonDataComponents[0]!;
-
-                  if (!firstComponent) {
-                    setIsAddingComponent(true);
-                  } else {
-                    dispatch(setComponentStack([firstComponent]));
-                  }
-                }
-              }}
-              className="w-full"
-            >
-              {shouldShowDrive ? "View Node Drive" : "Hide Node Drive"}
-            </ButtonSecondary>
-          </div>
-        ) : null}
+        <div className="px-4 pt-4 border-t dark:border-muted-900">
+          <DriveToggleButton />
+        </div>
       </div>
     </div>
   );
