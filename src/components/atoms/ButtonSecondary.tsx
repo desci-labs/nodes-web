@@ -16,7 +16,7 @@ const ButtonSecondary = tw.button`
  ${(p) =>
    p.disabled
      ? `bg-[#525659] text-[#C3C3C3] cursor-not-allowed`
-     : `border-tint-primary border-2 text-white hover:text-black font-bold text-sm hover:bg-tint-primary cursor-pointer`}
+     : `border-tint-primary border-[1px] text-white hover:text-black font-bold text-sm hover:bg-tint-primary cursor-pointer`}
  ${(p) => p.className}`;
 
 export default ButtonSecondary;
