@@ -15,6 +15,9 @@ export default function UserUpdater(props: PropsWithChildren<{}>) {
 
   const handleError = async (reason: string) => {
     if (reason.toLowerCase() === "unauthorized") {
+      // if (location.pathname.includes(site.app)) {
+      //   navigate(site.web)
+      // }
     }
   };
 
