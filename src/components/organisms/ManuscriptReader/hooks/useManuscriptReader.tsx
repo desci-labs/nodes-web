@@ -53,7 +53,7 @@ export default function useManuscriptReader(publicView: boolean = false) {
   console.log("Parsed Manuscript", parsedManuscript);
   const initPrivateReader = async (cid: string) => {
     if (
-      !publicView &&
+      publicView === false &&
       "manifest" in parsedManuscript &&
       "cid" in parsedManuscript
     ) {
