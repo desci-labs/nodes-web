@@ -22,7 +22,7 @@ export default function PrivateViewer() {
         </>
       )}
       <div id="app" className="flex-grow">
-        {isMobile ? <MobileReader /> : <ManuscriptReader />}
+        {isMobile ? <MobileReader /> : <ManuscriptReader publicView={false} />}
       </div>
     </div>
   );

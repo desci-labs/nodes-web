@@ -13,7 +13,6 @@ import { AnnotationLinkConfig } from "@src/components/molecules/AnnotationEditor
 import {
   cleanupManifestUrl,
   filterForFirstPdf,
-  filterForNonData,
 } from "@src/components/utils";
 import { RootState } from "@src/store";
 import axios from "axios";
@@ -25,7 +24,7 @@ export type ReaderMode = "reader" | "editor";
 export enum ResearchTabs {
   current = "current",
   history = "history",
-  source = "source",
+  credit = "credit",
 }
 
 export interface EditNodeParams {

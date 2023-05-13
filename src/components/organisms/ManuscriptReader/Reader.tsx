@@ -23,10 +23,8 @@ export default function Reader({ isLoading, isError }: ReaderViewerProps) {
   const { manifest: manifestData, componentStack } = useNodeReader();
 
   useEffect(() => {
-    // setPublicView(true);
-    // setIsResearchPanelOpen(false);
     dispatch(setPublicView(true));
-    dispatch(toggleResearchPanel(false));
+    dispatch(toggleResearchPanel(true));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
