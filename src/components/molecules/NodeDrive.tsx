@@ -6,9 +6,9 @@ import { getNonDataComponentsFromManifest } from "../utils";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { setComponentStack } from "@src/state/nodes/nodeReader";
-import React from "react";
+import React, { HTMLProps } from "react";
 
-export const DriveToggleButton = () => {
+export const DriveToggleButton = (props: HTMLProps<HTMLButtonElement>) => {
   const { setIsAddingComponent } = useManuscriptController();
   const dispatch = useSetter();
   const { componentStack, manifest: manifestData } = useNodeReader();
@@ -18,21 +18,22 @@ export const DriveToggleButton = () => {
     ? getNonDataComponentsFromManifest(manifestData)
     : [];
 
+  const defaultClick = () => {
+    if (shouldShowDrive) {
+      dispatch(setComponentStack([]));
+    } else {
+      const firstComponent = nonDataComponents[0]!;
+
+      if (!firstComponent) {
+        setIsAddingComponent(true);
+      } else {
+        dispatch(setComponentStack([firstComponent]));
+      }
+    }
+  };
   return (
     <ButtonSecondary
-      onClick={() => {
-        if (shouldShowDrive) {
-          dispatch(setComponentStack([]));
-        } else {
-          const firstComponent = nonDataComponents[0]!;
-
-          if (!firstComponent) {
-            setIsAddingComponent(true);
-          } else {
-            dispatch(setComponentStack([firstComponent]));
-          }
-        }
-      }}
+      onClick={props.onClick ?? defaultClick}
       className="w-full"
     >
       {shouldShowDrive ? "View Node Drive" : "Hide Node Drive"}
