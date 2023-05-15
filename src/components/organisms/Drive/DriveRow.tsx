@@ -191,7 +191,11 @@ export default function DriveRow({
       </li>
       <li className={`${everyRow}`}>
         <BlackGenericButton
-          disabled={!canUse || file.accessStatus === AccessStatus.UPLOADING}
+          disabled={
+            !canUse ||
+            file.accessStatus === AccessStatus.UPLOADING ||
+            isExternalLinksDir
+          }
           className="p-0 min-w-[28px] h-7"
           onClick={() => {
             dispatch(setFileBeingUsed(file));
