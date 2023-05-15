@@ -11,12 +11,11 @@ export const authApi = api.injectEndpoints({
       providesTags: [{ type: tags.user }],
       query: () => endpoints.v1.auth.profile,
       async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        console.log("onQueryStarted");
         try {
           const { data } = await queryFulfilled;
           dispatch(setUser(data));
-        } catch (error) {
-          localStorage.removeItem("auth")
-        }
+        } catch (error) {}
       },
     }),
     redeemMagicLink: builder.mutation<
