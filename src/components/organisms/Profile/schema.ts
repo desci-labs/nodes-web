@@ -2,7 +2,7 @@ import * as Yup from "yup";
 import { GOOGLE_SCHOLAR_URL_SCHEMA } from "../PopOver/CreditsModal/schema";
 
 export const userProfileActionSchema = Yup.object().shape({
-  name: Yup.string().required(),
+  name: Yup.string().optional(),
   googleScholarUrl: GOOGLE_SCHOLAR_URL_SCHEMA.optional(),
   organization: Yup.string().optional(),
   rorPid: Yup.string().optional(),

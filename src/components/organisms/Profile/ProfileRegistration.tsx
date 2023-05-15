@@ -20,6 +20,7 @@ import { CheckBox, CheckBoxText } from "@src/components/atoms/Checkbox";
 import { useSetter } from "@src/store/accessors";
 import { setPreferences } from "@src/state/preferences/preferencesSlice";
 import useProfileSubmit from "./useProfileSubmit";
+import { termsConsent } from "@src/api";
 
 export interface ProfilePopOverProps {
   onDismiss?: () => void;
@@ -35,9 +36,13 @@ export function ProfileRegistrationForm(props: ProfilePopOverProps) {
     handleSubmit,
     formState: { errors },
   } = useFormContext<ProfileRegistrationValues>();
-  const { onSubmit } = useProfileSubmit({ onClose: () => {
-    dispatch(setPreferences({ showProfileRegistration: false }));
-  } });
+
+  const { onSubmit } = useProfileSubmit({
+    onClose: async () => {
+      await termsConsent({ hasAcceptedTerms: true }, "");
+      dispatch(setPreferences({ showProfileRegistration: false }));
+    },
+  });
 
   if (!showProfileRegistration) return null;
 

@@ -1,4 +1,5 @@
 import {
+  checkConsent,
   getUserData,
   magicLinkSend,
   patchAcceptFriendReferral,
@@ -132,11 +133,13 @@ export default function useLogin() {
       // setIsLoading(false);
       // setCheckingCode(false);
       dispatch(setCheckingCode(false));
+
+      const { consent } = await checkConsent();
       setTimeout(() => {
         navigate(`${site.app}${app.nodes}/start`);
 
         // check if profile is valid
-        if (userData.userId > 0 && !userData.profile.name) {
+        if (!consent) {
           dispatch(setPreferences({ showProfileRegistration: true }));
         }
 

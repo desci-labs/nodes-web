@@ -78,6 +78,13 @@ export const termsConsent = async (obj: any, uuid: string) => {
   );
   return data;
 };
+export const checkConsent = async () => {
+  const { data } = await axios.get(
+    `${SCIWEAVE_URL}/v1/nodes/consent`,
+    config()
+  );
+  return data;
+};
 
 export const getNodeVersionDetails = async (hash: string) => {
   const { data } = await axios.get<
@@ -268,7 +275,10 @@ export const retrieveDoi = async (
 };
 
 export const getUserData = async () => {
-  const { data } = await axios.get<any, { data: UserProfile }>(`${SCIWEAVE_URL}/v1/auth/profile`, config());
+  const { data } = await axios.get<any, { data: UserProfile }>(
+    `${SCIWEAVE_URL}/v1/auth/profile`,
+    config()
+  );
   return data;
 };
 
@@ -337,7 +347,7 @@ export const getDatasetTree = async (
   shareId = ""
 ) => {
   const route = pub ? "pubTree" : "retrieveTree";
-  console.log('fetch dataset tree', pub, route);
+  console.log("fetch dataset tree", pub, route);
   const { data } = await axios.get(
     `${SCIWEAVE_URL}/v1/data/${route}/${nodeUuid}/${cid}${
       shareId ? "/" + shareId : ""
