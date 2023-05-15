@@ -74,7 +74,10 @@ export default function DriveRow({
     [init]
   );
 
-  const isExternalLinksDir = file.path === DRIVE_FULL_EXTERNAL_LINKS_PATH;
+  const isExternalLinksDir = file?.path === DRIVE_FULL_EXTERNAL_LINKS_PATH;
+  const isExternalLink =
+    !isExternalLinksDir &&
+    file?.path?.startsWith(DRIVE_FULL_EXTERNAL_LINKS_PATH);
 
   return (
     <div
@@ -152,10 +155,25 @@ export default function DriveRow({
           {file.name}
         </span>
       </li>
-      <li className={`${everyRow} col-last-modified text-xs`}>
-        {isExternalLinksDir ? "-" : file.lastModified}
+      <li
+        className={`${everyRow} ${
+          isExternalLink ? "" : "hidden"
+        } col-service text-xs`}
+      >
+        services
       </li>
-      <li className={`${everyRow} col-status text-xs`}>
+      <li
+        className={`${everyRow} ${
+          isExternalLink ? "hidden" : ""
+        } col-last-modified text-xs`}
+      >
+        {isExternalLinksDir ? "-" : file.lastModified} $
+      </li>
+      <li
+        className={`${everyRow} ${
+          isExternalLink ? "hidden" : ""
+        } col-status text-xs`}
+      >
         {file.accessStatus === AccessStatus.UPLOADING
           ? "Private"
           : isExternalLinksDir
@@ -170,7 +188,7 @@ export default function DriveRow({
             }: ${JSON.stringify(file.metadata)}`
           )
         }
-        className={`${everyRow} text-xs`}
+        className={`${everyRow} ${isExternalLink ? "hidden" : ""} text-xs`}
       >
         {isExternalLinksDir ? "-" : BytesToHumanFileSize(file.size)}
       </li>

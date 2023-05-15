@@ -62,7 +62,7 @@ const DriveTable: React.FC = () => {
     return Object.keys(selected).length <= 1;
   }, [selected]);
 
-  const canAdd = currentDrive?.path !== DRIVE_FULL_EXTERNAL_LINKS_PATH;
+  const isExternalLinks = currentDrive?.path === DRIVE_FULL_EXTERNAL_LINKS_PATH;
 
   return (
     <div className="w-full h-full">
@@ -112,7 +112,7 @@ const DriveTable: React.FC = () => {
                           setAddFilesWithoutContext(false);
                           dispatch(addFilesToDrive({ newFolder: true }));
                         },
-                        disabled: !canAdd,
+                        disabled: isExternalLinks,
                       },
                     ]}
                     close={() => setShowAddBtnSelectMenu(false)}
@@ -130,8 +130,9 @@ const DriveTable: React.FC = () => {
         ref={containerRef}
       >
         <ul
-          className={`drive-row-container ${
-            deprecated ? "drive-deprecated" : ""
+          className={`drive-row-container ${deprecated ? "deprecated" : ""}
+          ${
+            isExternalLinks ? "external-links" : ""
           } bg-neutrals-gray-1 grid list-none font-medium text-sm text-white select-none items-center rounded-t-xl rounded-b-xl h-full`}
         >
           <li
@@ -148,19 +149,38 @@ const DriveTable: React.FC = () => {
           <li className={`${everyRow} ${headerRow} !justify-start`}>
             File Name
           </li>
-          <li className={`${everyRow} ${headerRow} col-last-modified`}>
+          <li
+            className={`${everyRow} ${headerRow} ${
+              isExternalLinks ? "" : "hidden"
+            } col-service`}
+          >
+            Service
+          </li>
+          <li
+            className={`${everyRow} ${headerRow} ${
+              isExternalLinks ? "hidden" : ""
+            } col-last-modified`}
+          >
             Last Modified
           </li>
 
           <li
             data-tip={""}
             data-for="status"
-            className={`${everyRow} ${headerRow} col-status`}
+            className={`${everyRow} ${headerRow} ${
+              isExternalLinks ? "hidden" : ""
+            } col-status`}
           >
             Status
           </li>
 
-          <li className={`${everyRow} ${headerRow}`}>File Size</li>
+          <li
+            className={`${everyRow} ${headerRow} ${
+              isExternalLinks ? "hidden" : ""
+            }`}
+          >
+            File Size
+          </li>
           <li className={`${everyRow} ${headerRow}`}>Cite</li>
           <li className={`${everyRow} ${headerRow}`}>Use</li>
           {currentDrive?.contains?.length ? (
