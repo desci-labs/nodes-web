@@ -20,6 +20,7 @@ const initialState: AppPreferences = {
   isMobileView: false,
   mobileViewWarning: false,
   showMobileComponentStack: false,
+  showProfileRegistration: true,
 };
 
 const slice = createSlice({

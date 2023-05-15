@@ -3,6 +3,7 @@ import "./style.scss";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useGetUser } from "@src/hooks/useGetUser";
 import { site } from "@src/constants/routes";
+import { ProfilePromptModal } from "@src/components/organisms/Profile/ProfileRegistration";
 export const USE_ORCID_JWT = true;
 
 console.log(`[starting DeSci Nodes v${process.env.REACT_APP_VERSION}]`);
@@ -12,12 +13,13 @@ const App = () => {
   const navigate = useNavigate();
   const { userData, error } = useGetUser();
 
+  console.log("Auth errorrorrorr", userData, error)
   useEffect(() => {
     if (error) {
       console.error(error);
       
-      if (location.pathname.indexOf("/nodes/start") > -1) {
-        navigate(site.app);
+      if (location.pathname.indexOf("/app") > -1) {
+        navigate(site.web);
       }
       return;
     }
@@ -38,6 +40,7 @@ const App = () => {
   return (
     <>
       <Outlet />
+      <ProfilePromptModal />
     </>
   );
 };

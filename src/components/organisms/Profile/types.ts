@@ -14,3 +14,12 @@ export interface UserProfileApiData {
   };
   wallets: UserProfileWallet[];
 }
+
+export interface ProfileRegistrationValues {
+  name: string;
+  googleScholarUrl?: string;
+  organization?: string;
+  rorPid?: string;
+  hasAcceptedTerms: boolean;
+  hasAffiliation: boolean;
+}

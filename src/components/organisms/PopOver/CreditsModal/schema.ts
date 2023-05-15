@@ -16,7 +16,7 @@ export interface CreditModalProps {
   id?: number;
 }
 
-const GOOGLE_SCHOLAR_URL_SCHEMA = Yup.string()
+export const GOOGLE_SCHOLAR_URL_SCHEMA = Yup.string()
   .url()
   .optional()
   .test({

@@ -28,7 +28,7 @@ function ProfileInfo(props: {
 
   return (
     <div
-      className={`sm:grow max-w-[500px] ${!props.inModal ? "mt-10 pb-10" : ""}`}
+      className={`sm:grow ${!props.inModal ? "mt-10 pb-10" : ""}`}
     >
       <div className="flex flex-col gap-8">
         <IconSubTextHeader
