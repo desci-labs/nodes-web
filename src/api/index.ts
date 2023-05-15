@@ -15,12 +15,13 @@ import {
   PublicDataReferenceOnIpfsMirror,
 } from "@src/types/client";
 import {
-  CidString,
+  // CidString,
   DrivePath,
   ExternalCid,
   ExternalUrl,
 } from "@src/state/drive/types";
 import { arrayXor } from "@src/components/utils";
+import { UserProfile } from "@src/state/api/types";
 export const SCIWEAVE_URL =
   process.env.REACT_APP_NODES_API || "http://localhost:5420";
 
@@ -267,7 +268,7 @@ export const retrieveDoi = async (
 };
 
 export const getUserData = async () => {
-  const { data } = await axios.get(`${SCIWEAVE_URL}/v1/auth/profile`, config());
+  const { data } = await axios.get<any, { data: UserProfile }>(`${SCIWEAVE_URL}/v1/auth/profile`, config());
   return data;
 };
 

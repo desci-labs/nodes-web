@@ -41,12 +41,6 @@ export function ProfileRegistrationForm(props: ProfilePopOverProps) {
 
   if (!showProfileRegistration) return null;
 
-  // const onHandleSubmit = (data: ProfileRegistrationValues) => {
-  //   console.log("submit", data);
-  //   // onSub
-  //   dispatch(setPreferences({ showProfileRegistration: false }));
-  // };
-
   const hasAffiliation = watch("hasAffiliation");
   return (
     <PerfectScrollbar className="overflow-auto my-3">

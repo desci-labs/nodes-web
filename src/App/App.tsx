@@ -13,11 +13,8 @@ const App = () => {
   const navigate = useNavigate();
   const { userData, error } = useGetUser();
 
-  console.log("Auth errorrorrorr", userData, error)
   useEffect(() => {
     if (error) {
-      console.error(error);
-      
       if (location.pathname.indexOf("/app") > -1) {
         navigate(site.web);
       }

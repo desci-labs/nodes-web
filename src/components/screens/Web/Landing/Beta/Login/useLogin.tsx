@@ -13,7 +13,7 @@ import { tags } from "@src/state/api/tags";
 import { useSetter } from "@src/store/accessors";
 import { useRedeemMagicLinkMutation } from "@src/state/api/auth";
 import { setUser } from "@src/state/user/userSlice";
-import { setCheckingCode } from "@src/state/preferences/preferencesSlice";
+import { setCheckingCode, setPreferences } from "@src/state/preferences/preferencesSlice";
 
 export enum Steps {
   AutoLogin,
@@ -134,6 +134,12 @@ export default function useLogin() {
       dispatch(setCheckingCode(false));
       setTimeout(() => {
         navigate(`${site.app}${app.nodes}/start`);
+
+        // check if profile is valid
+        if (userData.userId > 0 && !userData.profile.name) {
+          dispatch(setPreferences({ showProfileRegistration: true }));
+        }
+
       }, 500);
     } catch (err) {
       if (step === Steps.AutoLogin || step === Steps.VerifyCode) {
@@ -143,7 +149,7 @@ export default function useLogin() {
         if (errorMessage === "Not found") {
           errorMessage = "Code invalid or expired";
           setStep((prevStep) =>
-            prevStep != Steps.VerifyCode || Steps.AutoLogin
+            prevStep !== Steps.VerifyCode || Steps.AutoLogin
               ? prevStep
               : Steps.VerifyCode
           );
