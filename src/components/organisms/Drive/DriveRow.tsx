@@ -36,6 +36,7 @@ import {
   findTarget,
 } from "../ComponentLibrary";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
+import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
 
 function renderComponentIcon(file: DriveObject) {
   const foundEntry = findTarget(
@@ -72,6 +73,8 @@ export default function DriveRow({
     },
     [init]
   );
+
+  const isExternalLinksDir = file.path === DRIVE_FULL_EXTERNAL_LINKS_PATH;
 
   return (
     <div
@@ -150,11 +153,13 @@ export default function DriveRow({
         </span>
       </li>
       <li className={`${everyRow} col-last-modified text-xs`}>
-        {file.lastModified}
+        {isExternalLinksDir ? "-" : file.lastModified}
       </li>
       <li className={`${everyRow} col-status text-xs`}>
         {file.accessStatus === AccessStatus.UPLOADING
           ? "Private"
+          : isExternalLinksDir
+          ? "-"
           : file.accessStatus}
       </li>
       <li
@@ -167,7 +172,7 @@ export default function DriveRow({
         }
         className={`${everyRow} text-xs`}
       >
-        {BytesToHumanFileSize(file.size)}
+        {isExternalLinksDir ? "-" : BytesToHumanFileSize(file.size)}
       </li>
       <li className={`${everyRow}`}>
         <BlackGenericButton
