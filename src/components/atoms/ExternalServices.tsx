@@ -47,7 +47,7 @@ export const commonServices: Record<string, CommonServiceObject> = {
         {...props}
       />
     ),
-    title: "CodeOcean",
+    title: "Code Ocean",
   },
   "mybinder.org": {
     icon: (props: any) => (
@@ -57,7 +57,7 @@ export const commonServices: Record<string, CommonServiceObject> = {
         {...props}
       />
     ),
-    title: "MyBinder",
+    title: "My Binder",
   },
   "youtube.com": {
     icon: (props: any) => (
@@ -93,7 +93,7 @@ export const commonServices: Record<string, CommonServiceObject> = {
         {...props}
       />
     ),
-    title: "ResearchHub",
+    title: "Research Hub",
   },
   "huggingface.co": {
     icon: (props: any) => (

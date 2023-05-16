@@ -80,6 +80,9 @@ $columns: 8;
     &.deprecated {
       grid-template-columns: $FILE_NAME $STATUS $FILE_SIZE $CITE $USE;
     }
+    &.external-links {
+      grid-template-columns: $STARRED $FILE_NAME $SERVICES $CITE $USE;
+    }
   }
 
   // drop status
@@ -93,6 +96,9 @@ $columns: 8;
     grid-template-columns: $STARRED $FILE_NAME $FILE_SIZE $CITE $USE;
     &.deprecated {
       grid-template-columns: $FILE_NAME $FILE_SIZE $CITE $USE;
+    }
+    &.external-links {
+      grid-template-columns: $STARRED $FILE_NAME $SERVICES $CITE $USE;
     }
   }
   // drop all
@@ -117,6 +123,9 @@ $columns: 8;
 
     grid-template-columns: $FILE_NAME;
     &.deprecated {
+      grid-template-columns: $FILE_NAME;
+    }
+    &.external-links {
       grid-template-columns: $FILE_NAME;
     }
   }
