@@ -137,6 +137,15 @@ import { ReactComponent as IconPlayRounded } from "@images/icons/play.svg";
 import { ReactComponent as IconAssignType } from "@images/icons/assign-type-icon.svg";
 import { ReactComponent as IconDrive } from "@images/icons/drive.svg";
 import { ReactComponent as IconUnstar } from "@images/icons/unstar.svg";
+import { ReactComponent as IconSvcCodeOcean } from "@images/icons/service-codeocean.svg";
+import { ReactComponent as IconSvcColab } from "@images/icons/service-colab.svg";
+import { ReactComponent as IconSvcHuggingFace } from "@images/icons/service-huggingface.svg";
+import { ReactComponent as IconSvcJupyter } from "@images/icons/service-jupyter.svg";
+import { ReactComponent as IconSvcMyBinder } from "@images/icons/service-mybinder.svg";
+import { ReactComponent as IconSvcOpenReview } from "@images/icons/service-openreview.svg";
+import { ReactComponent as IconSvcReplicateAi } from "@images/icons/service-replicateai.svg";
+import { ReactComponent as IconSvcResearchHub } from "@images/icons/service-researchhub.svg";
+import { ReactComponent as IconSvcYoutube } from "@images/icons/service-youtube.svg";
 
 export type SvgIconProps = FC<
   React.SVGProps<SVGSVGElement> & {
@@ -149,6 +158,15 @@ const IconZoomIn = React.memo(IconZoomInBase);
 const IconZoomOut = React.memo(IconZoomOutBase);
 
 export {
+  IconSvcColab,
+  IconSvcHuggingFace,
+  IconSvcMyBinder,
+  IconSvcJupyter,
+  IconSvcOpenReview,
+  IconSvcReplicateAi,
+  IconSvcResearchHub,
+  IconSvcYoutube,
+  IconSvcCodeOcean,
   IconUnstar,
   IconDrive,
   IconAssignType,

@@ -59,7 +59,7 @@ $columns: 8;
   $FILE_SIZE: minmax(auto, 1fr);
   $CITE: 50px;
   $USE: 50px;
-  $SERVICES: 200px;
+  $SERVICES: min-content;
 
   grid-template-columns: $STARRED $FILE_NAME $LAST_MODIFIED $STATUS $FILE_SIZE $CITE $USE;
 

@@ -37,6 +37,7 @@ import {
 } from "../ComponentLibrary";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
+import ExternalService from "@src/components/atoms/ExternalServices";
 
 function renderComponentIcon(file: DriveObject) {
   const foundEntry = findTarget(
@@ -158,9 +159,9 @@ export default function DriveRow({
       <li
         className={`${everyRow} ${
           isExternalLink ? "" : "hidden"
-        } col-service text-xs`}
+        } col-service text-xs !justify-start`}
       >
-        services
+        {isExternalLink && <ExternalService url={file.cid!} />}
       </li>
       <li
         className={`${everyRow} ${
