@@ -1,9 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import "./style.scss";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useGetUser } from "@src/hooks/useGetUser";
 import { site } from "@src/constants/routes";
 import { ProfilePromptModal } from "@src/components/organisms/Profile/ProfileRegistration";
+import { checkConsent } from "@src/api";
+import { useSetter } from "@src/store/accessors";
+import { setPreferences } from "@src/state/preferences/preferencesSlice";
+import { useUser } from "@src/state/user/hooks";
 export const USE_ORCID_JWT = true;
 
 console.log(`[starting DeSci Nodes v${process.env.REACT_APP_VERSION}]`);
@@ -11,28 +14,30 @@ console.log(`[starting DeSci Nodes v${process.env.REACT_APP_VERSION}]`);
 const App = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { userData, error } = useGetUser();
+  const dispatch = useSetter();
+  const userProfile = useUser();
+
+  const runCheck = useCallback(async () => {
+    const { consent } = await checkConsent();
+    if (!consent) {
+      dispatch(setPreferences({ showProfileRegistration: true }));
+    }
+  }, [dispatch]);
 
   useEffect(() => {
-    if (error) {
-      if (location.pathname.indexOf("/app") > -1) {
-        navigate(site.web);
+    if (userProfile.userId > 0) {
+      runCheck();
+      if (
+        !location.pathname.includes("/app/") ||
+        location.pathname === "/login"
+      ) {
+        navigate(`${site.app}/nodes/start`);
       }
-      return;
+    } else {
+      console.log("Redirect to login page", userProfile)
+       navigate(`${site.web}`);
     }
-
-    if (userData) {
-      let user = userData;
-      if (user) {
-        if (
-          !location.pathname.includes("/app/") ||
-          location.pathname === "/login"
-        ) {
-          navigate(`${site.app}/nodes/start`);
-        }
-      }
-    }
-  }, [userData, error, location.pathname, navigate]);
+  }, [location.pathname, navigate, runCheck, dispatch, userProfile]);
 
   return (
     <>

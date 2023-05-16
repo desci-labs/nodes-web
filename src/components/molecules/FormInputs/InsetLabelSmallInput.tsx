@@ -14,24 +14,15 @@ const Input = forwardRef<HTMLInputElement, HTMLProps<HTMLInputElement>>(
 );
 
 interface InsetLabelSmallInputProps {
-  // label: string;
   labelClassName?: string;
   textClassName?: string;
-  // value?: string;
-  // onChange?: FormEventHandler<HTMLInputElement | HTMLTextAreaElement>;
   multiline?: boolean;
   properties?: {};
   field?: any;
   fieldState?: any;
   clickToSelect?: boolean;
   mandatory?: boolean;
-  // className?: string;
   optional?: boolean;
-  // disabled?: boolean;
-  // maxLength?: number;
-  // pattern?: string;
-  // onFocus?: FormEventHandler;
-  // placeholder?: string;
 }
 
 interface InsetLabelProps

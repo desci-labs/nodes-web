@@ -11,6 +11,8 @@ export interface UserProfileApiData {
     name: string;
     googleScholarUrl: string;
     orcid?: string;
+    organization?: string;
+    rorpid?: string;
   };
   wallets: UserProfileWallet[];
 }
@@ -19,7 +21,7 @@ export interface ProfileRegistrationValues {
   name: string;
   googleScholarUrl?: string;
   organization?: string;
-  rorPid?: string;
+  rorpid?: string;
   hasAcceptedTerms: boolean;
   hasAffiliation: boolean;
 }

@@ -12,6 +12,8 @@ export interface UserProfile {
     googleScholarUrl: string;
     name: string;
     orcid: string;
+    rorpid?: string;
+    organization?: string;
   };
   wallets: Wallet[];
 }

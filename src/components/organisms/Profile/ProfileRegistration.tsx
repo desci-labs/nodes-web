@@ -1,5 +1,5 @@
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import {
   Controller,
   FormProvider,
@@ -12,19 +12,50 @@ import { ProfileRegistrationValues } from "./types";
 import { useUser } from "@src/state/user/hooks";
 import { useAppPreferences } from "@src/state/preferences/hooks";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { userProfileActionSchema } from "./schema";
+import { ROR_API_URL, ROR_URL, userProfileActionSchema } from "./schema";
 import InsetLabelSmallInput from "@src/components/molecules/FormInputs/InsetLabelSmallInput";
 import DividerSimple from "@src/components/atoms/DividerSimple";
-import { FlexRowAligned } from "@src/components/styled";
+import { FlexColumn, FlexRowAligned } from "@src/components/styled";
 import { CheckBox, CheckBoxText } from "@src/components/atoms/Checkbox";
 import { useSetter } from "@src/store/accessors";
 import { setPreferences } from "@src/state/preferences/preferencesSlice";
 import useProfileSubmit from "./useProfileSubmit";
 import { termsConsent } from "@src/api";
+import axios from "axios";
 
 export interface ProfilePopOverProps {
   onDismiss?: () => void;
 }
+
+const useRoRResolver = () => {
+  const {
+    watch,
+    setValue,
+    formState: { isValid },
+  } = useFormContext<ProfileRegistrationValues>();
+  const rorId = watch("rorpid");
+  const hasAffiliation = watch("hasAffiliation");
+
+  const resolveOrgName = useCallback(async () => {
+    try {
+      // const urlParts = rorId?.split("/") ?? [];
+      const pid = rorId || "" // urlParts[urlParts.length - 1];
+      const { data: org, status } = await axios.get(`${ROR_API_URL}${pid}`);
+      if (status === 200 && org?.name) {
+        setValue("organization", org.name);
+      }
+    } catch (e) {
+      //
+      setValue("organization", "");
+    }
+  }, [rorId, setValue]);
+
+  useEffect(() => {
+    if (rorId) {
+      resolveOrgName();
+    }
+  }, [hasAffiliation, isValid, resolveOrgName, rorId]);
+};
 
 export function ProfileRegistrationForm(props: ProfilePopOverProps) {
   const dispatch = useSetter();
@@ -37,6 +68,9 @@ export function ProfileRegistrationForm(props: ProfilePopOverProps) {
     formState: { errors },
   } = useFormContext<ProfileRegistrationValues>();
 
+  // autofill organisation name
+  useRoRResolver();
+
   const { onSubmit } = useProfileSubmit({
     onClose: async () => {
       await termsConsent({ hasAcceptedTerms: true }, "");
@@ -47,6 +81,8 @@ export function ProfileRegistrationForm(props: ProfilePopOverProps) {
   if (!showProfileRegistration) return null;
 
   const hasAffiliation = watch("hasAffiliation");
+  const rorpid = watch("rorpid");
+
   return (
     <PerfectScrollbar className="overflow-auto my-3">
       <div className="py-2 flex justify-center items-center max-h-[650px]">
@@ -96,7 +132,7 @@ export function ProfileRegistrationForm(props: ProfilePopOverProps) {
                 optional={false}
                 className="my-6 w-full"
                 {...field}
-                disabled={!hasAffiliation}
+                disabled={hasAffiliation}
               />
             )}
           />
@@ -109,35 +145,36 @@ export function ProfileRegistrationForm(props: ProfilePopOverProps) {
               I’m not affiliated with a research organization
             </CheckBoxText>
           </FlexRowAligned>
-
-          <Controller
-            name="rorPid"
-            control={control}
-            render={({ field }) => (
-              <InsetLabelSmallInput
-                label="ROR PID (Optional)"
-                {...field}
-                ref={register("rorPid").ref}
-                optional={false}
-                className="mt-6 mb-3 w-full"
-              />
+          <FlexColumn style={{ display: hasAffiliation ? "none" : "flex" }}>
+            <Controller
+              name="rorpid"
+              control={control}
+              render={({ field }) => (
+                <InsetLabelSmallInput
+                  label="ROR PID (Optional)"
+                  {...field}
+                  ref={register("rorpid").ref}
+                  optional={false}
+                  className="mt-6 mb-3 w-full"
+                />
+              )}
+            />
+            {errors.rorpid?.message ? (
+              <span className="text-red-400 text-xs h-8 block">
+                {errors.rorpid?.message}
+              </span>
+            ) : (
+              <a
+                className="flex flex-row gap-1 items-center text-md font-extrabold text-tint-primary hover:text-tint-primary-hover tracking-tight disabled:text-neutrals-gray-4"
+                href={`${ROR_URL}${rorpid}`}
+                target="_blank"
+                rel="noreferrer"
+                aria-disabled={!!errors?.rorpid}
+              >
+                Find Organization ROR PID
+              </a>
             )}
-          />
-          {errors.rorPid?.message ? (
-            <span className="text-red-400 text-xs h-8 block">
-              {errors.rorPid?.message}
-            </span>
-          ) : (
-            <a
-              className="flex flex-row gap-1 items-center text-md font-extrabold text-tint-primary hover:text-tint-primary-hover tracking-tight disabled:text-neutrals-gray-4"
-              href={`${errors?.rorPid ? "" : `https://orcid.org`}`}
-              target="_blank"
-              rel="noreferrer"
-              aria-disabled={!!errors?.rorPid}
-            >
-              Find Organization ROR PID
-            </a>
-          )}
+          </FlexColumn>
         </form>
       </div>
     </PerfectScrollbar>
@@ -154,6 +191,8 @@ export const ProfilePromptModal = (props: ModalProps) => {
       hasAffiliation: false,
       hasAcceptedTerms: false,
       name: userProfile.profile?.name ?? "",
+      rorpid: userProfile.profile?.rorpid ?? "",
+      organization: userProfile.profile?.organization ?? "",
       googleScholarUrl: userProfile.profile?.googleScholarUrl ?? "",
     },
     resolver: yupResolver(userProfileActionSchema),

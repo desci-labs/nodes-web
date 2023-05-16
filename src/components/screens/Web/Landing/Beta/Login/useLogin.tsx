@@ -108,15 +108,11 @@ export default function useLogin() {
 
     try {
       const data = await redeemMagicLink({ email, code }).unwrap();
-
       const referralUuid = queryString.parse(search).referralUuid as string;
 
       if (!data.user.token) {
         throw Error("Login failed");
       }
-
-      localStorage.setItem("auth", data.user.token);
-
       const userData = await getUserData();
       dispatch(setUser(userData));
       dispatch(api.util.invalidateTags([{ type: tags.user }]));

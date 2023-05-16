@@ -9,7 +9,7 @@ export const CheckBox = styled.input.attrs((props) => ({
 }))``;
 
 export const CheckBoxText = styled<any>("label").attrs((props: HTMLProps<HTMLLabelElement>) => ({
-  for: props.htmlFor,
+  htmlFor: props.htmlFor,
   className: `cursor-pointer select-none text-xs ${props.className ?? ''}`,
 }))`
   margin-left: 0.5rem;

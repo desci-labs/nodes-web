@@ -5,7 +5,7 @@ import InsetLabelInput from "@src/components/molecules/FormInputs/InsetLabelInpu
 import PdfHeader from "@src/components/organisms/PdfHeader";
 import PopOver from "@src/components/organisms/PopOver";
 import { site } from "@src/constants/routes";
-import { IconGreenCheck, IconInfo, IconWarning, IconX } from "@src/icons";
+import { IconGreenCheck, IconWarning, IconX } from "@src/icons";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useLogin, { Steps } from "./useLogin";
@@ -53,7 +53,7 @@ const Footer = ({ step, goBack, nextStep, isLoading, code }: any) => {
       )}
       {[Steps.ConfirmEmail, Steps.VerifyCode].includes(step) && (
         <PrimaryButton
-          disabled={isLoading || (step == Steps.VerifyCode && code?.length < 6)}
+          disabled={isLoading || (step === Steps.VerifyCode && code?.length < 6)}
           type="submit"
           onClick={nextStep}
           className="flex gap-2 items-center"
@@ -62,7 +62,7 @@ const Footer = ({ step, goBack, nextStep, isLoading, code }: any) => {
           {isLoading && checkingCode && (
             <DefaultSpinner color="white" size={20} />
           )}
-          {step == Steps.VerifyCode && isLoading && !checkingCode && (
+          {step === Steps.VerifyCode && isLoading && !checkingCode && (
             <IconGreenCheck width={20} />
           )}
         </PrimaryButton>
@@ -89,7 +89,6 @@ export default function Login() {
   const codeRef = useRef<HTMLInputElement | null>(null);
 
   const handleRef = useCallback((node) => {
-    console.log("Node", node);
     if (node) {
       inputRef.current = node;
     }
