@@ -168,7 +168,7 @@ export default function DriveRow({
           isExternalLink ? "hidden" : ""
         } col-last-modified text-xs`}
       >
-        {isExternalLinksDir ? "-" : file.lastModified} $
+        {isExternalLinksDir ? "-" : file.lastModified}
       </li>
       <li
         className={`${everyRow} ${

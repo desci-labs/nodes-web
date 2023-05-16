@@ -150,7 +150,7 @@ const DriveTable: React.FC = () => {
             File Name
           </li>
           <li
-            className={`${everyRow} ${headerRow} ${
+            className={`${everyRow} ${headerRow} !justify-start ${
               isExternalLinks ? "" : "hidden"
             } col-service`}
           >
