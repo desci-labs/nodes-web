@@ -161,7 +161,7 @@ const ModalHeader = ({
       </div>
       {!hideCloseIcon && (
         <button
-          className="cursor-pointer p-5 -m-5 right-5 top-5 z-[999] stroke-black dark:stroke-white hover:stroke-muted-300 hover:dark:stroke-muted-300"
+          className="cursor-pointer p-5 -m-5 absolute right-5 top-5 z-[999] stroke-black dark:stroke-white hover:stroke-muted-300 hover:dark:stroke-muted-300"
           onClick={onDismiss}
         >
           <IconX />

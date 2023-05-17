@@ -1,8 +1,4 @@
-import {
-  FlexColumn,
-  FlexRow,
-  FlexRowAligned,
-} from "@components/styled";
+import { FlexColumn, FlexRow, FlexRowAligned } from "@components/styled";
 import styled from "styled-components";
 import Modal, { ModalProps } from "@src/components/molecules/Modal";
 import { DriveObject } from "@components/organisms/Drive";
@@ -19,7 +15,7 @@ import { PropsWithChildren } from "react";
 const CardContainer = styled.div`
   background: #272727;
   border-radius: 4px 4px 0px 0px;
-  padding: 5px 8px;
+  padding: 5px 10px;
   flex: none;
   order: 0;
   flex-grow: 0;
@@ -50,6 +46,17 @@ function Pill(props: { keyword: string }) {
   );
 }
 
+const getComponentTypeName = (componentType: ResearchObjectComponentType) => {
+  switch (componentType) {
+    case ResearchObjectComponentType.DATA:
+      return "Dataset";
+    case ResearchObjectComponentType.CODE:
+      return "Code";
+    default:
+      return "";
+  }
+};
+
 const ViewMetadataModal = (
   props: ModalProps & { file: DriveObject | null }
 ) => {
@@ -62,7 +69,7 @@ const ViewMetadataModal = (
   const types = NODES_COMPONENT_SUBTYPES[type];
   const subtype = types && types.find((subtype) => fileSubtype === subtype.id);
 
-  const componentTypeName = subtype?.name || "";
+  const componentTypeName = subtype?.name || getComponentTypeName(type);
 
   const licenseType = metadata?.licenseType || manifest?.defaultLicense || "";
   console.log(licenseType, metadata);
@@ -125,9 +132,9 @@ const ViewMetadataModal = (
             <Title title={licenseType || "Unknown License"} />
             <ContentWrapper>
               <FlexRow className="my-1 items-start gap-2">
-                <div className="mt-[4px] bg-states-success min-w-[10px] min-h-[10px] w-[10px] h-[10px] m-0 p-0 rounded-full border-none"></div>
-                <FlexColumn className="items-start gap-2">
-                  <p className="uppercase">{licenseType}</p>
+                <div className="mt-[8px] bg-states-success min-w-[8px] min-h-[8px] w-[8px] h-[8px] m-0 p-0 rounded-full border-none"></div>
+                <FlexColumn className="items-start gap-1">
+                  <p className="text-md uppercase">{licenseType}</p>
                   <p className="text-sm">License description</p>
                 </FlexColumn>
               </FlexRow>
