@@ -302,7 +302,7 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
                   </div>
                 )}
                 <ManuscriptComponentsSection />
-                {!publicView && <MetadataKeywords />}
+                {/* {!publicView && <MetadataKeywords />} */}
               </>
             ) : null}
             {researchPanelTab === ResearchTabs.history ? <HistoryTab /> : null}
