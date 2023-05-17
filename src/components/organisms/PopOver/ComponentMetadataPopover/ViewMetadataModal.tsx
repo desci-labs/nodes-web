@@ -114,7 +114,16 @@ const ViewMetadataModal = (
           </CardContainer>
           <CardContainer>
             <Title title="Ontology PURL" />
-            <ContentWrapper>{metadata?.ontologyPurl || "-"}</ContentWrapper>
+            <ContentWrapper>
+              <a
+                href={metadata?.ontologyPurl}
+                rel="noreferrer"
+                target="_blank"
+                className="flex gap-1 mt-1 items-center group hover:text-tint-primary-hover text-tint-primary underline truncate line-clamp-1"
+              >
+                {metadata?.ontologyPurl}
+              </a>
+            </ContentWrapper>
           </CardContainer>
           <CardContainer>
             <Title title="Controlled Vocabulary Terms" />
