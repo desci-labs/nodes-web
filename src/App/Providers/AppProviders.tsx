@@ -7,6 +7,7 @@ import ReactTooltip from "react-tooltip";
 import PreferencUpdater from "@src/state/preferences/updater";
 import UserUpdater from "@src/state/user/updater";
 import NodesUpdater from "@src/state/nodes/updater/versions";
+import { TooltipProvider } from "@src/components/atoms/tooltip";
 export const USE_ORCID_JWT = true;
 
 const DEFAULT_THEME = {
@@ -38,7 +39,7 @@ export default function AppProviders(props: PropsWithChildren<{}>) {
         <ThemeProvider>
           <Toaster />
           <ReactTooltip effect="solid" backgroundColor="black" />
-          {props.children}
+          <TooltipProvider>{props.children}</TooltipProvider>
         </ThemeProvider>
       </StyledComponentsThemeProvider>
     </Web3Provider>

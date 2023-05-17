@@ -11,7 +11,6 @@ import CreditTab from "@src/components/organisms/SidePanel/ManuscriptSidePanel/T
 import PerfectScrollbar from "react-perfect-scrollbar";
 import PanelCloseButton from "@components/atoms/PanelCloseButton";
 import ManuscriptAttributesSection from "@src/components/organisms/ManuscriptAttributesSection";
-import ManuscriptComponentsSection from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/Components/ManuscriptComponentsSection";
 import {
   convertUUIDToHex,
   filterForNonData,
@@ -35,14 +34,15 @@ import {
   usePdfReader,
 } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
+import Navigator from "./Tabs/Components/Navigator/Navigator";
+import { SwitchBar, SwitchButton } from "@src/components/atoms/SwitchBar";
 import {
-  popFromComponentStack,
   ResearchTabs,
+  popFromComponentStack,
   setResearchPanelTab,
   toggleCommitPanel,
   toggleResearchPanel,
 } from "@src/state/nodes/nodeReader";
-import { SwitchBar, SwitchButton } from "@src/components/atoms/SwitchBar";
 import { IconPower } from "@src/icons";
 import MetadataKeywords from "@src/components/organisms/SidePanel/ManuscriptSidePanel/Tabs/Components/MetadataKeywords";
 import useLocalStorageState from "@src/hooks/useLocalStorageState";
@@ -305,14 +305,13 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
           <div className={`pl-4 pr-4`}>
             {researchPanelTab === ResearchTabs.current ? (
               <>
-                <ManuscriptAttributesSection />
                 {(publicView || !userProfile.userId) && (
                   <div className="mb-4">
                     <DriveToggleButton />
                   </div>
                 )}
-                <ManuscriptComponentsSection />
-                {/* {!publicView && <MetadataKeywords />} */}
+                <ManuscriptAttributesSection />
+                <Navigator />
               </>
             ) : null}
             {researchPanelTab === ResearchTabs.history ? <HistoryTab /> : null}

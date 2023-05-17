@@ -10,23 +10,24 @@ interface MetadataPreviewProps {
   isFair: boolean;
   component: ResearchObjectV1Component;
   text?: string;
-  classname?: string;
+  className?: string;
 }
 
 const MetadataPreview: React.FC<MetadataPreviewProps> = ({
   isFair,
   component,
-  classname,
+  className,
   text = "FAIR",
 }) => {
   const dispatch = useDispatch();
   const { mode } = useNodeReader();
+
   return (
     <button
       data-tip={mode === "editor" ? "Edit Metadata" : "View Metadata"}
       data-place={"bottom"}
       data-for={`fair_${component.id}`}
-      className={`bg-neutrals-black select-none hover:bg-dark-gray w-8 h-7 flex justify-center items-center rounded-md ${classname}`}
+      className={`bg-neutrals-black select-none hover:bg-dark-gray w-8 h-7 flex justify-start items-start rounded-md ${className}`}
       onClick={(e: React.MouseEvent) => {
         dispatch(showMetadataForComponent(component));
         e.stopPropagation();

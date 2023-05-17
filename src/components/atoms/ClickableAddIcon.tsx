@@ -14,7 +14,7 @@ const ClickableAddIcon = (props: ClickableAddIconProps) => {
       <div
         className={`border border-black dark:border-white group-hover:border-gray-500 group-hover:dark:border-gray-400 rounded-full p-1 cursor-pointer  stroke-black dark:stroke-white group-hover:stroke-gray-500 group-hover:dark:stroke-gray-400`}
       >
-        <IconAdd width={10} height={10} strokeWidth={1} />
+        <IconAdd className="w-2 h-2" strokeWidth={1} />
       </div>
     </div>
   );
