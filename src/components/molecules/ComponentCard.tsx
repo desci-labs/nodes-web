@@ -15,7 +15,7 @@ import { cleanupManifestUrl } from "@components/utils";
 import TooltipIcon from "@components/atoms/TooltipIcon";
 import ReactTooltip from "react-tooltip";
 import { findTarget } from "@components/organisms/ComponentLibrary";
-import ButtonFair from "@components/atoms/ButtonFair";
+import MetadataPreview from "@src/components/atoms/MetadataPreview";
 import { SessionStorageKeys } from "../driveUtils";
 import { useSetter } from "@src/store/accessors";
 import { setComponentStack } from "@src/state/nodes/nodeReader";
@@ -60,7 +60,7 @@ const CardWrapper: StyledComponent<
 const HeaderWrapper = styled(FlexRowSpaceBetween).attrs({
   className: " bg-zinc-200 dark:bg-muted-900 border-muted-300 dark:border-teal",
 })`
-  align-items: flex-start;
+  align-items: center;
   padding: 0.75rem;
 `;
 
@@ -227,10 +227,16 @@ const ComponentCard = (props: ComponentCardProps) => {
     >
       <FlexColumn>
         <HeaderWrapper>
-          <span className="text-xs font-bold truncate">{component.name}</span>
+          <span className="inline-block text-xs font-bold truncate">
+            {component.name}
+          </span>
           {/* {headerRight} */}
           <span className="flex flex-col items-center">
-            <div className="border-tint-primary border-[2px] p-1 rounded-full scale-75 block -my-1">
+            <div
+              className={`border-[2px] p-1 rounded-full scale-75 block -my-1 ${
+                isSelected ? "border-white" : "border-tint-primary"
+              }`}
+            >
               <span
                 className={`
                 cursor-pointer
@@ -292,7 +298,7 @@ const ComponentCard = (props: ComponentCardProps) => {
               <>
                 <div className="flex gap-2 justify-between w-full">
                   <div id="section-left">
-                    <ButtonFair
+                    <MetadataPreview
                       isFair={false}
                       component={component}
                       text={getLicenseShortName(
@@ -300,7 +306,7 @@ const ComponentCard = (props: ComponentCardProps) => {
                           component.payload?.licenseType ||
                           manifest?.defaultLicense
                       )} //Should only ever hit unknown for deprecated tree
-                      classname="w-auto bg-neutrals-gray-2 px-2 font-medium text-xs h-7"
+                      classname="w-auto font-medium text-xs h-7"
                     />
                   </div>
                   <div id="section-right" className="flex gap-2">

@@ -12,9 +12,9 @@ const ContentWrapper = styled(FlexRowAligned)`
   gap: 8px;
 `;
 
-interface PropertyTagsSectionProps {}
+interface MetadataKeywordsProps {}
 
-const PropertyTagsSection = (props: PropertyTagsSectionProps) => {
+const MetadataKeywords = (props: MetadataKeywordsProps) => {
   const { manifest: manifestData, mode } = useNodeReader();
 
   const isEditing = mode === "editor";
@@ -62,4 +62,4 @@ const PropertyTagsSection = (props: PropertyTagsSectionProps) => {
   );
 };
 
-export default PropertyTagsSection;
+export default MetadataKeywords;

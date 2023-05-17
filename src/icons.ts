@@ -146,6 +146,7 @@ import { ReactComponent as IconSvcOpenReview } from "@images/icons/service-openr
 import { ReactComponent as IconSvcReplicateAi } from "@images/icons/service-replicateai.svg";
 import { ReactComponent as IconSvcResearchHub } from "@images/icons/service-researchhub.svg";
 import { ReactComponent as IconSvcYoutube } from "@images/icons/service-youtube.svg";
+import { ReactComponent as IconAnnotate } from "@images/annotation.svg";
 
 export type SvgIconProps = FC<
   React.SVGProps<SVGSVGElement> & {
@@ -304,4 +305,5 @@ export {
   IconTwitter,
   IconGithub,
   IconGitbook,
+  IconAnnotate,
 };
