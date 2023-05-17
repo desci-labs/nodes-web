@@ -300,7 +300,7 @@ const ComponentCard = (props: ComponentCardProps) => {
                           component.payload?.licenseType ||
                           manifest?.defaultLicense
                       )} //Should only ever hit unknown for deprecated tree
-                      classname="w-auto bg-neutrals-gray-2 px-2 font-medium text-xs h-7"
+                      classname="w-auto font-medium text-xs h-7"
                     />
                   </div>
                   <div id="section-right" className="flex gap-2">

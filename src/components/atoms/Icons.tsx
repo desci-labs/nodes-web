@@ -176,3 +176,31 @@ export const ResearchNodeIcon = (props: SVGProps<SVGSVGElement>) => (
     </defs>
   </svg>
 );
+
+export const IconOrcidOutline = (props: SVGProps<SVGSVGElement>) => (
+  <svg
+    width={props.width || 12}
+    height={props.width || 12}
+    viewBox="0 0 12 12"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <path
+      d="M6 4.34372C6.27614 4.34372 6.5 4.11986 6.5 3.84372C6.5 3.56757 6.27614 3.34372 6 3.34372C5.72386 3.34372 5.5 3.56757 5.5 3.84372C5.5 4.11986 5.72386 4.34372 6 4.34372Z"
+      fill="white"
+    />
+    <path
+      d="M6 8.39896L6 5.67606"
+      stroke="white"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M9.75 1.3125H2.25C1.73223 1.3125 1.3125 1.73223 1.3125 2.25V9.75C1.3125 10.2678 1.73223 10.6875 2.25 10.6875H9.75C10.2678 10.6875 10.6875 10.2678 10.6875 9.75V2.25C10.6875 1.73223 10.2678 1.3125 9.75 1.3125Z"
+      stroke="white"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);

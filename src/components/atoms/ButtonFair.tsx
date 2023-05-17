@@ -1,9 +1,10 @@
-import { ComponentCardProps } from "@components/molecules/ComponentCard";
 import { ResearchObjectV1Component } from "@desci-labs/desci-models";
 import { showMetadataForComponent } from "@src/state/drive/driveSlice";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import React from "react";
 import { useDispatch } from "react-redux";
+import { FlexRowSpaceBetween } from "../styled";
+import { IconOrcidOutline } from "./Icons";
 
 interface FairBtnProps {
   isFair: boolean;
@@ -25,19 +26,24 @@ const FairBtn: React.FC<FairBtnProps> = ({
       data-tip={mode === "editor" ? "Edit Metadata" : "View Metadata"}
       data-place={"bottom"}
       data-for={`fair_${component.id}`}
-      className={`bg-black select-none hover:bg-neutrals-gray-3 active:bg-black w-8 h-7 flex justify-center items-center rounded-lg ${classname}`}
+      className={`bg-neutrals-black select-none hover:bg-neutrals-gray-3 w-8 h-7 flex justify-center items-center rounded-md ${classname}`}
       onClick={(e: React.MouseEvent) => {
         dispatch(showMetadataForComponent(component));
         e.stopPropagation();
       }}
     >
-      <p
-        className={`my-0 mx-1 ${
-          isFair ? "fairBoxLit text-tint-primary-hover" : "text-[#CCCCCC]"
-        }`}
-      >
-        {text}
-      </p>
+      <FlexRowSpaceBetween>
+        <div className="bg-black rounded-tl-md rounded-bl-md h-7 shrink-0 px-2 flex items-center justify-center">
+          <IconOrcidOutline width={18} />
+        </div>
+        <div
+          className={`my-0 px-2 ${
+            isFair ? "fairBoxLit text-tint-primary-hover" : "text-[#CCCCCC]"
+          }`}
+        >
+          {text}
+        </div>
+      </FlexRowSpaceBetween>
     </button>
   );
 };
