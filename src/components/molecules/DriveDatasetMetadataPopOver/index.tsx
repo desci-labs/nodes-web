@@ -93,7 +93,7 @@ const DriveDatasetMetadataPopOver = (
 
   const onSubmit = useCallback(
     async (data: DataComponent["payload"]) => {
-      console.log("[DRIVE METADATA] ON SUBMIT HIT");
+      console.log("[DRIVE METADATA] ON SUBMIT HIT", data);
 
       try {
         if (overWrite) {

@@ -59,8 +59,8 @@ export const DatasetMetadataForm = React.forwardRef(
               <InsetLabelSmallInput
                 label="Open Access Data Title"
                 labelClassName="text-xs"
-                {...field}
                 value={value}
+                {...field}
                 fieldState={fieldState}
                 mandatory={true}
               />

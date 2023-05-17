@@ -1,8 +1,20 @@
-import { FlexColumn } from "@components/styled";
+import {
+  FlexColumn,
+  FlexRow,
+  FlexRowAligned,
+} from "@components/styled";
 import styled from "styled-components";
 import Modal, { ModalProps } from "@src/components/molecules/Modal";
 import { DriveObject } from "@components/organisms/Drive";
 import DividerSimple from "@src/components/atoms/DividerSimple";
+import { NODES_COMPONENT_SUBTYPES } from "@src/nodesTypes";
+import {
+  ResearchObjectComponentDocumentSubtype,
+  ResearchObjectComponentLinkSubtype,
+  ResearchObjectComponentType,
+} from "@desci-labs/desci-models";
+import { useNodeReader } from "@src/state/nodes/hooks";
+import { PropsWithChildren } from "react";
 
 const CardContainer = styled.div`
   background: #272727;
@@ -24,10 +36,38 @@ const Heading = (props: { title: string }) => (
     {props.title}
   </p>
 );
+const ContentWrapper = (props: PropsWithChildren<{}>) => (
+  <div className="text-md text-neutrals-gray-3 dark:text-white">
+    {props.children}
+  </div>
+);
+
+function Pill(props: { keyword: string }) {
+  return (
+    <div className="py-[2px] px-2 bg-gray-300 dark:bg-black rounded-md text-neutrals-gray-4 dark:text-white">
+      <p className="text-sm">{props.keyword}</p>
+    </div>
+  );
+}
 
 const ViewMetadataModal = (
   props: ModalProps & { file: DriveObject | null }
 ) => {
+  const { manifest } = useNodeReader();
+  const metadata = props.file?.metadata;
+  const type = props.file?.componentType as ResearchObjectComponentType;
+  const fileSubtype = props.file?.componentSubtype as
+    | ResearchObjectComponentDocumentSubtype
+    | ResearchObjectComponentLinkSubtype;
+  const types = NODES_COMPONENT_SUBTYPES[type];
+  const subtype = types && types.find((subtype) => fileSubtype === subtype.id);
+
+  const componentTypeName = subtype?.name || "";
+
+  const licenseType = metadata?.licenseType || manifest?.defaultLicense || "";
+  console.log(licenseType, metadata);
+  console.log(props.file);
+
   return (
     <Modal
       isOpen={props.isOpen}
@@ -40,50 +80,58 @@ const ViewMetadataModal = (
         <FlexColumn className="mt-6 gap-6 w-full">
           <CardContainer>
             <Title title="Component type" />
-            <p className="text-lg text-neutrals-gray-3 dark:text-white">
-              {props.file?.componentType || "Unknown"}
-            </p>
+            <ContentWrapper>{componentTypeName || "Unknown"}</ContentWrapper>
           </CardContainer>
           <CardContainer>
-            <Title title="Research Report Title" />
-            <p className="text-lg text-neutrals-gray-3 dark:text-white">
-              {props.file?.componentType || "Unknown"}
-            </p>
+            <Title title={`${componentTypeName} Title`} />
+            <ContentWrapper>
+              <p>{metadata?.title || "-"}</p>
+            </ContentWrapper>
           </CardContainer>
           <DividerSimple />
           <CardContainer>
             <Title title="Description" />
-            <p className="text-lg text-neutrals-gray-3 dark:text-white">
-              {props.file?.componentType || "Unknown"}
-            </p>
+            <ContentWrapper>{metadata?.description || "-"}</ContentWrapper>
           </CardContainer>
           <DividerSimple />
           <Heading title="Keywords & Controlled Vocabulary Terms" />
           <CardContainer>
             <Title title="Keywords" />
-            <p className="text-lg text-neutrals-gray-3 dark:text-white">
-              {props.file?.componentType || "Unknown"}
-            </p>
+            <ContentWrapper>
+              <FlexRowAligned className="gap-2 w-full flex-wrap my-2">
+                {metadata?.keywords?.map((keyword: string, idx) => {
+                  return <Pill key={idx} keyword={keyword}></Pill>;
+                })}
+              </FlexRowAligned>
+            </ContentWrapper>
           </CardContainer>
           <CardContainer>
             <Title title="Ontology PURL" />
-            <p className="text-lg text-neutrals-gray-3 dark:text-white">
-              {props.file?.componentType || "Unknown"}
-            </p>
+            <ContentWrapper>{metadata?.ontologyPurl || "-"}</ContentWrapper>
           </CardContainer>
           <CardContainer>
             <Title title="Controlled Vocabulary Terms" />
-            <p className="text-lg text-neutrals-gray-3 dark:text-white">
-              {props.file?.componentType || "Unknown"}
-            </p>
+            <ContentWrapper>
+              <FlexRowAligned className="gap-2 w-full flex-wrap my-2">
+                {metadata?.controlledVocabTerms?.map((keyword: string, idx) => {
+                  return <Pill key={idx} keyword={keyword}></Pill>;
+                })}
+              </FlexRowAligned>
+            </ContentWrapper>
           </CardContainer>
           <DividerSimple />
           <Heading title="Licensing" />
           <CardContainer>
-            <Title title="Controlled Vocabulary Terms" />
-            <p className="text-lg text-neutrals-gray-3 dark:text-white">
-              {props.file?.componentType || "Unknown"}
-            </p>
+            <Title title={licenseType || "Unknown License"} />
+            <ContentWrapper>
+              <FlexRow className="my-1 items-start gap-2">
+                <div className="mt-[4px] bg-states-success min-w-[10px] min-h-[10px] w-[10px] h-[10px] m-0 p-0 rounded-full border-none"></div>
+                <FlexColumn className="items-start gap-2">
+                  <p className="uppercase">{licenseType}</p>
+                  <p className="text-sm">License description</p>
+                </FlexColumn>
+              </FlexRow>
+            </ContentWrapper>
           </CardContainer>
         </FlexColumn>
       </div>
