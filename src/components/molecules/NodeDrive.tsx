@@ -3,7 +3,6 @@ import { useManuscriptController } from "@src/components/organisms/ManuscriptRea
 import { ClassNameProp } from "nodesTypes";
 import DataUsage from "./DataUsage";
 import {
-  getFirstPdfFromManifest,
   getNonDataComponentsFromManifest,
   getStarredNonDataComponentsFromManifest,
 } from "../utils";
@@ -11,7 +10,7 @@ import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { setComponentStack } from "@src/state/nodes/nodeReader";
 import React, { HTMLProps, useState } from "react";
-import { ResearchObjectV1Component } from "@src/../../nodes/desci-models/dist";
+import { ResearchObjectV1Component } from "@desci-labs/desci-models";
 
 export const DriveToggleButton = (props: HTMLProps<HTMLButtonElement>) => {
   const { setIsAddingComponent } = useManuscriptController();
