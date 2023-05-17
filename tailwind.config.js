@@ -167,6 +167,8 @@ module.exports = {
       },
       boxShadow: {
         upperTealShadow: "inset 0px 1px 0 0 rgba(40, 170, 196, 1)",
+        verifyInput: "inset 0px -1px 0px #555659",
+        verifyInputActive: "inset 0px -1px 0px #65C3CA",
       },
       minWidth: {
         "49xl": "490xl",

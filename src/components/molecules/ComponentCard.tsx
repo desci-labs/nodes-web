@@ -345,7 +345,7 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                         <IconPlayRounded className="p-0" />
                       </TooltipButton>
                     ) : null}
-                    <div
+                    {/* <div
                       style={{
                         display:
                           component.type === ResearchObjectComponentType.PDF
@@ -357,7 +357,7 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                         annotations={sortedAnnotations}
                         handleComponentClick={handleComponentClick}
                       />
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </>

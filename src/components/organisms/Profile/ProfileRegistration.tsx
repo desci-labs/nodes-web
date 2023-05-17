@@ -10,15 +10,15 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import Modal, { ModalProps } from "@src/components/molecules/Modal";
 import { ProfileRegistrationValues } from "./types";
 import { useUser } from "@src/state/user/hooks";
-import { useAppPreferences } from "@src/state/preferences/hooks";
+// import { useAppPreferences } from "@src/state/preferences/hooks";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ROR_API_URL, ROR_URL, userProfileActionSchema } from "./schema";
 import InsetLabelSmallInput from "@src/components/molecules/FormInputs/InsetLabelSmallInput";
 import DividerSimple from "@src/components/atoms/DividerSimple";
 import { FlexColumn, FlexRowAligned } from "@src/components/styled";
 import { CheckBox, CheckBoxText } from "@src/components/atoms/Checkbox";
-import { useSetter } from "@src/store/accessors";
-import { setPreferences } from "@src/state/preferences/preferencesSlice";
+// import { useSetter } from "@src/store/accessors";
+// import { setPreferences } from "@src/state/preferences/preferencesSlice";
 import useProfileSubmit from "./useProfileSubmit";
 import { termsConsent } from "@src/api";
 import axios from "axios";
@@ -39,7 +39,7 @@ const useRoRResolver = () => {
   const resolveOrgName = useCallback(async () => {
     try {
       // const urlParts = rorId?.split("/") ?? [];
-      const pid = rorId || "" // urlParts[urlParts.length - 1];
+      const pid = rorId || ""; // urlParts[urlParts.length - 1];
       const { data: org, status } = await axios.get(`${ROR_API_URL}${pid}`);
       if (status === 200 && org?.name) {
         setValue("organization", org.name);
@@ -58,8 +58,8 @@ const useRoRResolver = () => {
 };
 
 export function ProfileRegistrationForm(props: ProfilePopOverProps) {
-  const dispatch = useSetter();
-  const { showProfileRegistration } = useAppPreferences();
+  // const dispatch = useSetter();
+  // const { showProfileRegistration } = useAppPreferences();
   const {
     watch,
     control,
@@ -74,11 +74,11 @@ export function ProfileRegistrationForm(props: ProfilePopOverProps) {
   const { onSubmit } = useProfileSubmit({
     onClose: async () => {
       await termsConsent({ hasAcceptedTerms: true }, "");
-      dispatch(setPreferences({ showProfileRegistration: false }));
+      // dispatch(setPreferences({ showProfileRegistration: false }));
     },
   });
 
-  if (!showProfileRegistration) return null;
+  // if (!showProfileRegistration) return null;
 
   const hasAffiliation = watch("hasAffiliation");
   const rorpid = watch("rorpid");
@@ -182,7 +182,7 @@ export function ProfileRegistrationForm(props: ProfilePopOverProps) {
 }
 
 export const ProfilePromptModal = (props: ModalProps) => {
-  const { showProfileRegistration } = useAppPreferences();
+  // const { showProfileRegistration } = useAppPreferences();
   const userProfile = useUser();
   const methods = useForm<ProfileRegistrationValues>({
     mode: "onChange",
@@ -201,11 +201,7 @@ export const ProfilePromptModal = (props: ModalProps) => {
   const formProps = useMemo(() => methods, [methods]);
 
   return (
-    <Modal
-      isOpen={showProfileRegistration}
-      $scrollOverlay={true}
-      $maxWidth={700}
-    >
+    <Modal isOpen={false} $scrollOverlay={true} $maxWidth={700}>
       <div className="py-4 px-6 text-neutrals-gray-5 font-inter">
         <Modal.Header
           title="Complete Your Profile"

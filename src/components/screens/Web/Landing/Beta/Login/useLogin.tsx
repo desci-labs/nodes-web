@@ -3,6 +3,7 @@ import {
   getUserData,
   magicLinkSend,
   patchAcceptFriendReferral,
+  termsConsent,
   waitlistAdd,
 } from "@src/api";
 import { useEffect, useRef, useState } from "react";
@@ -14,7 +15,7 @@ import { tags } from "@src/state/api/tags";
 import { useSetter } from "@src/store/accessors";
 import { useRedeemMagicLinkMutation } from "@src/state/api/auth";
 import { setUser } from "@src/state/user/userSlice";
-import { setCheckingCode, setPreferences } from "@src/state/preferences/preferencesSlice";
+import { setCheckingCode } from "@src/state/preferences/preferencesSlice";
 
 export enum Steps {
   AutoLogin,
@@ -113,10 +114,13 @@ export default function useLogin() {
       if (!data.user.token) {
         throw Error("Login failed");
       }
+      localStorage.setItem("auth", data.user.token);
       const userData = await getUserData();
       dispatch(setUser(userData));
       dispatch(api.util.invalidateTags([{ type: tags.user }]));
-
+      
+      
+      
       if (referralUuid) {
         /**
          * TODO: We likely want to show a success or something similar
@@ -130,15 +134,15 @@ export default function useLogin() {
       // setCheckingCode(false);
       dispatch(setCheckingCode(false));
 
-      const { consent } = await checkConsent();
-      setTimeout(() => {
-        navigate(`${site.app}${app.nodes}/start`);
-
+      setTimeout(async () => {
+        const { consent } = await checkConsent();
+        
         // check if profile is valid
         if (!consent) {
-          dispatch(setPreferences({ showProfileRegistration: true }));
+          await termsConsent({ hasAcceptedTerms: true }, "");
         }
-
+        
+        navigate(`${site.app}${app.nodes}/start`);
       }, 500);
     } catch (err) {
       if (step === Steps.AutoLogin || step === Steps.VerifyCode) {

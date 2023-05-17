@@ -20,5 +20,4 @@ export type AppPreferences = {
   mobileViewWarning: boolean;
   activeToolbar: TOOLBAR_ENTRY;
   showMobileComponentStack: boolean;
-  showProfileRegistration: boolean;
 };

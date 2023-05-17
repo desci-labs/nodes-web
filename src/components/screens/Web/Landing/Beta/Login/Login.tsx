@@ -11,7 +11,6 @@ import { useNavigate } from "react-router-dom";
 import useLogin, { Steps } from "./useLogin";
 import { useGetter } from "@src/store/accessors";
 import VerificationInput from "react-verification-input";
-import { MailIcon } from "@heroicons/react/solid";
 
 const labels: Record<Steps, { title: string; caption: string }> = {
   [Steps.AutoLogin]: {
@@ -36,11 +35,46 @@ const labels: Record<Steps, { title: string; caption: string }> = {
   },
 };
 
+function TermsAndPrivacy() {
+  return (
+    <p className="text-xs line-clamp-2 text-white w-[90%]">
+      {" "}
+      By clicking Log In, you agree to our{" "}
+      <a
+        href="/terms"
+        target="_blank"
+        rel="noreferrer"
+        className="text-tint-primary"
+      >
+        Terms of Service{" "}
+      </a>
+      and{" "}
+      <a
+        href="/privacy"
+        target="_blank"
+        rel="noreferrer"
+        className="text-tint-primary"
+      >
+        Privacy Policy
+      </a>
+    </p>
+  );
+}
+
 const Footer = ({ step, goBack, nextStep, isLoading, code }: any) => {
   const { checkingCode } = useGetter((state) => state.preferences);
   return (
     <PopoverFooter>
-      {[Steps.VerifyCode, Steps.WaitList, Steps.MagicLinkExpired].includes(
+      <div>
+        {step === Steps.ConfirmEmail && <TermsAndPrivacy />}
+        {step === Steps.VerifyCode && (
+          <div className="text-white text-xs 4xl:text-sm items-center border-yellow-300 gap-2 md:gap-3 flex flex-row">
+            <IconWarning height={20} /> Please check your spam folder for the
+            email
+          </div>
+        )}
+      </div>
+      {/* {[Steps.VerifyCode, Steps.WaitList, Steps.MagicLinkExpired].includes(
         step
       ) && (
         <PrimaryButton
@@ -50,15 +84,17 @@ const Footer = ({ step, goBack, nextStep, isLoading, code }: any) => {
         >
           Back
         </PrimaryButton>
-      )}
+      )} */}
       {[Steps.ConfirmEmail, Steps.VerifyCode].includes(step) && (
         <PrimaryButton
-          disabled={isLoading || (step === Steps.VerifyCode && code?.length < 6)}
+          disabled={
+            isLoading || (step === Steps.VerifyCode && code?.length < 6)
+          }
           type="submit"
           onClick={nextStep}
           className="flex gap-2 items-center"
         >
-          {step === Steps.ConfirmEmail ? "Login" : "Continue"}{" "}
+          {step === Steps.ConfirmEmail ? "Login" : "Get Verified"}{" "}
           {isLoading && checkingCode && (
             <DefaultSpinner color="white" size={20} />
           )}
@@ -213,12 +249,17 @@ export default function Login() {
                 <VerificationInput
                   classNames={{
                     container: "my-4 transition-transform animate-fadeIn",
+                    character:
+                      "bg-neutrals-gray-1 border-none shadow-verifyInput text-white",
+                    characterInactive:
+                      "outline-none border-b-white shadow-verifyInput",
+                    characterSelected: "outline-none shadow-verifyInputActive",
                   }}
                   value={code}
                   onComplete={(e: any) => onVerifyCode({ code: e, email })}
                   onChange={(e: any) => setCode(e)}
                   validChars="/0-9/"
-                  placeholder="_"
+                  placeholder=" "
                   inputProps={{
                     id: "box-search", // use search in id to disable 1password autofill prompt
                     ref: (r: any) => (codeRef.current = r),
@@ -226,13 +267,10 @@ export default function Login() {
                     disabled: isLoading,
                   }}
                 />
-                <div className="text-neutrals-gray-7 mb-4 text-xs border-tint-primary-300 gap-1 justify-center items-center p-4 rounded-md flex flex-row">
-                  <MailIcon fill="rgba(216, 216, 216,1)" height={20} /> Sent to{" "}
-                  <b>{email}</b>
-                </div>
-                <div className="text-neutrals-gray-7 text-xs sm:text-sm items-center border-yellow-300 gap-4 md:gap-3 bg-neutrals-gray-3 p-4 rounded-md flex flex-row">
-                  <IconWarning height={20} /> Please check your spam folder for
-                  the email
+                <div className="text-neutrals-gray-5 mb-4 text-sm border-tint-primary-300 gap-1 justify-center items-center p-4 rounded-md flex flex-row">
+                  {/* <MailIcon fill="rgba(216, 216, 216,1)" height={20} /> Sent to{" "} */}
+                  Email sent to
+                  <span className="font-bold text-white">{email}</span>
                 </div>
               </div>
             )}
