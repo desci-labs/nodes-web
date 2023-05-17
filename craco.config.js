@@ -13,6 +13,8 @@ module.exports = {
           zlib: require.resolve("browserify-zlib"),
           buffer: require.resolve("buffer"),
           asset: require.resolve("assert"),
+          "react/jsx-runtime": "react/jsx-runtime.js",
+          "react/jsx-dev-runtime": "react/jsx-dev-runtime.js",
         },
       },
       plugins: [

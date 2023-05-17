@@ -36,6 +36,8 @@ import {
   findTarget,
 } from "../ComponentLibrary";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
+import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
+import ExternalService from "@src/components/atoms/ExternalServices";
 
 function renderComponentIcon(file: DriveObject) {
   const foundEntry = findTarget(
@@ -72,6 +74,11 @@ export default function DriveRow({
     },
     [init]
   );
+
+  const isExternalLinksDir = file?.path === DRIVE_FULL_EXTERNAL_LINKS_PATH;
+  const isExternalLink =
+    !isExternalLinksDir &&
+    file?.path?.startsWith(DRIVE_FULL_EXTERNAL_LINKS_PATH);
 
   return (
     <div
@@ -149,12 +156,29 @@ export default function DriveRow({
           {file.name}
         </span>
       </li>
-      <li className={`${everyRow} col-last-modified text-xs`}>
-        {file.lastModified}
+      <li
+        className={`${everyRow} ${
+          isExternalLink ? "" : "hidden"
+        } col-service text-xs !justify-start`}
+      >
+        {isExternalLink && <ExternalService url={file.cid!} />}
       </li>
-      <li className={`${everyRow} col-status text-xs`}>
+      <li
+        className={`${everyRow} ${
+          isExternalLink ? "hidden" : ""
+        } col-last-modified text-xs`}
+      >
+        {isExternalLinksDir ? "-" : file.lastModified}
+      </li>
+      <li
+        className={`${everyRow} ${
+          isExternalLink ? "hidden" : ""
+        } col-status text-xs`}
+      >
         {file.accessStatus === AccessStatus.UPLOADING
           ? "Private"
+          : isExternalLinksDir
+          ? "-"
           : file.accessStatus}
       </li>
       <li
@@ -165,9 +189,9 @@ export default function DriveRow({
             }: ${JSON.stringify(file.metadata)}`
           )
         }
-        className={`${everyRow} text-xs`}
+        className={`${everyRow} ${isExternalLink ? "hidden" : ""} text-xs`}
       >
-        {BytesToHumanFileSize(file.size)}
+        {isExternalLinksDir ? "-" : BytesToHumanFileSize(file.size)}
       </li>
       <li className={`${everyRow}`}>
         <BlackGenericButton
@@ -186,7 +210,11 @@ export default function DriveRow({
       </li>
       <li className={`${everyRow}`}>
         <BlackGenericButton
-          disabled={!canUse || file.accessStatus === AccessStatus.UPLOADING}
+          disabled={
+            !canUse ||
+            file.accessStatus === AccessStatus.UPLOADING ||
+            isExternalLinksDir
+          }
           className="p-0 min-w-[28px] h-7"
           onClick={() => {
             dispatch(setFileBeingUsed(file));

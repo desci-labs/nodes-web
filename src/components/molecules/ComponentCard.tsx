@@ -13,9 +13,8 @@ import {
 } from "@desci-labs/desci-models";
 import { cleanupManifestUrl } from "@components/utils";
 import TooltipIcon from "@components/atoms/TooltipIcon";
-import ReactTooltip from "react-tooltip";
 import { findTarget } from "@components/organisms/ComponentLibrary";
-import ButtonFair from "@components/atoms/ButtonFair";
+import MetadataPreview from "@src/components/atoms/MetadataPreview";
 import { SessionStorageKeys } from "../driveUtils";
 import { useSetter } from "@src/store/accessors";
 import { setComponentStack } from "@src/state/nodes/nodeReader";
@@ -26,12 +25,12 @@ import {
   setFileBeingCited,
   setFileBeingUsed,
 } from "@src/state/drive/driveSlice";
-import BlackGenericButton from "../atoms/BlackGenericButton";
 import { IconDrive, IconPlayRounded, IconQuotes } from "@src/icons";
 import { findDriveByPath } from "@src/state/drive/utils";
 import { useDrive } from "@src/state/drive/hooks";
-import { AccessStatus } from "../organisms/Drive";
-import { getLicenseShortName } from "../organisms/PopOver/ComponentMetadataPopover";
+import { AccessStatus } from "@components/organisms/Drive";
+import { getLicenseShortName } from "@components/organisms/PopOver/ComponentMetadataPopover";
+import TooltipButton from "../atoms/TooltipButton";
 
 const CardWrapper: StyledComponent<
   "div",
@@ -60,7 +59,7 @@ const CardWrapper: StyledComponent<
 const HeaderWrapper = styled(FlexRowSpaceBetween).attrs({
   className: " bg-zinc-200 dark:bg-muted-900 border-muted-300 dark:border-teal",
 })`
-  align-items: flex-start;
+  align-items: center;
   padding: 0.75rem;
 `;
 
@@ -77,6 +76,7 @@ export interface SectionCardProps {
 export interface ComponentCardProps extends SectionCardProps {
   component: ResearchObjectV1Component;
 }
+
 const labelFor = (component: ResearchObjectV1Component): string => {
   const subtype =
     "subtype" in component
@@ -104,9 +104,8 @@ const iconFor = (
   return null;
 };
 
-const ComponentCard = (props: ComponentCardProps) => {
+const ComponentCard = ({ component }: ComponentCardProps) => {
   const dispatch = useSetter();
-  const { component } = props;
   const { componentStack, recentlyAddedComponent, manifest } = useNodeReader();
   const { nodeTree } = useDrive();
   /***
@@ -138,7 +137,7 @@ const ComponentCard = (props: ComponentCardProps) => {
         }
       }, 1000);
     }
-    ReactTooltip.rebuild();
+    // ReactTooltip.rebuild();
   }, [component]);
 
   const isSelected =
@@ -227,10 +226,16 @@ const ComponentCard = (props: ComponentCardProps) => {
     >
       <FlexColumn>
         <HeaderWrapper>
-          <span className="text-xs font-bold truncate">{component.name}</span>
+          <span className="inline-block text-xs font-bold truncate">
+            {component.name}
+          </span>
           {/* {headerRight} */}
           <span className="flex flex-col items-center">
-            <div className="border-tint-primary border-[2px] p-1 rounded-full scale-75 block -my-1">
+            <div
+              className={`border-[2px] p-1 rounded-full scale-75 block -my-1 ${
+                isSelected ? "border-white" : "border-tint-primary"
+              }`}
+            >
               <span
                 className={`
                 cursor-pointer
@@ -257,27 +262,6 @@ const ComponentCard = (props: ComponentCardProps) => {
                 />
               </span>
             </div>
-
-            <ReactTooltip
-              backgroundColor="black"
-              effect="solid"
-              id={`fair_${component.id}`}
-            />
-            <ReactTooltip
-              backgroundColor="black"
-              effect="solid"
-              id={`drive_${component.id}`}
-            />
-            <ReactTooltip
-              backgroundColor="black"
-              effect="solid"
-              id={`cite_${component.id}`}
-            />
-            <ReactTooltip
-              backgroundColor="black"
-              effect="solid"
-              id={`use_${component.id}`}
-            />
           </span>
         </HeaderWrapper>
         <div
@@ -292,7 +276,7 @@ const ComponentCard = (props: ComponentCardProps) => {
               <>
                 <div className="flex gap-2 justify-between w-full">
                   <div id="section-left">
-                    <ButtonFair
+                    <MetadataPreview
                       isFair={false}
                       component={component}
                       text={getLicenseShortName(
@@ -300,15 +284,13 @@ const ComponentCard = (props: ComponentCardProps) => {
                           component.payload?.licenseType ||
                           manifest?.defaultLicense
                       )} //Should only ever hit unknown for deprecated tree
-                      classname="w-auto bg-neutrals-gray-2 px-2 font-medium text-xs h-7"
+                      className="w-auto bg-black hover:bg-neutrals-gray-2 text-white font-medium text-xs h-7"
                     />
                   </div>
                   <div id="section-right" className="flex gap-2">
-                    <BlackGenericButton
-                      dataTip={"Show File Location"}
-                      dataFor={`drive_${component.id}`}
+                    <TooltipButton
+                      className="py-[7px] px-[1px] rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray disabled:bg-opacity-25 disabled:cursor-not-allowed"
                       disabled={false}
-                      className="p-0"
                       onClick={(e) => {
                         e!.stopPropagation();
                         dispatch(
@@ -326,13 +308,15 @@ const ComponentCard = (props: ComponentCardProps) => {
                           dispatch(setComponentStack([]));
                         }
                       }}
+                      tooltipContent={<>Show File Location</>}
                     >
                       <IconDrive className="p-0 min-w-[28px] scale-[1.2]" />
-                    </BlackGenericButton>
-                    <BlackGenericButton
-                      dataTip={"Cite"}
-                      dataFor={`cite_${component.id}`}
-                      className="w-7 h-7"
+                    </TooltipButton>
+                    <TooltipButton
+                      tooltipContent={"Cite"}
+                      side="top"
+                      // dataFor={`cite_${component.id}`}
+                      className="`p-2 rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray  disabled:bg-opacity-25 disabled:cursor-not-allowed w-7 h-7"
                       disabled={!canCite}
                       onClick={(e) => {
                         e!.stopPropagation();
@@ -340,24 +324,26 @@ const ComponentCard = (props: ComponentCardProps) => {
                       }}
                     >
                       <IconQuotes />
-                    </BlackGenericButton>
+                    </TooltipButton>
                     {[
                       ResearchObjectComponentType.DATA,
                       ResearchObjectComponentType.CODE,
                       ResearchObjectComponentType.UNKNOWN,
                     ].includes(component.type) ? (
-                      <BlackGenericButton
-                        dataTip={"Methods"}
-                        dataFor={`use_${component.id}`}
+                      <TooltipButton
+                        tooltipContent={"Methods"}
+                        // dataFor={`use_${component.id}`}
+                        side="top"
                         disabled={!drive}
-                        className="p-0 min-w-[28px] h-7"
+                        className="p-0 min-w-[28px] h-7 `p-2 rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray 
+      disabled:bg-opacity-25 disabled:cursor-not-allowed"
                         onClick={(e) => {
                           e!.stopPropagation();
                           dispatch(setFileBeingUsed(drive));
                         }}
                       >
                         <IconPlayRounded className="p-0" />
-                      </BlackGenericButton>
+                      </TooltipButton>
                     ) : null}
                     <div
                       style={{

@@ -25,12 +25,15 @@ export function useNodeValidator() {
 
   const validateComponents = useCallback(
     (components: ResearchObjectV1Component[]) => {
-      return components.reduce((obj: any, component: any) => {
-        return {
-          ...obj,
-          [component.id]: validate(component, manifestData!),
-        };
-      }, {});
+      return components.reduce(
+        (obj: any, component: ResearchObjectV1Component) => {
+          return {
+            ...obj,
+            [component.id]: validate(component, manifestData!),
+          };
+        },
+        {}
+      );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [manifestData, currentObjectId]
@@ -44,7 +47,7 @@ export function useNodeValidator() {
       // contributors: !!manifestData?.contributors?.length,
       // organizations: !!manifestData?.organizations?.length,
     }),
-    [manifestData, validateComponents, currentObjectId]
+    [manifestData, validateComponents]
   );
 
   const isValid = () => {
