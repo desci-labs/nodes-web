@@ -10,6 +10,7 @@ import ManuscriptAttributesSection from "@src/components/organisms/ManuscriptAtt
 import ManuscriptComponentsSection from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/Components/ManuscriptComponentsSection";
 import {
   convertUUIDToHex,
+  filterForNonData,
   isWindows,
   lockScroll,
   restoreScroll,
@@ -106,8 +107,8 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
     ResearchObjectV1 | undefined
   >(manifestData);
   const [, setMounted] = useState(false);
-  const [closeCube, setCloseCube] = useLocalStorageState("closeCub", false);
-  
+  const [closeCube, setCloseCube] = useLocalStorageState("closeCube", false);
+
   const refVideo = useRef(null);
 
   useEffect(() => {
@@ -162,23 +163,10 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
   }, [userProfile]);
 
   const showCloseButton =
-    componentStack.filter(
-      (a) =>
-        a &&
-        a.type !== ResearchObjectComponentType.DATA &&
-        a.type !== ResearchObjectComponentType.UNKNOWN &&
-        a.type !== ResearchObjectComponentType.DATA_BUCKET
-    ).length > 0 &&
+    componentStack.filter(filterForNonData).length > 0 &&
     (!isCodeActive || selectedAnnotationId);
   const isResearchPanelReallyOpen =
-    isResearchPanelOpen ||
-    componentStack.filter(
-      (a) =>
-        a &&
-        a.type !== ResearchObjectComponentType.DATA &&
-        a.type !== ResearchObjectComponentType.UNKNOWN &&
-        a.type !== ResearchObjectComponentType.DATA_BUCKET
-    ).length < 1;
+    isResearchPanelOpen || componentStack.filter(filterForNonData).length < 1;
 
   const canShowDrive = !publicView && userProfile.userId > 0;
 
