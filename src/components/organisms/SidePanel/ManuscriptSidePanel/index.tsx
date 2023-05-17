@@ -38,6 +38,8 @@ import {
   toggleResearchPanel,
 } from "@src/state/nodes/nodeReader";
 import { SwitchBar, SwitchButton } from "@src/components/atoms/SwitchBar";
+import MetadataKeywords from "@src/components/organisms/SidePanel/ManuscriptSidePanel/Tabs/Components/MetadataKeywords";
+import useLocalStorageState from "@src/hooks/useLocalStorageState";
 
 const ManuscriptSidePanelContainer = styled(SidePanel).attrs({
   className: "bg-light-gray dark:bg-dark-gray text-black dark:text-white",
@@ -104,13 +106,9 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
     ResearchObjectV1 | undefined
   >(manifestData);
   const [, setMounted] = useState(false);
-  const [closeCube, setCloseCube] = useState(
-    window.localStorage.getItem("closeCube") == "1"
-  );
+  const [closeCube, setCloseCube] = useLocalStorageState("closeCub", false);
+  
   const refVideo = useRef(null);
-  useEffect(() => {
-    window.localStorage.setItem("closeCube", closeCube ? "1" : "0");
-  }, [closeCube]);
 
   useEffect(() => {
     const didPush = !!nodeVersions;
@@ -167,9 +165,9 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
     componentStack.filter(
       (a) =>
         a &&
-        a.type != ResearchObjectComponentType.DATA &&
-        a.type != ResearchObjectComponentType.UNKNOWN &&
-        a.type != ResearchObjectComponentType.DATA_BUCKET
+        a.type !== ResearchObjectComponentType.DATA &&
+        a.type !== ResearchObjectComponentType.UNKNOWN &&
+        a.type !== ResearchObjectComponentType.DATA_BUCKET
     ).length > 0 &&
     (!isCodeActive || selectedAnnotationId);
   const isResearchPanelReallyOpen =
@@ -177,9 +175,9 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
     componentStack.filter(
       (a) =>
         a &&
-        a.type != ResearchObjectComponentType.DATA &&
-        a.type != ResearchObjectComponentType.UNKNOWN &&
-        a.type != ResearchObjectComponentType.DATA_BUCKET
+        a.type !== ResearchObjectComponentType.DATA &&
+        a.type !== ResearchObjectComponentType.UNKNOWN &&
+        a.type !== ResearchObjectComponentType.DATA_BUCKET
     ).length < 1;
 
   const canShowDrive = !publicView && userProfile.userId > 0;
@@ -316,6 +314,7 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
                   </div>
                 )}
                 <ManuscriptComponentsSection />
+                {!publicView && <MetadataKeywords />}
               </>
             ) : null}
             {researchPanelTab === ResearchTabs.history ? <HistoryTab /> : null}
