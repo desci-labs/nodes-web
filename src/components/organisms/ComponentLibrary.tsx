@@ -42,7 +42,7 @@ export interface UiComponentDefinition {
   doNotRender?: boolean;
 }
 
-type IconWrapperProps = {
+export type IconWrapperProps = {
   Icon: React.FunctionComponent<
     React.SVGProps<SVGSVGElement> & {
       title?: string | undefined;
@@ -52,7 +52,7 @@ type IconWrapperProps = {
   wrapperClassName?: string;
 };
 
-const IconWrapper = ({
+export const IconWrapper = ({
   Icon,
   className,
   wrapperClassName,

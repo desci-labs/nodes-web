@@ -8,11 +8,18 @@ export interface ClassNameProp {
   className?: string;
 }
 
-export const NODES_COMPONENT_SUBTYPES: { [key: string]: any } = {
+type TypeMaps = {
+  [key in ResearchObjectComponentType]?: Array<{
+    name: string;
+    id: ResearchObjectComponentDocumentSubtype | ResearchObjectComponentLinkSubtype;
+  }>;
+};
+
+export const NODES_COMPONENT_SUBTYPES: TypeMaps = {
   [ResearchObjectComponentType.PDF]: [
     {
       id: ResearchObjectComponentDocumentSubtype.RESEARCH_ARTICLE,
-      name: "Research Article",
+      name: "Research Report",
     },
     {
       id: ResearchObjectComponentDocumentSubtype.PREREGISTERED_REPORT,
