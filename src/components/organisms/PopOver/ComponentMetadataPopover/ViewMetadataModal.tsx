@@ -11,6 +11,7 @@ import {
 } from "@desci-labs/desci-models";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { PropsWithChildren } from "react";
+import { CODE_LICENSE_TYPES, PDF_LICENSE_TYPES } from "@src/helper/license";
 
 const CardContainer = styled.div`
   background: #272727;
@@ -57,6 +58,8 @@ const getComponentTypeName = (componentType: ResearchObjectComponentType) => {
   }
 };
 
+const ALL_LICENSES = PDF_LICENSE_TYPES.concat(CODE_LICENSE_TYPES);
+
 const ViewMetadataModal = (
   props: ModalProps & { file: DriveObject | null }
 ) => {
@@ -75,6 +78,13 @@ const ViewMetadataModal = (
   console.log(licenseType, metadata);
   console.log(props.file);
 
+  const licenseDescription = ALL_LICENSES.find(
+    (license: any) =>
+      license.name === licenseType ||
+      license.spdx == licenseType ||
+      license.shortName === licenseType
+  )?.description;
+
   return (
     <Modal
       isOpen={props.isOpen}
@@ -86,65 +96,89 @@ const ViewMetadataModal = (
         <Modal.Header title="Metadata" onDismiss={props.onDismiss} />
         <FlexColumn className="mt-6 gap-6 w-full">
           <CardContainer>
-            <Title title="Component type" />
+            <Title title="Component Type" />
             <ContentWrapper>{componentTypeName || "Unknown"}</ContentWrapper>
           </CardContainer>
-          <CardContainer>
-            <Title title={`${componentTypeName} Title`} />
-            <ContentWrapper>
-              <p>{metadata?.title || "-"}</p>
-            </ContentWrapper>
-          </CardContainer>
-          <DividerSimple />
-          <CardContainer>
-            <Title title="Description" />
-            <ContentWrapper>{metadata?.description || "-"}</ContentWrapper>
-          </CardContainer>
-          <DividerSimple />
-          <Heading title="Keywords & Controlled Vocabulary Terms" />
-          <CardContainer>
-            <Title title="Keywords" />
-            <ContentWrapper>
-              <FlexRowAligned className="gap-2 w-full flex-wrap my-2">
-                {metadata?.keywords?.map((keyword: string, idx) => {
-                  return <Pill key={idx} keyword={keyword}></Pill>;
-                })}
-              </FlexRowAligned>
-            </ContentWrapper>
-          </CardContainer>
-          <CardContainer>
-            <Title title="Ontology PURL" />
-            <ContentWrapper>
-              <a
-                href={metadata?.ontologyPurl}
-                rel="noreferrer"
-                target="_blank"
-                className="flex gap-1 mt-1 items-center group hover:text-tint-primary-hover text-tint-primary underline truncate line-clamp-1"
-              >
-                {metadata?.ontologyPurl}
-              </a>
-            </ContentWrapper>
-          </CardContainer>
-          <CardContainer>
-            <Title title="Controlled Vocabulary Terms" />
-            <ContentWrapper>
-              <FlexRowAligned className="gap-2 w-full flex-wrap my-2">
-                {metadata?.controlledVocabTerms?.map((keyword: string, idx) => {
-                  return <Pill key={idx} keyword={keyword}></Pill>;
-                })}
-              </FlexRowAligned>
-            </ContentWrapper>
-          </CardContainer>
+          {metadata?.title && (
+            <>
+              <CardContainer>
+                <Title title={`${componentTypeName} Title`} />
+                <ContentWrapper>
+                  <p>{metadata?.title || ""}</p>
+                </ContentWrapper>
+              </CardContainer>
+              <DividerSimple />
+            </>
+          )}
+
+          {metadata?.description && (
+            <>
+              <CardContainer>
+                <Title title="Description" />
+                <ContentWrapper>{metadata?.description || ""}</ContentWrapper>
+              </CardContainer>
+            </>
+          )}
+          {(metadata?.keywords?.length || 0) > 0 ||
+            metadata?.ontologyPurl ||
+            ((metadata?.controlledVocabTerms?.length || 0) > 0 && (
+              <>
+                <DividerSimple />
+                <Heading title="Keywords & Controlled Vocabulary Terms" />
+                {(metadata?.keywords?.length || 0) > 0 && (
+                  <CardContainer>
+                    <Title title="Keywords" />
+                    <ContentWrapper>
+                      <FlexRowAligned className="gap-2 w-full flex-wrap my-2">
+                        {metadata?.keywords?.map((keyword: string, idx) => {
+                          return <Pill key={idx} keyword={keyword}></Pill>;
+                        })}
+                      </FlexRowAligned>
+                    </ContentWrapper>
+                  </CardContainer>
+                )}
+                {metadata?.ontologyPurl && (
+                  <CardContainer>
+                    <Title title="Ontology PURL" />
+                    <ContentWrapper>
+                      <a
+                        href={metadata?.ontologyPurl}
+                        rel="noreferrer"
+                        target="_blank"
+                        className="flex gap-1 mt-1 items-center group hover:text-tint-primary-hover text-tint-primary underline truncate line-clamp-1"
+                      >
+                        {metadata?.ontologyPurl}
+                      </a>
+                    </ContentWrapper>
+                  </CardContainer>
+                )}
+                {(metadata?.controlledVocabTerms?.length || 0) > 0 && (
+                  <CardContainer>
+                    <Title title="Controlled Vocabulary Terms" />
+                    <ContentWrapper>
+                      <FlexRowAligned className="gap-2 w-full flex-wrap my-2">
+                        {metadata?.controlledVocabTerms?.map(
+                          (keyword: string, idx) => {
+                            return <Pill key={idx} keyword={keyword}></Pill>;
+                          }
+                        )}
+                      </FlexRowAligned>
+                    </ContentWrapper>
+                  </CardContainer>
+                )}
+              </>
+            ))}
           <DividerSimple />
           <Heading title="Licensing" />
           <CardContainer>
-            <Title title={licenseType || "Unknown License"} />
             <ContentWrapper>
               <FlexRow className="my-1 items-start gap-2">
                 <div className="mt-[8px] bg-states-success min-w-[8px] min-h-[8px] w-[8px] h-[8px] m-0 p-0 rounded-full border-none"></div>
                 <FlexColumn className="items-start gap-1">
-                  <p className="text-md uppercase">{licenseType}</p>
-                  <p className="text-sm">License description</p>
+                  <p className="text-sm uppercase">
+                    {licenseType || "Unknown License"}
+                  </p>
+                  <p className="text-xs">{licenseDescription}</p>
                 </FlexColumn>
               </FlexRow>
             </ContentWrapper>

@@ -5,11 +5,11 @@ import CreateableSelect from "@components/molecules/FormInputs/CreateableSelect"
 import {} from "@src/components/organisms/ManuscriptReader";
 import { DataComponent, DataComponentMetadata } from "@desci-labs/desci-models";
 import { Controller, useFormContext } from "react-hook-form";
-import { PDF_LICENSE_TYPES } from "@components/organisms/PopOver/ComponentMetadataPopover";
 import InsetLabelSmallInput from "./FormInputs/InsetLabelSmallInput";
 import SpacerHorizontal from "@components/atoms/SpacerHorizontal";
 import SelectList from "@src/components/molecules/FormInputs/SelectList";
 import { DriveMetadata } from "@src/components/organisms/Drive";
+import { PDF_LICENSE_TYPES } from "@src/helper/license";
 
 interface DatasetMetadataFormProps {
   onSubmit: (data: DataComponent["payload"]) => void;
