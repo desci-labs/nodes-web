@@ -156,12 +156,12 @@ const ModalHeader = ({
   return (
     <div className="flex flex-row justify-between items-center">
       <div>
-        {title && <h1 className="text-xl font-bold text-white">{title}</h1>}
+        {title && <h1 className="text-xl font-bold font-inter text-white">{title}</h1>}
         {subTitle && <p className="text-neutrals-gray-5 text-sm">{subTitle}</p>}
       </div>
       {!hideCloseIcon && (
         <button
-          className="cursor-pointer p-5 -m-5 absolute right-5 top-5 z-[999] stroke-black dark:stroke-white hover:stroke-muted-300 hover:dark:stroke-muted-300"
+          className="cursor-pointer p-5 -m-5 right-5 top-5 z-[999] stroke-black dark:stroke-white hover:stroke-muted-300 hover:dark:stroke-muted-300"
           onClick={onDismiss}
         >
           <IconX />

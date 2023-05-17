@@ -38,6 +38,7 @@ import { useDrive } from "@src/state/drive/hooks";
 import { v4 as uuidv4 } from "uuid";
 import { fetchTreeThunk } from "@src/state/drive/driveSlice";
 import { DriveObject } from "../../Drive";
+import ViewMetadataModal from "./ViewMetadataModal";
 
 export const PDF_LICENSE_TYPES = [
   { id: 0, name: "CC0", shortName: "CC0" },
@@ -322,7 +323,7 @@ const defaultProps = {
   onClose: EMPTY_FUNC,
 };
 
-const ComponentMetadataPopover = (
+const EditMetadataModal = (
   props: ComponentMetadataPopoverProps & typeof defaultProps
 ) => {
   const dispatch = useSetter();
@@ -331,12 +332,7 @@ const ComponentMetadataPopover = (
   const { dialogs, setDialogs } = useManuscriptController(["dialogs"]);
   const { fileMetadataBeingEdited } = useDrive();
 
-  const {
-    publicView,
-    mode,
-    manifest: manifestData,
-    currentObjectId,
-  } = useNodeReader();
+  const { publicView, mode, manifest: manifestData } = useNodeReader();
 
   const methods = useForm<CommonComponentPayload>({
     defaultValues: {
@@ -523,6 +519,26 @@ const ComponentMetadataPopover = (
   );
 };
 
+EditMetadataModal.defaultProps = defaultProps;
+
+const ComponentMetadataPopover = (
+  props: ComponentMetadataPopoverProps & typeof defaultProps
+) => {
+  const { mode } = useNodeReader();
+  const { fileMetadataBeingEdited } = useDrive();
+
+  if (mode === "editor") {
+    return <EditMetadataModal {...props} />;
+  }
+
+  return (
+    <ViewMetadataModal
+      file={fileMetadataBeingEdited}
+      isOpen={props.isVisible}
+      onDismiss={props.onClose}
+    />
+  );
+};
 ComponentMetadataPopover.defaultProps = defaultProps;
 
 export default ComponentMetadataPopover;
