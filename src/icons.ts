@@ -137,6 +137,7 @@ import { ReactComponent as IconPlayRounded } from "@images/icons/play.svg";
 import { ReactComponent as IconAssignType } from "@images/icons/assign-type-icon.svg";
 import { ReactComponent as IconDrive } from "@images/icons/drive.svg";
 import { ReactComponent as IconUnstar } from "@images/icons/unstar.svg";
+import { ReactComponent as IconAnnotate } from "@images/annotation.svg";
 
 export type SvgIconProps = FC<
   React.SVGProps<SVGSVGElement> & {
@@ -286,4 +287,5 @@ export {
   IconTwitter,
   IconGithub,
   IconGitbook,
+  IconAnnotate,
 };
