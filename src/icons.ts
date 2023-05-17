@@ -137,6 +137,7 @@ import { ReactComponent as IconPlayRounded } from "@images/icons/play.svg";
 import { ReactComponent as IconAssignType } from "@images/icons/assign-type-icon.svg";
 import { ReactComponent as IconDrive } from "@images/icons/drive.svg";
 import { ReactComponent as IconUnstar } from "@images/icons/unstar.svg";
+import { ReactComponent as IconPower } from "@images/power.svg";
 import { ReactComponent as IconSvcCodeOcean } from "@images/icons/service-codeocean.svg";
 import { ReactComponent as IconSvcColab } from "@images/icons/service-colab.svg";
 import { ReactComponent as IconSvcHuggingFace } from "@images/icons/service-huggingface.svg";
@@ -305,5 +306,6 @@ export {
   IconTwitter,
   IconGithub,
   IconGitbook,
+  IconPower,
   IconAnnotate,
 };

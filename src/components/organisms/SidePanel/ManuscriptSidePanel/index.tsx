@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
+import {
+  FlexColumn,
+  FlexRowCentered,
+  FlexRowSpaceBetween,
+} from "@components/styled";
 import SidePanel from "@components/organisms/SidePanel";
 import HistoryTab from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/History/HistoryTab";
 import CreditTab from "@src/components/organisms/SidePanel/ManuscriptSidePanel/Tabs/CreditTab";
@@ -39,6 +43,7 @@ import {
   toggleResearchPanel,
 } from "@src/state/nodes/nodeReader";
 import { SwitchBar, SwitchButton } from "@src/components/atoms/SwitchBar";
+import { IconPower } from "@src/icons";
 import MetadataKeywords from "@src/components/organisms/SidePanel/ManuscriptSidePanel/Tabs/Components/MetadataKeywords";
 import useLocalStorageState from "@src/hooks/useLocalStorageState";
 
@@ -254,9 +259,14 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
               dispatch(toggleCommitPanel(true));
             }}
           >
-            {isCommitPanelOpen
-              ? "Finish in Commit Panel (Left)"
-              : "Publish Node"}
+            <FlexRowCentered className="gap-1">
+              <IconPower width={18} />
+              <span className="inline-block">
+                {isCommitPanelOpen
+                  ? "Finish in Commit Panel (Left)"
+                  : "Publish Node"}
+              </span>
+            </FlexRowCentered>
           </PrimaryButton>
         </div>
         <div className="px-4">
