@@ -6,14 +6,14 @@ import { useDispatch } from "react-redux";
 import { FlexRowSpaceBetween } from "../styled";
 import { IconOrcidOutline } from "./Icons";
 
-interface FairBtnProps {
+interface MetadataPreviewProps {
   isFair: boolean;
   component: ResearchObjectV1Component;
   text?: string;
   classname?: string;
 }
 
-const FairBtn: React.FC<FairBtnProps> = ({
+const MetadataPreview: React.FC<MetadataPreviewProps> = ({
   isFair,
   component,
   classname,
@@ -26,7 +26,7 @@ const FairBtn: React.FC<FairBtnProps> = ({
       data-tip={mode === "editor" ? "Edit Metadata" : "View Metadata"}
       data-place={"bottom"}
       data-for={`fair_${component.id}`}
-      className={`bg-neutrals-black select-none hover:bg-neutrals-gray-3 w-8 h-7 flex justify-center items-center rounded-md ${classname}`}
+      className={`bg-neutrals-black select-none hover:bg-dark-gray w-8 h-7 flex justify-center items-center rounded-md ${classname}`}
       onClick={(e: React.MouseEvent) => {
         dispatch(showMetadataForComponent(component));
         e.stopPropagation();
@@ -48,4 +48,4 @@ const FairBtn: React.FC<FairBtnProps> = ({
   );
 };
 
-export default FairBtn;
+export default MetadataPreview;
