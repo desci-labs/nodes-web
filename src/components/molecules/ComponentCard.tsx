@@ -359,19 +359,6 @@ const ComponentCard = (props: ComponentCardProps) => {
                         <IconPlayRounded className="p-0" />
                       </BlackGenericButton>
                     ) : null}
-                    <div
-                      style={{
-                        display:
-                          component.type === ResearchObjectComponentType.PDF
-                            ? ""
-                            : "none",
-                      }}
-                    >
-                      <AnnotationSwitcher
-                        annotations={sortedAnnotations}
-                        handleComponentClick={handleComponentClick}
-                      />
-                    </div>
                   </div>
                 </div>
               </>
