@@ -32,7 +32,7 @@ import { memo, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useManuscriptController } from "../ManuscriptReader/ManuscriptController";
 import FieldSelector from "./FieldSelector";
-import { PDF_LICENSE_TYPES } from "../PopOver/ComponentMetadataPopover";
+import { PDF_LICENSE_TYPES } from "@src/helper/license";
 interface CreateNodeModalProps {
   isOpen: boolean;
   onDismiss: () => void;
