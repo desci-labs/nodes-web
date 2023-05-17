@@ -1,4 +1,5 @@
-$columns: 7;
+// includes cols with css property 'display: hidden'
+$columns: 8;
 
 .driveRowHeader {
   --borderRadius: 8px;
@@ -58,11 +59,16 @@ $columns: 7;
   $FILE_SIZE: minmax(auto, 1fr);
   $CITE: 50px;
   $USE: 50px;
+  $SERVICES: minmax(min-content, 150px);
 
   grid-template-columns: $STARRED $FILE_NAME $LAST_MODIFIED $STATUS $FILE_SIZE $CITE $USE;
 
   &.deprecated {
     grid-template-columns: $FILE_NAME $LAST_MODIFIED $STATUS $FILE_SIZE $CITE $USE;
+  }
+
+  &.external-links {
+    grid-template-columns: $STARRED $FILE_NAME $SERVICES $CITE $USE;
   }
 
   // drop file date
@@ -73,6 +79,9 @@ $columns: 7;
     grid-template-columns: $STARRED $FILE_NAME $STATUS $FILE_SIZE $CITE $USE;
     &.deprecated {
       grid-template-columns: $FILE_NAME $STATUS $FILE_SIZE $CITE $USE;
+    }
+    &.external-links {
+      grid-template-columns: $STARRED $FILE_NAME $SERVICES $CITE $USE;
     }
   }
 
@@ -87,6 +96,9 @@ $columns: 7;
     grid-template-columns: $STARRED $FILE_NAME $FILE_SIZE $CITE $USE;
     &.deprecated {
       grid-template-columns: $FILE_NAME $FILE_SIZE $CITE $USE;
+    }
+    &.external-links {
+      grid-template-columns: $STARRED $FILE_NAME $SERVICES $CITE $USE;
     }
   }
   // drop all
@@ -111,6 +123,9 @@ $columns: 7;
 
     grid-template-columns: $FILE_NAME;
     &.deprecated {
+      grid-template-columns: $FILE_NAME;
+    }
+    &.external-links {
       grid-template-columns: $FILE_NAME;
     }
   }
