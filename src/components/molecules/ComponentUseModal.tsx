@@ -25,7 +25,7 @@ const ComponentUseModal = ({
   file,
   ...restProps
 }: ModalProps & ComponentUseModalProps) => {
-  const { manifest: manifestData } = useNodeReader();
+  const { manifest: manifestData, mode } = useNodeReader();
   const { dpid, cid, license } = useComponentDpid(file);
   const handler = useActionHandler();
   const dispatch = useSetter();
@@ -177,24 +177,28 @@ const ComponentUseModal = ({
       <Modal.Footer>
         <div className="w-full flex items-center justify-between">
           <div className="flex flex-col text-white">
-            <div className="flex gap-2 items-center">
-              <WarningSign width={25} />{" "}
-              <span className="text-sm">
-                These content identifiers refer to the latest committed Node
-                state.
-                <br /> Uncommitted files are not included.
-              </span>
-            </div>
+            {mode === "editor" && (
+              <div className="flex gap-2 items-center">
+                <WarningSign width={25} />{" "}
+                <span className="text-sm">
+                  These content identifiers refer to the latest committed Node
+                  state.
+                  <br /> Uncommitted files are not included.
+                </span>
+              </div>
+            )}
             <span className="text-sm gap-2 hidden lg:flex">
               <span className="inline-block">
                 License Type: <b>{license}</b>{" "}
               </span>
-              <button
-                className="text-tint-primary hover:text-tint-primary-hover"
-                onClick={handleEditMetadata}
-              >
-                Edit Metadata
-              </button>
+              {mode === "editor" && (
+                <button
+                  className="text-tint-primary hover:text-tint-primary-hover"
+                  onClick={handleEditMetadata}
+                >
+                  Edit Metadata
+                </button>
+              )}
             </span>
           </div>
           <PrimaryButton onClick={close}>Done</PrimaryButton>
