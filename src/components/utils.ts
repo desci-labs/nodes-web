@@ -295,6 +295,15 @@ export const filterForNonData = (a: ResearchObjectV1Component) =>
   a.type !== ResearchObjectComponentType.UNKNOWN &&
   a.type !== ResearchObjectComponentType.DATA_BUCKET;
 
+export const getStarredNonDataComponentsFromManifest = (
+  manifestData: ResearchObjectV1
+) => {
+  const pdfComponents = manifestData?.components
+    ? manifestData.components.filter(filterForFirstPdf)
+    : [];
+  return pdfComponents;
+};
+
 export const getNonDataComponentsFromManifest = (
   manifestData: ResearchObjectV1
 ) => {

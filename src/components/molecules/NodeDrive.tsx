@@ -2,27 +2,43 @@ import ButtonSecondary from "@components/atoms/ButtonSecondary";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { ClassNameProp } from "nodesTypes";
 import DataUsage from "./DataUsage";
-import { getNonDataComponentsFromManifest } from "../utils";
+import {
+  getNonDataComponentsFromManifest,
+  getStarredNonDataComponentsFromManifest,
+} from "../utils";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { setComponentStack } from "@src/state/nodes/nodeReader";
-import React, { HTMLProps } from "react";
+import React, { HTMLProps, useState } from "react";
+import { ResearchObjectV1Component } from "@desci-labs/desci-models";
 
 export const DriveToggleButton = (props: HTMLProps<HTMLButtonElement>) => {
   const { setIsAddingComponent } = useManuscriptController();
   const dispatch = useSetter();
   const { componentStack, manifest: manifestData } = useNodeReader();
+  const [lastComponentStack, setLastComponentStack] = useState<
+    ResearchObjectV1Component[]
+  >([]);
 
   const shouldShowDrive = componentStack.length;
+  const firstStarredPdf = manifestData
+    ? getStarredNonDataComponentsFromManifest(manifestData)
+    : [];
   const nonDataComponents = manifestData
-    ? getNonDataComponentsFromManifest(manifestData)
+    ? firstStarredPdf
+      ? firstStarredPdf
+      : getNonDataComponentsFromManifest(manifestData)
     : [];
 
   const defaultClick = () => {
     if (shouldShowDrive) {
+      setLastComponentStack(componentStack);
       dispatch(setComponentStack([]));
     } else {
-      const firstComponent = nonDataComponents[0]!;
+      const firstComponent =
+        lastComponentStack && lastComponentStack.length
+          ? lastComponentStack[lastComponentStack.length - 1]
+          : nonDataComponents[0]!;
 
       if (!firstComponent) {
         setIsAddingComponent(true);
@@ -32,10 +48,7 @@ export const DriveToggleButton = (props: HTMLProps<HTMLButtonElement>) => {
     }
   };
   return (
-    <ButtonSecondary
-      onClick={props.onClick ?? defaultClick}
-      className="w-full"
-    >
+    <ButtonSecondary onClick={props.onClick ?? defaultClick} className="w-full">
       {shouldShowDrive ? "View Node Drive" : "Hide Node Drive"}
     </ButtonSecondary>
   );
