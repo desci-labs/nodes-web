@@ -156,7 +156,7 @@ const ModalHeader = ({
   return (
     <div className="flex flex-row justify-between items-center">
       <div>
-        {title && <h1 className="text-xl font-bold text-white">{title}</h1>}
+        {title && <h1 className="text-xl font-bold font-inter text-white">{title}</h1>}
         {subTitle && <p className="text-neutrals-gray-5 text-sm">{subTitle}</p>}
       </div>
       {!hideCloseIcon && (

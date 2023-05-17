@@ -76,6 +76,7 @@ const RenameDataModal: React.FC<RenameDataModalProps> = ({ file }) => {
         dispatch(saveManifestDraft({}));
       }
       close();
+      return;
     }
 
     const snapshotManifest = { ...manifestData! };

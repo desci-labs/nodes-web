@@ -45,7 +45,12 @@ const Navigator = () => {
   const { setIsAddingComponent } = useManuscriptController([
     "isAddingComponent",
   ]);
-  const { mode, manifest: manifestData, currentObjectId } = useNodeReader();
+  const {
+    mode,
+    manifest: manifestData,
+    currentObjectId,
+    componentStack,
+  } = useNodeReader();
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const { deprecated: deprecatedDrive } = useDrive();
   const dispatch = useSetter();
@@ -90,7 +95,7 @@ const Navigator = () => {
       );
     }
     return components;
-  }, [manifestData, deprecatedDrive]);
+  }, [manifestData, deprecatedDrive, componentStack]);
 
   const moveCard = useCallback(
     (dragIndex: number, hoverIndex: number) => {
@@ -108,35 +113,36 @@ const Navigator = () => {
         reorderComponent({ dragIndex: indexToMove, hoverIndex: indexToHover })
       );
     },
-    [cardComponents, dispatch, manifestData?.components]
+    [cardComponents, dispatch, manifestData?.components, componentStack]
   );
 
-  const renderEditableComponents = useCallback((
-    components: ResearchObjectV1Component[]
-  ) => {
-    return (
-      <>
-        {components.map(
-          (component: ResearchObjectV1Component, index: number) => (
-            <EditableWrapper
-              key={`editable_hoc_${currentObjectId}_${component.id}`}
-              id={component.id}
-              index={index}
-              isEditable={isEditable}
-              component={component}
-              moveCard={moveCard}
-            >
-              {isEditable ? (
-                <MiniComponentCard key={component.id} component={component} />
-              ) : (
-                <ComponentCard component={component} />
-              )}
-            </EditableWrapper>
-          )
-        )}
-      </>
-    );
-  }, [currentObjectId, isEditable, moveCard]);
+  const renderEditableComponents = useCallback(
+    (components: ResearchObjectV1Component[]) => {
+      return (
+        <>
+          {components.map(
+            (component: ResearchObjectV1Component, index: number) => (
+              <EditableWrapper
+                key={`editable_hoc_${currentObjectId}_${component.id}_${isEditable}_${componentStack.length}`}
+                id={component.id}
+                index={index}
+                isEditable={isEditable}
+                component={component}
+                moveCard={moveCard}
+              >
+                {isEditable ? (
+                  <MiniComponentCard key={component.id} component={component} />
+                ) : (
+                  <ComponentCard component={component} />
+                )}
+              </EditableWrapper>
+            )
+          )}
+        </>
+      );
+    },
+    [currentObjectId, isEditable, moveCard, componentStack]
+  );
 
   return (
     <>
