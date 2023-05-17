@@ -16,14 +16,7 @@ const FloatingActionBar = () => {
     useManuscriptController(["isAddingComponent"]);
 
   const AnnotationButton = () => {
-    return (
-      <IconAnnotate
-        height={28}
-        width={28}
-        fill="none"
-        className={``}
-      />
-    );
+    return <IconAnnotate height={28} width={28} fill="none" className={``} />;
   };
 
   const AnnotationButtonClose = () => {
@@ -55,7 +48,7 @@ const FloatingActionBar = () => {
         <TooltipIcon
           id="annotation-button"
           placement="bottom"
-          tooltip="Add annotation (or hold ALT and drag)"
+          tooltip="Annotate figure / chart"
           key={"tooltip-annotation-add"}
           tipClassName="w-48"
           offset={{ left: 5, top: 80 }}
