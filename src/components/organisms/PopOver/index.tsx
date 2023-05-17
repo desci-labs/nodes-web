@@ -142,7 +142,7 @@ const PopOver = (props: React.PropsWithChildren<PopOverProps>) => {
         ref={popoverRef}
         style={{
           minWidth: 300,
-          maxWidth: `calc(100vw - 200px)`,
+          maxWidth: `calc(100vw)`,
           margin: "3rem 0.75rem",
           // overflow: "scroll",
           marginLeft:
@@ -175,7 +175,7 @@ const PopOver = (props: React.PropsWithChildren<PopOverProps>) => {
               </CloseIconContainer>
             )} */}
         </div>
-        <PerfectScrollbar className="max-h-[calc(100vh-220px)] h-fit overflow-y-scroll">
+        <PerfectScrollbar className="max-h-[calc(100vh)] h-fit overflow-y-scroll">
           {props.children}
         </PerfectScrollbar>
         {props.footer ? (

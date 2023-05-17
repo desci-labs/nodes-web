@@ -92,7 +92,7 @@ const VSCodeViewer = () => {
     }
     let anno = (
       <div
-        className={`handle fixed bottom-[28px] left-0 transition-all duration-200 ease-out cursor-move ${
+        className={`handle fixed bottom-[28px] min-w-[355px] min-h-[70px] left-0 transition-all duration-200 ease-out cursor-move ${
           activeAnnotation ? "translate-x-2" : "-translate-x-96"
         }`}
         onClick={() => {

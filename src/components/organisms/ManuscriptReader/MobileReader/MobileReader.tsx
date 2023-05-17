@@ -32,9 +32,9 @@ const MobileWrapper = styled(FlexColumn)`
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  overflow-y: scroll
+  overflow-y: scroll;
 `;
-
+export const MOBILE_WARNING_KEY = "mobile-warning";
 interface ManuscriptReaderProps {
   publicView?: boolean;
 }
@@ -65,7 +65,9 @@ const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
 
   useEffect(() => {
     dispatch(setMobileView(true));
-    dispatch(setShowMobileWarning(true));
+    if (!localStorage.getItem(MOBILE_WARNING_KEY)) {
+      dispatch(setShowMobileWarning(true));
+    }
 
     return () => {
       dispatch(setMobileView(false));
@@ -115,7 +117,10 @@ const MobileWarning = () => {
         </span>
         <button
           className="cursor-pointer p-2 stroke-black dark:stroke-white hover:stroke-muted-300 hover:dark:stroke-muted-300"
-          onClick={() => dispatch(setShowMobileWarning(false))}
+          onClick={() => {
+            dispatch(setShowMobileWarning(false));
+            localStorage.setItem(MOBILE_WARNING_KEY, "1");
+          }}
         >
           <IconX />
         </button>

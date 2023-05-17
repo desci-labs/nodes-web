@@ -36,6 +36,7 @@ export default function PublicationDetailsModal(props: any) {
 
   const [closed, setClosed] = useState(false);
   const onClose = () => {
+    setIsLoading(true);
     setClosed(false);
     setShowPublicationDetails(false);
   };
@@ -47,6 +48,27 @@ export default function PublicationDetailsModal(props: any) {
   const transactionReceiptUrl = `${
     BLOCK_EXPLORER_URL || "https://etherscan.io"
   }/tx/${selectedHistory?.data.transaction?.id}`;
+  // debugger;
+
+  const PRELOAD_CACHE: { [k: string]: any } = {
+    "46": {
+      2: { size: 265440000 },
+      3: { size: 877960000 },
+      4: { size: 877960000 },
+      5: { size: 877960000 },
+      6: { size: 877960000 },
+      7: { size: 877960000 },
+    },
+  };
+
+  const preloadCacheResult =
+    manifestData &&
+    manifestData.dpid &&
+    manifestData.dpid.id &&
+    selectedHistory &&
+    selectedHistory.index &&
+    PRELOAD_CACHE[manifestData!.dpid.id]?.[selectedHistory?.index]?.size;
+
   return (
     <PopOver
       {...props}
@@ -91,43 +113,51 @@ export default function PublicationDetailsModal(props: any) {
           <Details
             title="Node Size"
             subTitle="Size of the stored data published on this version of your node."
-            detail={BytesToHumanFileSize(size)}
+            detail={BytesToHumanFileSize(preloadCacheResult || size)}
             isLoading={isLoading}
           />
           <Details
             title="Data Copies"
             subTitle="We've made several copies of your node so that you can always access your data."
-            detail={(copies || 6).toString()}
+            detail={(6).toString()}
             isLoading={isLoading}
           />
         </div>
-        <Divider />
+        {/* <Divider />
         <div className="py-4 flex flex-col gap-5">
           <Details
             title="Storage Service"
             subTitle={<Link href="https://estuary.tech" />}
           />
-        </div>
+        </div> */}
         <AdvancedSlideDown
           closed={closed}
           setClosed={setClosed}
           className="overflow-hidden"
         >
           <Divider />
-          <div className="py-4 flex flex-col gap-5 select-none">
-            <Details
-              title="Node Metadata"
-              subTitle={
-                <Link href={`https://ipfs.io/ipfs/${node?.manifestUrl}`} />
-              }
-              copy={`https://ipfs.io/ipfs/${node?.manifestUrl}`}
-            />
-            <Details
-              title="Transaction Receipt"
-              subTitle={<Link href={transactionReceiptUrl} />}
-              copy={transactionReceiptUrl}
-            />
-          </div>
+          {isLoading ? (
+            <>
+              <DefaultSpinner size={32} color="white" />
+            </>
+          ) : (
+            <div className="py-4 flex flex-col gap-5 select-none">
+              <Details
+                title="Node Metadata"
+                subTitle={
+                  <Link
+                    href={`https://ipfs.io/ipfs/${selectedHistory?.data?.transaction?.cid}`}
+                  />
+                }
+                copy={`https://ipfs.io/ipfs/${selectedHistory?.data?.transaction?.cid}`}
+              />
+              <Details
+                title="Transaction Receipt"
+                subTitle={<Link href={transactionReceiptUrl} />}
+                copy={transactionReceiptUrl}
+              />
+            </div>
+          )}
         </AdvancedSlideDown>
       </div>
     </PopOver>

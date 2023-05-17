@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import {
   PdfComponent,
@@ -7,7 +7,6 @@ import {
 } from "@desci-labs/desci-models";
 import {
   cleanupManifestUrl,
-  getNonDataComponentsFromManifest,
   triggerTooltips,
 } from "@src/components/utils";
 import { useNodeReader } from "@src/state/nodes/hooks";
@@ -43,6 +42,7 @@ export default function useManuscriptReader(publicView: boolean = false) {
   const cid = useParseObjectID();
   const dispatch = useSetter();
   const { mode } = useNodeReader();
+  const [isError, setIsError] = useState(false);
 
   const { scrollToPage$ } = useManuscriptController([
     "scrollToPage$",
@@ -53,7 +53,7 @@ export default function useManuscriptReader(publicView: boolean = false) {
   console.log("Parsed Manuscript", parsedManuscript);
   const initPrivateReader = async (cid: string) => {
     if (
-      !publicView &&
+      publicView === false &&
       "manifest" in parsedManuscript &&
       "cid" in parsedManuscript
     ) {
@@ -93,6 +93,8 @@ export default function useManuscriptReader(publicView: boolean = false) {
 
       if ("manifestUrl" in parsedManuscript)
         localStorage.setItem("manifest-url", parsedManuscript.manifestUrl);
+    } else {
+      setIsError(true)
     }
   };
 
@@ -179,6 +181,8 @@ export default function useManuscriptReader(publicView: boolean = false) {
         } else {
           dispatch(setComponentStack([targetComponent]));
         }
+      } else {
+        setIsError(true)
       }
       dispatch(setCurrentObjectId(currentId));
       dispatch(setResearchPanelTab(ResearchTabs.current));
@@ -192,6 +196,9 @@ export default function useManuscriptReader(publicView: boolean = false) {
    * Read the research object id from URL and make backend request
    */
   useEffect(() => {
+    if ("error" in parsedManuscript) {
+      setIsError(true)
+    }
     if (publicView) {
       const uuid = "uuid" in parsedManuscript ? parsedManuscript.uuid : "";
       initPublicViewer(uuid || (cid?.split("/")[0] as string));
@@ -205,5 +212,5 @@ export default function useManuscriptReader(publicView: boolean = false) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cid, parsedManuscript, publicView]);
 
-  return { isLoading: false, cid };
+  return { isLoading: false, cid, isError };
 }

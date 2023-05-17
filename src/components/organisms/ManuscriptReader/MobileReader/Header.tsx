@@ -3,11 +3,16 @@ import { IconShare } from "@src/icons";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import useComponentDpid from "@components/organisms/Drive/hooks/useComponentDpid";
 import useNodeCover from "@components/organisms/ManuscriptReader/hooks/useNodeCover";
-import React, { CSSProperties, useCallback, useRef } from "react";
+import React, { CSSProperties, useCallback, useRef, useState } from "react";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import { Helmet } from "react-helmet";
 import { animated, useSpring, config } from "@react-spring/web";
 import { useDrag } from "@use-gesture/react";
+import {
+  ATTESTATION_PRELOAD_CACHE,
+  BADGE_INFO,
+} from "../../ManuscriptAttributesSection";
+import AttributePopOver from "../../PopOver/AttributePopOver";
 
 const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
 const DEFAULT_URL =
@@ -23,14 +28,20 @@ const bgStyles: (url: string) => CSSProperties = (cover: string) => ({
         ), url(${cover})`,
   backgroundRepeat: "no-repeat",
   backgroundPosition: "center top",
-  backgroundSize: "cover",
+  backgroundSize: "100%",
 });
 
 export default function Header() {
-  const { manifest } = useNodeReader();
+  const { manifest: manifestData } = useNodeReader();
   const { dpid } = useComponentDpid();
   const { cover } = useNodeCover();
   const headerRef = useRef<HTMLDivElement>();
+
+  const manifest = { ...manifestData };
+  const dpidIndex = manifestData?.dpid?.id || "-1";
+  if (ATTESTATION_PRELOAD_CACHE[dpidIndex]) {
+    manifest.attributes = ATTESTATION_PRELOAD_CACHE[dpidIndex];
+  }
 
   const [{ height: y }, api] = useSpring(() => ({ height: 320 }));
 
@@ -42,9 +53,9 @@ export default function Header() {
       config: {
         ...config.gentle,
         velocity,
-        tension: 800,
-        friction: 20,
-        mass: 1
+        tension: 700,
+        friction: 80,
+        mass: 0.1,
       },
     });
   };
@@ -58,14 +69,14 @@ export default function Header() {
         movement: [, my],
       } = state;
       if (dy < 0) return close(vy);
-      // if user drags down passed a threashold, then we cancel the drag
+      // if user drags down passed a threshold, then we cancel the drag
       // so that the header resets to its open position
       if (y.get() > height * 1.2)
         api.start({
           from: { height: y.get() },
           to: { height: y.get() + my * 0.1 },
           immediate: true,
-          config: { ...config.stiff, friction: 10, tension: 200 },
+          config: { ...config.stiff, friction: 5, tension: 10 },
         });
 
       if (last) {
@@ -75,7 +86,7 @@ export default function Header() {
           from: { height: y.get() },
           to: { height: y.get() + my * 0.05 },
           immediate: true,
-          config: { ...config.stiff, velocity: vy, tension: 100 },
+          config: { ...config.stiff, velocity: vy, tension: 40 },
         });
     },
     {
@@ -88,6 +99,11 @@ export default function Header() {
 
   const url = dpid || window.location.href;
   const description = `Have a look at this Research Node published with DeSci Nodes.\n${dpid}`;
+
+  //**Attestation start */
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedBadge, setSelectedBadge] = useState("");
+  //**Attestation end */
 
   const onHandleShare = async () => {
     try {
@@ -121,19 +137,40 @@ export default function Header() {
       style={{
         ...bgStyles(cover),
         height: y,
-        touchAction: 'none',
+        touchAction: "none",
       }}
       ref={handleRef}
       onClick={onHandleClick}
       {...bind()}
-      
     >
-      <IconShare
-        width={30}
-        color="white"
-        className="absolute top-3 right-3"
-        onClick={onHandleShare}
-      />
+      {/** Attestation Start */}
+      <div className="absolute top-0 left-0 p-3 flex">
+        {manifest?.attributes?.map((attr, i) => (
+          <div
+            key={attr.key}
+            className={`flex items-center gap-2 ${
+              i > 0 ? "-ml-2" : ""
+            } -mt-2  rounded-full px-2 py-1`}
+          >
+            <img
+              className={`cursor-pointer ${attr.value ? "" : "opacity-20"}`}
+              src={((BADGE_INFO as any)[attr.key] as any)?.small}
+              key={attr.key}
+              style={{ width: 40 }}
+              alt=""
+              onClick={() => {
+                setIsOpen(true);
+                setSelectedBadge(attr.key);
+                // setValue(attr.value);
+              }}
+            />
+          </div>
+        ))}
+      </div>
+      {/** Attestation End */}
+      <div className="absolute top-0 right-0 p-3" onClick={onHandleShare}>
+        <IconShare width={30} color="white" />
+      </div>
       <button className="px-4 flex gap-3 items-center text-left w-full">
         <div className="shrink-0 w-fit">
           <ResearchNodeIcon width={40} className="" />
@@ -172,6 +209,26 @@ export default function Header() {
         <meta name="twitter:description" content={description} />
         <meta name="twitter:image" content={cover || DEFAULT_URL} />
       </Helmet>
+      <AttributePopOver
+        isVisible={isOpen}
+        key={selectedBadge}
+        value={true}
+        data={(BADGE_INFO as any)[selectedBadge]}
+        onClose={() => setIsOpen(false)}
+        containerStyle={{
+          marginTop: -60,
+          width: "100%",
+        }}
+        style={{
+          width: "100%",
+          margin: 0,
+          marginTop: 40,
+          paddingBottom: 120,
+          overflow: "hidden",
+          height: "calc(100%+220px)",
+        }}
+        className="absolute top-0 left-0 w-full h-full rounded-lg"
+      />
     </animated.div>
   );
 }

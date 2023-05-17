@@ -1,4 +1,5 @@
 import {
+  Annotation,
   PdfComponent,
   ResearchObjectComponentAnnotation,
   ResearchObjectComponentType,
@@ -13,7 +14,6 @@ import { AnnotationLinkConfig } from "@src/components/molecules/AnnotationEditor
 import {
   cleanupManifestUrl,
   filterForFirstPdf,
-  filterForNonData,
 } from "@src/components/utils";
 import { RootState } from "@src/store";
 import axios from "axios";
@@ -25,7 +25,7 @@ export type ReaderMode = "reader" | "editor";
 export enum ResearchTabs {
   current = "current",
   history = "history",
-  source = "source",
+  credit = "credit",
 }
 
 export interface EditNodeParams {
@@ -310,7 +310,7 @@ export const nodeReaderSlice = createSlice({
         state.manifest.components = state.manifest.components.map(
           (component, idx) => {
             if (idx === payload.componentIndex) {
-              const updatedAnnotations = (
+              let updatedAnnotations = (
                 component.payload.annotations || []
               ).map(
                 (
@@ -329,6 +329,15 @@ export const nodeReaderSlice = createSlice({
                   __client: undefined,
                 });
               }
+              // sort by page and startY
+              updatedAnnotations = updatedAnnotations.sort(
+                (a: Annotation, b: Annotation) => {
+                  if (a.pageIndex === b.pageIndex) {
+                    return a.startY - b.startY;
+                  }
+                  return (a?.pageIndex || 0) - (b?.pageIndex || 0);
+                }
+              );
               return {
                 ...component,
                 payload: {
@@ -450,11 +459,6 @@ export const nodeReaderSlice = createSlice({
         ) {
           const lastScrollTop = state.lastScrollTop[newComponent.payload.url];
           state.pdfScrollOffsetTop = lastScrollTop;
-          // if (lastScrollTop) {
-          //   setTimeout(() => {
-          //     document.scrollingElement!.scrollTop = lastScrollTop!;
-          //   }, 500);
-          // }
         }
       }
       state.annotationLinkConfig = null;
@@ -471,6 +475,7 @@ export const nodeReaderSlice = createSlice({
           newTopComponent.payload.annotations || []
         );
       }
+      return state;
     },
     pushToComponentStack: (
       state,

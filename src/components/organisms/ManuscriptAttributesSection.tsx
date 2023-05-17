@@ -14,6 +14,8 @@ import IconAcmFunctionalSmall from "@images/icons/acm/acm-functional-hex.png";
 import IconAcmFunctionalFull from "@images/icons/acm/acm-functional-full.png";
 import IconAcmReusableSmall from "@images/icons/acm/acm-reusable-hex.png";
 import IconAcmReusableFull from "@images/icons/acm/acm-reusable-full.png";
+import IconAuthorshipVerified from "@images/authorship-verified.png";
+import IconComputationalReproducibility from "@images/computational-reproducibility.png";
 import ClickableAddIcon from "@components/atoms/ClickableAddIcon";
 import { ResearchObjectAttributeKey } from "@desci-labs/desci-models";
 import { __log } from "@components/utils";
@@ -27,6 +29,23 @@ interface BadgeInfo {
 }
 
 export const BADGE_INFO: { [key in ResearchObjectAttributeKey]: BadgeInfo } = {
+  "computational-reproducibility": {
+    small: IconComputationalReproducibility,
+    full: IconComputationalReproducibility,
+    title: "Computational Reproducibility",
+    description: `This badge is granted to scientific publications whose fundamental results can be reproduced utilizing the code and data available in the Node.
+\nThe authors have earned this badge by supplying comprehensive documentation of their data, code, and computational techniques, enabling independent validation of their findings.
+\nThe Computational Reproducibility Badge represents the authors' commitment to upholding the most rigorous research integrity standards, fostering confidence and reliability within the scientific community.`,
+  },
+  "authorship-verified": {
+    small: IconAuthorshipVerified,
+    full: IconAuthorshipVerified,
+    title: "Author Collaboration",
+    description: `This badge is awarded to Nodes that have been verified and endorsed by one or more of the original contributors of the work.
+    \nThis Node was initially created by a Node Steward who collaborated with one or more original authors to transform the original publication into a research object. 
+\nThis badge signifies that the original authors have actively participated in the enhancement and confirmation of the research presented within the Node. 
+\nIt demonstrates a commitment to collaboration and openness towards new technologies.`,
+  },
   available: {
     small: IconAcmAvailableSmall,
     full: IconAcmAvailableFull,
@@ -64,13 +83,34 @@ export const BADGE_INFO: { [key in ResearchObjectAttributeKey]: BadgeInfo } = {
   },
 };
 
+export const ATTESTATION_PRELOAD_CACHE: { [k: string]: any[] } = {
+  "46": [
+    {
+      key: ResearchObjectAttributeKey.AUTHORSHIP_VERIFIED,
+      value: true,
+    },
+    {
+      key: ResearchObjectAttributeKey.COMPUTATIONAL_REPRODUCIBILITY,
+      value: true,
+    },
+  ],
+};
+
 const ManuscriptAttributesSection = () => {
-  const { mode, manifest: manifestData } = useNodeReader();
+  const { mode, manifest } = useNodeReader();
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState(false);
   const [selectedBadge, setSelectedBadge] = useState("");
   const [isEditable, setIsEditable] = useState<boolean>(false);
 
+  const manifestData = { ...manifest };
+  const dpidIndex = manifestData?.dpid?.id || "-1";
+  if (ATTESTATION_PRELOAD_CACHE[dpidIndex]) {
+    manifestData.attributes = [
+      ...(manifestData.attributes || []),
+      ...(ATTESTATION_PRELOAD_CACHE[dpidIndex] || []),
+    ];
+  }
   // useEffect(() => {
   //   // PRELOAD ATTRIBUTE BADGES
   //   setTimeout(() => {
@@ -103,32 +143,8 @@ const ManuscriptAttributesSection = () => {
 
   return (
     <CollapsibleSection
-      forceExpand={mode === "editor"}
-      title={
-        <div className="flex w-full justify-between">
-          <div className="flex items-end">
-            <span>Attributes</span>
-            {mode === "editor" ? (
-              <span
-                className="text-sm text-[#65C3CA] cursor-pointer ml-1 mb-0.5 font-bold"
-                onClick={(e: React.MouseEvent<HTMLSpanElement>) => {
-                  e.stopPropagation();
-                  setIsEditable(!isEditable);
-                }}
-              >
-                {isEditable ? "Done" : "Edit"}
-              </span>
-            ) : null}
-          </div>
-          {mode === "reader" ? (
-            <TooltipIcon
-              icon={<IconInfo className="fill-black dark:fill-[white]" />}
-              id="manuscript-attributes"
-              tooltip="Verified Badges"
-            />
-          ) : null}
-        </div>
-      }
+      forceExpand={true}
+      title={null}
       collapseIconComponent={
         mode === "editor"
           ? () => {
@@ -170,12 +186,7 @@ const ManuscriptAttributesSection = () => {
         value={value}
         data={(BADGE_INFO as any)[selectedBadge]}
         onClose={() => setIsOpen(false)}
-        style={{
-          backgroundColor: "#EFEFEF",
-          color: "black",
-          width: 600,
-          margin: "3rem 0.75rem",
-        }}
+        style={{ overflow: "hidden" }}
         className="py-3 px-6 rounded-lg"
       />
     </CollapsibleSection>

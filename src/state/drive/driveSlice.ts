@@ -559,7 +559,7 @@ export const fetchTreeThunk = createAsyncThunk(
       const { tree } = await getDatasetTree(
         rootCid,
         currentObjectId!,
-        publicView || state.nodes.nodeReader.mode === "reader",
+        publicView, //  state.nodes.nodeReader.mode === "reader", this would be inferred from the node access control guard
         shareId
       );
       return { tree, manifest };

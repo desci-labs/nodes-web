@@ -16,16 +16,15 @@ import {
 
 interface ReaderViewerProps {
   isLoading: boolean;
+  isError: boolean;
 }
-export default function Reader({ isLoading }: ReaderViewerProps) {
+export default function Reader({ isLoading, isError }: ReaderViewerProps) {
   const dispatch = useSetter();
   const { manifest: manifestData, componentStack } = useNodeReader();
 
   useEffect(() => {
-    // setPublicView(true);
-    // setIsResearchPanelOpen(false);
     dispatch(setPublicView(true));
-    dispatch(toggleResearchPanel(false));
+    dispatch(toggleResearchPanel(true));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -36,7 +35,7 @@ export default function Reader({ isLoading }: ReaderViewerProps) {
   return (
     <>
       {isLoading && <Placeholder isLoading />}
-      {!isLoading && !manifestData ? <Placeholder isLoading={false} /> : ""}
+      {isError ? <Placeholder isError={isError} isLoading={false} /> : ""}
       {!isLoading && manifestData ? (
         <>
           <ComponentStackView />

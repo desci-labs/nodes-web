@@ -3,9 +3,9 @@ import Credits from "./Credits";
 // import OrganizationsSection from "./OrganizationsSection";
 import PropertyTagsSection from "./PropertyTagsSection";
 
-interface SourceTabProps {}
+interface CreditTabProps {}
 
-const SourceTab = (props: SourceTabProps) => {
+const CreditTab = (props: CreditTabProps) => {
   return (
     <div className="flex flex-col gap-0">
       <PropertyTagsSection />
@@ -15,4 +15,4 @@ const SourceTab = (props: SourceTabProps) => {
   );
 };
 
-export default SourceTab;
+export default CreditTab;
