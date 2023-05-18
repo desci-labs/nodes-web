@@ -173,7 +173,7 @@ export default function Login() {
       <PopOver
         isVisible
         containerClassName="flex items-center justify-center min-h-screen bg-neutrals-gray-3"
-        className="bg-zinc-100 dark:bg-zinc-900 rounded-lg !max-w-none !w-fit !mx-2 sm:m-[initial] sm:py-0 sm:w-[400px] sm:mx-12 !sm:my-3 overflow-visible"
+        className="bg-neutrals-black rounded-lg !max-w-none !w-fit !mx-2 sm:m-[initial] sm:py-0 sm:w-[400px] sm:mx-12 !sm:my-3 overflow-visible"
         footer={useCallback(
           () => (
             <Footer
@@ -197,13 +197,13 @@ export default function Login() {
         }}
       >
         <form onSubmit={handleSubmit}>
-          <div className="px-6 py-5">
-            <div className="flex flex-row justify-between items-start mb-4">
+          <div className="px-6 pt-5">
+            <div className="flex flex-row justify-between items-start ">
               <div className="text-left flex gap-0.5 flex-col">
-                <span className="block text-2xl font-bold text-white">
+                <span className="block text-lg font-bold text-white">
                   {labels[step].title}
                 </span>
-                <span className="text-sm max-w-[380px] block text-neutrals-gray-5">
+                <span className="text-sm max-w-[380px] block font-medium text-neutrals-gray-5">
                   {labels[step].caption}
                 </span>
               </div>
@@ -277,7 +277,7 @@ export default function Login() {
                     disabled: isLoading,
                   }}
                 />
-                <div className="text-neutrals-gray-5 mb-4 text-xs border-tint-primary-300 gap-1 justify-center items-center p-4 rounded-md flex flex-row">
+                <div className="text-neutrals-gray-5 mb-6 text-xs border-tint-primary-300 gap-1 justify-center items-center rounded-md flex flex-row">
                   Email sent to <b className="text-white">{email}</b>
                 </div>
               </div>
