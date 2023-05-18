@@ -14,6 +14,7 @@ type State = {
   mirrors: PublicDataReferenceOnIpfsMirror[];
   node: Node | null;
   nodeVersion: NodeVersion | null;
+  loading: boolean;
 };
 
 export default function useVersionDetails(transactionHash: string) {
@@ -23,6 +24,7 @@ export default function useVersionDetails(transactionHash: string) {
     mirrors: [],
     node: null,
     nodeVersion: null,
+    loading: true,
   });
 
   function getTotalCopies(
@@ -50,7 +52,7 @@ export default function useVersionDetails(transactionHash: string) {
       setState((prev) => ({
         ...prev,
         size: size || fallbackSize,
-
+        loading: false,
         node: data.node,
         nodeVersion: data.nodeVersion,
         copies: isPublished ? getTotalCopies(data.publicDataReferences) : 0,

@@ -1,13 +1,5 @@
 export const PDF_LICENSE_TYPES = [
   {
-    id: 0,
-    name: "CC0",
-    shortName: "CC0",
-    spdx: "CC0-1.0",
-    description:
-      "This license is the most permissive license available. It allows reuse of the software for any purpose, including commercial purposes, and allows the software to be modified and redistributed without restriction.",
-  },
-  {
     id: 1,
     name: "CC BY",
     shortName: "CC BY",
@@ -24,12 +16,20 @@ export const PDF_LICENSE_TYPES = [
       "This license lets others remix, adapt, and build upon your work even for commercial purposes, as long as they credit you and license their new creations under the identical terms.",
   },
   {
+    id: 0,
+    name: "CC0",
+    shortName: "CC0",
+    spdx: "CC0-1.0",
+    description:
+      "This license is the most permissive license available. It allows reuse of the software for any purpose, including commercial purposes, and allows the software to be modified and redistributed without restriction.",
+  },
+  {
     id: 3,
     name: "CC BY-NC",
     shortName: "CC BY-NC",
     spdx: "CC-BY-NC-4.0",
     description:
-      "This license lets others remix, adapt, and build upon your work non-commercially, and although their new works must also acknowledge you and be non-commercial, they don’t have to license their derivative works on the same terms.",
+      "This license lets others remix, adapt, and build upon your work non-commercially, and although their new works must also acknowledge you and be non-commercial, they don't have to license their derivative works on the same terms.",
   },
   {
     id: 4,

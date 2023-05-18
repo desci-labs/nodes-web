@@ -15,23 +15,23 @@ const AdvancedSlideDown = ({
   return (
     <>
       <div
-        className={`flex flex-rows text-xs gap-2 items-center justify-end cursor-pointer group hover:text-neutrals-gray-6 select-none overflow-hidden ${
+        className={`flex flex-rows text-sm gap-2 items-center justify-start cursor-pointer group text-tint-primary font-bold hover:text-neutrals-gray-6 select-none overflow-hidden ${
           className ? className : ""
         }`}
         onClick={() => rest.setClosed(!rest.closed)}
       >
+        {rest.closed ? "Hide" : "View"} Additional Information
         {rest.closed ? (
           <IconChevronUp
             width={12}
-            className="fill-white group-hover:fill-neutrals-gray-6"
+            className="fill-tint-primary group-hover:fill-neutrals-gray-6"
           />
         ) : (
           <IconChevronDown
             width={12}
-            className="fill-white group-hover:fill-neutrals-gray-6"
+            className="fill-tint-primary group-hover:fill-neutrals-gray-6"
           />
-        )}{" "}
-        Advanced
+        )}
       </div>
       <SlideDown
         {...rest}

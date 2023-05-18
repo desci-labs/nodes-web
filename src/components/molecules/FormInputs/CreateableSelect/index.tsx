@@ -13,7 +13,7 @@ const CreateableSelectComponent = (props: CreateableSelectProps) => {
     field: { value = [], onChange },
     label,
     useSpaceAsSeparator,
-    optional
+    optional,
   } = props;
   const tagInputRef = useRef<HTMLInputElement>(null);
 
@@ -55,12 +55,18 @@ const CreateableSelectComponent = (props: CreateableSelectProps) => {
   return (
     <div className="border-b border-b-neutrals-gray-5 group rounded-md px-3 pt-2 shadow-sm bg-white dark:bg-neutrals-gray-1 w-full">
       <label className="block text-xs font-medium text-gray-900 dark:text-white pointer-events-none">
-        {label}{optional ? <>&nbsp;<span className="text-gray-500">(optional)</span></> : null}
+        {label}
+        {optional ? (
+          <>
+            &nbsp;
+            <span className="text-neutrals-gray-5 text-[10px]">(optional)</span>
+          </>
+        ) : null}
       </label>
       <div className="input-tag">
         <ul className="input-tag__tags">
           {value.map((tag: string, i: number) => (
-            <li key={tag} className="bg-tint-primary">
+            <li key={tag} className="bg-tint-primary h-2 inline-block">
               <div className="input-tag__label">{tag}</div>
               <button
                 type="button"

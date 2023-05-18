@@ -217,7 +217,7 @@ const DriveDatasetMetadataEditor = (
                   methods.formState.isDirty ? onHandleDismiss : props?.onClose
                 }
                 title="Edit Metadata"
-                subTitle=" Please fill in the metadata for open access data."
+                subTitle="Please fill in the metadata for open access data."
               />
               <div className="px-1">
                 {/**Have to force a re-render with props.isVisible */}
