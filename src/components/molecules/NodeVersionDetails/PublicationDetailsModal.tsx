@@ -1,7 +1,7 @@
 import PopOver from "@components/organisms/PopOver";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { BytesToHumanFileSize } from "@components/utils";
-import { IconX } from "@icons";
+import { IconCopyLink, IconX } from "@icons";
 import { ReactNode, useEffect, useState } from "react";
 import Copier from "../Copier";
 import useVersionDetails from "./useVersionDetails";
@@ -22,21 +22,12 @@ export default function PublicationDetailsModal(props: any) {
   const { manifest: manifestData } = useNodeReader();
   const { selectedHistory } = useHistoryReader();
 
-  const { size, copies, node, mirrors } = useVersionDetails(
+  const { size, copies, node, mirrors, loading } = useVersionDetails(
     selectedHistory?.data?.transaction?.id ?? ""
   );
 
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    if (mirrors && mirrors.length > 0) {
-      setIsLoading(false);
-    }
-  }, [mirrors]);
-
   const [closed, setClosed] = useState(false);
   const onClose = () => {
-    setIsLoading(true);
     setClosed(false);
     setShowPublicationDetails(false);
   };
@@ -115,13 +106,13 @@ export default function PublicationDetailsModal(props: any) {
             title="Node Size"
             subTitle="Size of the stored data published on this version of your node."
             detail={BytesToHumanFileSize(preloadCacheResult || size)}
-            isLoading={isLoading}
+            isLoading={loading}
           />
           <Details
             title="Data Copies"
             subTitle="Multiple archival copies of your Node are kept with automated integrity verification. "
             detail={(6).toString()}
-            isLoading={isLoading}
+            isLoading={loading}
           />
         </div>
         {/* <Divider />
@@ -137,7 +128,7 @@ export default function PublicationDetailsModal(props: any) {
           className="overflow-hidden"
         >
           <Divider />
-          {isLoading ? (
+          {loading ? (
             <>
               <DefaultSpinner size={32} color="white" />
             </>
@@ -195,7 +186,7 @@ function Details(props: {
       className={`flex flex-col items-start justify-between ${
         props.gradient
           ? "bg-gradient-to-r from-black to-neutrals-gray-1 rounded-[4px] px-4 py-2 -my-2 -mx-4 pseudo-border mb-0"
-          : " gap-2"
+          : "gap-1"
       }`}
     >
       <span className="text-lg font-bold">{props.title}</span>
@@ -213,20 +204,27 @@ function Details(props: {
         )}
         <div className="flex gap-2 flex-none">
           {props.detail && (
-            <div className="flex-none select-text -mt-8 text-[10px] text-white text-center font-bold border-2 border-neutrals-gray-2 bg-black min-w-16 w-24 px-2 py-2 rounded-xl">
+            <div className="flex-none select-text -mt-6 items-center justify-center font-mono text-[10px] text-white text-center font-bold border-2 border-neutrals-gray-2 bg-black min-w-[80px] w-fit px-1 py-1 rounded-xl">
               {props.isLoading ? (
-                <DefaultSpinner height={16} color="white" className="-ml-3" />
+                <DefaultSpinner
+                  height={16}
+                  color="white"
+                  className="w-[16px]"
+                />
               ) : (
                 props.detail
               )}
             </div>
           )}
           {props.copy && (
-            <div className="flex items-center justify-center text-center border-none w-8 bg-black p-2 text-sm rounded-xl">
+            <div className="flex -mt-4 items-center justify-center text-center border-none w-8 bg-black text-sm rounded-xl p-2">
               <Copier
                 text={props.copy}
                 icon={(props) => (
-                  <LinkIcon className="w-8 cursor-pointer" {...props} />
+                  <IconCopyLink
+                    className="w-8 cursor-pointer fill-white h-4"
+                    {...props}
+                  />
                 )}
               />
             </div>
