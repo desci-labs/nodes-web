@@ -106,7 +106,13 @@ export const DatasetMetadataForm = React.forwardRef(
               <CreateableSelect label="Keywords" field={field} />
             )}
           />
-          <div className="text-xs mt-1">Keywords aid in discovery.</div>
+          <div className="text-xs mt-1">
+            Keywords aid in discovery. Press enter or comma{" "}
+            <pre className="inline-block px-1 bg-neutrals-gray-1 text-neutrals-gray-8">
+              ,
+            </pre>{" "}
+            to add a keyword
+          </div>
         </div>
 
         <div className="py-3 my-3">

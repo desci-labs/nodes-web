@@ -81,19 +81,10 @@ const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
         [
           ResearchObjectComponentType.PDF,
           ResearchObjectComponentType.CODE,
+          ResearchObjectComponentType.DATA,
         ].includes(
           fileMetadataBeingEdited.componentType as ResearchObjectComponentType
         ) && (
-          <ComponentMetadataPopover
-            isVisible={!!fileMetadataBeingEdited}
-            onClose={() => {
-              dispatch(setFileMetadataBeingEdited(null));
-            }}
-          />
-        )}
-      {fileMetadataBeingEdited &&
-        fileMetadataBeingEdited.componentType ===
-          ResearchObjectComponentType.DATA && (
           <DriveDatasetMetadataPopOver
             isVisible={!!fileMetadataBeingEdited}
             onClose={() => {
