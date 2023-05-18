@@ -29,6 +29,7 @@ type SelectOption = {
 };
 interface SelectListProps {
   label: string;
+  labelRenderer?: (option: SelectOption) => JSX.Element;
   value?: SelectOption;
   onSelect?: (value: any) => void;
   data: any[];
@@ -50,6 +51,7 @@ export default function SelectList(props: SelectListProps) {
     mandatory = false,
     defaultValue,
     title,
+    labelRenderer,
   } = props;
   const { ref, ...fieldWithoutRef } = field;
   const [touched, setTouched] = useState<boolean>(false);
@@ -90,7 +92,9 @@ export default function SelectList(props: SelectListProps) {
                 </div>
               ) : null}
               <span className="block truncate font-bold text-white">
-                {value?.name || label}
+                {(value?.name && labelRenderer
+                  ? labelRenderer(value)
+                  : value?.name) || label}
               </span>
             </span>
             <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -103,12 +107,12 @@ export default function SelectList(props: SelectListProps) {
         </ListboxButton>
         <ListboxPopover
           portal={true}
-          className="relative mt-2 max-h-96"
+          className="relative max-h-96"
           onBlur={() => {
             setTouched(true);
           }}
         >
-          <PerfectScrollbar className="max-h-96 min-h-[120px] h-fit overflow-hidden overflow-y-scroll">
+          <div className="max-h-96 min-h-[120px] h-fit overflow-hidden overflow-y-scroll">
             <Transition
               show={true}
               as={Fragment}
@@ -116,8 +120,8 @@ export default function SelectList(props: SelectListProps) {
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <div className="absolute z-[1044] w-full h-full bg-white dark:bg-[#272727] shadow-lg rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm list-none">
-                {label && (
+              <div className="absolute z-[1044] w-full h-full bg-white dark:bg-[#272727] shadow-lg rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm list-none border border-neutrals-gray-4">
+                {label && !value?.name && (
                   <ListboxOption
                     className={classNames(
                       "hover:text-white hover:bg-indigo-600 hover:dark:bg-[#525659] text-gray-900 dark:text-white cursor-pointer select-none relative py-2 pl-3 pr-9"
@@ -159,7 +163,11 @@ export default function SelectList(props: SelectListProps) {
                                 {person.avatar}
                               </div>
                             ) : null}{" "}
-                            <span className="pl-2">{person.name}</span>
+                            <span className="pl-2">
+                              {labelRenderer
+                                ? labelRenderer(person)
+                                : person.name}
+                            </span>
                           </span>
                         </div>
 
@@ -178,7 +186,7 @@ export default function SelectList(props: SelectListProps) {
                 })}
               </div>
             </Transition>
-          </PerfectScrollbar>
+          </div>
         </ListboxPopover>
       </StyledListBoxInput>
     </div>

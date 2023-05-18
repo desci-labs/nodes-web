@@ -58,7 +58,8 @@ const CreateableSelectComponent = (props: CreateableSelectProps) => {
         {label}
         {optional ? (
           <>
-            &nbsp;<span className="text-gray-500">(optional)</span>
+            &nbsp;
+            <span className="text-neutrals-gray-5 text-[10px]">(optional)</span>
           </>
         ) : null}
       </label>
