@@ -11,6 +11,28 @@ import SelectList from "@src/components/molecules/FormInputs/SelectList";
 import { DriveMetadata } from "@src/components/organisms/Drive";
 import { PDF_LICENSE_TYPES } from "@src/helper/license";
 
+export const licenseSelectLabelRenderer = (l: any) => {
+  let licenseMapColor: { [key: string]: string } = {
+    "CC BY": "bg-green-500",
+    "CC BY-SA": "bg-green-500",
+    "CC BY-ND": "bg-red-500",
+    "CC BY-NC": "bg-yellow-300",
+    "CC BY-NC-SA": "bg-yellow-300",
+    "CC BY-NC-ND": "bg-red-500",
+    CC0: "bg-green-500",
+  };
+  return (
+    <div className="inline-flex justify-center gap-2 items-center h-4">
+      <div
+        className={`${
+          licenseMapColor[l.name] || "bg-red-500"
+        } rounded-full h-2 w-2`}
+      ></div>
+      <span>{l.name}</span>
+    </div>
+  );
+};
+
 interface DatasetMetadataFormProps {
   onSubmit: (data: DataComponent["payload"]) => void;
   loading?: boolean;
@@ -176,7 +198,7 @@ export const DatasetMetadataForm = React.forwardRef(
         <SpacerHorizontal />
         <div className="text-lg font-bold mt-3 text-white">Licensing</div>
 
-        <div className="py-3 my-3">
+        <div className="my-3">
           <Controller
             name="licenseType"
             control={control}
@@ -188,27 +210,7 @@ export const DatasetMetadataForm = React.forwardRef(
                   label="Choose license"
                   mandatory={true}
                   data={PDF_LICENSE_TYPES}
-                  labelRenderer={(l) => {
-                    let licenseMapColor: { [key: string]: string } = {
-                      "CC BY": "bg-green-500",
-                      "CC BY-SA": "bg-green-500",
-                      "CC BY-ND": "bg-red-500",
-                      "CC BY-NC": "bg-yellow-300",
-                      "CC BY-NC-SA": "bg-yellow-300",
-                      "CC BY-NC-ND": "bg-red-500",
-                      CC0: "bg-green-500",
-                    };
-                    return (
-                      <div className="inline-flex justify-center gap-2 items-center h-4">
-                        <div
-                          className={`${
-                            licenseMapColor[l.name] || "bg-red-500"
-                          } rounded-full h-2 w-2`}
-                        ></div>
-                        <span>{l.name}</span>
-                      </div>
-                    );
-                  }}
+                  labelRenderer={licenseSelectLabelRenderer}
                   field={{
                     ...field,
                     value: val || field.value || defaultLicense,

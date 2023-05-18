@@ -56,7 +56,7 @@ export default function SelectList(props: SelectListProps) {
   const { ref, ...fieldWithoutRef } = field;
   const [touched, setTouched] = useState<boolean>(false);
 
-  let value = field?.value || props?.value || defaultValue;
+  let value = field?.value || props?.value;
   onSelect = field?.onChange || onSelect;
   const chosen = data && value && data.filter((p: any) => p.name === value)[0];
 
@@ -121,30 +121,11 @@ export default function SelectList(props: SelectListProps) {
               leaveTo="opacity-0"
             >
               <div className="absolute z-[1044] w-full h-full bg-white dark:bg-[#272727] shadow-lg rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm list-none border border-neutrals-gray-4">
-                {label && !value?.name && (
-                  <ListboxOption
-                    className={classNames(
-                      "hover:text-white hover:bg-indigo-600 hover:dark:bg-[#525659] text-gray-900 dark:text-white cursor-pointer select-none relative py-2 pl-3 pr-9"
-                    )}
-                    value={label}
-                  >
-                    <div className="flex items-center">
-                      <span
-                        className={classNames(
-                          "font-normal",
-                          "block truncate text-md"
-                        )}
-                      >
-                        <span className="pl-2">{label}</span>
-                      </span>
-                    </div>
-                  </ListboxOption>
-                )}
                 {data.map((person: SelectOption) => {
                   const selected = person.name === value?.name;
                   return (
                     <ListboxOption
-                      key={person.id}
+                      key={`listbox_${person.id}`}
                       className={classNames(
                         "hover:text-white hover:bg-indigo-600 hover:dark:bg-[#525659] text-gray-900 dark:text-white cursor-pointer select-none relative py-2 pl-3 pr-9"
                       )}
