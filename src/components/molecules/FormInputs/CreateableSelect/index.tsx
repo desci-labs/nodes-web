@@ -54,7 +54,10 @@ const CreateableSelectComponent = (props: CreateableSelectProps) => {
 
   return (
     <div className="border-b border-b-neutrals-gray-5 group rounded-md px-3 pt-2 shadow-sm bg-white dark:bg-neutrals-gray-1 w-full">
-      <label className="block text-xs font-medium text-gray-900 dark:text-white pointer-events-none">
+      <label
+        className="block text-xs font-medium text-gray-900 dark:text-white"
+        onClick={() => tagInputRef.current?.focus()}
+      >
         {label}
         {optional ? (
           <>

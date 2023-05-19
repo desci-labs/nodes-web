@@ -276,7 +276,7 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
               onClick={() => onSetResearchPanelTab(ResearchTabs.current)}
             >
               <p className="text-xs flex justify-center items-center h-full">
-                Current
+                Components
               </p>
             </SwitchButton>
             <SwitchButton

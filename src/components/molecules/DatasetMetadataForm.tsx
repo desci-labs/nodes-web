@@ -79,7 +79,7 @@ export const DatasetMetadataForm = React.forwardRef(
             control={control}
             render={({ field, value, fieldState }: any) => (
               <InsetLabelSmallInput
-                label="Open Access Data Title"
+                label="Component Title"
                 labelClassName="text-xs"
                 value={value}
                 {...field}
