@@ -185,7 +185,7 @@ function Details(props: {
     <div
       className={`flex flex-col items-start justify-between ${
         props.gradient
-          ? "bg-gradient-to-r from-black to-neutrals-gray-1 rounded-[4px] px-4 py-2 -my-2 -mx-4 pseudo-border mb-0"
+          ? "bg-gradient-to-r from-black to-neutrals-gray-1 rounded-[4px] px-4 py-2 -my-2 -mx-4 border-white border mb-0"
           : "gap-1"
       }`}
     >
