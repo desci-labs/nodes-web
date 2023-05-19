@@ -97,7 +97,7 @@ export default function PublicationDetailsModal(props: any) {
         </div>
         <div className="py-4 flex flex-col gap-5">
           <Details
-            title="Node dPID"
+            title={`Node dPID (v${dpidLink.match(/v(\d+)/)?.[1] || 1})`}
             subTitle={<Link href={dpidLink} />}
             copy={dpidLink}
             gradient={true}
