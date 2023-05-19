@@ -12,6 +12,7 @@ import useLogin, { Steps } from "./useLogin";
 import { useGetter } from "@src/store/accessors";
 import VerificationInput from "react-verification-input";
 import { MailIcon } from "@heroicons/react/solid";
+import { termsConsent } from "@src/api";
 
 const labels: Record<Steps, { title: string; caption: string }> = {
   [Steps.AutoLogin]: {
@@ -134,6 +135,12 @@ export default function Login() {
     if (inputRef.current?.checkValidity()) {
       if (step === Steps.ConfirmEmail) {
         onSubmitEmail(email);
+        termsConsent(
+          {
+            email,
+          },
+          ""
+        );
       }
     }
     if (codeRef.current) {
