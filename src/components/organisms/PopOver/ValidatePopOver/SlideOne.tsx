@@ -1,5 +1,8 @@
 import { IconX } from "@icons";
-import { ResearchObjectV1Validation, ResearchObjectValidationType } from "@desci-labs/desci-models";
+import {
+  ResearchObjectV1Validation,
+  ResearchObjectValidationType,
+} from "@desci-labs/desci-models";
 import { useCallback, useEffect } from "react";
 import { ArcSimple } from ".";
 import SelectMenu from "@src/components/molecules/FormInputs/SelectMenu";
@@ -220,7 +223,7 @@ const SlideOne = (props: SlideOneProps) => {
           {renderDescription(arc)}
         </div>
       </div>
-      <div className="flex flex-row justify-end items-center h-16 w-full dark:bg-[#272727] border-t border-t-[#81C3C8] rounded-b-lg p-4">
+      <div className="flex flex-row justify-end items-center h-16 w-full dark:bg-[#272727] border-t border-t-tint-primary rounded-b-lg p-4">
         <button
           disabled={!validationType && !arc}
           className={`${

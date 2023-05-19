@@ -27,6 +27,8 @@ const ComponentUseModal = ({
 }: ModalProps & ComponentUseModalProps) => {
   const { manifest: manifestData, mode } = useNodeReader();
   const { dpid, cid, license } = useComponentDpid(file);
+  const fqDpid = `${dpid}/${file.path?.replace(/^root\//, "data/")}`;
+
   const handler = useActionHandler();
   const dispatch = useSetter();
 
@@ -59,13 +61,13 @@ const ComponentUseModal = ({
       $scrollOverlay={true}
     >
       <div className="max-w-[1150px]">
-        <div className="px-6 py-5 text-white relative lg:max-w-[90vw]">
+        <div className="px-6 py-4 text-white relative lg:max-w-[90vw]">
           <Modal.Header
             title="Interact with Node using dPID"
             subTitle="You can use the granular dPID of the file you have selected interact with the associated data."
             onDismiss={close}
           />
-          <div className="w-full grid grid-cols-1 lg:grid-cols-1 place-content-center gap-4 justify-items-center mt-8 overflow-hidden overflow-x-auto">
+          <div className="w-full grid grid-cols-1 lg:grid-cols-1 place-content-center gap-4 justify-items-center overflow-hidden overflow-x-auto">
             {/* <section className="hidden max-h-[700px] lg:block max-w-[512px]">
               {/* Max height should roughly match the right side of this modal }
               <VideoAnimation />
@@ -82,6 +84,16 @@ const ComponentUseModal = ({
                 </CodeBox>
                 <DividerSimple />
               </div>
+              <div>
+                <CopyBox
+                  title="dPID"
+                  copyButtonText="Copy dPID"
+                  className="my-6 w-full overflow-hidden pr-2"
+                  copyText={fqDpid}
+                >
+                  <>{fqDpid}</>
+                </CopyBox>
+              </div>
               <div className="mt-6">
                 <h1 className="font-bold">Use Edge Compute</h1>
                 <span className="text-neutrals-gray-4">
@@ -97,14 +109,6 @@ const ComponentUseModal = ({
                   </a>
                 </span>
                 <CopyBox
-                  title="dPID"
-                  copyButtonText="Copy dPID"
-                  className="my-6 w-full overflow-hidden pr-2"
-                  copyText={dpid}
-                >
-                  <>{dpid}</>
-                </CopyBox>
-                <CopyBox
                   title="CID"
                   copyButtonText="Copy CID"
                   className="my-6 w-full overflow-hidden pr-2"
@@ -112,7 +116,6 @@ const ComponentUseModal = ({
                 >
                   <>{cid}</>
                 </CopyBox>
-                <DividerSimple />
               </div>
               {/* <div className="my-6">
                 <h1 className="font-bold">Import Locally</h1>
@@ -138,7 +141,10 @@ const ComponentUseModal = ({
                 </CopyBox>
                 <DividerSimple />
               </div> */}
-              <div className="my-6">
+              <div className={`my-6 ${canPreview ? "" : "hidden"}`}>
+                <div className="mb-4">
+                  <DividerSimple />
+                </div>
                 <h2>Preview in Nodes IDE</h2>
                 <span className="text-neutrals-gray-4">
                   View data and run compute directly in Nodes IDE.

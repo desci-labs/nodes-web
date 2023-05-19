@@ -1,6 +1,9 @@
 import CurrencyInput from "@components/molecules/FormInputs/CurrencyInput";
 import { IconEthereum, IconX } from "@icons";
-import { ResearchObjectV1Validation, ResearchObjectValidationType } from "@desci-labs/desci-models";
+import {
+  ResearchObjectV1Validation,
+  ResearchObjectValidationType,
+} from "@desci-labs/desci-models";
 import { ArcSimple } from ".";
 import { __log } from "@components/utils";
 
@@ -102,7 +105,7 @@ const SlideTwo = (props: SlideTwoProps) => {
                 {/* <div>O</div> */}
               </div>
             </div>
-            <div className="flex flex-row justify-between items-center py-2.5 px-3 bg-[#272727] border-t border-t-[#222222] dark:border-t-[#81C3C8]">
+            <div className="flex flex-row justify-between items-center py-2.5 px-3 bg-[#272727] border-t border-t-[#222222] dark:border-t-tint-primary">
               <div className="text-sm font-bold flex items-center justify-center">
                 Grant: <IconEthereum /> {amount || 0}
               </div>
@@ -114,7 +117,7 @@ const SlideTwo = (props: SlideTwoProps) => {
           </div>
         </div>
       </div>
-      <div className="flex flex-row justify-end items-center h-16 w-full dark:bg-[#272727] border-t border-t-[#81C3C8] rounded-b-lg p-4">
+      <div className="flex flex-row justify-end items-center h-16 w-full dark:bg-[#272727] border-t border-t-tint-primary rounded-b-lg p-4">
         <button
           disabled={!amount}
           className={`${

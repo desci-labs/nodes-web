@@ -17,6 +17,7 @@ export default function useComponentDpid(componentToUse?: DriveObject) {
   const { currentObjectId, manifest: manifestData } = useNodeReader();
 
   const isDpidSupported = !!manifestData?.dpid;
+
   const version = versionIndex?.versions.length - 1 || 1;
   const dpidLink = useMemo(
     () =>
@@ -45,7 +46,7 @@ export default function useComponentDpid(componentToUse?: DriveObject) {
       ...DEFAULT_VALUE,
       license: umbrellaLicense,
     };
-    if (!componentToUse) return { ...DEFAULT_WITH_LICENSE, dpid: dpidLink, };
+    if (!componentToUse) return { ...DEFAULT_WITH_LICENSE, dpid: dpidLink };
 
     const component =
       componentToUse.type === FileType.DIR
@@ -106,13 +107,7 @@ export default function useComponentDpid(componentToUse?: DriveObject) {
           fqiDataSuffix ? `/${fqiDataSuffix}` : ""
         }`;
 
-    let codeLink = `${window.location.protocol}//${window.location.host}/${fqi}`;
-
-    const dpid = isDpidSupported
-      ? component.componentType === ResearchObjectComponentType.CODE
-        ? codeLink
-        : link
-      : "";
+    const dpid = isDpidSupported ? link : "";
 
     return { dpid, fqi, license, cid: component.cid };
   }, [
