@@ -152,7 +152,10 @@ export default function DriveRow({
             </div>
           )}
         </div>
-        <span className="truncate max-w-sm align-middle leading-loose">
+        <span
+          title={file.name}
+          className="truncate max-w-[17rem] w-full align-middle leading-loose"
+        >
           {file.name}
         </span>
       </li>

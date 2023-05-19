@@ -37,7 +37,7 @@ export default function Explorer() {
             onClick={() => onSetResearchPanelTab(ResearchTabs.current)}
           >
             <p className="text-xs flex justify-center items-center h-full">
-              Current
+              Components
             </p>
           </SwitchButton>
           <SwitchButton
@@ -45,7 +45,7 @@ export default function Explorer() {
             onClick={() => onSetResearchPanelTab(ResearchTabs.history)}
           >
             <p className="text-xs flex justify-center items-center h-full">
-              History
+              Activity
             </p>
           </SwitchButton>
           <SwitchButton
