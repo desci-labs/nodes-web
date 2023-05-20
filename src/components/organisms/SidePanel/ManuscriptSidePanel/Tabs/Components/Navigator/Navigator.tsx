@@ -203,7 +203,7 @@ const Navigator = () => {
               }),
             }}
           >
-            {cardComponents && cardComponents.length && (
+            {!!cardComponents?.length && (
               <>{renderEditableComponents(cardComponents)}</>
             )}
             {cardComponents?.length === 0 && (
