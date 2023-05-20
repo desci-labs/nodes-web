@@ -134,7 +134,7 @@ const ShareModal = React.memo((props: ModalProps) => {
                       height={20}
                     />
                   )}
-                  <span className="ml-1 font-inter">
+                  <span className="ml-1 font-inter capitalize">
                     {isLoading ? "Creating link" : "Create private link"}
                   </span>
                 </FlexRowAligned>

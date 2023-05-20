@@ -23,7 +23,7 @@ export const SwitchButton: any = styled.div.attrs(
   border-bottom: 0;
 `;
 export const SwitchBar = styled(FlexRow).attrs({
-  className: "border-[1px] border-muted-300 dark:border-muted-900",
+  className: "border-[1px] border-muted-300 dark:border-black",
 })`
   border-radius: 8px;
   overflow: hidden;
