@@ -89,7 +89,7 @@ const Footer = ({ step, goBack, nextStep, isLoading, code }: any) => {
         {[Steps.ConfirmEmail, Steps.VerifyCode].includes(step) && (
           <PrimaryButton
             disabled={
-              isLoading || (step == Steps.VerifyCode && code?.length < 6)
+              isLoading || (step === Steps.VerifyCode && code?.length < 6)
             }
             type="submit"
             onClick={nextStep}
@@ -99,7 +99,7 @@ const Footer = ({ step, goBack, nextStep, isLoading, code }: any) => {
             {isLoading && checkingCode && (
               <DefaultSpinner color="white" size={20} />
             )}
-            {step == Steps.VerifyCode && isLoading && !checkingCode && (
+            {step === Steps.VerifyCode && isLoading && !checkingCode && (
               <IconGreenCheck width={20} />
             )}
           </PrimaryButton>
