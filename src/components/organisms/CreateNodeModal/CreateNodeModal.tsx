@@ -33,6 +33,7 @@ import { useNavigate } from "react-router-dom";
 import { useManuscriptController } from "../ManuscriptReader/ManuscriptController";
 import FieldSelector from "./FieldSelector";
 import { PDF_LICENSE_TYPES } from "@src/helper/license";
+import { licenseSelectLabelRenderer } from "@src/components/molecules/DatasetMetadataForm";
 interface CreateNodeModalProps {
   isOpen: boolean;
   onDismiss: () => void;
@@ -216,9 +217,14 @@ export default memo(function CreateNodeModal({
           data={PDF_LICENSE_TYPES}
           className="mt-2"
           value={manifestLicense}
+          labelRenderer={licenseSelectLabelRenderer}
           onSelect={(value: any) => setManifestLicense(value)}
         />
-        <hr className="mt-6 mb-6 border-neutrals-gray-3" />
+        <p className="text-neutrals-gray-5 text-sm mt-2">
+          {manifestLicense &&
+            manifestLicense.description &&
+            manifestLicense.description}{" "}
+        </p>
       </div>
       <div className="flex flex-row justify-end items-center bg-neutrals-gray-1 border-t border-t-tint-primary rounded-b-md px-4 py-3">
         <PrimaryButton

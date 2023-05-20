@@ -166,17 +166,24 @@ const ManuscriptAttributesSection = () => {
         {manifestData &&
           manifestData.attributes &&
           manifestData.attributes.map((attr: any, index: number) => (
-            <img
-              className={`cursor-pointer ${attr.value ? "" : "opacity-20"}`}
-              src={((BADGE_INFO as any)[attr.key] as any).small}
+            <TooltipIcon
+              icon={
+                <img
+                  className={`cursor-pointer ${attr.value ? "" : "opacity-20"}`}
+                  src={((BADGE_INFO as any)[attr.key] as any).small}
+                  key={attr.key}
+                  style={{ width: 45 }}
+                  alt=""
+                  onClick={() => {
+                    setIsOpen(true);
+                    setSelectedBadge(attr.key);
+                    setValue(attr.value);
+                  }}
+                />
+              }
+              placement="bottom"
+              tooltip={((BADGE_INFO as any)[attr.key] as any).title}
               key={attr.key}
-              style={{ width: 45 }}
-              alt=""
-              onClick={() => {
-                setIsOpen(true);
-                setSelectedBadge(attr.key);
-                setValue(attr.value);
-              }}
             />
           ))}
       </div>

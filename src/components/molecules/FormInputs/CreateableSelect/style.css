@@ -59,14 +59,14 @@
   flex-direction: row;
   font-weight: 500;
   list-style: none;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
   margin-right: 0px;
-  margin-left: 5px;
-  padding: 0px 5px 0px 10px;
+  margin-left: 4px;
+  padding: 0px 4px 0px 10px;
   max-width: 100%;
   min-width: 0;
-  font-size: 0.8rem;
-  height: 30px;
+  font-size: 14px;
+  height: 28px;
 }
 .input-tag__tags li:first-child {
   margin-left: 0;
@@ -77,6 +77,11 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: black;
+}
+
+.input-tag__tags li button:hover {
+  color: #444;
 }
 
 .input-tag__tags li button {
@@ -88,12 +93,13 @@
   color: black;
   cursor: pointer;
   display: inline-flex;
-  font-size: 20px;
+  font-size: 28px;
   height: 15px;
   justify-content: center;
   line-height: 0;
   margin-left: 8px;
-  margin-right: -4px;
+  margin-top: -4px;
+  margin-right: 0px;
   padding: 0;
   transform: rotate(45deg);
   width: 15px;

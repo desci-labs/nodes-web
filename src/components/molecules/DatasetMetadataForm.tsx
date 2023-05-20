@@ -11,6 +11,28 @@ import SelectList from "@src/components/molecules/FormInputs/SelectList";
 import { DriveMetadata } from "@src/components/organisms/Drive";
 import { PDF_LICENSE_TYPES } from "@src/helper/license";
 
+export const licenseSelectLabelRenderer = (l: any) => {
+  let licenseMapColor: { [key: string]: string } = {
+    "CC BY": "bg-green-500",
+    "CC BY-SA": "bg-green-500",
+    "CC BY-ND": "bg-red-500",
+    "CC BY-NC": "bg-yellow-300",
+    "CC BY-NC-SA": "bg-yellow-300",
+    "CC BY-NC-ND": "bg-red-500",
+    CC0: "bg-green-500",
+  };
+  return (
+    <div className="inline-flex justify-center gap-2 items-center h-4">
+      <div
+        className={`${
+          licenseMapColor[l.name] || "bg-red-500"
+        } rounded-full h-2 w-2`}
+      ></div>
+      <span>{l.name}</span>
+    </div>
+  );
+};
+
 interface DatasetMetadataFormProps {
   onSubmit: (data: DataComponent["payload"]) => void;
   loading?: boolean;
@@ -57,7 +79,7 @@ export const DatasetMetadataForm = React.forwardRef(
             control={control}
             render={({ field, value, fieldState }: any) => (
               <InsetLabelSmallInput
-                label="Open Access Data Title"
+                label="Component Title"
                 labelClassName="text-xs"
                 value={value}
                 {...field}
@@ -92,7 +114,7 @@ export const DatasetMetadataForm = React.forwardRef(
         </div>
         <SpacerHorizontal />
         <div className="text-lg font-bold mt-3 text-white">
-          Enter Keywords & Controlled Vocabulary Terms
+          Keywords &amp; Controlled Vocabulary Terms
         </div>
         <div className="text-sm ">
           These fields are inherited from your node's global metadata.
@@ -103,10 +125,20 @@ export const DatasetMetadataForm = React.forwardRef(
             name="keywords"
             control={control}
             render={({ field }: any) => (
-              <CreateableSelect label="Keywords" field={field} />
+              <CreateableSelect
+                label="Keywords"
+                field={field}
+                optional={true}
+              />
             )}
           />
-          <div className="text-xs mt-1">Keywords aid in discovery.</div>
+          <div className="text-xs mt-1">
+            Keywords aid in discovery. Press enter or comma{" "}
+            <pre className="inline-block px-1 bg-neutrals-gray-1 text-neutrals-gray-8">
+              ,
+            </pre>{" "}
+            to add a keyword
+          </div>
         </div>
 
         <div className="py-3 my-3">
@@ -152,6 +184,7 @@ export const DatasetMetadataForm = React.forwardRef(
             render={({ field }: any) => (
               <CreateableSelect
                 label="Controlled Vocabulary Terms"
+                optional={true}
                 field={field}
               />
             )}
@@ -165,7 +198,7 @@ export const DatasetMetadataForm = React.forwardRef(
         <SpacerHorizontal />
         <div className="text-lg font-bold mt-3 text-white">Licensing</div>
 
-        <div className="py-3 my-3">
+        <div className="my-3">
           <Controller
             name="licenseType"
             control={control}
@@ -177,6 +210,7 @@ export const DatasetMetadataForm = React.forwardRef(
                   label="Choose license"
                   mandatory={true}
                   data={PDF_LICENSE_TYPES}
+                  labelRenderer={licenseSelectLabelRenderer}
                   field={{
                     ...field,
                     value: val || field.value || defaultLicense,
@@ -191,20 +225,18 @@ export const DatasetMetadataForm = React.forwardRef(
               {props.defaultLicense || "not set"}
             </span>
             <br />
-            You can change the license for this specific component, if
-            appropriate.
+            Choose the applicable license for this specific component.
             <a
               href="https://creativecommons.org/licenses/"
               rel="noreferrer"
               target="_blank"
-              className="flex gap-1 text-xs mb-1 group hover:text-tint-primary-hover text-tint-primary"
+              className="gap-1 text-xs mb-1 group hover:text-tint-primary-hover text-tint-primary inline-flex ml-1"
             >
               Learn more
               <IconViewLink
-                stroke={"inherit"}
                 width={12}
                 strokeWidth={0.5}
-                className="-mt-0.5 stroke-current"
+                className="-mt-0.5 stroke-tint-primary group-hover:stroke-tint-primary-hover"
               />
             </a>
           </div>

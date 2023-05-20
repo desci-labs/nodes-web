@@ -70,7 +70,7 @@ export default function ComponentsPreview() {
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
       {currentDrive && (
         <ButtonSecondary
           onClick={() => {
@@ -78,7 +78,6 @@ export default function ComponentsPreview() {
             dispatch(setShowComponentStack(true));
             mode === "editor" && dispatch(toggleMode());
           }}
-          className="mb-1"
         >
           View Node Drive
         </ButtonSecondary>
@@ -144,16 +143,16 @@ function ComponentPreview({
 
   return (
     <div
-      className="flex w-full gap-4 items-center bg-zinc-200 bg-neutrals-black active:bg-neutrals-gray-5 rounded-lg px-4 py-2 border border-black"
+      className="h-[52px] flex w-full h-full gap-3 items-center bg-neutrals-black active:bg-neutrals-gray-5 rounded-lg px-4 border border-black"
       onClick={onHandleClick}
     >
       <target.icon
         width={24}
         height={24}
-        wrapperClassName="w-[30px] h-[30px]"
-        className="p-[3px] fill-white stroke-white"
+        wrapperClassName="w-[27px] h-[38px]"
+        className="py-[3px] fill-white stroke-white"
       />
-      <span className="font-bold w-[calc(100%-80px)] truncate overflow-ellipsis">
+      <span className="text-sm pt-0.5 font-bold w-[calc(100%-80px)] truncate overflow-ellipsis">
         {component.name}
       </span>
     </div>

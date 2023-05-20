@@ -217,7 +217,7 @@ const DriveDatasetMetadataEditor = (
                   methods.formState.isDirty ? onHandleDismiss : props?.onClose
                 }
                 title="Edit Metadata"
-                subTitle=" Please fill in the metadata for open access data."
+                subTitle="Please fill in the metadata for this component or file."
               />
               <div className="px-1">
                 {/**Have to force a re-render with props.isVisible */}
@@ -237,7 +237,7 @@ const DriveDatasetMetadataEditor = (
                 {/* </PerfectScrollbar> */}
               </div>
             </div>
-            <div className="flex flex-row justify-end gap-4 items-center h-16 w-full dark:bg-[#272727] border-t border-t-[#81C3C8] rounded-b-lg p-4">
+            <div className="flex flex-row justify-end gap-4 items-center h-16 w-full dark:bg-[#272727] border-t border-t-tint-primary rounded-b-lg p-4">
               <PrimaryButton
                 onClick={() => {
                   if (publicView) {
