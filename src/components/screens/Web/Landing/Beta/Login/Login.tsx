@@ -262,7 +262,7 @@ export default function Login() {
                         ? "!border-transparent !outline-transparent !ring-none"
                         : ""
                     }`,
-                    character: `text-white !outline-0 bg-neutrals-gray-1 rounded-md rounded-b-none`,
+                    character: `text-white !outline-0 bg-neutrals-gray-1 rounded-md rounded-b-none shadow-Input`,
                     characterSelected: ` ${
                       focused ? "shadow-verifyInputActive" : "!text-transparent"
                     } `,
