@@ -1,11 +1,9 @@
 export default function NodeInvite() {
   return (
-    <div>
-      <h1>
-        Collaborators are able to view unpublished draft versions of your Node.
-      </h1>
-      <p className="text-sm italic mt-4">
-        Collaborators cannot currently edit your Node.
+    <div className="flex items-center justify-center">
+      <p className="text-sm max-w-[320px] text-center">
+        Collaborators can view unpublished drafts of your Node, but cannot edit
+        it currently.
       </p>
     </div>
   );
