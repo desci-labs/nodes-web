@@ -94,6 +94,7 @@ import { ReactComponent as IconComponentDiscussions } from "@images/icons/compon
 import { ReactComponent as IconComponentExternalApi } from "@images/icons/component-external-api.svg";
 import { ReactComponent as IconComponentRestrictedData } from "@images/icons/component-restricted-data.svg";
 import { ReactComponent as IconComponentMisc } from "@images/icons/component-misc.svg";
+import { ReactComponent as IconComponentOtherLink } from "@images/icons/other-link.svg";
 import { ReactComponent as IconComponentUnknown } from "@images/icons/component-unknown.svg";
 import { ReactComponent as IconLatex } from "@images/icons/a-icon-latex.svg";
 import { ReactComponent as IconAuthor } from "@images/icons/a-icon-author.svg";
@@ -161,6 +162,7 @@ const IconZoomIn = React.memo(IconZoomInBase);
 const IconZoomOut = React.memo(IconZoomOutBase);
 
 export {
+  IconComponentOtherLink,
   IconSvcLink,
   IconSvcColab,
   IconSvcHuggingFace,
