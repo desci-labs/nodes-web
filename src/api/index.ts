@@ -410,7 +410,7 @@ export const updateDag = async ({
   formData.append("manifest", JSON.stringify(manifest));
   if (newFolderName) formData.append("newFolderName", newFolderName);
   if (componentType) formData.append("componentType", componentType);
-  if (componentSubtype) formData.append("componentSubType", componentSubtype);
+  if (componentSubtype) formData.append("componentSubtype", componentSubtype);
   if (externalCids?.length)
     formData.append("externalCids", JSON.stringify(externalCids));
   formData.append("contextPath", contextPath);
