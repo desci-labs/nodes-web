@@ -607,7 +607,7 @@ export const addFilesToDrive = createAsyncThunk(
       externalCids,
       externalUrl,
       componentType,
-      componentSubType,
+      componentSubtype,
       newFolder,
       onSuccess,
     } = payload;
