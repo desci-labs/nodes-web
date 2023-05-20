@@ -39,27 +39,27 @@ const labels: Record<Steps, { title: string; caption: string }> = {
 
 function TermsAndPrivacy() {
   return (
-    <p className="text-xs line-clamp-2 text-white w-[90%]">
-      {" "}
-      By clicking Log In, you agree to our{" "}
-      <a
-        href="/terms"
+    <div className="w-[270px] px-4 text-white text-xs">
+      By clicking Log In, you agree to the DeSci Labs{" "}
+      <Link
+        className="text-tint-primary hover:text-tint-primary-hover"
+        to={site.terms}
         target="_blank"
-        rel="noreferrer"
-        className="text-tint-primary"
+        rel="noopener noreferrer"
       >
-        Terms of Service{" "}
-      </a>
+        Terms of Service
+      </Link>{" "}
       and{" "}
-      <a
-        href="/privacy"
+      <Link
+        className="text-tint-primary hover:text-tint-primary-hover"
+        to={site.privacy}
         target="_blank"
-        rel="noreferrer"
-        className="text-tint-primary"
+        rel="noopener noreferrer"
       >
         Privacy Policy
-      </a>
-    </p>
+      </Link>
+      .
+    </div>
   );
 }
 
@@ -85,29 +85,7 @@ const Footer = ({ step, goBack, nextStep, isLoading, code }: any) => {
           </PrimaryButton>
         )}
         {/** terms of service description*/}
-        {[Steps.ConfirmEmail].includes(step) && (
-          <div className="w-[270px] px-4 text-white text-xs">
-            By clicking Log In, you agree to the DeSci Labs{" "}
-            <Link
-              className="text-tint-primary hover:text-tint-primary-hover"
-              to={site.terms}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Terms of Service
-            </Link>{" "}
-            and{" "}
-            <Link
-              className="text-tint-primary hover:text-tint-primary-hover"
-              to={site.privacy}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Privacy Policy
-            </Link>
-            .
-          </div>
-        )}
+        {[Steps.ConfirmEmail].includes(step) && <TermsAndPrivacy />}
         {[Steps.ConfirmEmail, Steps.VerifyCode].includes(step) && (
           <PrimaryButton
             disabled={
@@ -284,11 +262,11 @@ export default function Login() {
                         ? "!border-transparent !outline-transparent !ring-none"
                         : ""
                     }`,
-                    character: `text-white !outline-0 bg-neutrals-gray-1 border-b-4 border-b-neutrals-gray-5  rounded-md rounded-b-none`,
+                    character: `text-white !outline-0 bg-neutrals-gray-1 rounded-md rounded-b-none`,
                     characterSelected: ` ${
-                      focused ? "!border-b-tint-primary" : " !text-transparent"
+                      focused ? "shadow-verifyInputActive" : "!text-transparent"
                     } `,
-                    characterInactive: "text-transparent",
+                    characterInactive: "text-transparent shadow-verifyInput",
                   }}
                   onBlur={() => {
                     setFocused(false);
