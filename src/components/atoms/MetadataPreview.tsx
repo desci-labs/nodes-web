@@ -38,11 +38,12 @@ const MetadataPreview: React.FC<MetadataPreviewProps> = ({
           <IconOrcidOutline width={18} />
         </div>
         <div
-          className={`my-0 px-2 ${
+          className={`my-0 px-1 line-clamp-1  ${
             isFair ? "fairBoxLit text-tint-primary-hover" : "text-[#CCCCCC]"
           }`}
         >
           {text}
+          {/* <span className="inline-block truncate line-clamp-1">{text}</span> */}
         </div>
       </FlexRowSpaceBetween>
     </button>
