@@ -40,6 +40,7 @@ const EditableWrapper = (props: EditableWrapperProps) => {
 
   const handleUnstar = () => {
     const file = findDriveByPath(nodeTree!, component?.payload?.path);
+    console.log("Unstar", file, nodeTree, component.payload);
     if (file) {
       dispatch(starComponentThunk({ item: file }));
     }
