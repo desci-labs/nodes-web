@@ -607,7 +607,7 @@ export const addFilesToDrive = createAsyncThunk(
       externalCids,
       externalUrl,
       componentType,
-      componentSubType,
+      componentSubtype,
       newFolder,
       onSuccess,
     } = payload;
@@ -760,7 +760,7 @@ export const addFilesToDrive = createAsyncThunk(
         externalCids,
         externalUrl,
         componentType,
-        componentSubType,
+        componentSubtype,
         newFolderName,
         onProgress: (e) => {
           if (batchUid === undefined) return;
