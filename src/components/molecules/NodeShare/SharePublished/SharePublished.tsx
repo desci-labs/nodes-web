@@ -170,9 +170,9 @@ const SharePublished = React.memo(() => {
     if (lastManifest && currentObjectId && (publicView || versions)) {
       const versionCount = numVersions;
       body = (
-        <div>
+        <div className="font-inter">
           {/* <div className="">Your Node is public</div> */}
-          <div className="my-4 w-full">
+          {/* <div className="my-4 w-full">
             <LinkCopier
               icon={<IconNetwork height={15} stroke={"white"} width={15} />}
               label="Public Share Link (always points to latest version)"
@@ -185,9 +185,11 @@ const SharePublished = React.memo(() => {
               label="Public Share Link (always points to this version)"
               value={dpidLink}
             />
-          </div>
+          </div> */}
 
-          <AdvancedSlideDown
+          <p className="text-center text-sm">Share the published version of your Node.</p>
+
+          {/* <AdvancedSlideDown
             closed={showAdvanced}
             setClosed={setShowAdvanced}
             className="overflow-hidden mt-5"
@@ -280,12 +282,12 @@ const SharePublished = React.memo(() => {
                 </div>
               ) : null}
             </PerfectScrollbar>
-          </AdvancedSlideDown>
+          </AdvancedSlideDown> */}
         </div>
       );
     } else {
       body = (
-        <div className="flex items-center h-full flex-grow flex-col justify-evenl">
+        <div className="flex items-center h-96 flex-grow flex-col justify-evenly">
           This Node is not published and cannot yet be shared
           <PaneInfo>Sharing unpublished Nodes is coming soon</PaneInfo>
         </div>
