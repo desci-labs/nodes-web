@@ -8,7 +8,7 @@ import { DRIVE_NODE_ROOT_PATH, tempDate } from "@src/components/driveUtils";
 import {
   AccessStatus,
   DriveMetadata,
-  DriveNonComponentTypes,
+  // DriveNonComponentTypes,
   DriveObject,
   FileDir,
   FileType,
