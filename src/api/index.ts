@@ -365,7 +365,7 @@ export interface UpdateDag {
   manifest: ResearchObjectV1;
   contextPath: DrivePath;
   componentType?: ResearchObjectComponentType;
-  componentSubType?: ResearchObjectComponentSubtypes;
+  componentSubtype?: ResearchObjectComponentSubtypes;
   externalCids?: ExternalCid[];
   externalUrl?: ExternalUrl;
   newFolderName?: string;
@@ -382,7 +382,7 @@ export const updateDag = async ({
   contextPath,
   onProgress,
   componentType,
-  componentSubType,
+  componentSubtype,
   externalCids,
   externalUrl,
   newFolderName,
@@ -410,7 +410,7 @@ export const updateDag = async ({
   formData.append("manifest", JSON.stringify(manifest));
   if (newFolderName) formData.append("newFolderName", newFolderName);
   if (componentType) formData.append("componentType", componentType);
-  if (componentSubType) formData.append("componentSubType", componentSubType);
+  if (componentSubtype) formData.append("componentSubtype", componentSubtype);
   if (externalCids?.length)
     formData.append("externalCids", JSON.stringify(externalCids));
   formData.append("contextPath", contextPath);
