@@ -5,7 +5,7 @@ import { useSetter } from "@src/store/accessors";
 import { popFromComponentStack } from "@src/state/nodes/nodeReader";
 import ComponentRenamePopover from "@src/components/organisms/PopOver/ComponentRenamePopover";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
-import { findDriveByPath } from "@src/components/driveUtils";
+import { findDriveByPath } from "@src/state/drive/utils";
 import { starComponentThunk } from "@src/state/drive/driveSlice";
 import { useDrive } from "@src/state/drive/hooks";
 import { ResearchObjectV1Component } from "@desci-labs/desci-models";
@@ -40,6 +40,7 @@ const EditableWrapper = (props: EditableWrapperProps) => {
 
   const handleUnstar = () => {
     const file = findDriveByPath(nodeTree!, component?.payload?.path);
+    console.log("Unstar", file, nodeTree, component.payload);
     if (file) {
       dispatch(starComponentThunk({ item: file }));
     }

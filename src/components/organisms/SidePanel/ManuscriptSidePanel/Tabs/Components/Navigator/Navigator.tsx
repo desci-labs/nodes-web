@@ -95,7 +95,7 @@ const Navigator = () => {
       );
     }
     return components;
-  }, [manifestData, deprecatedDrive, componentStack]);
+  }, [manifestData, deprecatedDrive]);
 
   const moveCard = useCallback(
     (dragIndex: number, hoverIndex: number) => {
@@ -113,7 +113,7 @@ const Navigator = () => {
         reorderComponent({ dragIndex: indexToMove, hoverIndex: indexToHover })
       );
     },
-    [cardComponents, dispatch, manifestData?.components, componentStack]
+    [cardComponents, dispatch, manifestData?.components]
   );
 
   const renderEditableComponents = useCallback(
@@ -144,6 +144,7 @@ const Navigator = () => {
     [currentObjectId, isEditable, moveCard, componentStack]
   );
 
+  console.log(cardComponents);
   return (
     <>
       <CollapsibleSection
@@ -203,9 +204,9 @@ const Navigator = () => {
               }),
             }}
           >
-            {!!cardComponents?.length && (
+            {cardComponents?.length ? (
               <>{renderEditableComponents(cardComponents)}</>
-            )}
+            ) : null}
             {cardComponents?.length === 0 && (
               <div className="text-[10px] text-neutrals-gray-6 flex flex-row gap-1 items-center">
                 <IconStar width={12} className="fill-tint-primary-hover" />

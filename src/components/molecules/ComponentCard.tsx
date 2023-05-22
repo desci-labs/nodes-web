@@ -284,7 +284,7 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                           component.payload?.licenseType ||
                           manifest?.defaultLicense
                       )} //Should only ever hit unknown for deprecated tree
-                      className="w-auto bg-black hover:bg-neutrals-gray-2 text-white font-medium text-xs h-7"
+                      className="w-auto bg-black hover:bg-neutrals-gray-2 text-white font-medium text-[11px] h-7"
                     />
                   </div>
                   <div id="section-right" className="flex gap-2">
@@ -312,19 +312,23 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                     >
                       <IconDrive className="p-0 min-w-[28px] scale-[1.2]" />
                     </TooltipButton>
-                    <TooltipButton
-                      tooltipContent={"Cite"}
-                      side="top"
-                      // dataFor={`cite_${component.id}`}
-                      className="`p-2 rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray  disabled:bg-opacity-25 disabled:cursor-not-allowed w-7 h-7"
-                      disabled={!canCite}
-                      onClick={(e) => {
-                        e!.stopPropagation();
-                        dispatch(setFileBeingCited(drive));
-                      }}
-                    >
-                      <IconQuotes />
-                    </TooltipButton>
+                    {component.type !== ResearchObjectComponentType.PDF ? (
+                      <TooltipButton
+                        tooltipContent={"Cite"}
+                        side="top"
+                        // dataFor={`cite_${component.id}`}
+                        className="`p-2 rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray  disabled:bg-opacity-25 disabled:cursor-not-allowed w-7 h-7"
+                        disabled={!canCite}
+                        onClick={(e) => {
+                          e!.stopPropagation();
+                          dispatch(setFileBeingCited(drive));
+                        }}
+                      >
+                        <IconQuotes />
+                      </TooltipButton>
+                    ) : (
+                      <></>
+                    )}
                     {[
                       ResearchObjectComponentType.DATA,
                       ResearchObjectComponentType.CODE,
