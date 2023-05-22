@@ -38,7 +38,7 @@ const MetadataPreview: React.FC<MetadataPreviewProps> = ({
           <IconOrcidOutline width={18} />
         </div>
         <div
-          className={`my-0 px-1 line-clamp-1  ${
+          className={`my-0 px-1 pr-2 font-mono line-clamp-1  ${
             isFair ? "fairBoxLit text-tint-primary-hover" : "text-[#CCCCCC]"
           }`}
         >
