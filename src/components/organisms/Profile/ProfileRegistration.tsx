@@ -12,16 +12,17 @@ import { ProfileRegistrationValues } from "./types";
 import { useUser } from "@src/state/user/hooks";
 // import { useAppPreferences } from "@src/state/preferences/hooks";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { ROR_API_URL, ROR_URL, userProfileActionSchema } from "./schema";
+import { userProfileActionSchema } from "./schema";
 import InsetLabelSmallInput from "@src/components/molecules/FormInputs/InsetLabelSmallInput";
 import DividerSimple from "@src/components/atoms/DividerSimple";
-import { FlexColumn, FlexRowAligned } from "@src/components/styled";
+import { FlexRowAligned } from "@src/components/styled";
 import { CheckBox, CheckBoxText } from "@src/components/atoms/Checkbox";
 // import { useSetter } from "@src/store/accessors";
 // import { setPreferences } from "@src/state/preferences/preferencesSlice";
 import useProfileSubmit from "./useProfileSubmit";
 import { termsConsent } from "@src/api";
 import axios from "axios";
+import { ROR_API_URL } from "@src/schema/schema";
 
 export interface ProfilePopOverProps {
   onDismiss?: () => void;
@@ -33,7 +34,7 @@ const useRoRResolver = () => {
     setValue,
     formState: { isValid },
   } = useFormContext<ProfileRegistrationValues>();
-  const rorId = watch("rorpid");
+  const rorId = ""; // watch("rorPid");
   const hasAffiliation = watch("hasAffiliation");
 
   const resolveOrgName = useCallback(async () => {
@@ -81,7 +82,7 @@ export function ProfileRegistrationForm(props: ProfilePopOverProps) {
   // if (!showProfileRegistration) return null;
 
   const hasAffiliation = watch("hasAffiliation");
-  const rorpid = watch("rorpid");
+  // const rorpid = watch("rorpid");
 
   return (
     <PerfectScrollbar className="overflow-auto my-3">
@@ -145,23 +146,23 @@ export function ProfileRegistrationForm(props: ProfilePopOverProps) {
               I’m not affiliated with a research organization
             </CheckBoxText>
           </FlexRowAligned>
-          <FlexColumn style={{ display: hasAffiliation ? "none" : "flex" }}>
+          {/* <FlexColumn style={{ display: hasAffiliation ? "none" : "flex" }}>
             <Controller
-              name="rorpid"
+              name="rorPid"
               control={control}
               render={({ field }) => (
                 <InsetLabelSmallInput
                   label="ROR PID (Optional)"
                   {...field}
-                  ref={register("rorpid").ref}
+                  ref={register("rorPid").ref}
                   optional={false}
                   className="mt-6 mb-3 w-full"
                 />
               )}
             />
-            {errors.rorpid?.message ? (
+            {errors.rorPid?.message ? (
               <span className="text-red-400 text-xs h-8 block">
-                {errors.rorpid?.message}
+                {errors.rorPid?.message}
               </span>
             ) : (
               <a
@@ -169,12 +170,12 @@ export function ProfileRegistrationForm(props: ProfilePopOverProps) {
                 href={`${ROR_URL}${rorpid}`}
                 target="_blank"
                 rel="noreferrer"
-                aria-disabled={!!errors?.rorpid}
+                aria-disabled={!!errors?.rorPid}
               >
                 Find Organization ROR PID
               </a>
             )}
-          </FlexColumn>
+          </FlexColumn> */}
         </form>
       </div>
     </PerfectScrollbar>
@@ -191,7 +192,7 @@ export const ProfilePromptModal = (props: ModalProps) => {
       hasAffiliation: false,
       hasAcceptedTerms: false,
       name: userProfile.profile?.name ?? "",
-      rorpid: userProfile.profile?.rorpid ?? "",
+      rorPid: userProfile.profile?.rorPid ?? [],
       organization: userProfile.profile?.organization ?? "",
       googleScholarUrl: userProfile.profile?.googleScholarUrl ?? "",
     },

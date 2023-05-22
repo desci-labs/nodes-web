@@ -3,11 +3,12 @@ import IconSubTextHeader from "@components/molecules/IconSubTextHeader";
 import DigitalSignature from "@components/molecules/DigitalSignature";
 import OrcidButton from "@src/components/molecules/OrcIdAuthButton";
 import DividerSimple from "@components/atoms/DividerSimple";
-import UserProfileForm from "./UserProfileForm";
+import UserProfileForm from "@components/organisms/UserProfileForm";
 import { memo, useEffect } from "react";
 import { api } from "@src/state/api";
 import { tags } from "@src/state/api/tags";
 import { useSetter } from "@src/store/accessors";
+import PrimaryAffiliation from "@src/components/molecules/PrimaryAffiliation";
 // import {
 //   LS_VSCODE_ENABLED,
 //   useManuscriptController,
@@ -27,9 +28,7 @@ function ProfileInfo(props: {
   }, []);
 
   return (
-    <div
-      className={`sm:grow ${!props.inModal ? "mt-10 pb-10" : ""}`}
-    >
+    <div className={`sm:grow ${!props.inModal ? "mt-10 pb-10" : ""} max-w-[600px]`}>
       <div className="flex flex-col gap-8">
         <IconSubTextHeader
           headerText={"Profile Information"}
@@ -41,6 +40,18 @@ function ProfileInfo(props: {
         <UserProfileForm viewOnly={!props.inModal} />
         {!props.inModal ? (
           <>
+            <DividerSimple />
+            <div className="flex flex-col gap-8">
+              <div>
+                <IconSubTextHeader
+                  headerText="Primary Affiliation"
+                  subText="Add your primary academic affiliation."
+                  withCircleBorder={true}
+                />
+              </div>
+              <PrimaryAffiliation />
+            </div>
+
             <DividerSimple />
 
             <div className="flex flex-col gap-8">

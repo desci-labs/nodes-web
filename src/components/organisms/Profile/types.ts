@@ -21,7 +21,7 @@ export interface ProfileRegistrationValues {
   name: string;
   googleScholarUrl?: string;
   organization?: string;
-  rorpid?: string;
+  rorPid?: string[];
   hasAcceptedTerms: boolean;
   hasAffiliation: boolean;
 }

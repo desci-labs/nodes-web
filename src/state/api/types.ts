@@ -12,7 +12,7 @@ export interface UserProfile {
     googleScholarUrl: string;
     name: string;
     orcid: string;
-    rorpid?: string;
+    rorPid?: string[];
     organization?: string;
   };
   wallets: Wallet[];
