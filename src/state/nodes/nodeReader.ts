@@ -7,13 +7,13 @@ import {
   ResearchObjectV1Author,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
+import update from "immutability-helper";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { updateDraft } from "@src/api";
 import { AnnotationLinkConfig } from "@src/components/molecules/AnnotationEditor/components";
 import {
   cleanupManifestUrl,
   filterForFirstPdf,
-  filterForNonData,
 } from "@src/components/utils";
 import { RootState } from "@src/store";
 import axios from "axios";
@@ -25,7 +25,7 @@ export type ReaderMode = "reader" | "editor";
 export enum ResearchTabs {
   current = "current",
   history = "history",
-  source = "source",
+  credit = "credit",
 }
 
 export interface EditNodeParams {
@@ -234,6 +234,24 @@ export const nodeReaderSlice = createSlice({
       if (component.type === "link")
         component.payload.path =
           DRIVE_FULL_EXTERNAL_LINKS_PATH + "/" + component.name;
+    },
+    reorderComponent: (
+      state,
+      {
+        payload,
+      }: PayloadAction<{
+        dragIndex: number;
+        hoverIndex: number;
+      }>
+    ) => {
+      if (!state.manifest?.components) return;
+      const item = state.manifest.components[payload.dragIndex];
+      state.manifest.components = update(state.manifest.components, {
+        $splice: [
+          [payload.dragIndex, 1],
+          [payload.hoverIndex, 0, item as any],
+        ],
+      });
     },
     updatePendingAnnotations: (
       state,
@@ -611,10 +629,10 @@ export const {
   removeAuthor,
   addNodeAuthor,
   setPublicView,
+  addComponent,
   setEditNodeId,
   resetEditNode,
   setManifestCid,
-  setAnnotationLinkConfig,
   saveAnnotation,
   resetNodeViewer,
   deleteComponent,
@@ -622,6 +640,7 @@ export const {
   setManifestData,
   updateNodeAuthor,
   deleteAnnotation,
+  reorderComponent,
   toggleCommitPanel,
   setComponentStack,
   setCurrentShareId,
@@ -632,9 +651,9 @@ export const {
   pushToComponentStack,
   popFromComponentStack,
   updatePendingAnnotations,
+  setAnnotationLinkConfig,
   replaceAnnotations,
   setStartedNewAnnotationViaButton,
-  addComponent,
   addRecentlyAddedComponent,
   removeRecentlyAddedComponent,
   removeComponentMetadata,

@@ -26,6 +26,7 @@ import SelectList from "@src/components/molecules/FormInputs/SelectList";
 import { useDrive } from "@src/state/drive/hooks";
 import { setFileBeingCited } from "@src/state/drive/driveSlice";
 import { useSetter } from "@src/store/accessors";
+import useComponentDpid from "../Drive/hooks/useComponentDpid";
 
 const CitationComponent = () => {
   const { fileBeingCited } = useDrive();
@@ -87,81 +88,8 @@ const CitationComponent = () => {
     ]
   );
 
-  const getComponentDpid = useCallback((): string => {
-    if (!componentToCite) return "";
-
-    const component =
-      componentToCite.type === FileType.DIR
-        ? componentToCite?.contains?.find(
-            (file) => file.accessStatus === AccessStatus.PUBLIC
-          ) ?? null
-        : componentToCite;
-    if (!component) return dpidLink;
-
-    let componentParent: DriveObject | FileDir = component;
-    while (
-      componentParent &&
-      componentParent.parent &&
-      componentParent.parent.cid?.length > 10
-    ) {
-      componentParent = componentParent?.parent!;
-    }
-
-    const index = manifestData?.components.findIndex(
-      (c: ResearchObjectV1Component) =>
-        c.id === component.cid || c.id === componentParent.cid
-    );
-    const versionString =
-      index === undefined || index < 0 ? version : `${version}/${index}`;
-
-    let fqi = isDpidSupported
-      ? `${manifestData?.dpid?.id}/${versionString}`
-      : `${currentObjectId?.replaceAll(".", "") ?? ""}/${versionString}`;
-
-    let fqiDataSuffix = undefined;
-
-    if (
-      index &&
-      manifestData?.components[index]?.type ===
-        ResearchObjectComponentType.DATA &&
-      componentParent
-    ) {
-      const splitPath = component.path?.split("/").filter((a) => a !== "Data");
-      if (splitPath && splitPath.length > 1) {
-        let newPath = splitPath.slice(1);
-        newPath.unshift(componentParent.name);
-        if (componentToCite.type === FileType.DIR) {
-          newPath = [componentParent.name];
-        }
-        fqiDataSuffix = newPath.join("/");
-      }
-    }
-
-    const fqDpid =
-      index === undefined || index < 0
-        ? dpidLink
-        : `${dpidLink}/${index}${fqiDataSuffix ? `/${fqiDataSuffix}` : ""}`;
-
-    const link = isDpidSupported
-      ? fqDpid
-      : `${window.location.protocol}//${window.location.host}/${fqi}${
-          fqiDataSuffix ? `/${fqiDataSuffix}` : ""
-        }`;
-
-    let codeLink = `${window.location.protocol}//${window.location.host}/${fqi}`;
-
-    return component.componentType === ResearchObjectComponentType.CODE
-      ? codeLink
-      : link;
-  }, [
-    componentToCite,
-    currentObjectId,
-    dpidLink,
-    isDpidSupported,
-    manifestData?.components,
-    manifestData?.dpid?.id,
-    version,
-  ]);
+  const { dpid, cid, license } = useComponentDpid(fileBeingCited);
+  const fqDpid = `${dpid}/${fileBeingCited.path?.replace(/^root\//, "data/")}`;
 
   const canCite = !!manifestData && manifestData?.authors?.length;
   const formatter = useMemo(() => getFormatter(format.name), [format.name]);
@@ -171,7 +99,7 @@ const CitationComponent = () => {
       canCite
         ? formatter({
             manifest: manifestData!,
-            dpidLink: getComponentDpid(),
+            dpidLink: fqDpid,
             year,
             isPublished: componentToCite?.accessStatus === AccessStatus.PUBLIC,
             componentType: componentToCite?.componentType,
@@ -181,7 +109,7 @@ const CitationComponent = () => {
       canCite,
       formatter,
       manifestData,
-      getComponentDpid,
+      fqDpid,
       year,
       componentToCite?.accessStatus,
       componentToCite?.componentType,
@@ -245,11 +173,11 @@ const CitationComponent = () => {
                 <input
                   type="text"
                   className="text-sm bg-transparent outline-none border-0 p-0 pr-10 !ring-0 block w-full overflow-auto"
-                  value={getComponentDpid()}
+                  value={fqDpid}
                 />
                 <CopyButton
                   disabled={!isPublished}
-                  text={getComponentDpid()}
+                  text={fqDpid}
                   label="Copy dPID"
                   className="absolute right-2 top-0"
                 />

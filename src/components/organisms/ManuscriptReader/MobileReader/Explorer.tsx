@@ -5,7 +5,7 @@ import { useSetter } from "@src/store/accessors";
 import { useHistoryReader, useNodeReader } from "@src/state/nodes/hooks";
 import ComponentsPreview from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/Components/ComponentsPreview";
 import HistoryPreview from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/History/Preview";
-import CreditsPreview from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/SourceTab/CreditsPreview";
+import CreditsPreview from "@src/components/organisms/SidePanel/ManuscriptSidePanel/Tabs/CreditTab/CreditsPreview";
 import useNodeHistory from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/History/useNodeHistory";
 
 export default function Explorer() {
@@ -37,7 +37,7 @@ export default function Explorer() {
             onClick={() => onSetResearchPanelTab(ResearchTabs.current)}
           >
             <p className="text-xs flex justify-center items-center h-full">
-              Current
+              Components
             </p>
           </SwitchButton>
           <SwitchButton
@@ -45,12 +45,12 @@ export default function Explorer() {
             onClick={() => onSetResearchPanelTab(ResearchTabs.history)}
           >
             <p className="text-xs flex justify-center items-center h-full">
-              History
+              Activity
             </p>
           </SwitchButton>
           <SwitchButton
-            isSelected={researchPanelTab === ResearchTabs.source}
-            onClick={() => onSetResearchPanelTab(ResearchTabs.source)}
+            isSelected={researchPanelTab === ResearchTabs.credit}
+            onClick={() => onSetResearchPanelTab(ResearchTabs.credit)}
           >
             <p className="text-xs flex justify-center items-center h-full">
               Credit
@@ -67,7 +67,7 @@ export default function Explorer() {
           {researchPanelTab === ResearchTabs.history ? (
             <HistoryPreview />
           ) : null}
-          {researchPanelTab === ResearchTabs.source ? <CreditsPreview /> : null}
+          {researchPanelTab === ResearchTabs.credit ? <CreditsPreview /> : null}
         </div>
       </PerfectScrollbar>
     </div>

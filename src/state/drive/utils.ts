@@ -8,7 +8,7 @@ import { DRIVE_NODE_ROOT_PATH, tempDate } from "@src/components/driveUtils";
 import {
   AccessStatus,
   DriveMetadata,
-  DriveNonComponentTypes,
+  // DriveNonComponentTypes,
   DriveObject,
   FileDir,
   FileType,
@@ -170,12 +170,16 @@ export function hasPublic(tree: DriveObject): boolean {
   });
 }
 
+// Prevent rendering certain files in the tree in the drive view
+const FILTER_LIST = [".nodeKeep", ".DS_Store"];
+
 //Convert IPFS tree to DriveObject tree V2
 export function convertIpfsTreeToDriveObjectTree(
   tree: DriveObject[],
   pathToCompMap: Record<DrivePath, ResearchObjectV1Component>,
   pathToSizeMap: Record<DrivePath, number>
 ) {
+  tree = tree.filter((branch) => !FILTER_LIST.includes(branch.name));
   tree.forEach((branch) => {
     const fileDirBranch = branch as FileDir;
     const neutralPath = neutralizePath(branch.path!);

@@ -1,15 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
+import {
+  FlexColumn,
+  FlexRowCentered,
+  FlexRowSpaceBetween,
+} from "@components/styled";
 import SidePanel from "@components/organisms/SidePanel";
 import HistoryTab from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/History/HistoryTab";
-import SourceTab from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/SourceTab";
+import CreditTab from "@src/components/organisms/SidePanel/ManuscriptSidePanel/Tabs/CreditTab";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import PanelCloseButton from "@components/atoms/PanelCloseButton";
 import ManuscriptAttributesSection from "@src/components/organisms/ManuscriptAttributesSection";
-import ManuscriptComponentsSection from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/Components/ManuscriptComponentsSection";
 import {
   convertUUIDToHex,
+  filterForNonData,
   isWindows,
   lockScroll,
   restoreScroll,
@@ -21,7 +25,7 @@ import {
   ResearchObjectV1,
 } from "@desci-labs/desci-models";
 import { useEffectOnce } from "react-use";
-import NodeDrive from "@components/molecules/NodeDrive";
+import NodeDrive, { DriveToggleButton } from "@components/molecules/NodeDrive";
 import useSaveManifest from "@src/hooks/useSaveManifest";
 import { useUser } from "@src/state/user/hooks";
 import {
@@ -30,14 +34,18 @@ import {
   usePdfReader,
 } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
+import Navigator from "./Tabs/Components/Navigator/Navigator";
+import { SwitchBar, SwitchButton } from "@src/components/atoms/SwitchBar";
 import {
-  popFromComponentStack,
   ResearchTabs,
+  popFromComponentStack,
   setResearchPanelTab,
   toggleCommitPanel,
   toggleResearchPanel,
 } from "@src/state/nodes/nodeReader";
-import { SwitchBar, SwitchButton } from "@src/components/atoms/SwitchBar";
+import { IconPower } from "@src/icons";
+import MetadataKeywords from "@src/components/organisms/SidePanel/ManuscriptSidePanel/Tabs/Components/MetadataKeywords";
+import useLocalStorageState from "@src/hooks/useLocalStorageState";
 
 const ManuscriptSidePanelContainer = styled(SidePanel).attrs({
   className: "bg-light-gray dark:bg-dark-gray text-black dark:text-white",
@@ -104,13 +112,9 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
     ResearchObjectV1 | undefined
   >(manifestData);
   const [, setMounted] = useState(false);
-  const [closeCube, setCloseCube] = useState(
-    window.localStorage.getItem("closeCube") == "1"
-  );
+  const [closeCube, setCloseCube] = useLocalStorageState("closeCube", false);
+
   const refVideo = useRef(null);
-  useEffect(() => {
-    window.localStorage.setItem("closeCube", closeCube ? "1" : "0");
-  }, [closeCube]);
 
   useEffect(() => {
     const didPush = !!nodeVersions;
@@ -164,23 +168,10 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
   }, [userProfile]);
 
   const showCloseButton =
-    componentStack.filter(
-      (a) =>
-        a &&
-        a.type != ResearchObjectComponentType.DATA &&
-        a.type != ResearchObjectComponentType.UNKNOWN &&
-        a.type != ResearchObjectComponentType.DATA_BUCKET
-    ).length > 0 &&
+    componentStack.filter(filterForNonData).length > 0 &&
     (!isCodeActive || selectedAnnotationId);
   const isResearchPanelReallyOpen =
-    isResearchPanelOpen ||
-    componentStack.filter(
-      (a) =>
-        a &&
-        a.type != ResearchObjectComponentType.DATA &&
-        a.type != ResearchObjectComponentType.UNKNOWN &&
-        a.type != ResearchObjectComponentType.DATA_BUCKET
-    ).length < 1;
+    isResearchPanelOpen || componentStack.filter(filterForNonData).length < 1;
 
   const canShowDrive = !publicView && userProfile.userId > 0;
 
@@ -268,9 +259,14 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
               dispatch(toggleCommitPanel(true));
             }}
           >
-            {isCommitPanelOpen
-              ? "Finish in Commit Panel (Left)"
-              : "Publish Node"}
+            <FlexRowCentered className="gap-1">
+              <IconPower width={18} />
+              <span className="inline-block">
+                {isCommitPanelOpen
+                  ? "Finish in Commit Panel (Left)"
+                  : "Publish Node"}
+              </span>
+            </FlexRowCentered>
           </PrimaryButton>
         </div>
         <div className="px-4">
@@ -280,7 +276,7 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
               onClick={() => onSetResearchPanelTab(ResearchTabs.current)}
             >
               <p className="text-xs flex justify-center items-center h-full">
-                Current
+                Components
               </p>
             </SwitchButton>
             <SwitchButton
@@ -288,15 +284,15 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
               onClick={() => onSetResearchPanelTab(ResearchTabs.history)}
             >
               <p className="text-xs flex justify-center items-center h-full">
-                History
+                Activity
               </p>
             </SwitchButton>
             <SwitchButton
-              isSelected={researchPanelTab === ResearchTabs.source}
-              onClick={() => onSetResearchPanelTab(ResearchTabs.source)}
+              isSelected={researchPanelTab === ResearchTabs.credit}
+              onClick={() => onSetResearchPanelTab(ResearchTabs.credit)}
             >
               <p className="text-xs flex justify-center items-center h-full">
-                Source
+                Credit
               </p>
             </SwitchButton>
           </SwitchBar>
@@ -309,13 +305,17 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
           <div className={`pl-4 pr-4`}>
             {researchPanelTab === ResearchTabs.current ? (
               <>
+                {(publicView || !userProfile.userId) && (
+                  <div className="mb-4">
+                    <DriveToggleButton />
+                  </div>
+                )}
                 <ManuscriptAttributesSection />
-                {/* <ManuscriptValidationSection /> */}
-                <ManuscriptComponentsSection />
+                <Navigator />
               </>
             ) : null}
             {researchPanelTab === ResearchTabs.history ? <HistoryTab /> : null}
-            {researchPanelTab === ResearchTabs.source ? <SourceTab /> : null}
+            {researchPanelTab === ResearchTabs.credit ? <CreditTab /> : null}
             {isAdmin ? (
               <>
                 <div

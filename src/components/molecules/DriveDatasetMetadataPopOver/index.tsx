@@ -26,6 +26,7 @@ import { useManuscriptController } from "@src/components/organisms/ManuscriptRea
 import { useDrive } from "@src/state/drive/hooks";
 import { v4 as uuidv4 } from "uuid";
 import { fetchTreeThunk } from "@src/state/drive/driveSlice";
+import ViewMetadataModal from "@src/components/organisms/PopOver/ComponentMetadataPopover/ViewMetadataModal";
 
 export const DATASET_METADATA_FORM_DEFAULTS = {
   title: "",
@@ -45,13 +46,12 @@ const defaultProps = {
   onClose: EMPTY_FUNC,
 };
 
-const DriveDatasetMetadataPopOver = (
+const DriveDatasetMetadataEditor = (
   props: DriveDatasetMetadataPopoverProps & typeof defaultProps
 ) => {
   const dispatch = useSetter();
   const {
     publicView,
-    mode,
     currentObjectId,
     manifest: manifestData,
   } = useNodeReader();
@@ -93,7 +93,7 @@ const DriveDatasetMetadataPopOver = (
 
   const onSubmit = useCallback(
     async (data: DataComponent["payload"]) => {
-      console.log("[DRIVE METADATA] ON SUBMIT HIT");
+      console.log("[DRIVE METADATA] ON SUBMIT HIT", data);
 
       try {
         if (overWrite) {
@@ -217,12 +217,12 @@ const DriveDatasetMetadataPopOver = (
                   methods.formState.isDirty ? onHandleDismiss : props?.onClose
                 }
                 title="Edit Metadata"
-                subTitle=" Please fill in the metadata for open access data."
+                subTitle="Please fill in the metadata for this component or file."
               />
               <div className="px-1">
                 {/**Have to force a re-render with props.isVisible */}
                 {/* <PerfectScrollbar className="max-h-[calc(100vh-300px)] h-[calc(100vh-300px)] overflow-y-scroll"> */}
-                {props.isVisible && mode === "editor" ? (
+                {props.isVisible && (
                   <DatasetMetadataForm
                     ref={formRef}
                     prepopulate={fileMetadataBeingEdited!.metadata}
@@ -233,12 +233,11 @@ const DriveDatasetMetadataPopOver = (
                     loading={isSaving}
                     defaultLicense={manifestData!.defaultLicense || ""}
                   />
-                ) : // <ReadOnlyComponent component={component} />
-                null}
+                )}
                 {/* </PerfectScrollbar> */}
               </div>
             </div>
-            <div className="flex flex-row justify-end gap-4 items-center h-16 w-full dark:bg-[#272727] border-t border-t-[#81C3C8] rounded-b-lg p-4">
+            <div className="flex flex-row justify-end gap-4 items-center h-16 w-full dark:bg-[#272727] border-t border-t-tint-primary rounded-b-lg p-4">
               <PrimaryButton
                 onClick={() => {
                   if (publicView) {
@@ -256,8 +255,6 @@ const DriveDatasetMetadataPopOver = (
               >
                 {isSaving ? (
                   <DefaultSpinner color="black" size={24} />
-                ) : mode !== "editor" ? (
-                  "Done"
                 ) : hasFilesWithMoreSpecificMetadata ? (
                   "Next"
                 ) : (
@@ -278,6 +275,27 @@ const DriveDatasetMetadataPopOver = (
         </FormProvider>
       </Modal>
     </div>
+  );
+};
+
+DriveDatasetMetadataEditor.defaultProps = defaultProps;
+
+const DriveDatasetMetadataPopOver = (
+  props: DriveDatasetMetadataPopoverProps & typeof defaultProps
+) => {
+  const { mode } = useNodeReader();
+  const { fileMetadataBeingEdited } = useDrive();
+
+  if (mode === "editor") {
+    return <DriveDatasetMetadataEditor {...props} />;
+  }
+
+  return (
+    <ViewMetadataModal
+      file={fileMetadataBeingEdited}
+      isOpen={props.isVisible}
+      onDismiss={props.onClose}
+    />
   );
 };
 

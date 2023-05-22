@@ -5,9 +5,10 @@ import {
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
+import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
 import EmptyPreview from "@src/components/molecules/EmptyPreview";
 import { findTarget } from "@src/components/organisms/ComponentLibrary";
-import { IconData } from "@src/icons";
+// import { IconData } from "@src/icons";
 import { useDrive } from "@src/state/drive/hooks";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { setComponentStack, toggleMode } from "@src/state/nodes/nodeReader";
@@ -25,8 +26,9 @@ const isDriveComponent = (component: ResearchObjectV1Component) =>
   component.type !== ResearchObjectComponentType.DATA_BUCKET;
 
 export default function ComponentsPreview() {
-  const { manifest: manifestData } = useNodeReader();
+  const { manifest: manifestData, mode } = useNodeReader();
   const { currentDrive } = useDrive();
+  const dispatch = useSetter();
 
   const components = useMemo(() => {
     const hasDataComponent =
@@ -43,20 +45,20 @@ export default function ComponentsPreview() {
         (c) => c.type !== ResearchObjectComponentType.DATA
       );
 
-      if (currentDrive) {
-        componentsWithOneData?.push({
-          name: "Node Data",
-          id: "__virtual_node_data",
-          payload: {},
-          type: ResearchObjectComponentType.DATA,
-          icon: IconData,
-        });
-      }
+      // if (currentDrive) {
+      //   componentsWithOneData?.push({
+      //     name: "Node Data",
+      //     id: "__virtual_node_data",
+      //     payload: {},
+      //     type: ResearchObjectComponentType.DATA,
+      //     icon: IconData,
+      //   });
+      // }
     }
 
     // Remove the default 3 (data, code, reports) added components
     return componentsWithOneData?.filter(isDriveComponent);
-  }, [currentDrive, manifestData]);
+  }, [manifestData]);
 
   if (!components?.length || components?.length > 7) {
     return (
@@ -68,7 +70,18 @@ export default function ComponentsPreview() {
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
+      {currentDrive && (
+        <ButtonSecondary
+          onClick={() => {
+            dispatch(setComponentStack([]));
+            dispatch(setShowComponentStack(true));
+            mode === "editor" && dispatch(toggleMode());
+          }}
+        >
+          View Node Drive
+        </ButtonSecondary>
+      )}
       {components.map((component, i) => (
         <ComponentPreview key={i} component={component} />
       ))}
@@ -130,16 +143,16 @@ function ComponentPreview({
 
   return (
     <div
-      className="flex w-full gap-4 items-center bg-zinc-200 bg-neutrals-black active:bg-neutrals-gray-5 rounded-lg px-4 py-2 border border-black"
+      className="h-[52px] flex w-full h-full gap-3 items-center bg-neutrals-black active:bg-neutrals-gray-5 rounded-lg px-4 border border-black"
       onClick={onHandleClick}
     >
       <target.icon
         width={24}
         height={24}
-        wrapperClassName="w-[30px] h-[30px]"
-        className="p-[3px] fill-white stroke-white"
+        wrapperClassName="w-[27px] h-[38px]"
+        className="py-[3px] fill-white stroke-white"
       />
-      <span className="font-bold w-[calc(100%-80px)] truncate overflow-ellipsis">
+      <span className="text-sm pt-0.5 font-bold w-[calc(100%-80px)] truncate overflow-ellipsis">
         {component.name}
       </span>
     </div>

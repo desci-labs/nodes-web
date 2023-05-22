@@ -38,16 +38,8 @@ import { useDrive } from "@src/state/drive/hooks";
 import { v4 as uuidv4 } from "uuid";
 import { fetchTreeThunk } from "@src/state/drive/driveSlice";
 import { DriveObject } from "../../Drive";
-
-export const PDF_LICENSE_TYPES = [
-  { id: 0, name: "CC0", shortName: "CC0" },
-  { id: 1, name: "CC BY", shortName: "CC BY" },
-  { id: 2, name: "CC BY-SA", shortName: "CC BY-SA" },
-  { id: 3, name: "CC BY-NC", shortName: "CC BY-NC" },
-  { id: 4, name: "CC BY-NC-SA", shortName: "CC BY-NC-SA" },
-  { id: 5, name: "CC BY-ND", shortName: "CC BY-ND" },
-  { id: 6, name: "CC BY-NC-ND", shortName: "CC BY-NC-ND" },
-];
+import ViewMetadataModal from "./ViewMetadataModal";
+import { CODE_LICENSE_TYPES, PDF_LICENSE_TYPES } from "@src/helper/license";
 
 const getLicenseTypes = () => {
   return PDF_LICENSE_TYPES.concat(CODE_LICENSE_TYPES);
@@ -57,91 +49,6 @@ export const getLicenseShortName = (license: string) => {
   const licenseType = getLicenseTypes().find((l) => l.name === license);
   return licenseType ? licenseType.shortName : "";
 };
-
-export const CODE_LICENSE_TYPES = [
-  {
-    id: 10,
-    name: "MIT License",
-    shortName: "MIT",
-    link: "https://choosealicense.com/licenses/mit/",
-  },
-  {
-    id: 1,
-    name: "Apache License 2.0",
-    shortName: "Apache 2.0",
-    link: "https://choosealicense.com/licenses/apache-2.0/",
-  },
-  {
-    id: 11,
-    name: "Mozilla Public License 2.0",
-    shortName: "MPL 2.0",
-    link: "https://choosealicense.com/licenses/mpl-2.0/",
-  },
-  {
-    id: 7,
-    name: "GNU General Public License v2.0",
-    shortName: "GPL 2.0",
-    link: "https://choosealicense.com/licenses/gpl-2.0/",
-  },
-  {
-    id: 8,
-    name: "GNU General Public License v3.0",
-    shortName: "GPL 3.0",
-    link: "https://choosealicense.com/licenses/gpl-3.0/",
-  },
-  {
-    id: 9,
-    name: "GNU Lesser General Public License v2.1",
-    shortName: "LGPL 2.1",
-    link: "https://choosealicense.com/licenses/lgpl-2.1/",
-  },
-
-  {
-    id: 5,
-    name: "Creative Commons Zero v1.0 Universal",
-    shortName: "CC0",
-    link: "https://choosealicense.com/licenses/cc0-1.0/",
-  },
-  {
-    id: 2,
-    name: 'BSD 2-Clause "Simplified" License',
-    shortName: "BSD 2-Clause",
-    link: "https://choosealicense.com/licenses/bsd-2-clause/",
-  },
-
-  {
-    id: 3,
-    name: 'BSD 3-Clause "New" or "Revised" License',
-    shortName: "BSD 3-Clause",
-    link: "https://choosealicense.com/licenses/bsd-3-clause/",
-  },
-  {
-    id: 0,
-    name: "GNU Affero General Public License v3.0",
-    shortName: "AGPL 3.0",
-    link: "https://choosealicense.com/licenses/agpl-3.0/",
-  },
-  {
-    id: 4,
-    name: "Boost Software License 1.0",
-    shortName: "BSL 1.0",
-    link: "https://choosealicense.com/licenses/bsl-1.0/",
-  },
-
-  {
-    id: 6,
-    name: "Eclipse Public License 2.0",
-    shortName: "EPL 2.0",
-    link: "https://choosealicense.com/licenses/epl-2.0/",
-  },
-
-  {
-    id: 12,
-    name: "The Unlicense",
-    shortName: "Unlicense",
-    link: "https://choosealicense.com/licenses/unlicense/",
-  },
-];
 
 interface ComponentMetadataFormProps {
   file: DriveObject;
@@ -322,7 +229,7 @@ const defaultProps = {
   onClose: EMPTY_FUNC,
 };
 
-const ComponentMetadataPopover = (
+const EditMetadataModal = (
   props: ComponentMetadataPopoverProps & typeof defaultProps
 ) => {
   const dispatch = useSetter();
@@ -331,12 +238,7 @@ const ComponentMetadataPopover = (
   const { dialogs, setDialogs } = useManuscriptController(["dialogs"]);
   const { fileMetadataBeingEdited } = useDrive();
 
-  const {
-    publicView,
-    mode,
-    manifest: manifestData,
-    currentObjectId,
-  } = useNodeReader();
+  const { publicView, mode, manifest: manifestData } = useNodeReader();
 
   const methods = useForm<CommonComponentPayload>({
     defaultValues: {
@@ -498,7 +400,7 @@ const ComponentMetadataPopover = (
             )}
           </div>
         </div>
-        <div className="flex flex-row justify-end gap-4 items-center h-16 w-full dark:bg-[#272727] border-t border-t-[#81C3C8] rounded-b-lg p-4">
+        <div className="flex flex-row justify-end gap-4 items-center h-16 w-full dark:bg-[#272727] border-t border-t-tint-primary rounded-b-lg p-4">
           <PrimaryButton
             onClick={() => {
               if (publicView || mode === "reader") {
@@ -523,6 +425,26 @@ const ComponentMetadataPopover = (
   );
 };
 
+EditMetadataModal.defaultProps = defaultProps;
+
+const ComponentMetadataPopover = (
+  props: ComponentMetadataPopoverProps & typeof defaultProps
+) => {
+  const { mode } = useNodeReader();
+  const { fileMetadataBeingEdited } = useDrive();
+
+  if (mode === "editor") {
+    return <EditMetadataModal {...props} />;
+  }
+
+  return (
+    <ViewMetadataModal
+      file={fileMetadataBeingEdited}
+      isOpen={props.isVisible}
+      onDismiss={props.onClose}
+    />
+  );
+};
 ComponentMetadataPopover.defaultProps = defaultProps;
 
 export default ComponentMetadataPopover;

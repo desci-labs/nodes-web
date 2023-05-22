@@ -185,5 +185,6 @@ module.exports = {
     require("@tailwindcss/forms"),
     require("flowbite/plugin"),
     require("@tailwindcss/line-clamp"),
+    require("tailwindcss-animate"),
   ],
 };

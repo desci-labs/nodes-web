@@ -12,7 +12,7 @@ import {
 import axios from "axios";
 import { LoaderFunctionArgs, Outlet, Params } from "react-router-dom";
 import { cleanupManifestUrl } from "../utils";
-import { ReaderMode } from "@src/state/nodes/viewer";
+import { ReaderMode } from "@src/state/nodes/nodeReader";
 
 export type ManuscriptLoaderData =
   | {

@@ -180,7 +180,7 @@ const PopOver = (props: React.PropsWithChildren<PopOverProps>) => {
         </PerfectScrollbar>
         {props.footer ? (
           <div
-            className={`w-full dark:bg-[#272727] border-t border-tint-primary rounded-b-lg`}
+            className={`w-full dark:bg-[#272727] border-t border-primary rounded-b-lg`}
           >
             <props.footer />
           </div>

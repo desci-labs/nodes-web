@@ -156,7 +156,9 @@ const ModalHeader = ({
   return (
     <div className="flex flex-row justify-between items-center">
       <div>
-        {title && <h1 className="text-xl font-bold text-white">{title}</h1>}
+        {title && (
+          <h1 className="text-xl font-bold font-inter text-white">{title}</h1>
+        )}
         {subTitle && <p className="text-neutrals-gray-5 text-sm">{subTitle}</p>}
       </div>
       {!hideCloseIcon && (
@@ -178,7 +180,7 @@ const ModalFooter = ({
   return (
     <div
       className={`flex flex-row justify-end gap-4 items-center w-full dark:bg-[#272727] ${
-        border ? "border-t border-t-[#81C3C8]" : ""
+        border ? "border-t border-t-tint-primary" : ""
       } rounded-b-lg ${padded ? "p-4" : ""}`}
     >
       {children}
