@@ -336,7 +336,7 @@ export const getDatasetTree = async (
   shareId = ""
 ) => {
   const route = pub ? "pubTree" : "retrieveTree";
-  console.log('fetch dataset tree', pub, route);
+  console.log("fetch dataset tree", pub, route);
   const { data } = await axios.get(
     `${SCIWEAVE_URL}/v1/data/${route}/${nodeUuid}/${cid}${
       shareId ? "/" + shareId : ""
