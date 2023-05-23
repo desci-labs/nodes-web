@@ -1,19 +1,6 @@
 import { getPublishedVersions, resolvePublishedManifest } from "@api/index";
 import PaneInfo from "@components/atoms/PaneInfo";
-import {
-  ResearchObjectComponentType,
-  ResearchObjectV1,
-  ResearchObjectV1Component,
-} from "@desci-labs/desci-models";
-import {
-  IconChevronDown,
-  IconChevronUp,
-  IconCode,
-  IconCodeBracket,
-  IconDocument,
-  IconFile,
-  IconNetwork,
-} from "@icons";
+import { ResearchObjectV1 } from "@desci-labs/desci-models";
 import React, {
   ButtonHTMLAttributes,
   PropsWithChildren,
@@ -27,9 +14,9 @@ import { useParams } from "react-router-dom";
 import { CheckIcon } from "@heroicons/react/outline";
 import { useGetNodesQuery } from "@src/state/api/nodes";
 import { useNodeReader, useNodeVersions } from "@src/state/nodes/hooks";
-import { useCopier } from "@src/components/molecules/Copier";
-import PerfectScrollbar from "react-perfect-scrollbar";
-import AdvancedSlideDown from "@src/components/atoms/AdvancedSlideDown";
+import Copier, { useCopier } from "@src/components/molecules/Copier";
+import { FlexColumnCentered, FlexRowCentered } from "@src/components/styled";
+import { IconCopyLink, IconNetwork, IconTwitter } from "@src/icons";
 
 function CopyButton(
   props: ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -89,7 +76,7 @@ const SharePublished = React.memo(() => {
   const [requestedVersion, setRequestedVersion] = useState<number | undefined>(
     undefined
   );
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  // const [showAdvanced, setShowAdvanced] = useState(false);
 
   const versionForLink =
     publicView && versionParam ? versionParam : requestedVersion;
@@ -187,8 +174,32 @@ const SharePublished = React.memo(() => {
             />
           </div> */}
 
-          <p className="text-center text-sm">Share the published version of your Node.</p>
-
+          <p className="text-center text-sm">
+            Share the published version of your Node.
+          </p>
+          <FlexRowCentered className="justify-center mt-5">
+            <FlexColumnCentered className="gap-1 max-w-[150px]">
+              <div className="p-2 rounded-full border border-social-twitter">
+                <IconTwitter className="fill-social-twitter" width={25} />
+              </div>
+              <p className="text-sm">Twitter</p>
+            </FlexColumnCentered>
+            <FlexColumnCentered className="gap-1 max-w-[150px]">
+              <div className="flex items-center justify-center text-center border border-social-twitter text-sm rounded-full p-2">
+                <Copier
+                  text={dpidLinkLatest}
+                  icon={(props) => (
+                    <IconCopyLink
+                      width={25}
+                      className="w-6 cursor-pointer fill-white h-6"
+                      {...props}
+                    />
+                  )}
+                />
+              </div>
+              <p className="text-sm">Copy dPid Link</p>
+            </FlexColumnCentered>
+          </FlexRowCentered>
           {/* <AdvancedSlideDown
             closed={showAdvanced}
             setClosed={setShowAdvanced}
