@@ -107,7 +107,7 @@ function AffiliateSelector(props: Props) {
         <div
           className={`relative flex flex-wrap gap-0 w-full border-0 p-2 text-sm bg-transparent font-medium placeholder-white text-gray-900 dark:text-white focus:outline-none focus:group:bg-black focus:ring-0 ring-transparent dark:ring-transparent outline-none shadow-none text-left sm:text-sm`}
         >
-          <label className="grow w-full">Add Affiliation ROR PID or Name</label>
+          {/* <label className="grow w-full">Add Affiliation ROR PID or Name</label> */}
           <div className="flex gap-1 flex-wrap items-center shrink">
             {values.map((value, idx) => (
               <span
@@ -121,11 +121,11 @@ function AffiliateSelector(props: Props) {
           </div>
           <ComboboxInput
             type="text"
-            placeholder="Search ROR PID or oranization name"
+            placeholder="Add Affiliation ROR PID or Name"
             selectOnClick
             onChange={onHandleChange}
             value={input}
-            className="block grow text-sm w-full bg-transparent ring-0 focus:ring-0 border-none focus:border-none"
+            className="block grow text-sm w-full bg-transparent ring-0 focus:ring-0 border-none focus:border-none placeholder-white placeholder:font-bold"
           />
         </div>
         <IconRor className="mr-2 fill-white" width={32} />
