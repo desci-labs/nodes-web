@@ -45,7 +45,7 @@ export const config = (preset?: AxiosRequestConfig): AxiosRequestConfig => {
     withCredentials: true,
     headers: {
       authorization: `Bearer ${localStorage.getItem("auth")}`,
-      ...preset?.headers
+      ...preset?.headers,
     },
   };
 };
@@ -295,7 +295,7 @@ export const getResearchFields = async (search: string = "") => {
 // AxiosResponse<{ items: { id: string; name: string } }
 export const getRorQueries = async (value: string = "") => {
   const { data } = await axios.get<any, any>(
-    `${SCIWEAVE_URL}/v1/ror?query=${encodeURIComponent(value.trim())}`,
+    `${SCIWEAVE_URL}/v1/ror?query=${value.trim()}`,
     config()
   );
   return data;
