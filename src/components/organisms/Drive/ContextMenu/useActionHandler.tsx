@@ -187,10 +187,15 @@ export default function useActionHandler() {
     dispatch(setFileMetadataBeingEdited(file));
   }
 
+  async function move(file: DriveObject) {
+    //open move file picker
+  }
+
   const handler: Record<
     Actions,
     ((file: DriveObject) => Promise<void>) | null
   > = {
+    MOVE: move,
     RENAME: rename,
     PREVIEW: preview,
     DOWNLOAD: download,
