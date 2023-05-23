@@ -1,34 +1,12 @@
 import PrimaryButton from "@components/atoms/PrimaryButton";
-import {
-  createVirtualDrive,
-  fillOuterSizes,
-  getAllTrees,
-  manifestToVirtualDrives,
-} from "@components/driveUtils";
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
+
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
-import {
-  IconChevronLeft,
-  IconCodeRepo,
-  IconData,
-  IconDirectory,
-  IconIpfs,
-  IconResearchNode,
-  IconResearchReport,
-  IconViewLink,
-  IconX,
-} from "@icons";
+import { IconChevronLeft, IconDirectory, IconIpfs, IconX } from "@icons";
 
 import { useEffect, useState } from "react";
 import ReactTooltip from "react-tooltip";
 import { DriveNonComponentTypes, DriveObject, FileType } from "./Drive";
-import { useNodeReader } from "@src/state/nodes/hooks";
-import { BreadCrumb } from "@src/state/drive/types";
-import {
-  navigateToDriveByPath,
-  navigateToDrivePickerByPath,
-} from "@src/state/drive/driveSlice";
-import { Reducer } from "@reduxjs/toolkit";
+import { navigateToDrivePickerByPath } from "@src/state/drive/driveSlice";
 import { useDrive } from "@src/state/drive/hooks";
 import { useSetter } from "@src/store/accessors";
 
@@ -207,7 +185,13 @@ function DriveRow({
       >
         <span>
           {file.type === FileType.DIR ? (
-            <IconDirectory />
+            <IconDirectory
+              className={`${
+                file.componentType !== DriveNonComponentTypes.UNKNOWN
+                  ? "fill-tint-primary"
+                  : "fill-neutrals-gray-5"
+              }`}
+            />
           ) : (
             <IconIpfs height={20} width={17.3} />
           )}

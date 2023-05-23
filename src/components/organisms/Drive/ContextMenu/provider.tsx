@@ -10,6 +10,7 @@ import {
 } from "react";
 import { DriveObject } from "../types";
 import { buildMenu } from "./MenuList";
+import DriveTableFilePicker from "../../DriveFilePicker";
 
 type ShowMenuProps = { coords: { x: number; y: number }; file: DriveObject };
 const setContext = createContext<{
@@ -40,6 +41,7 @@ function calMaxHeight() {
 export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
   const [coords, setCoords] = useState<{ x: number; y: number } | null>(null);
   const [Menu, setMenu] = useState<ReactNode>();
+  const [showPicker, setShowPicker] = useState<boolean>(true);
   const escKeyPressed = useKeyPress("Escape");
 
   const handleClick = useCallback((event: MouseEvent) => {
@@ -101,6 +103,14 @@ export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
           </div>
         )}
         {props.children}
+        {showPicker && (
+          <div className="w-64 left-64 relative bg-neutrals-gray-1 rounded-xl text-white">
+            <DriveTableFilePicker
+              onRequestClose={() => {}}
+              onInsert={() => {}}
+            />
+          </div>
+        )}
       </getContext.Provider>
     </setContext.Provider>
   );
