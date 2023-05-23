@@ -61,7 +61,7 @@ export default function PrimaryAffiliation() {
             <FlexRowAligned className="text-neutrals-gray-4 flex items-center gap-4 self-baseline">
               <IconAffiliation
                 width={20}
-                className="-mb-1 inline-block self-baseline"
+                className="-mb-1 inline-block self-baseline stroke-neutrals-gray-4"
               />{" "}
               Connect to your Institution (coming soon..)
             </FlexRowAligned>

@@ -19,6 +19,7 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
       googleScholar: props?.author?.googleScholar ?? "",
       role: props?.author?.role || ResearchObjectV1AuthorRole.AUTHOR,
       orcid: props?.author?.orcid ?? "",
+      organizations: props?.author?.organizations ?? []
     },
     reValidateMode: "onChange",
     resolver: yupResolver(authorsFormSchema),
@@ -26,7 +27,7 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
 
   return (
     <Modal {...props} $maxWidth={650} $scrollOverlay={true}>
-      <div className="px-6 py-5 w-full lg:w-[650px] text-white">
+      <div className="px-6 py-5 w-full lg:w-[550px] max-w-[550px] text-white">
         <Modal.Header title="Contributor Details" onDismiss={props.onDismiss} />
         <FormProvider {...methods}>
           <CreditsForm {...props} />

@@ -29,9 +29,9 @@ interface Props {
 function useRorQuery(query?: string) {
   // Todo: convert to use redux-query
   const { data, isValidating } = useSWR<{
-    items: Organization[];
+    results: Organization[];
   }>(query, getRorQueries, { shouldRetryOnError: false });
-  return { data: data?.items ?? [], isFetching: isValidating };
+  return { data: data?.results ?? [], isFetching: isValidating };
 }
 
 function AffiliateSelector(props: Props) {
@@ -137,7 +137,6 @@ function AffiliateSelector(props: Props) {
           style={{
             minHeight: "200px",
             zIndex: 1046,
-            width: 500,
             marginLeft: -8,
           }}
         >
