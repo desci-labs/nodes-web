@@ -1,9 +1,7 @@
 import {
-  checkConsent,
   getUserData,
   magicLinkSend,
   patchAcceptFriendReferral,
-  termsConsent,
   waitlistAdd,
 } from "@src/api";
 import { useEffect, useRef, useState } from "react";
@@ -119,8 +117,6 @@ export default function useLogin() {
       dispatch(setUser(userData));
       dispatch(api.util.invalidateTags([{ type: tags.user }]));
       
-      
-      
       if (referralUuid) {
         /**
          * TODO: We likely want to show a success or something similar
@@ -135,13 +131,6 @@ export default function useLogin() {
       dispatch(setCheckingCode(false));
 
       setTimeout(async () => {
-        const { consent } = await checkConsent();
-        
-        // check if profile is valid
-        if (!consent) {
-          await termsConsent({ hasAcceptedTerms: true }, "");
-        }
-        
         navigate(`${site.app}${app.nodes}/start`);
       }, 500);
     } catch (err) {

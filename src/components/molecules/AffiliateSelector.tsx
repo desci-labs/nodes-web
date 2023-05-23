@@ -1,5 +1,5 @@
 /* This example requires Tailwind CSS v2.0+ */
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 import { CheckIcon } from "@heroicons/react/solid";
 import {
   Combobox,
@@ -34,7 +34,7 @@ function useRorQuery(query?: string) {
   return { data: data?.items ?? [], isFetching: isValidating };
 }
 
-export default function AffiliateSelector(props: Props) {
+function AffiliateSelector(props: Props) {
   let { onChange } = props;
   const [, setTouched] = useState<boolean>(false);
   const [input, setInput] = useState("");
@@ -58,9 +58,12 @@ export default function AffiliateSelector(props: Props) {
     if (inputChangedRef.current === true) return;
 
     if (values.length === 0 && defaultValues?.length > 0) {
-      console.log("update...", values, defaultValues);
       setValues(defaultValues);
       onChange(props?.defaultValues ?? []);
+      props.defaultValues.forEach(
+        (org) =>
+          (dataCacheRef.current[org.name] = { id: org.id, name: org.name })
+      );
     }
   }, [values, defaultValues, onChange, props?.defaultValues]);
 
@@ -136,7 +139,6 @@ export default function AffiliateSelector(props: Props) {
             zIndex: 1046,
             width: 500,
             marginLeft: -8,
-            // marginTop: 5
           }}
         >
           <ComboboxList
@@ -208,3 +210,5 @@ export default function AffiliateSelector(props: Props) {
     </Combobox>
   );
 }
+
+export default memo(AffiliateSelector);

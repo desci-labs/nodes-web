@@ -1,6 +1,4 @@
 import * as Yup from "yup";
-import { useState } from "react";
-import { useWeb3React } from "@web3-react/core";
 
 import cx from "classnames";
 import {
@@ -48,13 +46,8 @@ export default function PrimaryAffiliation() {
 
   const { onSubmit } = useProfileSubmit({});
 
-  // const onSubmit = async (data: string[]) => {
-  //   console.log("submit", data);
-  //   console.log("isvalid", isValid);
-  // };
-
   return (
-    <form id="rorPidForm" onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <FlexColumnAligned className="gap-3">
         <button
           type="button"
@@ -78,11 +71,10 @@ export default function PrimaryAffiliation() {
         <Controller
           name="organization"
           control={control}
-          render={({ field: { defaultValue } }: any) => (
+          render={({ field }: any) => (
             <AffiliateSelector
-              defaultValues={defaultValue}
+              defaultValues={field.value ?? []}
               onChange={(val: Organization[]) => {
-                console.log("onchange", val);
                 setValue("organization", val, {
                   shouldValidate: true,
                   shouldDirty: true,
@@ -104,13 +96,12 @@ export default function PrimaryAffiliation() {
             Find ROR PID
           </a>
         </FlexRowSpaceBetween>
-        {/* {errors.organization ? <span>{errors.organization || ""}</span> : null} */}
         {isDirty ? (
           <FlexRowAligned className="items-center justify-end w-full">
             <PrimaryButton
               disabled={!isValid || isSubmitting}
               className="flex gap-2"
-              form="rorPidForm"
+              type="submit"
             >
               Save Affiliations
             </PrimaryButton>
