@@ -485,6 +485,23 @@ export const renameData = async (
   return data;
 };
 
+export const moveData = async (
+  uuid: string,
+  oldPath: string,
+  newPath: string
+) => {
+  const { data } = await axios.post(
+    `${SCIWEAVE_URL}/v1/data/move`,
+    {
+      uuid,
+      oldPath,
+      newPath,
+    },
+    config()
+  );
+  return data;
+};
+
 export const query = async (query: string) => {
   const payload = JSON.stringify({
     query,
