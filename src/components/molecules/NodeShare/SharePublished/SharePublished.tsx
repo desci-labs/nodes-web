@@ -15,46 +15,53 @@ import { CheckIcon } from "@heroicons/react/outline";
 import { useGetNodesQuery } from "@src/state/api/nodes";
 import { useNodeReader, useNodeVersions } from "@src/state/nodes/hooks";
 import Copier, { useCopier } from "@src/components/molecules/Copier";
-import { FlexColumnCentered, FlexRowCentered } from "@src/components/styled";
-import { IconCopyLink, IconNetwork, IconTwitter } from "@src/icons";
+import {
+  FlexColumnCentered,
+  FlexRowCentered,
+} from "@src/components/styled";
+import {
+  IconCopyLink,
+  IconTwitter,
+} from "@src/icons";
+import NodeMetadataPreview from "@src/components/molecules/NodeMetadataPreview";
 
-function CopyButton(
-  props: ButtonHTMLAttributes<HTMLButtonElement> & {
-    value: string;
-    label: string;
-  }
-) {
-  const { handleCopy, copied } = useCopier();
+// function CopyButton(
+//   props: ButtonHTMLAttributes<HTMLButtonElement> & {
+//     value: string;
+//     label: string;
+//   }
+// ) {
+//   const { handleCopy, copied } = useCopier();
 
-  return (
-    <button
-      {...props}
-      className="text-sm font-bold text-white hover:text-tint-primary-hover disabled:text-neutrals-gray-4"
-      onClick={() => handleCopy(props.value)}
-    >
-      {copied ? (
-        <CheckIcon stroke="#28AAC4" strokeWidth={4} width={20} height={15} />
-      ) : (
-        props.label
-      )}
-    </button>
-  );
-}
+//   return (
+//     <button
+//       {...props}
+//       className="text-sm font-bold text-white hover:text-tint-primary-hover disabled:text-neutrals-gray-4"
+//       onClick={() => handleCopy(props.value)}
+//     >
+//       {copied ? (
+//         <CheckIcon stroke="#28AAC4" strokeWidth={4} width={20} height={15} />
+//       ) : (
+//         props.label
+//       )}
+//     </button>
+//   );
+// }
 
-function LinkCopier(
-  props: PropsWithChildren<{ icon: JSX.Element; label: string; value: string }>
-) {
-  return (
-    <div className="relative flex gap-2 p-2 w-full bg-white dark:bg-[#272727] border border-transparent border-b border-b-[#969696] rounded-md shadow-sm text-left focus:outline-none sm:text-sm">
-      {props.icon}
-      <div className="grow">
-        <span className="block text-xs dark:text-gray-400">{props.label}</span>
-        <span className="block text-xs">{props.value}</span>
-      </div>
-      <CopyButton label="Copy" value={props.value} disabled={!props.value} />
-    </div>
-  );
-}
+// function LinkCopier(
+//   props: PropsWithChildren<{ icon: JSX.Element; label: string; value: string }>
+// ) {
+//   return (
+//     <div className="relative flex gap-2 p-2 w-full bg-white dark:bg-[#272727] border border-transparent border-b border-b-[#969696] rounded-md shadow-sm text-left focus:outline-none sm:text-sm">
+//       {props.icon}
+//       <div className="grow">
+//         <span className="block text-xs dark:text-gray-400">{props.label}</span>
+//         <span className="block text-xs">{props.value}</span>
+//       </div>
+//       <CopyButton label="Copy" value={props.value} disabled={!props.value} />
+//     </div>
+//   );
+// }
 
 const SharePublished = React.memo(() => {
   const {
@@ -174,14 +181,21 @@ const SharePublished = React.memo(() => {
             />
           </div> */}
 
-          <p className="text-center text-sm">
+          <FlexRowCentered className="mb-5">
+            <NodeMetadataPreview
+              uuid={currentObjectId}
+              version={versionCount}
+              dpidLink={dpidLinkLatest}
+            />
+          </FlexRowCentered>
+          <p className="text-center text-sm my-3">
             Share the published version of your Node.
           </p>
-          <FlexRowCentered className="justify-center mt-5">
+          <FlexRowCentered className="justify-center mt-1 mb-8">
             <FlexColumnCentered className="gap-1 max-w-[150px]">
-              <div className="p-2 rounded-full border border-social-twitter">
+              <button className="p-2 rounded-full border border-social-twitter">
                 <IconTwitter className="fill-social-twitter" width={25} />
-              </div>
+              </button>
               <p className="text-sm">Twitter</p>
             </FlexColumnCentered>
             <FlexColumnCentered className="gap-1 max-w-[150px]">

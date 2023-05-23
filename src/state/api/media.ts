@@ -2,11 +2,11 @@ import { api } from ".";
 import { endpoints } from "./endpoint";
 import { tags } from "./tags";
 
-type NodeCoverParams = { cid: string; uuid: string; version?: string | number };
+type NodeCoverParams = { cid?: string; uuid: string; version?: string | number };
 
 export const nodesMediaApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    nodesMediaCover: builder.query<{ url: string }, NodeCoverParams>({
+    nodesMediaCover: builder.query<{ url: string, title: string }, NodeCoverParams>({
       providesTags: (_, error, arg) => [
         {
           type: tags.mediaCover,
