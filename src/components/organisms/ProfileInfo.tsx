@@ -8,7 +8,7 @@ import { memo, useEffect } from "react";
 import { api } from "@src/state/api";
 import { tags } from "@src/state/api/tags";
 import { useSetter } from "@src/store/accessors";
-import PrimaryAffiliation from "@src/components/molecules/PrimaryAffiliation";
+import PrimaryAffiliation, { AffiliationForm } from "@src/components/molecules/PrimaryAffiliation";
 // import {
 //   LS_VSCODE_ENABLED,
 //   useManuscriptController,
@@ -28,7 +28,11 @@ function ProfileInfo(props: {
   }, []);
 
   return (
-    <div className={`sm:grow ${!props.inModal ? "mt-10 pb-10" : ""} w-[500px] max-w-[500px]`}>
+    <div
+      className={`sm:grow ${
+        !props.inModal ? "mt-10 pb-10" : ""
+      } w-[500px] max-w-[500px]`}
+    >
       <div className="flex flex-col gap-8">
         <IconSubTextHeader
           headerText={"Profile Information"}
@@ -80,7 +84,12 @@ function ProfileInfo(props: {
               <DigitalSignature />
             </div>
           </>
-        ) : null}
+        ) : (
+          <>
+            <DividerSimple />
+            <AffiliationForm />
+          </>
+        )}
 
         {process.env.REACT_APP_ENABLE_ORCID ? (
           <>

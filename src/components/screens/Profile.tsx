@@ -6,7 +6,7 @@ import { useManuscriptController } from "@src/components/organisms/ManuscriptRea
 import ProfileInfo from "@src/components/organisms/ProfileInfo";
 import Profiler, {
   ProfileValues,
-} from "@src/components/organisms/WrapperProfileModal";
+} from "@src/components/organisms/Profiler";
 import Modal from "@src/components/molecules/Modal";
 
 export interface ProfilePopOverProps {
