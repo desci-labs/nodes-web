@@ -9,6 +9,7 @@ import { DriveNonComponentTypes, DriveObject, FileType } from "./Drive";
 import { navigateToDrivePickerByPath } from "@src/state/drive/driveSlice";
 import { useDrive } from "@src/state/drive/hooks";
 import { useSetter } from "@src/store/accessors";
+import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
 
 export interface FileDir {
   name: string;
@@ -24,17 +25,23 @@ const Empty = () => {
   return <div className="p-5 text-xs">No files</div>;
 };
 
+export enum DrivePickerMode {
+  ANNOTATION = "annotation",
+  MOVE = "move",
+}
 interface DriveTableProps {
   onRequestClose: () => void;
   onInsert: (file: DriveObject) => void;
+  mode?: DrivePickerMode;
 }
 
 const DriveTableFilePicker: React.FC<DriveTableProps> = ({
   onRequestClose,
   onInsert,
+  mode = DrivePickerMode.ANNOTATION,
 }) => {
   const dispatch = useSetter();
-  const { currentDrivePicker, breadCrumbsPicker } = useDrive();
+  const { currentDrivePicker, breadCrumbsPicker, currentDrive } = useDrive();
 
   const [selected, setSelected] = useState<number | undefined>(undefined);
 
@@ -75,6 +82,12 @@ const DriveTableFilePicker: React.FC<DriveTableProps> = ({
     }
   }
 
+  const moveModeDisabledConditions =
+    mode === DrivePickerMode.MOVE
+      ? currentDrivePicker?.path === DRIVE_FULL_EXTERNAL_LINKS_PATH ||
+        currentDrivePicker?.path === currentDrive?.path
+      : false;
+
   return (
     <div className="w-full h-full  pb-14">
       {/* <DriveBreadCrumbs crumbs={breadCrumbs} eatBreadCrumb={eatBreadCrumb} /> */}
@@ -94,7 +107,7 @@ const DriveTableFilePicker: React.FC<DriveTableProps> = ({
         </span>
         <IconX
           height={14}
-          stroke={"black"}
+          stroke={DrivePickerMode.MOVE ? "white" : "black"}
           className="cursor-pointer"
           onClick={onRequestClose}
         />
@@ -111,6 +124,7 @@ const DriveTableFilePicker: React.FC<DriveTableProps> = ({
                 selected={idx === selected}
                 toggleSelected={toggleSelected}
                 onInsert={onInsert}
+                mode={mode}
               />
             );
           })
@@ -122,14 +136,22 @@ const DriveTableFilePicker: React.FC<DriveTableProps> = ({
         <PrimaryButton
           title="Insert"
           onClick={() => {
-            setSelected(undefined);
-            selected !== undefined &&
-              onInsert(currentDrivePicker?.contains![selected]!);
+            if (mode === DrivePickerMode.ANNOTATION) {
+              setSelected(undefined);
+              selected !== undefined &&
+                onInsert(currentDrivePicker?.contains![selected]!);
+            }
+            if (mode === DrivePickerMode.MOVE) {
+              onInsert(currentDrivePicker!);
+            }
           }}
-          disabled={selected === undefined}
+          disabled={
+            (mode === DrivePickerMode.ANNOTATION && selected === undefined) ||
+            moveModeDisabledConditions
+          }
           className="py-1"
         >
-          Insert
+          {mode === DrivePickerMode.MOVE ? "Move Here" : "Insert"}
         </PrimaryButton>
       </div>
     </div>
@@ -151,6 +173,7 @@ interface DriveRowProps {
     componentType: ResearchObjectComponentType | DriveNonComponentTypes
   ) => void;
   onInsert?: (file: DriveObject) => void;
+  mode?: DrivePickerMode;
 }
 
 function DriveRow({
@@ -160,10 +183,15 @@ function DriveRow({
   toggleSelected,
   exploreDirectory,
   onInsert,
+  mode = DrivePickerMode.ANNOTATION,
 }: DriveRowProps) {
   return (
     <ul
-      className={`h-[48px]list-none font-medium text-sm content-center justify-items-center items-center gap-10 px-5 hover:bg-neutrals-gray-8
+      className={`h-[48px]list-none font-medium text-sm content-center justify-items-center items-center gap-10 px-5 ${
+        mode === DrivePickerMode.MOVE
+          ? "hover:bg-neutrals-gray-2"
+          : "hover:bg-neutrals-gray-8"
+      }
         ${
           selected
             ? "bg-tint-primary bg-opacity-50 hover:bg-tint-primary hover:bg-opacity-75"
@@ -171,7 +199,7 @@ function DriveRow({
         }`}
       onClick={(e) => {
         e.stopPropagation();
-        if (!file.contains) {
+        if (mode === DrivePickerMode.ANNOTATION && !file.contains) {
           toggleSelected(index, file.componentType);
         }
       }}
