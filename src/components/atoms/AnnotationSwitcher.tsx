@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import styled, { StyledComponent } from "styled-components";
 import { FlexRowAligned } from "@components/styled";
-import { IconTriangleLeft, IconTriangleRight } from "icons";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { ResearchObjectComponentAnnotation } from "@desci-labs/desci-models";
 import { usePageZoomedOffset, usePdfReader } from "@src/state/nodes/hooks";
@@ -12,6 +11,7 @@ import {
   setSelectedAnnotationId,
 } from "@src/state/nodes/pdf";
 import ReactTooltip from "react-tooltip";
+import { AiFillCaretLeft, AiFillCaretRight } from "react-icons/ai";
 
 const Wrapper: StyledComponent<"div", any, any> = styled(FlexRowAligned)`
   flex: unset;
@@ -20,8 +20,10 @@ const MiddleElementWrapper = styled(FlexRowAligned).attrs({
   className: "bg-zinc-100 dark:bg-muted-900 select-none",
 })`
   border-radius: 0.875rem;
-  padding: 0.3rem 0.5rem;
+  padding: 0.2rem 0.4rem;
   gap: 0.25rem;
+  width: 50px;
+  box-sizing: border-box;
 `;
 const MiddleElementText = styled.p.attrs({
   className: "font-mono",
@@ -29,6 +31,8 @@ const MiddleElementText = styled.p.attrs({
   font-size: 0.7rem;
   font-weight: bold;
   white-space: nowrap;
+  width: 100%;
+  text-align: center;
 `;
 
 interface AnnotationSwitcherProps {
@@ -57,6 +61,7 @@ const AnnotationSwitcher = (props: AnnotationSwitcherProps) => {
     "pageMetadata",
     "scrollToPage$",
   ]);
+  // const [disableSwitch, setDisableSwitch] = useState(false);
 
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
@@ -67,10 +72,11 @@ const AnnotationSwitcher = (props: AnnotationSwitcherProps) => {
    */
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      const selectedIndex = annotations.findIndex(
-        (a: ResearchObjectComponentAnnotation) => a.id === selectedAnnotationId
-      );
-      setSelectedIndex(selectedIndex);
+      // const selectedIndex = annotations.findIndex(
+      //   (a: ResearchObjectComponentAnnotation) => a.id === selectedAnnotationId
+      // );
+      // console.log('annotation update', selectedIndex)
+      // setSelectedIndex(selectedIndex);
     }, 100);
     return () => clearTimeout(timeoutId);
   }, [selectedAnnotationId, annotations]);
@@ -103,6 +109,7 @@ const AnnotationSwitcher = (props: AnnotationSwitcherProps) => {
 
   // recenter on the current annotation
   const pinax = useCallback(() => {
+    //  console.log("pinax", disableSwitch);
     const targetAnnotation: ResearchObjectComponentAnnotation | null =
       annotations[selectedIndex];
     /**
@@ -118,11 +125,14 @@ const AnnotationSwitcher = (props: AnnotationSwitcherProps) => {
 
   const increment = useCallback(
     (skipScrollToTop: boolean = false) => {
+     
+
       /**
        * handleComponentClick, setTimeout pattern.
        * Handle clicking annotation when other component is currently selected
        */
       handleComponentClick();
+
       setTimeout(() => {
         const topIndex = skipScrollToTop ? 0 : -1;
         const nextIndex =
@@ -143,11 +153,13 @@ const AnnotationSwitcher = (props: AnnotationSwitcherProps) => {
 
   const decrement = useCallback(
     (skipScrollToTop: boolean = false) => {
+     
       /**
        * handleComponentClick, setTimeout pattern.
        * Handle clicking annotation when other component is currently selected
        */
       handleComponentClick();
+
       setTimeout(() => {
         const topIndex = skipScrollToTop ? 0 : -1;
         const prevIndex =
@@ -213,30 +225,31 @@ const AnnotationSwitcher = (props: AnnotationSwitcherProps) => {
       data-annotation-switch
       className="group"
     >
-      <IconTriangleLeft
+      <AiFillCaretLeft
         title="Previous annotation"
-        className={`cursor-pointer fill-black dark:fill-white hover:dark:fill-neutrals-gray-5 outline-none`}
+        className={`annotation-switch-svg cursor-pointer fill-black dark:fill-white hover:dark:fill-neutrals-gray-5 disabled:dark:fill-neutrals-gray-5 outline-none`}
         onClick={() => decrement()}
         data-tip={"Previous Annotation"}
         data-place="bottom"
         data-type="info"
         data-background-color="black"
-        width={15}
       />
       <MiddleElementWrapper onClick={pinax} title="Back to selected annotation">
         <MiddleElementText>
           {selectedIndex + 1}/{annotations.length}
         </MiddleElementText>
       </MiddleElementWrapper>
-      <IconTriangleRight
+      <AiFillCaretRight
         title="Next annotation"
-        className="cursor-pointer fill-black dark:fill-white hover:dark:fill-neutrals-gray-5 outline-none"
-        onClick={() => increment()}
+        className="annotation-switch-svg cursor-pointer fill-black dark:fill-white hover:dark:fill-neutrals-gray-5 disabled:dark:fill-neutrals-gray-5 outline-none"
+        onClick={(e) => {
+          e.stopPropagation();
+          increment();
+        }}
         data-tip={"Next Annotation"}
         data-place="bottom"
         data-type="info"
         data-background-color="black"
-        width={15}
       />
     </Wrapper>
   );
