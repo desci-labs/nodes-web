@@ -150,6 +150,7 @@ import { ReactComponent as IconSvcResearchHub } from "@images/icons/service-rese
 import { ReactComponent as IconSvcYoutube } from "@images/icons/service-youtube.svg";
 import { ReactComponent as IconSvcLink } from "@images/icons/service-any.svg";
 import { ReactComponent as IconAnnotate } from "@images/annotation.svg";
+import { ReactComponent as IconGoogleScholar } from "@images/google_scholar.svg";
 
 export type SvgIconProps = FC<
   React.SVGProps<SVGSVGElement> & {
@@ -312,4 +313,5 @@ export {
   IconGitbook,
   IconPower,
   IconAnnotate,
+  IconGoogleScholar,
 };
