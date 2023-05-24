@@ -60,7 +60,7 @@ import NodeMetadataPreview from "@src/components/molecules/NodeMetadataPreview";
 //   );
 // }
 
-const shareCaption = "View my research node on Desci Labs here."
+const shareCaption = "Check out this research Node:";
 const getTwitterShareLink = (text: string) => `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
 
 
@@ -195,7 +195,7 @@ const SharePublished = React.memo(() => {
           <FlexRowCentered className="justify-center mt-8 mb-4">
             <FlexColumnCentered className="gap-1 max-w-[150px]">
               <a
-                href={getTwitterShareLink(`${shareCaption} \n${dpidLinkLatest}`)}
+                href={getTwitterShareLink(`${shareCaption} ${manifest?.title} \n${dpidLinkLatest}`)}
                 target="_blank"
                 rel="noreferrer"
                 className="p-2 rounded-full border border-social-twitter"
