@@ -1,7 +1,6 @@
 import { IconAuthor } from "@icons";
 import IconSubTextHeader from "@components/molecules/IconSubTextHeader";
 import DigitalSignature from "@components/molecules/DigitalSignature";
-import OrcidButton from "@src/components/molecules/OrcIdAuthButton";
 import DividerSimple from "@components/atoms/DividerSimple";
 import UserProfileForm from "@components/organisms/UserProfileForm";
 import { memo, useEffect } from "react";
@@ -42,6 +41,7 @@ function ProfileInfo(props: {
         />
 
         <UserProfileForm viewOnly={!props.inModal} />
+        <DividerSimple />
         {!props.inModal ? (
           <>
             <DividerSimple />
@@ -85,13 +85,12 @@ function ProfileInfo(props: {
             </div>
           </>
         ) : (
-          <>
-            <DividerSimple />
+          <div>
             <AffiliationForm />
-          </>
+          </div>
         )}
 
-        {process.env.REACT_APP_ENABLE_ORCID ? (
+        {/* {process.env.REACT_APP_ENABLE_ORCID ? (
           <>
             <DividerSimple />
             <div className="flex flex-col gap-8">
@@ -99,9 +98,6 @@ function ProfileInfo(props: {
                 <IconSubTextHeader
                   withCircleBorder={false}
                   headerText={"External Accounts"}
-                  // subText={
-                  //   "Linking external account plays an important role in protecting your contributor dentity."
-                  // }
                 />
                 <p className="mt-1 text-neutrals-gray-5 text-[12px] w-96">
                   ORCID is a researcher identity disembiguation service used by
@@ -119,22 +115,13 @@ function ProfileInfo(props: {
               </div>
               <OrcidButton
                 callback={async () => {
-                  /**
-                   * TODO: Why does this cause the pane to collapse?
-                   * Manually editing the orcId (or other) in the prisma gui also causes the pane to collapse
-                   * Seems anytime the user is updated, the pane collapses?
-                   */
-                  // const refreshedUser = await getUserData();
-                  // setUserProfile(refreshedUser as UserProfileApiData);
                   dispatch(api.util.invalidateTags([{ type: tags.user }]));
                   console.log("[ProfileInfo]::Refresh User data");
                 }}
               />
             </div>
           </>
-        ) : null}
-        {/** NOTE: disabling advanced options because VSCode is now default / forced, Old Code Viewer removed */}
-        {/* <AdvancedOptions /> */}
+        ) : null} */}
       </div>
     </div>
   );

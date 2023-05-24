@@ -52,7 +52,7 @@ export const AffiliationForm = () => {
           />
         )}
       />
-      <FlexRowSpaceBetween className="justify-between gap-5 w-full">
+      <FlexRowSpaceBetween className="justify-between gap-5 w-full mt-1">
         <p className="text-sm text-neutrals-gray-5">
           Tap enter to add multiple affiliations.
         </p>
