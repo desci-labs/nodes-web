@@ -47,7 +47,7 @@ export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
   const [Menu, setMenu] = useState<ReactNode>();
   const [showDrivePicker, setShowDrivePicker] = useState<boolean>(false);
   const escKeyPressed = useKeyPress("Escape");
-  const [lastFile, setLastFile] = useState<DriveObject | null>(null);
+  const [lastFile, setLastFile] = useState<DriveObject | undefined>(undefined);
 
   const dispatch = useSetter();
 
@@ -130,6 +130,7 @@ export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
                 setShowDrivePicker(false);
               }}
               mode={DrivePickerMode.MOVE}
+              contextDrive={lastFile}
             />
           </div>
         )}

@@ -33,12 +33,14 @@ interface DriveTableProps {
   onRequestClose: () => void;
   onInsert: (file: DriveObject) => void;
   mode?: DrivePickerMode;
+  contextDrive?: DriveObject;
 }
 
 const DriveTableFilePicker: React.FC<DriveTableProps> = ({
   onRequestClose,
   onInsert,
   mode = DrivePickerMode.ANNOTATION,
+  contextDrive,
 }) => {
   const dispatch = useSetter();
   const { currentDrivePicker, breadCrumbsPicker, currentDrive } = useDrive();
@@ -85,7 +87,9 @@ const DriveTableFilePicker: React.FC<DriveTableProps> = ({
   const moveModeDisabledConditions =
     mode === DrivePickerMode.MOVE
       ? currentDrivePicker?.path === DRIVE_FULL_EXTERNAL_LINKS_PATH ||
-        currentDrivePicker?.path === currentDrive?.path
+        currentDrivePicker?.path === currentDrive?.path ||
+        (contextDrive?.path &&
+          currentDrivePicker?.path!.includes(contextDrive?.path))
       : false;
 
   return (
