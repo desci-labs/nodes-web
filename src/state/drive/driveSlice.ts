@@ -1,6 +1,6 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
-import { getDatasetTree, updateDag } from "@src/api";
+import { getDatasetTree, moveData, updateDag } from "@src/api";
 import {
   AccessStatus,
   DriveObject,
@@ -49,6 +49,7 @@ import {
   AssignTypeThunkPayload,
   BreadCrumb,
   DrivePath,
+  MoveFilesThunkPayload,
   NavigateToDriveByPathAction,
   removeBatchFromUploadQueueAction,
   StarComponentThunkPayload,
@@ -887,6 +888,30 @@ export const assignTypeThunk = createAsyncThunk(
       dispatch(addComponent({ component: newComponent }));
     }
     dispatch(saveManifestDraft({ onSucess: () => dispatch(fetchTreeThunk()) }));
+  }
+);
+
+export const moveFilesThunk = createAsyncThunk(
+  "drive/moveFiles",
+  async (payload: MoveFilesThunkPayload, { getState, dispatch }) => {
+    const state = getState() as RootState;
+    const { item, newDirectory } = payload;
+    const { currentObjectId: nodeUuid } = state.nodes.nodeReader;
+
+    const oldPath = item.path;
+    const newPath = newDirectory.path + "/" + item.name;
+
+    const { manifest: updatedManifest, manifestCid } = await moveData(
+      nodeUuid!,
+      oldPath!,
+      newPath!
+    );
+
+    if (updatedManifest) {
+      dispatch(setManifest(updatedManifest));
+      dispatch(setManifestCid(manifestCid));
+      dispatch(fetchTreeThunk());
+    }
   }
 );
 
