@@ -2,6 +2,8 @@ import Modal, { ModalProps } from "@components/molecules/Modal";
 import { CreditModalProps } from "./schema";
 import { FlexColumnCentered, FlexRowCentered } from "@src/components/styled";
 import { IconGithub, IconGoogleScholar, IconOrcid } from "@src/icons";
+import { isMobile } from "react-device-detect";
+import clsx from "clsx";
 
 const getOrcidUrl = (orcid: string) => `https://orcid.org/${orcid}`;
 
@@ -11,9 +13,14 @@ export default function PreviewModal(props: ModalProps & CreditModalProps) {
       isOpen={props.isOpen}
       onDismiss={props?.onDismiss}
       $maxWidth={600}
-      $scrollOverlay={true}
+      $scrollOverlay={isMobile ? false : true}
     >
-      <div className="px-6 py-5 text-white relative min-w-[600px] font-interr">
+      <div
+        className={clsx(
+          "px-6 py-5 text-white relative  font-interr",
+          isMobile ? "min-w-[350px]" : "min-w-[600px]"
+        )}
+      >
         <Modal.Header onDismiss={props?.onDismiss} />
         <FlexColumnCentered className="mt-8 w-full">
           <span className="font-bold capitalize text-lg">
