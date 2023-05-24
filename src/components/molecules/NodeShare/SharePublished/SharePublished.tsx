@@ -2,8 +2,6 @@ import { getPublishedVersions, resolvePublishedManifest } from "@api/index";
 import PaneInfo from "@components/atoms/PaneInfo";
 import { ResearchObjectV1 } from "@desci-labs/desci-models";
 import React, {
-  ButtonHTMLAttributes,
-  PropsWithChildren,
   useEffect,
   useMemo,
   useState,
@@ -11,10 +9,9 @@ import React, {
 import { SpinnerCircular } from "spinners-react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
-import { CheckIcon } from "@heroicons/react/outline";
 import { useGetNodesQuery } from "@src/state/api/nodes";
 import { useNodeReader, useNodeVersions } from "@src/state/nodes/hooks";
-import Copier, { useCopier } from "@src/components/molecules/Copier";
+import Copier from "@src/components/molecules/Copier";
 import {
   FlexColumnCentered,
   FlexRowCentered,
@@ -62,6 +59,10 @@ import NodeMetadataPreview from "@src/components/molecules/NodeMetadataPreview";
 //     </div>
 //   );
 // }
+
+const shareCaption = "View my research node on Desci Labs here."
+const getTwitterShareLink = (text: string) => `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+
 
 const SharePublished = React.memo(() => {
   const {
@@ -191,11 +192,16 @@ const SharePublished = React.memo(() => {
           <p className="text-center text-sm my-3">
             Share the published version of your Node.
           </p>
-          <FlexRowCentered className="justify-center mt-1 mb-8">
+          <FlexRowCentered className="justify-center mt-8 mb-4">
             <FlexColumnCentered className="gap-1 max-w-[150px]">
-              <button className="p-2 rounded-full border border-social-twitter">
+              <a
+                href={getTwitterShareLink(`${shareCaption} \n${dpidLinkLatest}`)}
+                target="_blank"
+                rel="noreferrer"
+                className="p-2 rounded-full border border-social-twitter"
+              >
                 <IconTwitter className="fill-social-twitter" width={25} />
-              </button>
+              </a>
               <p className="text-sm">Twitter</p>
             </FlexColumnCentered>
             <FlexColumnCentered className="gap-1 max-w-[150px]">
@@ -204,8 +210,7 @@ const SharePublished = React.memo(() => {
                   text={dpidLinkLatest}
                   icon={(props) => (
                     <IconCopyLink
-                      width={25}
-                      className="w-6 cursor-pointer fill-white h-6"
+                      className="w-5 cursor-pointer fill-white h-5"
                       {...props}
                     />
                   )}
