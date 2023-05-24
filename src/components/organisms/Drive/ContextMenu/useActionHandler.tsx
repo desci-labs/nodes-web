@@ -26,6 +26,7 @@ import { deleteData } from "@src/api";
 import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
 import { deleteComponent } from "@src/state/nodes/nodeReader";
 import { useDrive } from "@src/state/drive/hooks";
+import { useContextMenu } from "./provider";
 
 const IPFS_URL = process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE;
 const PUB_IPFS_URL = process.env.REACT_APP_PUBLIC_IPFS_RESOLVER;
@@ -63,6 +64,12 @@ export const getActionState = (action: Actions, file: DriveObject) => {
           file.componentType === ResearchObjectComponentType.CODE
         ),
       };
+    case Actions.MOVE:
+      return {
+        disabled:
+          file?.path === DRIVE_FULL_EXTERNAL_LINKS_PATH ||
+          file.componentType === ResearchObjectComponentType.LINK,
+      };
     default:
       return { disabled: true };
   }
@@ -77,6 +84,8 @@ export default function useActionHandler() {
     mode,
   } = useNodeReader();
   const { deprecated } = useDrive();
+
+  const { openDrivePicker } = useContextMenu();
 
   async function preview(file: DriveObject) {
     if (
@@ -188,7 +197,7 @@ export default function useActionHandler() {
   }
 
   async function move(file: DriveObject) {
-    //open move file picker
+    openDrivePicker();
   }
 
   const handler: Record<

@@ -10,17 +10,21 @@ import {
 } from "react";
 import { DriveObject } from "../types";
 import { buildMenu } from "./MenuList";
-import DriveTableFilePicker from "../../DriveFilePicker";
+import DriveTableFilePicker, { DrivePickerMode } from "../../DriveFilePicker";
+import { useSetter } from "@src/store/accessors";
+import { moveFilesThunk } from "@src/state/drive/driveSlice";
 
 type ShowMenuProps = { coords: { x: number; y: number }; file: DriveObject };
 const setContext = createContext<{
   showMenu: (props: ShowMenuProps) => void;
   renderMenu: (file: DriveObject) => void;
   closeMenu: () => void;
+  openDrivePicker: () => void;
 }>({
   showMenu: () => {},
   closeMenu: () => {},
   renderMenu: () => {},
+  openDrivePicker: () => {},
 });
 const getContext = createContext<{ coords: { x: number; y: number } | null }>({
   coords: { x: 0, y: 0 },
@@ -41,8 +45,11 @@ function calMaxHeight() {
 export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
   const [coords, setCoords] = useState<{ x: number; y: number } | null>(null);
   const [Menu, setMenu] = useState<ReactNode>();
-  const [showPicker, setShowPicker] = useState<boolean>(true);
+  const [showDrivePicker, setShowDrivePicker] = useState<boolean>(false);
   const escKeyPressed = useKeyPress("Escape");
+  const [lastFile, setLastFile] = useState<DriveObject | null>(null);
+
+  const dispatch = useSetter();
 
   const handleClick = useCallback((event: MouseEvent) => {
     const path = event.composedPath && event.composedPath();
@@ -60,12 +67,17 @@ export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
 
   const renderMenu = (file: DriveObject) => {
     const menuToRender = buildMenu(file);
+    setLastFile(file);
     setMenu(menuToRender);
   };
 
   const closeMenu = () => {
     setMenu(null);
     setCoords(null);
+  };
+
+  const openDrivePicker = () => {
+    setShowDrivePicker(true);
   };
 
   useEffect(() => {
@@ -80,7 +92,9 @@ export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
   );
 
   return (
-    <setContext.Provider value={{ showMenu, closeMenu, renderMenu }}>
+    <setContext.Provider
+      value={{ showMenu, closeMenu, renderMenu, openDrivePicker }}
+    >
       <getContext.Provider value={{ coords }}>
         {!!Menu && (
           <div
@@ -103,11 +117,19 @@ export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
           </div>
         )}
         {props.children}
-        {showPicker && (
+        {showDrivePicker && (
           <div className="w-64 left-64 relative bg-neutrals-gray-1 rounded-xl text-white">
             <DriveTableFilePicker
-              onRequestClose={() => {}}
-              onInsert={() => {}}
+              onRequestClose={() => {
+                setShowDrivePicker(false);
+              }}
+              onInsert={(newDir: DriveObject) => {
+                dispatch(
+                  moveFilesThunk({ item: lastFile!, newDirectory: newDir })
+                );
+                setShowDrivePicker(false);
+              }}
+              mode={DrivePickerMode.MOVE}
             />
           </div>
         )}
