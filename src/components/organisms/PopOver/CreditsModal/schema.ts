@@ -61,12 +61,14 @@ const ORCID_SCHEMA = Yup.string()
     test: (value = "", ctx) => {
       if (value === "") return true;
 
-      let cids = value.split('-');
-      
+      let cids = value.split("-");
+
       let invalid = cids
         .map((data, index) => {
           if (index === cids.length - 1) {
-            return data.length === 4 && /^\d{3}[a-zA-Z0-9]{1}$/.test(data) ? data : ""
+            return data.length === 4 && /^\d{3}[a-zA-Z0-9]{1}$/.test(data)
+              ? data
+              : "";
           }
           return /^\d+$/.test(data) && data.length === 4 ? data : "";
         })
@@ -94,5 +96,17 @@ export const authorsFormSchema = Yup.object({
   name: Yup.string().required(),
   role: AUTHOR_ROLES_SCHEMA,
   googleScholar: GOOGLE_SCHOLAR_URL_SCHEMA.optional(),
+  github: Yup.string()
+    .url()
+    .optional()
+    .test({
+      message: "Invalid github url",
+      name: "Github",
+      test: (data, _) => {
+        if (data === "" || !data) return true;
+        const pattern = /^(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9_-]{1,25}$/igm
+        if (!pattern.test(data)) return false;
+        return true;
+      },
+    }),
 });
-

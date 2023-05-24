@@ -133,6 +133,23 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
           {errors.googleScholar?.message}
         </span>
       </div>
+      <div className="mt-8">
+        <Controller
+          name="github"
+          control={control}
+          render={({ field }) => (
+            <InsetLabelSmallInput
+              label="Github profile"
+              {...field}
+              ref={register("github").ref}
+              optional={true}
+            />
+          )}
+        />
+        <span className="text-red-400 text-xs">
+          {errors.github?.message}
+        </span>
+      </div>
     </form>
   );
 }

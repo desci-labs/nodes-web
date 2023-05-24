@@ -19,6 +19,7 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
       googleScholar: props?.author?.googleScholar ?? "",
       role: props?.author?.role || ResearchObjectV1AuthorRole.AUTHOR,
       orcid: props?.author?.orcid ?? "",
+      github: props?.author?.github ?? "",
     },
     reValidateMode: "onChange",
     resolver: yupResolver(authorsFormSchema),

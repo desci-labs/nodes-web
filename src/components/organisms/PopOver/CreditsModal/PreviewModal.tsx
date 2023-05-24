@@ -50,9 +50,9 @@ export default function PreviewModal(props: ModalProps & CreditModalProps) {
                 <IconGoogleScholar width={23} />
               </a>
             ) : null}
-            {props.author?.googleScholar ? (
+            {props.author?.github ? (
               <a
-                href={props.author?.googleScholar}
+                href={props.author?.github}
                 rel="noreferrer"
                 target="_blank"
                 className="flex gap-1 items-center text-xs group hover:text-tint-primary-hover text-tint-primary underline"
