@@ -132,7 +132,13 @@ const DriveTableFilePicker: React.FC<DriveTableProps> = ({
           <Empty />
         )}
       </div>
-      <div className="flex flex-row justify-end items-center p-3 border-t border-neutrals-gray-7 absolute w-full bg-white bottom-0 rounded-b-lg">
+      <div
+        className={`flex flex-row justify-end items-center p-3 border-t border-neutrals-gray-7 absolute w-full bg-white bottom-0 rounded-b-lg ${
+          mode === DrivePickerMode.MOVE
+            ? "bg-neutrals-gray-2 border-primary"
+            : ""
+        }`}
+      >
         <PrimaryButton
           title="Insert"
           onClick={() => {
