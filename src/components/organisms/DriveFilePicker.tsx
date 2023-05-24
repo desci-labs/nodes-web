@@ -88,8 +88,10 @@ const DriveTableFilePicker: React.FC<DriveTableProps> = ({
     mode === DrivePickerMode.MOVE
       ? currentDrivePicker?.path === DRIVE_FULL_EXTERNAL_LINKS_PATH ||
         currentDrivePicker?.path === currentDrive?.path ||
-        (contextDrive?.path &&
-          currentDrivePicker?.path!.includes(contextDrive?.path))
+        !!(
+          contextDrive?.path &&
+          currentDrivePicker?.path!.includes(contextDrive?.path)
+        )
       : false;
 
   return (
