@@ -73,7 +73,7 @@ export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
 
   const closeMenu = () => {
     setMenu(null);
-    setCoords(null);
+    // setCoords(null);
   };
 
   const openDrivePicker = () => {
@@ -118,7 +118,13 @@ export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
         )}
         {props.children}
         {showDrivePicker && (
-          <div className="w-64 left-64 relative bg-neutrals-gray-1 rounded-xl text-white">
+          <div
+            className="w-64 absolute bg-neutrals-black rounded-xl text-white h-fit shadow-lg"
+            style={{
+              left: coords?.x,
+              top: coords?.y,
+            }}
+          >
             <DriveTableFilePicker
               onRequestClose={() => {
                 setShowDrivePicker(false);
