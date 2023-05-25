@@ -134,7 +134,7 @@ export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
         {showDrivePicker && (
           <div
             ref={pickerRef}
-            className="w-64 absolute bg-neutrals-black rounded-xl text-white h-fit shadow-lg"
+            className="w-64 absolute bg-neutrals-black rounded-xl text-white h-fit shadow-lg before:w-5 before:h-5 before:absolute before:rotate-45 before:-inset-2 before:left-20 before:bg-neutrals-black"
             style={{
               left: coords?.x,
               top: coords?.y! - 50,
