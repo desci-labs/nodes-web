@@ -130,7 +130,7 @@ export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
             className="w-64 absolute bg-neutrals-black rounded-xl text-white h-fit shadow-lg"
             style={{
               left: coords?.x,
-              top: coords?.y,
+              top: coords?.y! - 50,
             }}
           >
             <DriveTableFilePicker
