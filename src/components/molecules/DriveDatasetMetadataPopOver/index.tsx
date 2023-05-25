@@ -31,6 +31,7 @@ import ViewMetadataModal from "@src/components/organisms/PopOver/ComponentMetada
 export const DATASET_METADATA_FORM_DEFAULTS = {
   title: "",
   ontologyPurl: "",
+  cedarLink: "",
   controlledVocabTerms: [],
   keywords: [],
   description: "",
@@ -70,6 +71,7 @@ const DriveDatasetMetadataEditor = (
       title: data?.title || DATASET_METADATA_FORM_DEFAULTS.title,
       ontologyPurl:
         data?.ontologyPurl || DATASET_METADATA_FORM_DEFAULTS.ontologyPurl,
+      cedarLink: data?.cedarLink || DATASET_METADATA_FORM_DEFAULTS.cedarLink,
       controlledVocabTerms:
         data?.controlledVocabTerms ||
         DATASET_METADATA_FORM_DEFAULTS.controlledVocabTerms,

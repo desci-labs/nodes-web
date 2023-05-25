@@ -121,6 +121,7 @@ const ViewMetadataModal = (
           )}
           {(metadata?.keywords?.length || 0) > 0 ||
             metadata?.ontologyPurl ||
+            metadata?.cedarLink ||
             ((metadata?.controlledVocabTerms?.length || 0) > 0 && (
               <>
                 <DividerSimple />
@@ -148,6 +149,21 @@ const ViewMetadataModal = (
                         className="flex gap-1 mt-1 items-center group hover:text-tint-primary-hover text-tint-primary underline truncate line-clamp-1"
                       >
                         {metadata?.ontologyPurl}
+                      </a>
+                    </ContentWrapper>
+                  </CardContainer>
+                )}
+                {metadata?.cedarLink && (
+                  <CardContainer>
+                    <Title title="CEDAR Metadata Schema" />
+                    <ContentWrapper>
+                      <a
+                        href={metadata?.cedarLink}
+                        rel="noreferrer"
+                        target="_blank"
+                        className="flex gap-1 mt-1 items-center group hover:text-tint-primary-hover text-tint-primary underline truncate line-clamp-1"
+                      >
+                        {metadata?.cedarLink}
                       </a>
                     </ContentWrapper>
                   </CardContainer>
