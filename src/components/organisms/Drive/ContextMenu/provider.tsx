@@ -15,6 +15,7 @@ import DriveTableFilePicker, { DrivePickerMode } from "../../DriveFilePicker";
 import { useSetter } from "@src/store/accessors";
 import { moveFilesThunk } from "@src/state/drive/driveSlice";
 import { useClickAway } from "react-use";
+import { navigateToDrivePickerByPath } from "@src/state/drive/driveSlice";
 
 type ShowMenuProps = { coords: { x: number; y: number }; file: DriveObject };
 const setContext = createContext<{
@@ -80,6 +81,11 @@ export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
   };
 
   const openDrivePicker = () => {
+    dispatch(
+      navigateToDrivePickerByPath({
+        path: lastFile?.path!,
+      })
+    );
     setShowDrivePicker(true);
   };
 
