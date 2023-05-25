@@ -143,6 +143,47 @@ export const DatasetMetadataForm = React.forwardRef(
 
         <div className="py-3 my-3">
           <Controller
+            name="cedarLink"
+            control={control}
+            render={({ field, value, fieldState }: any) => (
+              <div className="flex flex-col gap-1">
+                <InsetLabelSmallInput
+                  label="CEDAR Metadata Schema"
+                  labelClassName="text-xs"
+                  value={value}
+                  {...field}
+                  fieldState={fieldState}
+                  mandatory={false}
+                  optional
+                />
+                {field.value && field.value.length > 0 && (
+                  <a
+                    href={`https://open.metadatacenter.org/templates/${encodeURIComponent(
+                      field.value
+                    )}`}
+                    className="inline-flex gap-1 text-xs text-tint-primary hover:text-tint-primary-hover"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    Preview CEDAR Resource{" "}
+                    <IconViewLink
+                      stroke={"inherit"}
+                      width={12}
+                      strokeWidth={0.5}
+                      className="-mt-0.5 stroke-current"
+                    />
+                  </a>
+                )}
+              </div>
+            )}
+          />
+          <div className="text-xs mt-1">
+            Enter the CEDAR metadata link for this data.
+          </div>
+        </div>
+
+        <div className="py-3 my-3">
+          <Controller
             name="ontologyPurl"
             control={control}
             render={({ field, value, fieldState }: any) => (
