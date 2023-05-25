@@ -1,25 +1,15 @@
 import { getPublishedVersions, resolvePublishedManifest } from "@api/index";
 import PaneInfo from "@components/atoms/PaneInfo";
 import { ResearchObjectV1 } from "@desci-labs/desci-models";
-import React, {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { SpinnerCircular } from "spinners-react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import { useGetNodesQuery } from "@src/state/api/nodes";
 import { useNodeReader, useNodeVersions } from "@src/state/nodes/hooks";
 import Copier from "@src/components/molecules/Copier";
-import {
-  FlexColumnCentered,
-  FlexRowCentered,
-} from "@src/components/styled";
-import {
-  IconCopyLink,
-  IconTwitter,
-} from "@src/icons";
+import { FlexColumnCentered, FlexRowCentered } from "@src/components/styled";
+import { IconCopyLink, IconTwitter } from "@src/icons";
 import NodeMetadataPreview from "@src/components/molecules/NodeMetadataPreview";
 
 // function CopyButton(
@@ -60,9 +50,9 @@ import NodeMetadataPreview from "@src/components/molecules/NodeMetadataPreview";
 //   );
 // }
 
-const shareCaption = "Check out this research Node:";
-const getTwitterShareLink = (text: string) => `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
-
+const shareCaption = "Check out this research:";
+const getTwitterShareLink = (text: string) =>
+  `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
 
 const SharePublished = React.memo(() => {
   const {
@@ -189,13 +179,15 @@ const SharePublished = React.memo(() => {
               dpidLink={dpidLinkLatest}
             />
           </FlexRowCentered>
-          <p className="text-center text-sm my-3">
+          {/* <p className="text-center text-sm my-3">
             Share the published version of your Node.
-          </p>
+          </p> */}
           <FlexRowCentered className="justify-center mt-8 mb-4">
             <FlexColumnCentered className="gap-1 max-w-[150px]">
               <a
-                href={getTwitterShareLink(`${shareCaption} ${manifest?.title} \n${dpidLinkLatest}`)}
+                href={getTwitterShareLink(
+                  `${shareCaption} ${manifest?.title} \n${dpidLinkLatest}`
+                )}
                 target="_blank"
                 rel="noreferrer"
                 className="p-2 rounded-full border border-social-twitter"
@@ -216,7 +208,7 @@ const SharePublished = React.memo(() => {
                   )}
                 />
               </div>
-              <p className="text-sm">Copy dPid Link</p>
+              <p className="text-sm">Copy dPID Link</p>
             </FlexColumnCentered>
           </FlexRowCentered>
           {/* <AdvancedSlideDown
