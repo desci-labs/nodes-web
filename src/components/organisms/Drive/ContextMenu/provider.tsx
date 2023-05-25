@@ -16,6 +16,7 @@ import { useSetter } from "@src/store/accessors";
 import { moveFilesThunk } from "@src/state/drive/driveSlice";
 import { useClickAway } from "react-use";
 import { navigateToDrivePickerByPath } from "@src/state/drive/driveSlice";
+import toast from "react-hot-toast";
 
 type ShowMenuProps = { coords: { x: number; y: number }; file: DriveObject };
 const setContext = createContext<{
@@ -144,6 +145,23 @@ export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
                 setShowDrivePicker(false);
               }}
               onInsert={(newDir: DriveObject) => {
+                if (newDir.contains?.some((f) => f.name === lastFile?.name)) {
+                  toast.error(
+                    `Move failed, '${lastFile?.name}' already exists in '${newDir.name}'`,
+                    {
+                      position: "top-center",
+                      duration: 5000,
+                      style: {
+                        marginTop: 55,
+                        borderRadius: "10px",
+                        background: "#111",
+                        color: "#fff",
+                        zIndex: 150,
+                      },
+                    }
+                  );
+                  return;
+                }
                 dispatch(
                   moveFilesThunk({ item: lastFile!, newDirectory: newDir })
                 );
