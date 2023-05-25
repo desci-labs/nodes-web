@@ -25,12 +25,13 @@ import {
   setFileBeingCited,
   setFileBeingUsed,
 } from "@src/state/drive/driveSlice";
-import { IconDrive, IconPlayRounded, IconQuotes } from "@src/icons";
+import { IconDrive, IconPlayRounded, IconQuotes, IconViewLink } from "@src/icons";
 import { findDriveByPath } from "@src/state/drive/utils";
 import { useDrive } from "@src/state/drive/hooks";
 import { AccessStatus } from "@components/organisms/Drive";
 import { getLicenseShortName } from "@components/organisms/PopOver/ComponentMetadataPopover";
 import TooltipButton from "../atoms/TooltipButton";
+import { ExternalLinkIcon } from "@heroicons/react/outline";
 
 const CardWrapper: StyledComponent<
   "div",
@@ -215,6 +216,7 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
     (drive.accessStatus === AccessStatus.PUBLIC ||
       drive.accessStatus === AccessStatus.PARTIAL);
 
+  console.log("component", component);
   return (
     <CardWrapper
       isSelected={isSelected}
@@ -226,8 +228,8 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
     >
       <FlexColumn>
         <HeaderWrapper>
-          <span className="inline-block text-xs font-bold truncate">
-            {component.name}
+          <span className="inline-block text-xs font-bold truncate flex gap-1 items-center">
+            {component.name} {component.type === ResearchObjectComponentType.LINK && <ExternalLinkIcon width={15} />}
           </span>
           {/* {headerRight} */}
           <span className="flex flex-col items-center">
@@ -288,6 +290,19 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                     />
                   </div>
                   <div id="section-right" className="flex gap-2">
+                    {component.type === ResearchObjectComponentType.LINK ? (
+                      <TooltipButton
+                        tooltipContent={"Open Link"}
+                        side="top"
+                        className="p-[5px] rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray  disabled:bg-opacity-25 disabled:cursor-not-allowed w-7 h-7"
+                        onClick={(e) => {
+                          e!.stopPropagation();
+                          window.open(component.payload.url, "_blank");
+                        }}
+                      >
+                        <IconViewLink />
+                      </TooltipButton>
+                    ) : null}
                     <TooltipButton
                       className="py-[7px] px-[1px] rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray disabled:bg-opacity-25 disabled:cursor-not-allowed"
                       disabled={false}
@@ -312,13 +327,14 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                     >
                       <IconDrive className="p-0 min-w-[28px] scale-[1.2]" />
                     </TooltipButton>
-                    {component.type !== ResearchObjectComponentType.PDF ? (
+                    {component.type !== ResearchObjectComponentType.PDF &&
+                    canCite ? (
                       <TooltipButton
                         tooltipContent={"Cite"}
                         side="top"
                         // dataFor={`cite_${component.id}`}
                         className="`p-2 rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray  disabled:bg-opacity-25 disabled:cursor-not-allowed w-7 h-7"
-                        disabled={!canCite}
+                        // disabled={!canCite}
                         onClick={(e) => {
                           e!.stopPropagation();
                           dispatch(setFileBeingCited(drive));
@@ -326,9 +342,8 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                       >
                         <IconQuotes />
                       </TooltipButton>
-                    ) : (
-                      <></>
-                    )}
+                    ) : null}
+
                     {[
                       ResearchObjectComponentType.DATA,
                       ResearchObjectComponentType.CODE,
@@ -336,11 +351,9 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                     ].includes(component.type) ? (
                       <TooltipButton
                         tooltipContent={"Methods"}
-                        // dataFor={`use_${component.id}`}
                         side="top"
                         disabled={!drive}
-                        className="p-0 min-w-[28px] h-7 `p-2 rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray 
-      disabled:bg-opacity-25 disabled:cursor-not-allowed"
+                        className="p-0 min-w-[28px] h-7 `p-2 rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray disabled:bg-opacity-25 disabled:cursor-not-allowed"
                         onClick={(e) => {
                           e!.stopPropagation();
                           dispatch(setFileBeingUsed(drive));
