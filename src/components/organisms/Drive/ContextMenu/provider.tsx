@@ -6,6 +6,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { DriveObject } from "../types";
@@ -13,6 +14,7 @@ import { buildMenu } from "./MenuList";
 import DriveTableFilePicker, { DrivePickerMode } from "../../DriveFilePicker";
 import { useSetter } from "@src/store/accessors";
 import { moveFilesThunk } from "@src/state/drive/driveSlice";
+import { useClickAway } from "react-use";
 
 type ShowMenuProps = { coords: { x: number; y: number }; file: DriveObject };
 const setContext = createContext<{
@@ -48,6 +50,7 @@ export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
   const [showDrivePicker, setShowDrivePicker] = useState<boolean>(false);
   const escKeyPressed = useKeyPress("Escape");
   const [lastFile, setLastFile] = useState<DriveObject | undefined>(undefined);
+  const pickerRef = useRef<HTMLDivElement>(null);
 
   const dispatch = useSetter();
 
@@ -79,6 +82,10 @@ export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
   const openDrivePicker = () => {
     setShowDrivePicker(true);
   };
+
+  useClickAway(pickerRef, (e) => {
+    setShowDrivePicker(false);
+  });
 
   useEffect(() => {
     if (escKeyPressed) {
@@ -119,6 +126,7 @@ export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
         {props.children}
         {showDrivePicker && (
           <div
+            ref={pickerRef}
             className="w-64 absolute bg-neutrals-black rounded-xl text-white h-fit shadow-lg"
             style={{
               left: coords?.x,
