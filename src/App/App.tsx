@@ -57,11 +57,15 @@ const App = () => {
     if (userData) {
       let user = userData;
       if (user) {
-        mixpanel.identify(user.userId);
-
-        segmentAnalytics.identify(user.userId);
-
-        amplitude.setUserId(`${user.userId}`);
+        if (process.env.REACT_APP_MIXPANEL_TOKEN) {
+          mixpanel.identify(user.userId);
+        }
+        if (process.env.REACT_APP_SEGMENT_TOKEN) {
+          segmentAnalytics.identify(user.userId);
+        }
+        if (process.env.REACT_APP_AMPLITUDE_TOKEN) {
+          amplitude.setUserId(`${user.userId}`);
+        }
 
         if (
           !location.pathname.includes("/app/") ||

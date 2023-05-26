@@ -614,15 +614,19 @@ export const postUserAction = async (
 };
 
 export const track = async (action: string, message?: string) => {
-  mixpanel.track(action, {
-    message,
-  });
-
-  segmentAnalytics.track(action, {
-    message,
-  });
-
-  amplitude.track(action, {
-    message,
-  });
+  if (process.env.REACT_APP_MIXPANEL_TOKEN) {
+    mixpanel.track(action, {
+      message,
+    });
+  }
+  if (process.env.REACT_APP_SEGMENT_TOKEN) {
+    segmentAnalytics.track(action, {
+      message,
+    });
+  }
+  if (process.env.REACT_APP_AMPLITUDE_TOKEN) {
+    amplitude.track(action, {
+      message,
+    });
+  }
 };
