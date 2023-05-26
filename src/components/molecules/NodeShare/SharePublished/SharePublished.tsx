@@ -1,73 +1,58 @@
 import { getPublishedVersions, resolvePublishedManifest } from "@api/index";
 import PaneInfo from "@components/atoms/PaneInfo";
-import {
-  ResearchObjectComponentType,
-  ResearchObjectV1,
-  ResearchObjectV1Component,
-} from "@desci-labs/desci-models";
-import {
-  IconChevronDown,
-  IconChevronUp,
-  IconCode,
-  IconCodeBracket,
-  IconDocument,
-  IconFile,
-  IconNetwork,
-} from "@icons";
-import React, {
-  ButtonHTMLAttributes,
-  PropsWithChildren,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { ResearchObjectV1 } from "@desci-labs/desci-models";
+import React, { useEffect, useMemo, useState } from "react";
 import { SpinnerCircular } from "spinners-react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
-import { CheckIcon } from "@heroicons/react/outline";
 import { useGetNodesQuery } from "@src/state/api/nodes";
 import { useNodeReader, useNodeVersions } from "@src/state/nodes/hooks";
-import { useCopier } from "@src/components/molecules/Copier";
-import PerfectScrollbar from "react-perfect-scrollbar";
-import AdvancedSlideDown from "@src/components/atoms/AdvancedSlideDown";
+import Copier from "@src/components/molecules/Copier";
+import { FlexColumnCentered, FlexRowCentered } from "@src/components/styled";
+import { IconCopyLink, IconTwitter } from "@src/icons";
+import NodeMetadataPreview from "@src/components/molecules/NodeMetadataPreview";
 
-function CopyButton(
-  props: ButtonHTMLAttributes<HTMLButtonElement> & {
-    value: string;
-    label: string;
-  }
-) {
-  const { handleCopy, copied } = useCopier();
+// function CopyButton(
+//   props: ButtonHTMLAttributes<HTMLButtonElement> & {
+//     value: string;
+//     label: string;
+//   }
+// ) {
+//   const { handleCopy, copied } = useCopier();
 
-  return (
-    <button
-      {...props}
-      className="text-sm font-bold text-white hover:text-tint-primary-hover disabled:text-neutrals-gray-4"
-      onClick={() => handleCopy(props.value)}
-    >
-      {copied ? (
-        <CheckIcon stroke="#28AAC4" strokeWidth={4} width={20} height={15} />
-      ) : (
-        props.label
-      )}
-    </button>
-  );
-}
+//   return (
+//     <button
+//       {...props}
+//       className="text-sm font-bold text-white hover:text-tint-primary-hover disabled:text-neutrals-gray-4"
+//       onClick={() => handleCopy(props.value)}
+//     >
+//       {copied ? (
+//         <CheckIcon stroke="#28AAC4" strokeWidth={4} width={20} height={15} />
+//       ) : (
+//         props.label
+//       )}
+//     </button>
+//   );
+// }
 
-function LinkCopier(
-  props: PropsWithChildren<{ icon: JSX.Element; label: string; value: string }>
-) {
-  return (
-    <div className="relative flex gap-2 p-2 w-full bg-white dark:bg-[#272727] border border-transparent border-b border-b-[#969696] rounded-md shadow-sm text-left focus:outline-none sm:text-sm">
-      {props.icon}
-      <div className="grow">
-        <span className="block text-xs dark:text-gray-400">{props.label}</span>
-        <span className="block text-xs">{props.value}</span>
-      </div>
-      <CopyButton label="Copy" value={props.value} disabled={!props.value} />
-    </div>
-  );
-}
+// function LinkCopier(
+//   props: PropsWithChildren<{ icon: JSX.Element; label: string; value: string }>
+// ) {
+//   return (
+//     <div className="relative flex gap-2 p-2 w-full bg-white dark:bg-[#272727] border border-transparent border-b border-b-[#969696] rounded-md shadow-sm text-left focus:outline-none sm:text-sm">
+//       {props.icon}
+//       <div className="grow">
+//         <span className="block text-xs dark:text-gray-400">{props.label}</span>
+//         <span className="block text-xs">{props.value}</span>
+//       </div>
+//       <CopyButton label="Copy" value={props.value} disabled={!props.value} />
+//     </div>
+//   );
+// }
+
+const shareCaption = "Check out this research:";
+const getTwitterShareLink = (text: string) =>
+  `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
 
 const SharePublished = React.memo(() => {
   const {
@@ -89,7 +74,7 @@ const SharePublished = React.memo(() => {
   const [requestedVersion, setRequestedVersion] = useState<number | undefined>(
     undefined
   );
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  // const [showAdvanced, setShowAdvanced] = useState(false);
 
   const versionForLink =
     publicView && versionParam ? versionParam : requestedVersion;
@@ -170,9 +155,9 @@ const SharePublished = React.memo(() => {
     if (lastManifest && currentObjectId && (publicView || versions)) {
       const versionCount = numVersions;
       body = (
-        <div>
+        <div className="font-inter">
           {/* <div className="">Your Node is public</div> */}
-          <div className="my-4 w-full">
+          {/* <div className="my-4 w-full">
             <LinkCopier
               icon={<IconNetwork height={15} stroke={"white"} width={15} />}
               label="Public Share Link (always points to latest version)"
@@ -185,9 +170,48 @@ const SharePublished = React.memo(() => {
               label="Public Share Link (always points to this version)"
               value={dpidLink}
             />
-          </div>
+          </div> */}
 
-          <AdvancedSlideDown
+          <FlexRowCentered className="mb-5">
+            <NodeMetadataPreview
+              uuid={currentObjectId}
+              version={versionCount}
+              dpidLink={dpidLinkLatest}
+            />
+          </FlexRowCentered>
+          {/* <p className="text-center text-sm my-3">
+            Share the published version of your Node.
+          </p> */}
+          <FlexRowCentered className="justify-center mt-8 mb-4">
+            <FlexColumnCentered className="gap-1 max-w-[150px]">
+              <a
+                href={getTwitterShareLink(
+                  `${shareCaption} ${manifest?.title} \n${dpidLinkLatest}`
+                )}
+                target="_blank"
+                rel="noreferrer"
+                className="p-2 rounded-full border border-social-twitter"
+              >
+                <IconTwitter className="fill-social-twitter" width={25} />
+              </a>
+              <p className="text-sm">Twitter</p>
+            </FlexColumnCentered>
+            <FlexColumnCentered className="gap-1 max-w-[150px]">
+              <div className="flex items-center justify-center text-center border border-social-twitter text-sm rounded-full p-2">
+                <Copier
+                  text={dpidLinkLatest}
+                  icon={(props) => (
+                    <IconCopyLink
+                      className="w-5 cursor-pointer fill-white h-5"
+                      {...props}
+                    />
+                  )}
+                />
+              </div>
+              <p className="text-sm">Copy dPID Link</p>
+            </FlexColumnCentered>
+          </FlexRowCentered>
+          {/* <AdvancedSlideDown
             closed={showAdvanced}
             setClosed={setShowAdvanced}
             className="overflow-hidden mt-5"
@@ -280,12 +304,12 @@ const SharePublished = React.memo(() => {
                 </div>
               ) : null}
             </PerfectScrollbar>
-          </AdvancedSlideDown>
+          </AdvancedSlideDown> */}
         </div>
       );
     } else {
       body = (
-        <div className="flex items-center h-full flex-grow flex-col justify-evenl">
+        <div className="flex items-center h-96 flex-grow flex-col justify-evenly">
           This Node is not published and cannot yet be shared
           <PaneInfo>Sharing unpublished Nodes is coming soon</PaneInfo>
         </div>

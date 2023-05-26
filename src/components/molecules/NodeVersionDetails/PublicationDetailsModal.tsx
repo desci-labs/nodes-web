@@ -2,15 +2,13 @@ import PopOver from "@components/organisms/PopOver";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { BytesToHumanFileSize } from "@components/utils";
 import { IconCopyLink, IconX } from "@icons";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useState } from "react";
 import Copier from "../Copier";
 import useVersionDetails from "./useVersionDetails";
 import { CHAINS } from "@connectors/../chains";
 import { DEFAULT_CHAIN } from "../ConnectWithSelect";
 import { useHistoryReader, useNodeReader } from "@src/state/nodes/hooks";
-import { LinkIcon } from "@heroicons/react/solid";
 import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
-import SlideDown from "react-slidedown";
 import AdvancedSlideDown from "@src/components/atoms/AdvancedSlideDown";
 
 const ACTIVE_CHAIN = CHAINS[DEFAULT_CHAIN] as any;
@@ -22,6 +20,7 @@ export default function PublicationDetailsModal(props: any) {
   const { manifest: manifestData } = useNodeReader();
   const { selectedHistory } = useHistoryReader();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { size, copies, node, mirrors, loading } = useVersionDetails(
     selectedHistory?.data?.transaction?.id ?? ""
   );
