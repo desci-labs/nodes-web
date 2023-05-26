@@ -7,6 +7,7 @@ import { useEffectOnce } from "react-use";
 import mixpanel from "mixpanel-browser";
 import { AnalyticsBrowser } from "@segment/analytics-next";
 import * as amplitude from "@amplitude/analytics-browser";
+import { trackPage } from "@src/api";
 export const USE_ORCID_JWT = true;
 
 console.log(`[starting DeSci Nodes v${process.env.REACT_APP_VERSION}]`);
@@ -76,6 +77,10 @@ const App = () => {
       }
     }
   }, [userData, error, location.pathname, navigate]);
+
+  useEffect(() => {
+    trackPage(location.pathname);
+  }, [location]);
 
   return (
     <>
