@@ -35,7 +35,9 @@ export default function PublicViewer() {
         navigate(`${site.app}${app.nodes}/start`);
       }
     } else {
-      navigate(`${site.web}${location.search}`);
+      if (location.pathname === "/") {
+        navigate(`${site.web}${location.search}`);
+      }
       // localStorage.removeItem("auth");
     }
   }, [user, location.pathname, navigate, location.search, dispatch]);
