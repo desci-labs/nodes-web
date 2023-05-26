@@ -17,7 +17,7 @@ export default function PreviewModal(props: ModalProps & CreditModalProps) {
     >
       <div
         className={clsx(
-          "px-6 py-5 text-white relative  font-interr",
+          "px-6 py-5 pb-16 text-white relative  font-interr",
           isMobile ? "min-w-[350px]" : "min-w-[600px]"
         )}
       >
@@ -34,40 +34,46 @@ export default function PreviewModal(props: ModalProps & CreditModalProps) {
               {org.name}
             </span>
           ))}
-          <div className="h-[1px] w-[200px] bg-neutrals-gray-3 my-4"></div>
-          <h1 className="font-bold mb-2">View External Profiles</h1>
-          <FlexRowCentered className="gap-1">
-            {props.author?.orcid ? (
-              <a
-                href={getOrcidUrl(props.author?.orcid)}
-                rel="noreferrer"
-                target="_blank"
-                className="flex gap-1 items-center text-xs group hover:text-tint-primary-hover text-tint-primary underline"
-              >
-                <IconOrcid width={25} />
-              </a>
-            ) : null}
-            {props.author?.googleScholar ? (
-              <a
-                href={props.author?.googleScholar}
-                rel="noreferrer"
-                target="_blank"
-                className="flex gap-1 items-center text-xs group hover:text-tint-primary-hover text-tint-primary underline"
-              >
-                <IconGoogleScholar width={23} />
-              </a>
-            ) : null}
-            {props.author?.github ? (
-              <a
-                href={props.author?.github}
-                rel="noreferrer"
-                target="_blank"
-                className="flex gap-1 items-center text-xs group hover:text-tint-primary-hover text-tint-primary underline"
-              >
-                <IconGithub width={23} fill="white" />
-              </a>
-            ) : null}
-          </FlexRowCentered>
+          {props.author?.orcid ||
+          props.author?.googleScholar ||
+          props.author?.github ? (
+            <>
+              <div className="h-[1px] w-[200px] bg-neutrals-gray-3 my-4"></div>
+              <h1 className="font-bold mb-2">View External Profiles</h1>
+              <FlexRowCentered className="gap-1">
+                {props.author?.orcid ? (
+                  <a
+                    href={getOrcidUrl(props.author?.orcid)}
+                    rel="noreferrer"
+                    target="_blank"
+                    className="flex gap-1 items-center text-xs group hover:text-tint-primary-hover text-tint-primary underline"
+                  >
+                    <IconOrcid width={25} />
+                  </a>
+                ) : null}
+                {props.author?.googleScholar ? (
+                  <a
+                    href={props.author?.googleScholar}
+                    rel="noreferrer"
+                    target="_blank"
+                    className="flex gap-1 items-center text-xs group hover:text-tint-primary-hover text-tint-primary underline"
+                  >
+                    <IconGoogleScholar width={23} />
+                  </a>
+                ) : null}
+                {props.author?.github ? (
+                  <a
+                    href={props.author?.github}
+                    rel="noreferrer"
+                    target="_blank"
+                    className="flex gap-1 items-center text-xs group hover:text-tint-primary-hover text-tint-primary underline"
+                  >
+                    <IconGithub width={23} fill="white" />
+                  </a>
+                ) : null}
+              </FlexRowCentered>{" "}
+            </>
+          ) : null}
         </FlexColumnCentered>
       </div>
     </Modal>
