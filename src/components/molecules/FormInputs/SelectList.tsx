@@ -112,7 +112,12 @@ export default function SelectList(props: SelectListProps) {
             setTouched(true);
           }}
         >
-          <div className="max-h-96 min-h-[120px] h-fit overflow-hidden overflow-y-scroll">
+          <div
+            style={{
+              minHeight: data.length > 2 ? 120 : data.length * 42,
+            }}
+            className={`max-h-96 h-fit overflow-hidden overflow-y-scroll`}
+          >
             <Transition
               show={true}
               as={Fragment}
@@ -140,13 +145,15 @@ export default function SelectList(props: SelectListProps) {
                           <span className="pl-2">{defaultValue?.name}</span>
                         </span>
                       </div>
-                      {isDefaultSelected && <span
-                        className={classNames(
-                          "text-teal hover:text-white absolute inset-y-0 right-0 flex items-center pr-4"
-                        )}
-                      >
-                        <CheckIcon className="h-5 w-5" aria-hidden="true" />
-                      </span>}
+                      {isDefaultSelected && (
+                        <span
+                          className={classNames(
+                            "text-teal hover:text-white absolute inset-y-0 right-0 flex items-center pr-4"
+                          )}
+                        >
+                          <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                        </span>
+                      )}
                     </>
                   </ListboxOption>
                 ) : null}
