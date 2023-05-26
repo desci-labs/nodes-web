@@ -15,12 +15,17 @@ import {
   PublicDataReferenceOnIpfsMirror,
 } from "@src/types/client";
 import {
-  CidString,
+  // CidString,
   DrivePath,
   ExternalCid,
   ExternalUrl,
 } from "@src/state/drive/types";
 import { arrayXor } from "@src/components/utils";
+import { UserProfile } from "@src/state/api/types";
+import mixpanel from "mixpanel-browser";
+import { segmentAnalytics } from "@src/App/App";
+import * as amplitude from "@amplitude/analytics-browser";
+
 export const SCIWEAVE_URL =
   process.env.REACT_APP_NODES_API || "http://localhost:5420";
 
@@ -44,6 +49,7 @@ export const config = (preset?: AxiosRequestConfig): AxiosRequestConfig => {
     withCredentials: true,
     headers: {
       authorization: `Bearer ${localStorage.getItem("auth")}`,
+      ...preset?.headers,
     },
   };
 };
@@ -73,6 +79,13 @@ export const termsConsent = async (obj: any, uuid: string) => {
       ...obj,
       uuid,
     },
+    config()
+  );
+  return data;
+};
+export const checkConsent = async () => {
+  const { data } = await axios.get(
+    `${SCIWEAVE_URL}/v1/nodes/consent`,
     config()
   );
   return data;
@@ -267,13 +280,26 @@ export const retrieveDoi = async (
 };
 
 export const getUserData = async () => {
-  const { data } = await axios.get(`${SCIWEAVE_URL}/v1/auth/profile`, config());
+  const { data } = await axios.get<any, { data: UserProfile }>(
+    `${SCIWEAVE_URL}/v1/auth/profile`,
+    config()
+  );
   return data;
 };
 
 export const getResearchFields = async (search: string = "") => {
   const { data } = await axios.get(
     `${SCIWEAVE_URL}/v1/researchFields?q=${search}`,
+    config()
+  );
+  return data;
+};
+
+// { items: { id: string; name: string }
+// AxiosResponse<{ items: { id: string; name: string } }
+export const getRorQueries = async (value: string = "") => {
+  const { data } = await axios.get<any, any>(
+    `${SCIWEAVE_URL}/v1/ror?query=${value.trim()}`,
     config()
   );
   return data;
@@ -309,6 +335,7 @@ export const updateProfile = async (profile: Profile) => {
 export const logout = async () => {
   // await axios.delete(`${SCIWEAVE_URL}/v1/auth/logout`, config());
   localStorage.removeItem("auth");
+  stopTracking();
   return {};
 };
 
@@ -551,6 +578,47 @@ export enum AvailableUserActionLogTypes {
   btnDownloadData = "btnDownloadData",
   btnDownloadManuscript = "btnDownloadManuscript",
   btnShare = "btnShare",
+  btnPublish = "btnPublish",
+  btnAddComponentFab = "btnAddComponentFab",
+  btnAddComponentDrive = "btnAddComponentDrive",
+  btnAddComponentDriveNewComponent = "btnAddComponentDriveNewComponent",
+  btnAddComponentDriveNewFolder = "btnAddComponentDriveNewFolder",
+  driveNavigateBreadcrumb = "driveNavigateBreadcrumb",
+  btnFigureAnnotate = "btnFigureAnnotate",
+  btnContinuePublish = "btnContinuePublish",
+  btnReviewBeforePublish = "btnReviewBeforePublish",
+  dismissCommitAdditionalInfo = "dismissCommitAdditionalInfo",
+  dismissCommitStatus = "dismissCommitStatus",
+  completePublish = "completePublish",
+  btnSignPublish = "btnSignPublish",
+  commitPanelDismiss = "commitPanelDismiss",
+  viewWalletSettings = "viewWalletSettings",
+  walletMoreOptions = "walletMoreOptions",
+  walletSwitchChain = "walletSwitchChain",
+  walletClickCard = "walletClickCard",
+  walletError = "walletError",
+  walletDisconnect = "walletDisconnect",
+  connectWallet = "connectWallet",
+  btnComponentCardCite = "btnComponentCardCite",
+  btnComponentCardViewFile = "btnComponentCardViewFile",
+  btnComponentCardUse = "btnComponentCardUse",
+  btnComponentCardViewLink = "btnComponentCardViewLink",
+  btnComponentCardViewMetadata = "btnComponentCardViewMetadata",
+  viewDrive = "viewDrive",
+  btnDriveCite = "btnDriveCite",
+  btnDriveUse = "btnDriveUse",
+  btnDriveStarToggle = "btnDriveStarToggle",
+  saveMetadata = "saveMetadata",
+  btnInspectMetadata = "btnInspectMetadata",
+  ctxDriveRename = "ctxDriveRename",
+  ctxDrivePreview = "ctxDrivePreview",
+  ctxDriveDownload = "ctxDriveDownload",
+  ctxDriveDelete = "ctxDriveDelete",
+  ctxDriveAssignType = "ctxDriveAssignType",
+  ctxDriveEditMetadata = "ctxDriveEditMetadata",
+  btnCreateNewNode = "btnCreateNewNode",
+  btnCreateNodeModalSave = "btnCreateNodeModalSave",
+  errNodeCreate = "errNodeCreate",
   viewedNode = "viewedNode",
 }
 export const postUserAction = async (
@@ -562,5 +630,54 @@ export const postUserAction = async (
     { action, message },
     config()
   );
+
+  track(action, message);
+
   return data;
+};
+
+export const track = async (action: string, message?: string) => {
+  if (process.env.REACT_APP_MIXPANEL_TOKEN) {
+    mixpanel.track(action, {
+      message,
+    });
+  }
+  if (process.env.REACT_APP_SEGMENT_TOKEN) {
+    segmentAnalytics.track(action, {
+      message,
+    });
+  }
+  if (process.env.REACT_APP_AMPLITUDE_TOKEN) {
+    amplitude.track(action, {
+      message,
+    });
+  }
+};
+
+export const trackPage = async (route: string) => {
+  if (process.env.REACT_APP_MIXPANEL_TOKEN) {
+    mixpanel.track("page", {
+      route,
+    });
+  }
+  if (process.env.REACT_APP_SEGMENT_TOKEN) {
+    segmentAnalytics.page();
+  }
+  if (process.env.REACT_APP_AMPLITUDE_TOKEN) {
+    amplitude.track("page", {
+      route,
+    });
+  }
+};
+
+export const stopTracking = async () => {
+  if (process.env.REACT_APP_MIXPANEL_TOKEN) {
+    mixpanel.reset();
+  }
+  if (process.env.REACT_APP_SEGMENT_TOKEN) {
+    segmentAnalytics.reset();
+  }
+  if (process.env.REACT_APP_AMPLITUDE_TOKEN) {
+    amplitude.reset();
+  }
 };

@@ -25,13 +25,19 @@ import {
   setFileBeingCited,
   setFileBeingUsed,
 } from "@src/state/drive/driveSlice";
-import { IconDrive, IconPlayRounded, IconQuotes, IconViewLink } from "@src/icons";
+import {
+  IconDrive,
+  IconPlayRounded,
+  IconQuotes,
+  IconViewLink,
+} from "@src/icons";
 import { findDriveByPath } from "@src/state/drive/utils";
 import { useDrive } from "@src/state/drive/hooks";
 import { AccessStatus } from "@components/organisms/Drive";
 import { getLicenseShortName } from "@components/organisms/PopOver/ComponentMetadataPopover";
 import TooltipButton from "../atoms/TooltipButton";
 import { ExternalLinkIcon } from "@heroicons/react/outline";
+import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 
 const CardWrapper: StyledComponent<
   "div",
@@ -229,7 +235,10 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
       <FlexColumn>
         <HeaderWrapper>
           <span className="inline-block text-xs font-bold truncate flex gap-1 items-center">
-            {component.name} {component.type === ResearchObjectComponentType.LINK && <ExternalLinkIcon width={15} />}
+            {component.name}{" "}
+            {component.type === ResearchObjectComponentType.LINK && (
+              <ExternalLinkIcon width={15} />
+            )}
           </span>
           {/* {headerRight} */}
           <span className="flex flex-col items-center">
@@ -298,6 +307,9 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                         onClick={(e) => {
                           e!.stopPropagation();
                           window.open(component.payload.url, "_blank");
+                          postUserAction(
+                            AvailableUserActionLogTypes.btnComponentCardViewLink
+                          );
                         }}
                       >
                         <IconViewLink />
@@ -322,6 +334,9 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                         } else {
                           dispatch(setComponentStack([]));
                         }
+                        postUserAction(
+                          AvailableUserActionLogTypes.btnComponentCardViewFile
+                        );
                       }}
                       tooltipContent={<>Show File Location</>}
                     >
@@ -338,6 +353,9 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                         onClick={(e) => {
                           e!.stopPropagation();
                           dispatch(setFileBeingCited(drive));
+                          postUserAction(
+                            AvailableUserActionLogTypes.btnComponentCardCite
+                          );
                         }}
                       >
                         <IconQuotes />
@@ -357,12 +375,15 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                         onClick={(e) => {
                           e!.stopPropagation();
                           dispatch(setFileBeingUsed(drive));
+                          postUserAction(
+                            AvailableUserActionLogTypes.btnComponentCardUse
+                          );
                         }}
                       >
                         <IconPlayRounded className="p-0" />
                       </TooltipButton>
                     ) : null}
-                    <div
+                    {/* <div
                       style={{
                         display:
                           component.type === ResearchObjectComponentType.PDF
@@ -374,7 +395,7 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                         annotations={sortedAnnotations}
                         handleComponentClick={handleComponentClick}
                       />
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </>

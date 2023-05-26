@@ -6,7 +6,7 @@ import { IconInfo, IconOrcid } from "icons";
 import Section from "../../Section";
 import SectionHeader from "../../Section/SectionHeader";
 import { ResearchObjectV1Author } from "@desci-labs/desci-models";
-import ClickableAddIcon from "@components/atoms/ClickableIcon/ClickableAddIcon";
+import ClickableAddIcon from "@components/atoms/ClickableAddIcon";
 import toast from "react-hot-toast";
 import { useNodeReader } from "@src/state/nodes/hooks";
 

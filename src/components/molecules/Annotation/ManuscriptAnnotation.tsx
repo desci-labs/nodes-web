@@ -298,12 +298,7 @@ const ManuscriptAnnotation = (props: ManuscriptAnnotationProps) => {
               dispatch(
                 setSelectedAnnotationId(annotationWithLayoutMeta.data.id)
               ),
-            [
-              dispatch,
-              setSelectedAnnotationId,
-              selectedAnnotationId,
-              annotationWithLayoutMeta,
-            ]
+            [dispatch, selectedAnnotationId, annotationWithLayoutMeta]
           )}
           onMouseEnter={useCallback(() => {
             !isEditingAnnotation &&

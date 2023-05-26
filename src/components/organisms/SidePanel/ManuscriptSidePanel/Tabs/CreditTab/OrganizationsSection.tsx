@@ -1,4 +1,4 @@
-import ClickableAddIcon from "@components/atoms/ClickableIcon/ClickableAddIcon";
+import ClickableAddIcon from "@components/atoms/ClickableAddIcon";
 import PillButton from "@components/atoms/PillButton";
 import TooltipIcon from "@components/atoms/TooltipIcon";
 import CollapsibleSection from "@components/organisms/CollapsibleSection";

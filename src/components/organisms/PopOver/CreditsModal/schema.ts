@@ -4,6 +4,7 @@ import validUrl from "valid-url";
 import {
   ResearchObjectV1Author,
   ResearchObjectV1AuthorRole,
+  ResearchObjectV1Organization,
 } from "@desci-labs/desci-models";
 
 export type OrcidPartsKeys = "orcid1" | "orcid2" | "orcid3" | "orcid4";
@@ -16,7 +17,7 @@ export interface CreditModalProps {
   id?: number;
 }
 
-const GOOGLE_SCHOLAR_URL_SCHEMA = Yup.string()
+export const GOOGLE_SCHOLAR_URL_SCHEMA = Yup.string()
   .url()
   .optional()
   .test({
@@ -61,12 +62,14 @@ const ORCID_SCHEMA = Yup.string()
     test: (value = "", ctx) => {
       if (value === "") return true;
 
-      let cids = value.split('-');
-      
+      let cids = value.split("-");
+
       let invalid = cids
         .map((data, index) => {
           if (index === cids.length - 1) {
-            return data.length === 4 && /^\d{3}[a-zA-Z0-9]{1}$/.test(data) ? data : ""
+            return data.length === 4 && /^\d{3}[a-zA-Z0-9]{1}$/.test(data)
+              ? data
+              : "";
           }
           return /^\d+$/.test(data) && data.length === 4 ? data : "";
         })
@@ -94,5 +97,19 @@ export const authorsFormSchema = Yup.object({
   name: Yup.string().required(),
   role: AUTHOR_ROLES_SCHEMA,
   googleScholar: GOOGLE_SCHOLAR_URL_SCHEMA.optional(),
+  github: Yup.string()
+    .url()
+    .optional()
+    .test({
+      message: "Invalid github url",
+      name: "Github",
+      test: (data, _) => {
+        if (data === "" || !data) return true;
+        const pattern =
+          /^(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9_-]{1,25}$/gim;
+        if (!pattern.test(data)) return false;
+        return true;
+      },
+    }),
+  organizations: Yup.mixed<ResearchObjectV1Organization[]>().optional(),
 });
-

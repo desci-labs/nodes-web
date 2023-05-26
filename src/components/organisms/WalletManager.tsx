@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import WalletSwitcher from "./WalletSwitcher";
 import { Wallet } from "@src/state/api/types";
 import { useUser } from "@src/state/user/hooks";
+import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 
 const IdentityList = ({ setSelectingWallet }: IdentityProps) => {
   const { wallets } = useManuscriptController(["wallets"]);
@@ -120,6 +121,7 @@ const WalletManager = () => {
             color: "#fff",
           },
         });
+        postUserAction(AvailableUserActionLogTypes.connectWallet);
       }
     }
     accountRef.current = account;

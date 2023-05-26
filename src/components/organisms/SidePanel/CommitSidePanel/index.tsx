@@ -18,6 +18,7 @@ import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { toggleCommitPanel } from "@src/state/nodes/nodeReader";
 import { animated, useTransition } from "react-spring";
+import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 
 // @ts-ignore
 const Wrapper: StyledComponent<"div", any, any, any> = styled(SidePanel).attrs({
@@ -89,10 +90,10 @@ const CommitSidePanel = (props: CommitSidePanelProps) => {
     }
   }, [isCommitPanelOpen]);
 
-  const closePane = useCallback(
-    () => dispatch(toggleCommitPanel(false)),
-    [dispatch, toggleCommitPanel]
-  );
+  const closePane = useCallback(() => {
+    dispatch(toggleCommitPanel(false));
+    postUserAction(AvailableUserActionLogTypes.commitPanelDismiss);
+  }, [dispatch, toggleCommitPanel]);
 
   if (!isCommitPanelOpen) {
     return (
@@ -117,7 +118,10 @@ const CommitSidePanel = (props: CommitSidePanelProps) => {
                 opacity: opacity.to({ range: [0.0, 1.0], output: [0, 1] }),
                 // opacity: opacity.to({ range: [0.0, 1.0], output: [0, 1] }),
               }}
-              onClick={() => dispatch(toggleCommitPanel(false))}
+              onClick={() => {
+                dispatch(toggleCommitPanel(false));
+                postUserAction(AvailableUserActionLogTypes.commitPanelDismiss);
+              }}
             >
               <Wrapper
                 orientation={panelOrientation}
@@ -152,7 +156,12 @@ const CommitSidePanel = (props: CommitSidePanelProps) => {
                       <FlexRowSpaceBetween>
                         <FooterUpdatesText numUpdates={5} />
                         <PrimaryButton
-                          onClick={() => setShowAdditionalInfoPopover(true)}
+                          onClick={() => {
+                            setShowAdditionalInfoPopover(true);
+                            postUserAction(
+                              AvailableUserActionLogTypes.btnContinuePublish
+                            );
+                          }}
                           disabled={!isValid()}
                         >
                           Continue
@@ -165,18 +174,28 @@ const CommitSidePanel = (props: CommitSidePanelProps) => {
                   isOpen={showAdditionalInfoPopover}
                   onDismiss={() => {
                     setShowAdditionalInfoPopover(false);
+                    postUserAction(
+                      AvailableUserActionLogTypes.dismissCommitAdditionalInfo
+                    );
                   }}
                   onSuccess={() => {
                     setShowCommitStatusPopover(true);
+                    postUserAction(
+                      AvailableUserActionLogTypes.btnReviewBeforePublish
+                    );
                   }}
                 />
                 <CommitStatusPopover
                   isOpen={showCommitStatusPopover}
                   onDismiss={() => {
                     setShowCommitStatusPopover(false);
+                    postUserAction(
+                      AvailableUserActionLogTypes.dismissCommitStatus
+                    );
                   }}
                   onSuccess={() => {
                     dispatch(toggleCommitPanel(false));
+                    postUserAction(AvailableUserActionLogTypes.completePublish);
                   }}
                 />
               </Wrapper>

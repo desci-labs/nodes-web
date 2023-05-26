@@ -1,13 +1,15 @@
 import { IconAuthor } from "@icons";
 import IconSubTextHeader from "@components/molecules/IconSubTextHeader";
 import DigitalSignature from "@components/molecules/DigitalSignature";
-import OrcidButton from "@src/components/molecules/OrcIdAuthButton";
 import DividerSimple from "@components/atoms/DividerSimple";
-import UserProfileForm from "./UserProfileForm";
+import UserProfileForm from "@components/organisms/UserProfileForm";
 import { memo, useEffect } from "react";
 import { api } from "@src/state/api";
 import { tags } from "@src/state/api/tags";
 import { useSetter } from "@src/store/accessors";
+import PrimaryAffiliation, {
+  AffiliationForm,
+} from "@src/components/molecules/PrimaryAffiliation";
 // import {
 //   LS_VSCODE_ENABLED,
 //   useManuscriptController,
@@ -28,7 +30,9 @@ function ProfileInfo(props: {
 
   return (
     <div
-      className={`sm:grow max-w-[500px] ${!props.inModal ? "mt-10 pb-10" : ""}`}
+      className={`sm:grow ${
+        !props.inModal ? "mt-10 pb-10" : ""
+      } w-[500px] max-w-[500px]`}
     >
       <div className="flex flex-col gap-8">
         <IconSubTextHeader
@@ -39,8 +43,21 @@ function ProfileInfo(props: {
         />
 
         <UserProfileForm viewOnly={!props.inModal} />
+        {/* <DividerSimple /> */}
         {!props.inModal ? (
           <>
+            <DividerSimple />
+            <div className="flex flex-col gap-8">
+              <div>
+                <IconSubTextHeader
+                  headerText="Academic Affiliation"
+                  subText="Add your academic affiliations."
+                  withCircleBorder={true}
+                />
+              </div>
+              <PrimaryAffiliation />
+            </div>
+
             <DividerSimple />
 
             <div className="flex flex-col gap-8">
@@ -69,9 +86,13 @@ function ProfileInfo(props: {
               <DigitalSignature />
             </div>
           </>
-        ) : null}
+        ) : (
+          <div>
+            <AffiliationForm />
+          </div>
+        )}
 
-        {process.env.REACT_APP_ENABLE_ORCID ? (
+        {/* {process.env.REACT_APP_ENABLE_ORCID ? (
           <>
             <DividerSimple />
             <div className="flex flex-col gap-8">
@@ -79,9 +100,6 @@ function ProfileInfo(props: {
                 <IconSubTextHeader
                   withCircleBorder={false}
                   headerText={"External Accounts"}
-                  // subText={
-                  //   "Linking external account plays an important role in protecting your contributor dentity."
-                  // }
                 />
                 <p className="mt-1 text-neutrals-gray-5 text-[12px] w-96">
                   ORCID is a researcher identity disembiguation service used by
@@ -99,22 +117,13 @@ function ProfileInfo(props: {
               </div>
               <OrcidButton
                 callback={async () => {
-                  /**
-                   * TODO: Why does this cause the pane to collapse?
-                   * Manually editing the orcId (or other) in the prisma gui also causes the pane to collapse
-                   * Seems anytime the user is updated, the pane collapses?
-                   */
-                  // const refreshedUser = await getUserData();
-                  // setUserProfile(refreshedUser as UserProfileApiData);
                   dispatch(api.util.invalidateTags([{ type: tags.user }]));
                   console.log("[ProfileInfo]::Refresh User data");
                 }}
               />
             </div>
           </>
-        ) : null}
-        {/** NOTE: disabling advanced options because VSCode is now default / forced, Old Code Viewer removed */}
-        {/* <AdvancedOptions /> */}
+        ) : null} */}
       </div>
     </div>
   );

@@ -14,7 +14,7 @@ import {
   ResearchObjectComponentType,
 } from "@desci-labs/desci-models";
 import AnnotationFixedPosition from "@components/atoms/AnnotationFixedPosition";
-import AnnotationVisible from "@components/atoms/AnnotationVisible";
+// import AnnotationVisible from "@components/atoms/AnnotationVisible";
 import AnnotationHidden from "@components/atoms/AnnotationHidden";
 import AnnotationExpanded from "@components/atoms/AnnotationExpanded";
 import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
@@ -77,14 +77,13 @@ const AnnotationComponent = (props: AnnotationProps) => {
     hoveredAnnotationId,
   } = usePdfReader();
   const {
-    mode,
+    // mode,
     componentStack,
     annotations,
     manifest: manifestData,
   } = useNodeReader();
 
   useClickAway(ref, (e: Event) => {
-    __log("annotation click away");
     const ev = e as MouseEvent;
     // do not click away when in code view
     const isCode =
@@ -100,7 +99,7 @@ const AnnotationComponent = (props: AnnotationProps) => {
       if (
         t &&
         (t as any).tagName! === "svg" &&
-        (t as any).className!.baseVal.indexOf("cursor-pointer select-none") > -1
+        (t as any).className!.baseVal.indexOf("annotation-switch-svg") > -1
       ) {
       } else {
         if (selected && allowClickAway) {
@@ -241,6 +240,7 @@ const AnnotationComponent = (props: AnnotationProps) => {
         }
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     annotations,
     replaceAnnotations,
@@ -357,8 +357,8 @@ const AnnotationComponent = (props: AnnotationProps) => {
 
   const isExpanded = !isFixedPosition && isVisible;
 
-  const isAnnotationVisible = !isFixedPosition && isVisible && !selected;
-  const isAnnotationHidden = !isFixedPosition && !isVisible && !selected;
+  // const isAnnotationVisible = !isFixedPosition && isVisible && !selected;
+  // const isAnnotationHidden = !isFixedPosition && !isVisible && !selected;
 
   // console.log("isExpanded", isEditingAnnotation, isFixedPosition, isExpanded);
   return (
