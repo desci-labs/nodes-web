@@ -215,6 +215,7 @@ export default memo(function CreateNodeModal({
         <SelectList
           label="License Type"
           data={PDF_LICENSE_TYPES}
+          defaultValue={{ name: "License Type", id: 111 }}
           className="mt-2"
           value={manifestLicense}
           labelRenderer={licenseSelectLabelRenderer}

@@ -9,7 +9,6 @@ import {
   ListboxOption,
 } from "@reach/listbox";
 import styled from "styled-components";
-import PerfectScrollbar from "react-perfect-scrollbar";
 
 const StyledListBoxInput = styled(ListboxInput)<{}>`
   [data-reach-listbox-input] {
@@ -63,14 +62,15 @@ export default function SelectList(props: SelectListProps) {
   const labelId = `select-list-${1}`;
 
   const onHandleChange = (value: any) => {
-    if (value === label) return;
+    if (value === label || value.id === defaultValue?.id) return;
     onSelect?.(value);
   };
 
+  const isDefaultSelected = !value || value.id === defaultValue?.id;
   return (
     <div>
       <StyledListBoxInput
-        defaultValue={value}
+        defaultValue={defaultValue || value}
         onChange={onHandleChange}
         aria-labelledby={labelId}
         className="border-0 border-transparent relative mt-2"
@@ -121,6 +121,35 @@ export default function SelectList(props: SelectListProps) {
               leaveTo="opacity-0"
             >
               <div className="absolute z-[1044] w-full h-full bg-white dark:bg-[#272727] shadow-lg rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm list-none border border-neutrals-gray-4">
+                {defaultValue ? (
+                  <ListboxOption
+                    key={`listbox_${defaultValue?.id}`}
+                    className={classNames(
+                      "hover:text-white hover:bg-indigo-600 hover:dark:bg-[#525659] text-gray-900 dark:text-white cursor-pointer select-none relative py-2 pl-3 pr-9"
+                    )}
+                    value={defaultValue as unknown as any}
+                  >
+                    <>
+                      <div className="flex items-center">
+                        <span
+                          className={classNames(
+                            isDefaultSelected ? "font-semibold" : "font-normal",
+                            "block truncate text-md"
+                          )}
+                        >
+                          <span className="pl-2">{defaultValue?.name}</span>
+                        </span>
+                      </div>
+                      {isDefaultSelected && <span
+                        className={classNames(
+                          "text-teal hover:text-white absolute inset-y-0 right-0 flex items-center pr-4"
+                        )}
+                      >
+                        <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                      </span>}
+                    </>
+                  </ListboxOption>
+                ) : null}
                 {data.map((person: SelectOption) => {
                   const selected = person.name === value?.name;
                   return (
