@@ -28,7 +28,7 @@ import {
 import { toggleToolbar } from "@src/state/preferences/preferencesSlice";
 import { useSetter } from "@src/store/accessors";
 import axios from "axios";
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useManuscriptController } from "../ManuscriptReader/ManuscriptController";
 import FieldSelector from "./FieldSelector";
@@ -39,6 +39,7 @@ interface CreateNodeModalProps {
   onDismiss: () => void;
 }
 
+const defaultLicense = { name: "License Type", id: 111 };
 export default memo(function CreateNodeModal({
   isOpen,
   onDismiss,
@@ -160,6 +161,16 @@ export default memo(function CreateNodeModal({
     researchFields,
   ]);
 
+  const isValid = useMemo(
+    () =>
+      !(
+        manifestTitle &&
+        researchFields.length > 0 &&
+        manifestLicense &&
+        manifestLicense?.id !== defaultLicense.id
+      ),
+    [manifestLicense, manifestTitle, researchFields.length]
+  );
   return (
     <Modal
       isOpen={isOpen}
@@ -215,7 +226,7 @@ export default memo(function CreateNodeModal({
         <SelectList
           label="License Type"
           data={PDF_LICENSE_TYPES}
-          defaultValue={{ name: "License Type", id: 111 }}
+          defaultValue={defaultLicense}
           className="mt-2"
           value={manifestLicense}
           labelRenderer={licenseSelectLabelRenderer}
@@ -229,10 +240,7 @@ export default memo(function CreateNodeModal({
       </div>
       <div className="flex flex-row justify-end items-center bg-neutrals-gray-1 border-t border-t-tint-primary rounded-b-md px-4 py-3">
         <PrimaryButton
-          disabled={
-            !(manifestTitle && researchFields.length > 0 && manifestLicense) ||
-            isLoading
-          }
+          disabled={isValid || isLoading}
           onClick={() => {
             if (editingNodeParams) return handleEdit();
             /**

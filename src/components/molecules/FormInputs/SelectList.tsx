@@ -125,7 +125,7 @@ export default function SelectList(props: SelectListProps) {
                   <ListboxOption
                     key={`listbox_${defaultValue?.id}`}
                     className={classNames(
-                      "hover:text-white hover:bg-indigo-600 hover:dark:bg-[#525659] text-gray-900 dark:text-white cursor-pointer select-none relative py-2 pl-3 pr-9"
+                      "hover:text-white hidden hover:bg-indigo-600 hover:dark:bg-[#525659] text-gray-900 dark:text-white cursor-pointer select-none relative py-2 pl-3 pr-9"
                     )}
                     value={defaultValue as unknown as any}
                   >
