@@ -3,8 +3,10 @@ import {
   RESEARCH_OBJECT_NODES_PREFIX,
 } from "@desci-labs/desci-models";
 import {
+  AvailableUserActionLogTypes,
   createResearchObjectStub,
   getResearchObjectStub,
+  postUserAction,
   updateDraft,
 } from "@src/api";
 import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
@@ -282,12 +284,14 @@ export default memo(function CreateNodeModal({
                 return;
               } catch (e) {
                 console.log("Error", e);
+                postUserAction(AvailableUserActionLogTypes.errNodeCreate);
               } finally {
                 setIsLoading(false);
               }
             });
             dispatch(setCurrentObjectId(""));
             dispatch(setPublicView(false));
+            postUserAction(AvailableUserActionLogTypes.btnCreateNodeModalSave);
           }}
           className="h-10 text-lg flex gap-2"
         >

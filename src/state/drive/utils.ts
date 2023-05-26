@@ -106,6 +106,7 @@ export function extractComponentMetadata(
     "description",
     "licenseType",
     "ontologyPurl",
+    "cedarLink",
     "controlledVocabTerms",
   ];
 
