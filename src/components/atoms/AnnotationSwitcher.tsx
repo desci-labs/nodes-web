@@ -125,8 +125,6 @@ const AnnotationSwitcher = (props: AnnotationSwitcherProps) => {
 
   const increment = useCallback(
     (skipScrollToTop: boolean = false) => {
-     
-
       /**
        * handleComponentClick, setTimeout pattern.
        * Handle clicking annotation when other component is currently selected
@@ -153,7 +151,6 @@ const AnnotationSwitcher = (props: AnnotationSwitcherProps) => {
 
   const decrement = useCallback(
     (skipScrollToTop: boolean = false) => {
-     
       /**
        * handleComponentClick, setTimeout pattern.
        * Handle clicking annotation when other component is currently selected
@@ -223,7 +220,7 @@ const AnnotationSwitcher = (props: AnnotationSwitcherProps) => {
     <Wrapper
       onClick={(e: any) => e.stopPropagation()}
       data-annotation-switch
-      className="group"
+      className="group mt-0.5"
     >
       <AiFillCaretLeft
         title="Previous annotation"
