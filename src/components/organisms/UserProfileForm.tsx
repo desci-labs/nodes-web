@@ -2,7 +2,7 @@ import { memo, useEffect, useRef } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import validUrl from "valid-url";
 import InsetLabelSmallInput from "@components/molecules/FormInputs/InsetLabelSmallInput";
-import { ProfileValues } from "@components/organisms/WrapperProfileModal";
+import { ProfileValues } from "@src/components/organisms/Profiler";
 import useProfileSubmit from "./Profile/useProfileSubmit";
 import PrimaryButton from "@components/atoms/PrimaryButton";
 import { useManuscriptController } from "./ManuscriptReader/ManuscriptController";

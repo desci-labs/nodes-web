@@ -107,12 +107,17 @@ const Credits = (props: CreditsProps) => {
                           <span className="text-xs text-gray-400">
                             {author.role}
                           </span>
+                          {author.organizations ? (
+                            <span className="text-xs text-gray-400">
+                              {author.organizations[0].name}
+                            </span>
+                          ) : null}
                         </div>
                       )}
                       action={() => (
-                        <Identicon string={author.name} size={20} />
+                        <Identicon className="rounded-full" string={author.name} size={20} />
                       )}
-                      className="w-full bg-zinc-100 dark:bg-muted-900"
+                      className="w-full bg-zinc-100 dark:bg-muted-900 gap-1"
                       containerStyle={{ alignItems: "start" }}
                     />
                   )}
