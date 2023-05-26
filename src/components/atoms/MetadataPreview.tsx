@@ -5,6 +5,7 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { FlexRowSpaceBetween } from "../styled";
 import { IconOrcidOutline } from "./Icons";
+import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 
 interface MetadataPreviewProps {
   isFair: boolean;
@@ -31,6 +32,9 @@ const MetadataPreview: React.FC<MetadataPreviewProps> = ({
       onClick={(e: React.MouseEvent) => {
         dispatch(showMetadataForComponent(component));
         e.stopPropagation();
+        postUserAction(
+          AvailableUserActionLogTypes.btnComponentCardViewMetadata
+        );
       }}
     >
       <FlexRowSpaceBetween>
@@ -38,11 +42,12 @@ const MetadataPreview: React.FC<MetadataPreviewProps> = ({
           <IconOrcidOutline width={18} />
         </div>
         <div
-          className={`my-0 px-2 ${
+          className={`my-0 px-1 pr-2 font-mono line-clamp-1  ${
             isFair ? "fairBoxLit text-tint-primary-hover" : "text-[#CCCCCC]"
           }`}
         >
           {text}
+          {/* <span className="inline-block truncate line-clamp-1">{text}</span> */}
         </div>
       </FlexRowSpaceBetween>
     </button>

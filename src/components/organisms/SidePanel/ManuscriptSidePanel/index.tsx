@@ -46,6 +46,7 @@ import {
 import { IconPower } from "@src/icons";
 import MetadataKeywords from "@src/components/organisms/SidePanel/ManuscriptSidePanel/Tabs/Components/MetadataKeywords";
 import useLocalStorageState from "@src/hooks/useLocalStorageState";
+import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 
 const ManuscriptSidePanelContainer = styled(SidePanel).attrs({
   className: "bg-light-gray dark:bg-dark-gray text-black dark:text-white",
@@ -257,6 +258,7 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
             // disabled={!changesToCommit.length} // uncomment when this func is implemented
             onClick={() => {
               dispatch(toggleCommitPanel(true));
+              postUserAction(AvailableUserActionLogTypes.btnPublish);
             }}
           >
             <FlexRowCentered className="gap-1">

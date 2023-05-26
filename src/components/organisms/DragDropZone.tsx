@@ -66,7 +66,6 @@ const DragDropZone = ({ children }: React.PropsWithChildren<any>) => {
     return item;
   };
   const dropHandler = async (ev: DragEvent<HTMLDivElement>) => {
-    console.log("File(s) dropped");
 
     // Prevent default behavior (Prevent file from being opened)
     ev.preventDefault();
@@ -88,7 +87,11 @@ const DragDropZone = ({ children }: React.PropsWithChildren<any>) => {
           );
         }
       }
-      setDroppedTransferItemList(flatten(processed));
+
+      if (processed.length > 0) {
+        setDroppedTransferItemList(flatten(processed));
+      }
+
     } else {
       setDroppedFileList(ev.dataTransfer.files);
       // Use DataTransfer interface to access the file(s)

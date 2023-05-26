@@ -38,7 +38,7 @@ import {
   findUniqueName,
   GENERIC_NEW_FOLDER_NAME,
   CID_PENDING,
-  getAncestorComponent,
+  // getAncestorComponent,
   defaultSort,
   GENERIC_NEW_LINK_NAME,
   DRIVE_FULL_EXTERNAL_LINKS_PATH,
@@ -607,7 +607,7 @@ export const addFilesToDrive = createAsyncThunk(
       externalCids,
       externalUrl,
       componentType,
-      componentSubType,
+      componentSubtype,
       newFolder,
       onSuccess,
     } = payload;
@@ -760,7 +760,7 @@ export const addFilesToDrive = createAsyncThunk(
         externalCids,
         externalUrl,
         componentType,
-        componentSubType,
+        componentSubtype,
         newFolderName,
         onProgress: (e) => {
           if (batchUid === undefined) return;

@@ -24,6 +24,7 @@ import { tags } from "@src/state/api/tags";
 import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
 import { useUser } from "@src/state/user/hooks";
+import { FlexRowAligned } from "../styled";
 
 enum ShareTabs {
   Invite = "Invite",
@@ -77,7 +78,7 @@ const ShareModal = React.memo((props: ModalProps) => {
     >
       <div
         className={`px-6 py-5 text-white relative min-w-[600px] ${
-          canSharePublished ? "min-h-[400px]" : "min-h-[200px]"
+          canSharePublished ? "" : "min-h-[200px]"
         }`}
       >
         <Modal.Header
@@ -90,21 +91,21 @@ const ShareModal = React.memo((props: ModalProps) => {
               style={{ margin: "1rem 0 1rem 0", height: 35, maxWidth: 400 }}
             >
               <SwitchButton
-                isSelected={currentTab === ShareTabs.Public}
-                onClick={() => setCurrentTab(ShareTabs.Public)}
-                disabled={!canSharePublished}
-              >
-                <p className="text-xs flex justify-center items-center h-full capitalize">
-                  Share Published version
-                </p>
-              </SwitchButton>
-              <SwitchButton
                 isSelected={currentTab === ShareTabs.Invite}
                 onClick={() => canSendInvite && setCurrentTab(ShareTabs.Invite)}
                 disabled={!canSendInvite}
               >
-                <p className="text-xs flex justify-center items-center h-full capitalize">
-                  Invite Collaborator
+                <p className="text-xs flex justify-center items-center h-full capitalize font-inter font-bold">
+                  Share privately
+                </p>
+              </SwitchButton>
+              <SwitchButton
+                isSelected={currentTab === ShareTabs.Public}
+                onClick={() => setCurrentTab(ShareTabs.Public)}
+                disabled={!canSharePublished}
+              >
+                <p className="text-xs flex justify-center items-center h-full capitalize font-inter font-bold">
+                  Share Published version
                 </p>
               </SwitchButton>
             </SwitchBar>
@@ -113,41 +114,31 @@ const ShareModal = React.memo((props: ModalProps) => {
         {currentTab === ShareTabs.Invite && <NodeInvite />}
         {currentTab === ShareTabs.Public && <SharePublished />}
       </div>
-      {currentTab === ShareTabs.Public && (
-        <Modal.Footer>
-          <div className="flex items-center justify-end w-full gap-2">
-            <PrimaryButton
-              onClick={() => props?.onDismiss && props.onDismiss()}
-              className="flex gap-1"
-            >
-              Done
-            </PrimaryButton>
-          </div>
-        </Modal.Footer>
-      )}
       {currentTab === ShareTabs.Invite && canSendInvite && (
         <Modal.Footer>
           <div className="flex items-center justify-end w-full gap-2">
             {!shareId && (
-              <ButtonSecondary
+              <PrimaryButton
                 disabled={isLoading || isCreated}
                 onClick={() => createShareLink(currentObjectId!)}
               >
-                {isLoading ? (
-                  <DefaultSpinner color="white" size={24} />
-                ) : (
-                  <IconCopyLink
-                    className={`fill-white transition-colors ${
-                      isLoading || isCreated ? "" : "group-hover:fill-black"
-                    }`}
-                    width={20}
-                    height={20}
-                  />
-                )}
-                <span className="ml-1">
-                  {isLoading ? "Creating link" : "Create private link"}
-                </span>
-              </ButtonSecondary>
+                <FlexRowAligned>
+                  {isLoading ? (
+                    <DefaultSpinner color="white" size={24} />
+                  ) : (
+                    <IconCopyLink
+                      className={`fill-black transition-colors ${
+                        isLoading || isCreated ? "" : "group-hover:fill-white"
+                      }`}
+                      width={20}
+                      height={20}
+                    />
+                  )}
+                  <span className="ml-1 font-inter capitalize">
+                    {isLoading ? "Creating link" : "Create private link"}
+                  </span>
+                </FlexRowAligned>
+              </PrimaryButton>
             )}
 
             {shareId && (

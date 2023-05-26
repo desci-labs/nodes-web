@@ -494,11 +494,11 @@ export function getVirtualDriveMetadataStatus(drive: DriveObject) {
   // if (!drive.metadata.licenseType) return ButtonState.ERROR;
   // FORCING green to not confuse users temporarily
   return ButtonState.SUCCESS;
-  if (drive.type === FileType.DIR && drive.contains) {
-    if (!noChildrenError(drive)) return ButtonState.ERROR;
-    if (!noChildrenPending(drive)) return ButtonState.PENDING;
-  }
-  return ButtonState.SUCCESS;
+  // if (drive.type === FileType.DIR && drive.contains) {
+  //   if (!noChildrenError(drive)) return ButtonState.ERROR;
+  //   if (!noChildrenPending(drive)) return ButtonState.PENDING;
+  // }
+  // return ButtonState.SUCCESS;
 }
 
 export function getMetadataStatus(drive: DriveObject) {
@@ -507,22 +507,22 @@ export function getMetadataStatus(drive: DriveObject) {
   // FORCING green to not confuse users temporarily
   return ButtonState.SUCCESS;
 
-  if (drive.type === FileType.DIR) {
-    if (!noChildrenError(drive)) return ButtonState.ERROR;
-    if (!noChildrenPending(drive)) return ButtonState.PENDING;
-  }
+  // if (drive.type === FileType.DIR) {
+  //   if (!noChildrenError(drive)) return ButtonState.ERROR;
+  //   if (!noChildrenPending(drive)) return ButtonState.PENDING;
+  // }
 
-  const allFilled = Object.entries(drive.metadata).every(
-    (kv) =>
-      kv[0] === "ontologyPurl" ||
-      kv[0] === "description" ||
-      kv[0] === "keywords" ||
-      kv[0] === "licenseType" ||
-      kv[1]?.length
-  );
-  if (allFilled) return ButtonState.SUCCESS;
+  // const allFilled = Object.entries(drive.metadata).every(
+  //   (kv) =>
+  //     kv[0] === "ontologyPurl" ||
+  //     kv[0] === "description" ||
+  //     kv[0] === "keywords" ||
+  //     kv[0] === "licenseType" ||
+  //     kv[1]?.length
+  // );
+  // if (allFilled) return ButtonState.SUCCESS;
 
-  return ButtonState.PENDING;
+  // return ButtonState.PENDING;
 }
 
 export function noChildrenPending(drive: DriveObject): boolean {
@@ -564,6 +564,7 @@ export function noChildrenError(drive: DriveObject): boolean {
         if (child.type === FileType.FILE) return true;
         if (child.type === FileType.DIR) return noChildrenError(child);
       }
+      return false;
     });
   }
   return true;
@@ -618,7 +619,7 @@ export function stringifyMaxDepth(obj: any, depth = 1) {
 //   return node;
 // }
 
-export function findDriveByPath(
+export function __deprecated__findDriveByPath(
   parentDrive: DriveObject,
   path: string
 ): DriveObject | undefined {
@@ -628,7 +629,7 @@ export function findDriveByPath(
     const node = parentDrive.contains![idx];
     if (node.path === path) return node;
     if (node.contains && node.contains.length)
-      return findDriveByPath(node, path);
+      return __deprecated__findDriveByPath(node, path);
   }
   return undefined;
 }

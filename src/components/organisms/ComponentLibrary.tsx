@@ -8,6 +8,7 @@ import {
   IconComponentExternalApi,
   IconComponentMisc,
   IconComponentOpenData,
+  IconComponentOtherLink,
   IconComponentPreregisteredAnalysisPlan,
   IconComponentPreregisteredReport,
   IconComponentPresentation,
@@ -203,7 +204,9 @@ export const EXTERNAL_COMPONENTS: UiComponentDefinition[] = [
     componentSubtype: ResearchObjectComponentLinkSubtype.RESTRICTED_DATA,
   },
   {
-    icon: (props) => <IconWrapper Icon={IconComponentMisc} {...props} />,
+    icon: (props) => (
+      <IconWrapper Icon={IconComponentOtherLink} fill="none" {...props} />
+    ),
     title: "Other Link",
     componentType: ResearchObjectComponentType.LINK,
     componentSubtype: ResearchObjectComponentLinkSubtype.OTHER,

@@ -17,7 +17,7 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
     defaultValues: {
       name: props?.author?.name,
       googleScholar: props?.author?.googleScholar ?? "",
-      role: props?.author?.role || ResearchObjectV1AuthorRole.AUTHOR,
+      role: props?.author?.role,
       orcid: props?.author?.orcid ?? "",
       organizations: props?.author?.organizations ?? []
     },

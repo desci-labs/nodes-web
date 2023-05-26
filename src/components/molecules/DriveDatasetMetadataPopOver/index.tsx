@@ -27,10 +27,12 @@ import { useDrive } from "@src/state/drive/hooks";
 import { v4 as uuidv4 } from "uuid";
 import { fetchTreeThunk } from "@src/state/drive/driveSlice";
 import ViewMetadataModal from "@src/components/organisms/PopOver/ComponentMetadataPopover/ViewMetadataModal";
+import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 
 export const DATASET_METADATA_FORM_DEFAULTS = {
   title: "",
   ontologyPurl: "",
+  cedarLink: "",
   controlledVocabTerms: [],
   keywords: [],
   description: "",
@@ -70,6 +72,7 @@ const DriveDatasetMetadataEditor = (
       title: data?.title || DATASET_METADATA_FORM_DEFAULTS.title,
       ontologyPurl:
         data?.ontologyPurl || DATASET_METADATA_FORM_DEFAULTS.ontologyPurl,
+      cedarLink: data?.cedarLink || DATASET_METADATA_FORM_DEFAULTS.cedarLink,
       controlledVocabTerms:
         data?.controlledVocabTerms ||
         DATASET_METADATA_FORM_DEFAULTS.controlledVocabTerms,
@@ -250,6 +253,7 @@ const DriveDatasetMetadataEditor = (
                       formRef.current!.submit!();
                     }
                   }
+                  postUserAction(AvailableUserActionLogTypes.saveMetadata);
                 }}
                 disabled={isSaving && !publicView}
               >

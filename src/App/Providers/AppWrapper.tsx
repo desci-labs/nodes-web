@@ -20,6 +20,8 @@ export default function AppWrapper(props: PropsWithChildren<{}>) {
 
   // Orchid checker init
   useCheckOrcid();
+  
+  const authToken = localStorage.getItem("auth");
 
   return (
     <>
@@ -37,8 +39,7 @@ export default function AppWrapper(props: PropsWithChildren<{}>) {
         )}
 
         {checkingCode ||
-        ((!userProfile || !(userProfile as any).userId) &&
-          localStorage.getItem("auth")) ? (
+        ((!userProfile || !(userProfile as any).userId) && authToken) ? (
           <div className="fixed z-[101] bg-[#525659] h-screen w-screen">
             {!isMobileView && <PdfHeader />}
             <div className="w-full absolute z-[102] top-[52px] rounded-full h-[3px]">

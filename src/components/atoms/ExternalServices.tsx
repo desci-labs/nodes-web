@@ -4,6 +4,7 @@ import {
   IconSvcColab,
   IconSvcHuggingFace,
   IconSvcJupyter,
+  IconSvcLink,
   IconSvcMyBinder,
   IconSvcOpenReview,
   IconSvcReplicateAi,
@@ -23,7 +24,7 @@ export const ServiceIconWrapper = ({
       wrapperClassName ?? ""
     }`}
   >
-    <Icon fill="white" width={24} height={24} className={className} {...rest} />
+    <Icon width={24} height={24} className={className} {...rest} />
   </div>
 );
 
@@ -151,9 +152,15 @@ const getServiceFromUrl = (url: string): CommonServiceObject => {
     const sld = domain.split(".")[0];
     const capitalizedSLD = sld.charAt(0).toUpperCase() + sld.slice(1);
 
-    return { title: capitalizedSLD };
+    return {
+      title: capitalizedSLD,
+      icon: (props: any) => <ServiceIconWrapper Icon={IconSvcLink} />,
+    };
   } catch {
-    return { title: "Unknown" };
+    return {
+      title: "Unknown",
+      icon: (props: any) => <ServiceIconWrapper Icon={IconSvcLink} />,
+    };
   }
 };
 

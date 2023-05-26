@@ -62,6 +62,7 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
       <SelectList
         label="Role"
         mandatory={true}
+        defaultValue={{ id: -1, name: "Role" }}
         data={authorRoles}
         value={authorRoles.find((role) => role.name === selectedRole)}
         onSelect={(val) =>

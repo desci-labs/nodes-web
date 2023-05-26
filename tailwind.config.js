@@ -146,6 +146,9 @@ module.exports = {
         "state-success": "#00A180",
         "state-pending": "#FFC01E",
         "state-error": "#C96664",
+        social: {
+          twitter: "#00ACEE"
+        },
         muted: {
           100: "#969696",
           200: "#cccccc",
