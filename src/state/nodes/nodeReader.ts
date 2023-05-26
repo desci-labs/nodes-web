@@ -11,10 +11,7 @@ import update from "immutability-helper";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { updateDraft } from "@src/api";
 import { AnnotationLinkConfig } from "@src/components/molecules/AnnotationEditor/components";
-import {
-  cleanupManifestUrl,
-  filterForFirstPdf,
-} from "@src/components/utils";
+import { cleanupManifestUrl, filterForFirstPdf } from "@src/components/utils";
 import { RootState } from "@src/store";
 import axios from "axios";
 import { DrivePath } from "../drive/types";
@@ -557,6 +554,7 @@ export const nodeReaderSlice = createSlice({
         delete state.manifest!.components[componentIndex].payload.keywords;
         delete state.manifest!.components[componentIndex].payload.licenseType;
         delete state.manifest!.components[componentIndex].payload.ontologyPurl;
+        delete state.manifest!.components[componentIndex].payload.cedarLink;
         delete state.manifest!.components[componentIndex].payload
           .controlledVocabTerms;
       });

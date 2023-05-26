@@ -1,7 +1,7 @@
 import { memo } from "react";
 import UserAttestations from "@components/organisms/UserAttestations";
 import ProfileInfo from "./ProfileInfo";
-import Profiler from "./WrapperProfileModal";
+import Profiler from "./Profiler";
 
 export const PaneUserProfile = memo(() => {
   return (

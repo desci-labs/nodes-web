@@ -8,6 +8,7 @@ import { useCallback, useState } from "react";
 import { CHAINS, getAddChainParameters, URLS } from "@connectors/../chains";
 import { DEFAULT_CHAIN } from "@components/molecules/ConnectWithSelect";
 import { Web3AuthConnector } from "@lib/web3auth";
+import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 // import { TorusWallet } from "@components/../lib/torus";
 
 function ChainSelect({
@@ -106,6 +107,7 @@ export function ConnectWithSelect({
           .then(() => setError(undefined))
           .catch(setError);
       }
+      postUserAction(AvailableUserActionLogTypes.walletSwitchChain);
     },
     [connector, chainId, setError]
   );
@@ -136,9 +138,11 @@ export function ConnectWithSelect({
         .then(() => setError(undefined))
         .catch(setError);
     }
+    postUserAction(AvailableUserActionLogTypes.walletClickCard);
   }, [connector, desiredChainId, setError]);
 
   if (error) {
+    postUserAction(AvailableUserActionLogTypes.walletError);
     return (
       <div
         style={{ display: "flex", flexDirection: "column" }}
@@ -183,6 +187,7 @@ export function ConnectWithSelect({
             } else {
               void connector.resetState();
             }
+            postUserAction(AvailableUserActionLogTypes.walletDisconnect);
           }}
         >
           {children}

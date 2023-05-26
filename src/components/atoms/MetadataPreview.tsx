@@ -5,6 +5,7 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { FlexRowSpaceBetween } from "../styled";
 import { IconOrcidOutline } from "./Icons";
+import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 
 interface MetadataPreviewProps {
   isFair: boolean;
@@ -31,6 +32,9 @@ const MetadataPreview: React.FC<MetadataPreviewProps> = ({
       onClick={(e: React.MouseEvent) => {
         dispatch(showMetadataForComponent(component));
         e.stopPropagation();
+        postUserAction(
+          AvailableUserActionLogTypes.btnComponentCardViewMetadata
+        );
       }}
     >
       <FlexRowSpaceBetween>

@@ -24,8 +24,9 @@ const CreateableSelectComponent = (props: CreateableSelectProps) => {
   };
 
   const addTag = (val: string | undefined) => {
+    console.log('add tag', val, tagInputRef.current?.value);
     if (val && tagInputRef.current?.value) {
-      if (value.find((tag: any) => tag.toLowerCase() === val.toLowerCase())) {
+      if (value.find((tag: any) => tag.trim().toLowerCase() === val.trim().toLowerCase())) {
         return;
       }
       onChange([...value, val]);

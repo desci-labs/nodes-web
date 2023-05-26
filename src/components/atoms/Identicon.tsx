@@ -1,6 +1,5 @@
-
 // @ts-ignore
-import IdenticonComponent from 'react-identicons';
+import IdenticonComponent from "react-identicons";
 
 interface IdenticonProps {
   string: any;
@@ -12,6 +11,7 @@ const Identicon = (props: IdenticonProps) => {
   const { string, size = 26 } = props;
   return (
     <span
+      style={{ minWidth: 21, width: size }}
       className={`cursor-pointer fill-black stroke-black rounded-full overflow-hidden border dark:border-white dark:bg-black border-black ${props.className}`}
     >
       <IdenticonComponent
@@ -24,4 +24,4 @@ const Identicon = (props: IdenticonProps) => {
   );
 };
 
-export default Identicon
+export default Identicon;

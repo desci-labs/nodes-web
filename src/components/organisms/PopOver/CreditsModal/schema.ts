@@ -4,6 +4,7 @@ import validUrl from "valid-url";
 import {
   ResearchObjectV1Author,
   ResearchObjectV1AuthorRole,
+  ResearchObjectV1Organization,
 } from "@desci-labs/desci-models";
 
 export type OrcidPartsKeys = "orcid1" | "orcid2" | "orcid3" | "orcid4";
@@ -16,7 +17,7 @@ export interface CreditModalProps {
   id?: number;
 }
 
-const GOOGLE_SCHOLAR_URL_SCHEMA = Yup.string()
+export const GOOGLE_SCHOLAR_URL_SCHEMA = Yup.string()
   .url()
   .optional()
   .test({
@@ -104,9 +105,17 @@ export const authorsFormSchema = Yup.object({
       name: "Github",
       test: (data, _) => {
         if (data === "" || !data) return true;
-        const pattern = /^(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9_-]{1,25}$/igm
+        const pattern =
+          /^(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9_-]{1,25}$/gim;
         if (!pattern.test(data)) return false;
         return true;
       },
     }),
+  organizations: Yup.mixed<ResearchObjectV1Organization[]>().test({
+    name: "Organization",
+    message: "Invalid organization",
+    test: (data) => {
+      return true;
+    },
+  }),
 });

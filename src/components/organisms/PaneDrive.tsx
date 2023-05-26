@@ -15,6 +15,11 @@ import { useDrive } from "@src/state/drive/hooks";
 import { addFilesToDrive } from "@src/state/drive/driveSlice";
 import { isMobile } from "react-device-detect";
 import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
+import PrimaryButton from "../atoms/PrimaryButton";
+import { EyeIcon } from "@heroicons/react/solid";
+import ContextMenu from "./ContextMenu";
+import ButtonSecondary from "../atoms/ButtonSecondary";
+import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 
 const PaneDrive = () => {
   const {
@@ -24,7 +29,8 @@ const PaneDrive = () => {
     setDroppedTransferItemList,
   } = useManuscriptController(["droppedFileList", "droppedTransferItemList"]);
   const dispatch = useSetter();
-  const { isDraggingFiles } = useNodeReader();
+  const { isDraggingFiles, manifest } = useNodeReader();
+  const canViewMetadata = manifest && manifest.dpid;
 
   const { status, currentDrive } = useDrive();
 
@@ -111,7 +117,28 @@ const PaneDrive = () => {
             !isMobile ? "!pb-[300px]" : ""
           } `}
         >
-          <h1 className="text-[28px] font-bold text-white">Node Drive</h1>
+          <div className="flex flex-row justify-between items-center">
+            <h1 className="text-[28px] font-bold text-white">Node Drive</h1>
+            {canViewMetadata ? (
+              <ButtonSecondary
+                onClick={() => {
+                  window.open(
+                    `https://beta.dpid.org/${manifest?.dpid!.id}?jsonld`,
+                    `_blank`
+                  );
+                  postUserAction(
+                    AvailableUserActionLogTypes.btnInspectMetadata
+                  );
+                }}
+              >
+                <EyeIcon
+                  width={16}
+                  className="fill-white group-hover:fill-black transition-colors"
+                />
+                Inspect Metadata
+              </ButtonSecondary>
+            ) : null}
+          </div>
           <SpacerHorizontal />
           <div id="tableWrapper" className="mt-5 h-full">
             <DriveTable />

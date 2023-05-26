@@ -6,6 +6,10 @@ import { useUser } from "@src/state/user/hooks";
 import { NavLink, useNavigate } from "react-router-dom";
 import { TextLink } from "./Footer";
 import { useMobileMenu, useSetMobileMenu } from "./useAppMenu";
+import { useEffect } from "react";
+import { useSetter } from "@src/store/accessors";
+import { api } from "@src/state/api";
+import { tags } from "@src/state/api/tags";
 const LINK_STYLE =
   "text-white hover:border-tint-primary border-transparent border-b-4 !no-underline transition-all";
 export const BetaLogo = ({
@@ -44,10 +48,15 @@ const URL_GETTING_STARTED =
   "https://docs.desci.com/using-nodes/getting-started";
 
 export default function Header() {
-  const navigate = useNavigate();
+  const dispatch = useSetter();
   const userProfile = useUser();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    dispatch(api.util.invalidateTags([{ type: tags.user }]));
+  }, [dispatch]);
+  
   const isLoggedIn = userProfile.userId > 0;
-
   return (
     <div className="px-10 md:px-0 w-screen bg-black py-3 flex justify-center select-none transition-transform duration-1000 relative">
       <div className="container mx-auto flex gap-5 justify-between items-center h-[60px]">

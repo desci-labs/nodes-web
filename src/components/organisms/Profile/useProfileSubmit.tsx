@@ -7,7 +7,7 @@ import { useSetter } from "@src/store/accessors";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-import { ProfileValues } from "../WrapperProfileModal";
+import { ProfileValues } from "@src/components/organisms/Profiler";
 
 interface UseProfileSubmitProps {
   onClose?: () => void;

@@ -146,6 +146,9 @@ module.exports = {
         "state-success": "#00A180",
         "state-pending": "#FFC01E",
         "state-error": "#C96664",
+        social: {
+          twitter: "#00ACEE"
+        },
         muted: {
           100: "#969696",
           200: "#cccccc",
@@ -167,6 +170,10 @@ module.exports = {
       },
       boxShadow: {
         upperTealShadow: "inset 0px 1px 0 0 rgba(40, 170, 196, 1)",
+        Input: "inset 0px -2px 0px #555659",
+        InputActive: "inset 0px -2px 0px #65C3CA",
+        verifyInput: "inset 0px -1px 0px #555659",
+        verifyInputActive: "inset 0px -1px 0px #65C3CA",
       },
       minWidth: {
         "49xl": "490xl",

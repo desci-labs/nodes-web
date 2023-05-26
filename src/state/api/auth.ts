@@ -15,7 +15,11 @@ export const authApi = api.injectEndpoints({
         try {
           const { data } = await queryFulfilled;
           dispatch(setUser(data));
-        } catch (error) {}
+        } catch (error) {
+          // if (error.error.status)
+          // dispatch(logout());
+          console.log("Auth error", error);
+        }
       },
     }),
     redeemMagicLink: builder.mutation<
@@ -34,7 +38,9 @@ export const authApi = api.injectEndpoints({
       },
       async onQueryStarted(args, { dispatch, queryFulfilled }) {
         try {
-          await queryFulfilled;
+          const res = await queryFulfilled;
+          console.log("Magic link response", res);
+          localStorage.setItem("auth", res.data.user.token);
           await dispatch(authApi.endpoints.getUser.initiate());
           await dispatch(nodesApi.util.invalidateTags([{ type: tags.nodes }]));
         } catch (error) {}

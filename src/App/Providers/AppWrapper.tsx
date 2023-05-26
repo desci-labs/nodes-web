@@ -7,6 +7,7 @@ import Toolbar from "@src/components/organisms/Toolbar";
 import { useUser } from "@src/state/user/hooks";
 import ProfilePopOver from "@src/components/screens/Profile";
 import { useGetter } from "@src/store/accessors";
+import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 
 export default function AppWrapper(props: PropsWithChildren<{}>) {
   const userProfile = useUser();
@@ -60,9 +61,12 @@ export default function AppWrapper(props: PropsWithChildren<{}>) {
 }
 
 export function Popovers() {
+   const { showProfileUpdater, setShowProfileUpdater } = useManuscriptController([
+     "showProfileUpdater",
+   ]);
   return (
     <>
-      <ProfilePopOver onClose={() => {}} />
+      {showProfileUpdater && <ProfilePopOver onClose={() => setShowProfileUpdater(false)} />}
     </>
   );
 }

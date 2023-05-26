@@ -18,17 +18,32 @@ export default function useCreditsForm({
   const dispatch = useSetter();
 
   const onSubmit = async (data: ResearchObjectV1Author) => {
-    const { name, googleScholar, orcid, role, github } = data;
+    const { name, googleScholar, orcid, role, github, organizations } = data;
+
     if (author && id !== undefined) {
       dispatch(
         updateNodeAuthor({
           index: id,
-          update: { name: name.trim(), role, googleScholar, orcid, github },
+          update: {
+            name: name.trim(),
+            role,
+            googleScholar,
+            orcid,
+            organizations,
+            github,
+          },
         })
       );
     } else {
       dispatch(
-        addNodeAuthor({ name: name.trim(), role, googleScholar, orcid, github })
+        addNodeAuthor({
+          name: name.trim(),
+          role,
+          googleScholar,
+          orcid,
+          organizations,
+          github,
+        })
       );
     }
 
