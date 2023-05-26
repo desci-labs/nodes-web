@@ -97,7 +97,11 @@ const DriveTableFilePicker: React.FC<DriveTableProps> = ({
   return (
     <div className="w-full h-full  pb-14">
       {/* <DriveBreadCrumbs crumbs={breadCrumbs} eatBreadCrumb={eatBreadCrumb} /> */}
-      <div className="p-4 border-b border-neutrals-gray-7 flex flex-row items-center justify-between">
+      <div
+        className={`p-4 border-b border-neutrals-gray-7 flex flex-row items-center justify-between ${
+          mode === DrivePickerMode.MOVE ? "border-black" : ""
+        }`}
+      >
         <span className="flex flex-row items-center">
           {breadCrumbsPicker.length > 1 ? (
             <span
