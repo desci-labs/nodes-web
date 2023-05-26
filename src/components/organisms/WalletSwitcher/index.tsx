@@ -81,7 +81,7 @@ const WalletSwitcher = () => {
             <div className="flex flex-col items-start justify-between p-5 border-solid border-blueGray-200 rounded-t w-[25rem]">
               {/* <h3 className="">Connect a wallet</h3> */}
               <div className="text-center my-1 mt-0 select-none bg-gray-800 p-2 py-1.5 border border-gray-700 text-gray-200 rounded-md text-[10px] w-full leading-4">
-                By connecting a wallet you agree to the DeSci Labs{" "}
+                By continuing you agree to the DeSci Labs{" "}
                 <a
                   href="/terms"
                   className="text-tint-primary hover:text-tint-primary-hover font-bold"

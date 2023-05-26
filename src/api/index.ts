@@ -313,6 +313,7 @@ export const updateProfile = async (profile: Profile) => {
 export const logout = async () => {
   // await axios.delete(`${SCIWEAVE_URL}/v1/auth/logout`, config());
   localStorage.removeItem("auth");
+  stopTracking();
   return {};
 };
 
@@ -628,5 +629,33 @@ export const track = async (action: string, message?: string) => {
     amplitude.track(action, {
       message,
     });
+  }
+};
+
+export const trackPage = async (route: string) => {
+  if (process.env.REACT_APP_MIXPANEL_TOKEN) {
+    mixpanel.track("page", {
+      route,
+    });
+  }
+  if (process.env.REACT_APP_SEGMENT_TOKEN) {
+    segmentAnalytics.page();
+  }
+  if (process.env.REACT_APP_AMPLITUDE_TOKEN) {
+    amplitude.track("page", {
+      route,
+    });
+  }
+};
+
+export const stopTracking = async () => {
+  if (process.env.REACT_APP_MIXPANEL_TOKEN) {
+    mixpanel.reset();
+  }
+  if (process.env.REACT_APP_SEGMENT_TOKEN) {
+    segmentAnalytics.reset();
+  }
+  if (process.env.REACT_APP_AMPLITUDE_TOKEN) {
+    amplitude.reset();
   }
 };
