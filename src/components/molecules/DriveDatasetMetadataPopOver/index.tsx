@@ -27,6 +27,7 @@ import { useDrive } from "@src/state/drive/hooks";
 import { v4 as uuidv4 } from "uuid";
 import { fetchTreeThunk } from "@src/state/drive/driveSlice";
 import ViewMetadataModal from "@src/components/organisms/PopOver/ComponentMetadataPopover/ViewMetadataModal";
+import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 
 export const DATASET_METADATA_FORM_DEFAULTS = {
   title: "",
@@ -252,6 +253,7 @@ const DriveDatasetMetadataEditor = (
                       formRef.current!.submit!();
                     }
                   }
+                  postUserAction(AvailableUserActionLogTypes.saveMetadata);
                 }}
                 disabled={isSaving && !publicView}
               >

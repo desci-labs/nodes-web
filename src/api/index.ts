@@ -21,6 +21,10 @@ import {
   ExternalUrl,
 } from "@src/state/drive/types";
 import { arrayXor } from "@src/components/utils";
+import mixpanel from "mixpanel-browser";
+import { segmentAnalytics } from "@src/App/App";
+import * as amplitude from "@amplitude/analytics-browser";
+
 export const SCIWEAVE_URL =
   process.env.REACT_APP_NODES_API || "http://localhost:5420";
 
@@ -551,6 +555,47 @@ export enum AvailableUserActionLogTypes {
   btnDownloadData = "btnDownloadData",
   btnDownloadManuscript = "btnDownloadManuscript",
   btnShare = "btnShare",
+  btnPublish = "btnPublish",
+  btnAddComponentFab = "btnAddComponentFab",
+  btnAddComponentDrive = "btnAddComponentDrive",
+  btnAddComponentDriveNewComponent = "btnAddComponentDriveNewComponent",
+  btnAddComponentDriveNewFolder = "btnAddComponentDriveNewFolder",
+  driveNavigateBreadcrumb = "driveNavigateBreadcrumb",
+  btnFigureAnnotate = "btnFigureAnnotate",
+  btnContinuePublish = "btnContinuePublish",
+  btnReviewBeforePublish = "btnReviewBeforePublish",
+  dismissCommitAdditionalInfo = "dismissCommitAdditionalInfo",
+  dismissCommitStatus = "dismissCommitStatus",
+  completePublish = "completePublish",
+  btnSignPublish = "btnSignPublish",
+  commitPanelDismiss = "commitPanelDismiss",
+  viewWalletSettings = "viewWalletSettings",
+  walletMoreOptions = "walletMoreOptions",
+  walletSwitchChain = "walletSwitchChain",
+  walletClickCard = "walletClickCard",
+  walletError = "walletError",
+  walletDisconnect = "walletDisconnect",
+  connectWallet = "connectWallet",
+  btnComponentCardCite = "btnComponentCardCite",
+  btnComponentCardViewFile = "btnComponentCardViewFile",
+  btnComponentCardUse = "btnComponentCardUse",
+  btnComponentCardViewLink = "btnComponentCardViewLink",
+  btnComponentCardViewMetadata = "btnComponentCardViewMetadata",
+  viewDrive = "viewDrive",
+  btnDriveCite = "btnDriveCite",
+  btnDriveUse = "btnDriveUse",
+  btnDriveStarToggle = "btnDriveStarToggle",
+  saveMetadata = "saveMetadata",
+  btnInspectMetadata = "btnInspectMetadata",
+  ctxDriveRename = "ctxDriveRename",
+  ctxDrivePreview = "ctxDrivePreview",
+  ctxDriveDownload = "ctxDriveDownload",
+  ctxDriveDelete = "ctxDriveDelete",
+  ctxDriveAssignType = "ctxDriveAssignType",
+  ctxDriveEditMetadata = "ctxDriveEditMetadata",
+  btnCreateNewNode = "btnCreateNewNode",
+  btnCreateNodeModalSave = "btnCreateNodeModalSave",
+  errNodeCreate = "errNodeCreate",
   viewedNode = "viewedNode",
 }
 export const postUserAction = async (
@@ -562,5 +607,26 @@ export const postUserAction = async (
     { action, message },
     config()
   );
+
+  track(action, message);
+
   return data;
+};
+
+export const track = async (action: string, message?: string) => {
+  if (process.env.REACT_APP_MIXPANEL_TOKEN) {
+    mixpanel.track(action, {
+      message,
+    });
+  }
+  if (process.env.REACT_APP_SEGMENT_TOKEN) {
+    segmentAnalytics.track(action, {
+      message,
+    });
+  }
+  if (process.env.REACT_APP_AMPLITUDE_TOKEN) {
+    amplitude.track(action, {
+      message,
+    });
+  }
 };

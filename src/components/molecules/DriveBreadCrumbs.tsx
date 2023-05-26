@@ -1,5 +1,6 @@
 import { DriveObject, FileDir } from "@components/organisms/Drive";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/solid";
+import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 import { useDrive } from "@src/state/drive/hooks";
 import React from "react";
 
@@ -28,7 +29,12 @@ const DriveBreadCrumbs = ({ eatBreadCrumb }: BreadCrumbsProps) => {
               className={`font-medium text-sm text-white hover:text-tint-primary-hover cursor-pointer  ${
                 i == 0 ? "text-tint-primary" : "text-white"
               }`}
-              onClick={() => eatBreadCrumb(i)}
+              onClick={() => {
+                eatBreadCrumb(i);
+                postUserAction(
+                  AvailableUserActionLogTypes.driveNavigateBreadcrumb
+                );
+              }}
             >
               {c.name}
             </span>
