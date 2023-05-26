@@ -1,14 +1,16 @@
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
-import { RESEARCH_OBJECT_NODES_PREFIX } from "@desci-labs/desci-models";
+import {
+  RESEARCH_OBJECT_NODES_PREFIX,
+  ResearchObjectV1,
+} from "@desci-labs/desci-models";
 import { ResearchNode } from "@src/state/api/types";
 import {
   IconCopyLink,
   IconKebab,
   IconNodeNoMetadata,
-  IconPen,
   IconPenFancy,
 } from "@icons";
-import { useState } from "react";
+import { MouseEvent, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { app, site } from "@src/constants/routes";
 import { useSetter } from "@src/store/accessors";
@@ -21,6 +23,10 @@ import {
   MenubarPortal,
   MenubarTrigger,
 } from "../atoms/menubar";
+import { getResearchObjectStub } from "@src/api";
+import { cleanupManifestUrl } from "../utils";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 export interface NodeProps {
   id?: number;
@@ -54,6 +60,49 @@ const NodeCard = ({
     uuid || id
   }`;
   const [showContext, setShowContext] = useState<boolean>(false);
+  const [manifest, setManifest] = useState<ResearchObjectV1>();
+  const pullRef = useRef(false);
+
+  useEffect(() => {
+    if (pullRef.current) return;
+    async function getManifest() {
+      try {
+        let targetManifest: ResearchObjectV1;
+        // const cid = convertHexToCID(decodeBase64UrlSafeToHex(uuid));
+        const { manifestData, uri, manifestUrl } = await getResearchObjectStub(
+          "objects/" + uuid
+        );
+        if (manifestData) {
+          targetManifest = manifestData;
+        } else {
+          const prepManifestUrl = cleanupManifestUrl(uri || manifestUrl);
+          const { data } = await axios.get(prepManifestUrl);
+
+          targetManifest = data;
+        }
+        setManifest(targetManifest);
+        pullRef.current = true;
+      } catch (e) {}
+    }
+    getManifest();
+  }, [uuid]);
+
+  const isDpidSupported = !!manifest?.dpid;
+  const copydPid = (e: MouseEvent) => {
+    e.stopPropagation();
+    const dpid = `https://${
+      manifest?.dpid?.prefix ? manifest.dpid.prefix + "." : ""
+    }dpid.org/${manifest?.dpid?.id}`;
+    navigator.clipboard.writeText(dpid);
+    toast.success("dPid copied", {
+      style: {
+        marginTop: 50,
+        borderRadius: "10px",
+        background: "#333333",
+        color: "#fff",
+      },
+    });
+  }
 
   return (
     <div
@@ -116,32 +165,19 @@ const NodeCard = ({
                           }}
                         >
                           <span color="#ffffff">
-                            <IconPenFancy
-                              width={15}
-                            />
+                            <IconPenFancy width={15} color="#fff" fill="#fff" />
                           </span>
                           <span className="text-white">Edit Metadata</span>
                         </MenubarItem>
-                        <MenubarItem
-                          className="hover:bg-neutrals-gray-3"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            console.log("dpid");
-                            navigator.clipboard.writeText("");
-                            // dispatch(
-                            //   setEditNodeId({
-                            //     uuid: uuid!,
-                            //     title,
-                            //     licenseType: null,
-                            //   })
-                            // );
-                            // onHandleEdit?.();
-                            // setShowAddNewNode(true);
-                          }}
-                        >
-                          <IconCopyLink fill="white" width={15} />
-                          <span className="text-white">Copy dPid</span>
-                        </MenubarItem>
+                        {isDpidSupported ? (
+                          <MenubarItem
+                            className="hover:bg-neutrals-gray-3 disabled:hover:bg-transparent disabled:opacity-5"
+                            onClick={copydPid}
+                          >
+                            <IconCopyLink fill="white" width={15} />
+                            <span className="text-white">Copy dPid</span>
+                          </MenubarItem>
+                        ) : null}
                       </MenubarContent>
                     </MenubarPortal>
                   </MenubarMenu>
