@@ -7,7 +7,9 @@ import { memo, useEffect } from "react";
 import { api } from "@src/state/api";
 import { tags } from "@src/state/api/tags";
 import { useSetter } from "@src/store/accessors";
-import PrimaryAffiliation, { AffiliationForm } from "@src/components/molecules/PrimaryAffiliation";
+import PrimaryAffiliation, {
+  AffiliationForm,
+} from "@src/components/molecules/PrimaryAffiliation";
 // import {
 //   LS_VSCODE_ENABLED,
 //   useManuscriptController,
@@ -41,15 +43,15 @@ function ProfileInfo(props: {
         />
 
         <UserProfileForm viewOnly={!props.inModal} />
-        <DividerSimple />
+        {/* <DividerSimple /> */}
         {!props.inModal ? (
           <>
             <DividerSimple />
             <div className="flex flex-col gap-8">
               <div>
                 <IconSubTextHeader
-                  headerText="Primary Affiliation"
-                  subText="Add your primary academic affiliation."
+                  headerText="Academic Affiliation"
+                  subText="Add your academic affiliations."
                   withCircleBorder={true}
                 />
               </div>

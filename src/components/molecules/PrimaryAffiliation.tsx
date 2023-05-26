@@ -94,7 +94,7 @@ export default function PrimaryAffiliation(props: {
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <FlexColumnAligned className="gap-3">
-          <button
+          {/* <button
             type="button"
             disabled
             className={cx(
@@ -111,7 +111,7 @@ export default function PrimaryAffiliation(props: {
                 Connect to your Institution (coming soon..)
               </FlexRowAligned>
             </div>
-          </button>
+          </button> */}
 
           {/* <Controller
           name="organization"
