@@ -1,13 +1,26 @@
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { RESEARCH_OBJECT_NODES_PREFIX } from "@desci-labs/desci-models";
 import { ResearchNode } from "@src/state/api/types";
-import { IconKebab, IconNodeNoMetadata, IconPen } from "@icons";
+import {
+  IconCopyLink,
+  IconKebab,
+  IconNodeNoMetadata,
+  IconPen,
+  IconPenFancy,
+} from "@icons";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { app, site } from "@src/constants/routes";
-import ContextMenu from "../organisms/ContextMenu";
 import { useSetter } from "@src/store/accessors";
 import { setEditNodeId, setPublicView } from "@src/state/nodes/nodeReader";
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarPortal,
+  MenubarTrigger,
+} from "../atoms/menubar";
 
 export interface NodeProps {
   id?: number;
@@ -68,37 +81,71 @@ const NodeCard = ({
                 Last update:{" "}
                 {new Date(updatedTime).toLocaleString("en-US", options)}
               </div>
-              <div className="ml-auto relative">
-                <IconKebab
-                  width={20}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowContext(!showContext);
-                  }}
-                />
-                {showContext && (
-                  <ContextMenu
-                    items={[
-                      {
-                        icon: <IconPen fill="white" />,
-                        label: <span>Edit</span>,
-                        onClick: () => {
-                          dispatch(
-                            setEditNodeId({
-                              uuid: uuid!,
-                              title,
-                              licenseType: null,
-                            })
-                          );
-                          onHandleEdit?.();
-                          setShowAddNewNode(true);
-                        },
-                      },
-                    ]}
-                    close={() => setShowContext(false)}
-                    className={"right-0"}
-                  />
-                )}
+              <div className="ml-auto ">
+                <Menubar className="border-0 relative">
+                  <MenubarMenu>
+                    <MenubarTrigger className="cursor-pointer text-white p-2">
+                      <IconKebab
+                        width={20}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowContext(!showContext);
+                        }}
+                      />
+                    </MenubarTrigger>
+                    <MenubarPortal>
+                      <MenubarContent
+                        align="end"
+                        sideOffset={-30}
+                        alignOffset={30}
+                        className="border-0 bg-neutrals-gray-2"
+                      >
+                        <MenubarItem
+                          className="hover:bg-neutrals-gray-3"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            dispatch(
+                              setEditNodeId({
+                                uuid: uuid!,
+                                title,
+                                licenseType: null,
+                              })
+                            );
+                            onHandleEdit?.();
+                            setShowAddNewNode(true);
+                          }}
+                        >
+                          <span color="#ffffff">
+                            <IconPenFancy
+                              width={15}
+                            />
+                          </span>
+                          <span className="text-white">Edit Metadata</span>
+                        </MenubarItem>
+                        <MenubarItem
+                          className="hover:bg-neutrals-gray-3"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            console.log("dpid");
+                            navigator.clipboard.writeText("");
+                            // dispatch(
+                            //   setEditNodeId({
+                            //     uuid: uuid!,
+                            //     title,
+                            //     licenseType: null,
+                            //   })
+                            // );
+                            // onHandleEdit?.();
+                            // setShowAddNewNode(true);
+                          }}
+                        >
+                          <IconCopyLink fill="white" width={15} />
+                          <span className="text-white">Copy dPid</span>
+                        </MenubarItem>
+                      </MenubarContent>
+                    </MenubarPortal>
+                  </MenubarMenu>
+                </Menubar>
               </div>
             </>
           ) : null}

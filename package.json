@@ -16,6 +16,7 @@
     "@headlessui/react": "^1.4.0",
     "@heroicons/react": "^1.0.3",
     "@hookform/resolvers": "^3.0.0",
+    "@radix-ui/react-menubar": "^1.0.2",
     "@radix-ui/react-tooltip": "^1.0.5",
     "@reach/combobox": "^0.18.0",
     "@reach/dialog": "^0.18.0",
