@@ -26,7 +26,10 @@ const App = () => {
 
   useEffectOnce(() => {
     if (process.env.REACT_APP_MIXPANEL_TOKEN) {
-      mixpanel.init(process.env.REACT_APP_MIXPANEL_TOKEN, { debug: true });
+      mixpanel.init(process.env.REACT_APP_MIXPANEL_TOKEN, {
+        debug: true,
+        persistence: "localStorage",
+      });
     }
     if (process.env.REACT_APP_AMPLITUDE_TOKEN) {
       amplitude.init(process.env.REACT_APP_AMPLITUDE_TOKEN, undefined, {
@@ -36,6 +39,7 @@ const App = () => {
           formInteractions: true,
           fileDownloads: true,
         },
+        minIdLength: 1,
       });
     }
   });
@@ -53,13 +57,11 @@ const App = () => {
     if (userData) {
       let user = userData;
       if (user) {
-        mixpanel.identify(user.id);
+        mixpanel.identify(user.userId);
 
-        segmentAnalytics.identify({
-          userId: user.id,
-        });
+        segmentAnalytics.identify(user.userId);
 
-        amplitude.setUserId(user.id);
+        amplitude.setUserId(`${user.userId}`);
 
         if (
           !location.pathname.includes("/app/") ||
