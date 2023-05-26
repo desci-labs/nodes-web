@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 // import { ConnectWithSelect } from "@components/molecules/ConnectWithSelect";
 // import { eagerlyConnect } from "@connectors/useDefaultWeb3";
 import MetaMaskCard from "./connectorCards/MetaMaskCard";
@@ -66,9 +66,11 @@ import Web3AuthCard from "./connectorCards/Web3AuthCard";
 
 import { SlideDownContainer } from "../PopOver/CommitAdditionalInfoPopover";
 import { IconChevronDown, IconChevronUp } from "@icons";
+import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 
 const WalletSwitcher = () => {
   const [closed, setClosed] = useState(true);
+
   return (
     <>
       <div className="text-gray-900 justify-center items-center w-[25rem] flex overflow-x-hidden overflow-y-auto relative inset-0 z-50 outline-none focus:outline-none pointer-events-none">
@@ -94,7 +96,14 @@ const WalletSwitcher = () => {
               <Web3AuthCard />
               <button
                 className="text-gray-300 text-[10px] mt-5 flex fill-current text-right w-full flex-row-reverse items-center hover:text-white"
-                onClick={() => setClosed(!closed)}
+                onClick={() => {
+                  if (!closed) {
+                    postUserAction(
+                      AvailableUserActionLogTypes.walletMoreOptions
+                    );
+                  }
+                  setClosed(!closed);
+                }}
               >
                 {closed ? "More options" : "Less options"}
                 {closed ? (

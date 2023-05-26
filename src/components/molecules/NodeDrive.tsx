@@ -11,6 +11,7 @@ import { useSetter } from "@src/store/accessors";
 import { setComponentStack } from "@src/state/nodes/nodeReader";
 import React, { HTMLProps, useState } from "react";
 import { ResearchObjectV1Component } from "@desci-labs/desci-models";
+import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 
 export const DriveToggleButton = (props: HTMLProps<HTMLButtonElement>) => {
   const { setIsAddingComponent } = useManuscriptController();
@@ -34,6 +35,7 @@ export const DriveToggleButton = (props: HTMLProps<HTMLButtonElement>) => {
     if (shouldShowDrive) {
       setLastComponentStack(componentStack);
       dispatch(setComponentStack([]));
+      postUserAction(AvailableUserActionLogTypes.viewDrive);
     } else {
       const firstComponent =
         lastComponentStack && lastComponentStack.length

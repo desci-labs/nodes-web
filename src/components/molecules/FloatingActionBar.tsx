@@ -7,6 +7,7 @@ import * as React from "react";
 import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import { setAnnotatingViaButton, setIsAnnotating } from "@src/state/nodes/pdf";
+import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 
 const FloatingActionBar = () => {
   const dispatch = useSetter();
@@ -71,6 +72,7 @@ const FloatingActionBar = () => {
             lockScroll();
             setAddFilesWithoutContext(true);
             setIsAddingComponent(true);
+            postUserAction(AvailableUserActionLogTypes.btnAddComponentFab);
           }}
         >
           <IconAdd width={18} height={18} stroke="black" />
@@ -83,6 +85,7 @@ const FloatingActionBar = () => {
       onClick={() => {
         dispatch(setIsAnnotating(!isAnnotating));
         dispatch(setAnnotatingViaButton(true));
+        postUserAction(AvailableUserActionLogTypes.btnFigureAnnotate);
       }}
     >
       <SelectedAnnotationButton />

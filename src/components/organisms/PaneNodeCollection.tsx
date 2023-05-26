@@ -17,6 +17,7 @@ import {
 } from "@src/state/nodes/nodeReader";
 import CreateNodeModal from "./CreateNodeModal/CreateNodeModal";
 import PerfectScrollbar from "react-perfect-scrollbar";
+import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 export interface EditNodeInfo {
   uuid: string;
   title: string;
@@ -121,6 +122,7 @@ export default React.memo(function PaneNodeCollection() {
               dispatch(setPublicView(false));
               setShowAddNewNode(true);
               setOpen(true);
+              postUserAction(AvailableUserActionLogTypes.btnCreateNewNode);
             }}
             className="h-10 text-lg"
           >

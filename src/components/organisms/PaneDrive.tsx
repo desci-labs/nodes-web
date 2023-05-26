@@ -19,6 +19,7 @@ import PrimaryButton from "../atoms/PrimaryButton";
 import { EyeIcon } from "@heroicons/react/solid";
 import ContextMenu from "./ContextMenu";
 import ButtonSecondary from "../atoms/ButtonSecondary";
+import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 
 const PaneDrive = () => {
   const {
@@ -122,8 +123,11 @@ const PaneDrive = () => {
               <ButtonSecondary
                 onClick={() => {
                   window.open(
-                    `https://beta.dpid.org/${manifest?.dpid.id}?jsonld`,
+                    `https://beta.dpid.org/${manifest?.dpid!.id}?jsonld`,
                     `_blank`
+                  );
+                  postUserAction(
+                    AvailableUserActionLogTypes.btnInspectMetadata
                   );
                 }}
               >
