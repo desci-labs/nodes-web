@@ -100,3 +100,8 @@ export type ResearchFields = {
   id: number;
   name: string;
 };
+
+export type Organization = {
+  id: string;
+  name: string;
+};

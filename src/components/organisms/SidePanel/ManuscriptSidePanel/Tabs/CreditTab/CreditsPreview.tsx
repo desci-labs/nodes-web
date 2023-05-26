@@ -14,7 +14,7 @@ export default function CreditsPreview() {
       />
     );
   }
-
+  console.log('authors', manifestData.authors)
   return (
     <div className="flex flex-col gap-2">
       {manifestData?.authors &&
@@ -27,6 +27,11 @@ export default function CreditsPreview() {
               <div className="flex flex-col">
                 <span className="text-sm font-bold">{author.name}</span>
                 <span className="text-xs text-gray-400">{author.role}</span>
+                {author.organizations ? (
+                  <span className="text-xs text-gray-400">
+                    {author.organizations[0].name}
+                  </span>
+                ) : null}
               </div>
               <Identicon string={author.name} size={20} />
             </div>

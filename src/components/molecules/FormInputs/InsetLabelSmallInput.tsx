@@ -1,7 +1,4 @@
-import React, {
-  forwardRef,
-  HTMLProps,
-} from "react";
+import React, { forwardRef, HTMLProps } from "react";
 
 const TextArea = forwardRef<
   HTMLTextAreaElement,
@@ -17,24 +14,15 @@ const Input = forwardRef<HTMLInputElement, HTMLProps<HTMLInputElement>>(
 );
 
 interface InsetLabelSmallInputProps {
-  // label: string;
   labelClassName?: string;
   textClassName?: string;
-  // value?: string;
-  // onChange?: FormEventHandler<HTMLInputElement | HTMLTextAreaElement>;
   multiline?: boolean;
   properties?: {};
   field?: any;
   fieldState?: any;
   clickToSelect?: boolean;
   mandatory?: boolean;
-  // className?: string;
   optional?: boolean;
-  // disabled?: boolean;
-  // maxLength?: number;
-  // pattern?: string;
-  // onFocus?: FormEventHandler;
-  // placeholder?: string;
 }
 
 interface InsetLabelProps
@@ -58,7 +46,6 @@ const InsetLabelSmallInput = forwardRef<any, InsetLabelProps>(
       maxLength,
       onFocus,
       pattern,
-      // onChange,
       placeholder = "",
       ...restProps
     } = props;
@@ -77,7 +64,9 @@ const InsetLabelSmallInput = forwardRef<any, InsetLabelProps>(
         <label
           className={`absolute font-medium text-sm text-gray-900 dark:text-white pointer-events-none ${
             props.labelClassName
-          } ${hasValue ? "top-0 text-[10px]" : "top-3"}`}
+          } ${hasValue ? "top-0 text-[10px]" : "top-3"} ${
+            disabled ? "dark:text-neutrals-gray-4 text-neutrals-gray-4" : ""
+          }`}
         >
           {label}
           {optional && (
@@ -89,10 +78,10 @@ const InsetLabelSmallInput = forwardRef<any, InsetLabelProps>(
         </label>
         <InputComponent
           type="text"
-          placeholder={placeholder}
+          placeholder={placeholder ?? ""}
           className={`relative block w-full border-0 p-0 ${
             value ? "mt-2 py-0.5" : "mt-0 py-1.5"
-          } text-sm leading-3 bg-transparent font-medium text-gray-900 dark:text-white focus:outline-none focus:group:bg-black focus:ring-0 outline-none shadow-none ${
+          } text-sm leading-3 bg-transparent font-medium text-gray-900 dark:text-white dark:disabled:text-neutrals-gray-4 focus:outline-none focus:group:bg-black focus:ring-0 outline-none shadow-none ${
             props.textClassName ?? ""
           }
         ${multiline ? "mt-2 leading-[1.25rem]" : null}`}

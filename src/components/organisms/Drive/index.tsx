@@ -19,6 +19,7 @@ import { useManuscriptController } from "../ManuscriptReader/ManuscriptControlle
 import ContextMenu from "../ContextMenu";
 import { FolderAddIcon } from "@heroicons/react/solid";
 import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
+import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 
 const Empty = () => {
   return <div className="p-5 text-xs col-span-7">No files</div>;
@@ -75,6 +76,9 @@ const DriveTable: React.FC = () => {
                 <ButtonSecondary
                   onClick={() => {
                     setShowAddBtnSelectMenu(true);
+                    postUserAction(
+                      AvailableUserActionLogTypes.btnAddComponentDrive
+                    );
                   }}
                 >
                   <IconCirclePlus className="group-hover:hidden" fill="white" />
@@ -98,6 +102,9 @@ const DriveTable: React.FC = () => {
                         onClick: () => {
                           setAddFilesWithoutContext(false);
                           setIsAddingComponent(true);
+                          postUserAction(
+                            AvailableUserActionLogTypes.btnAddComponentDriveNewComponent
+                          );
                         },
                       },
                       {
@@ -111,6 +118,9 @@ const DriveTable: React.FC = () => {
                         onClick: () => {
                           setAddFilesWithoutContext(false);
                           dispatch(addFilesToDrive({ newFolder: true }));
+                          postUserAction(
+                            AvailableUserActionLogTypes.btnAddComponentDriveNewFolder
+                          );
                         },
                         disabled: isExternalLinks,
                       },

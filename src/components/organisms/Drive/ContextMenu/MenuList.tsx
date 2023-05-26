@@ -7,6 +7,7 @@ import { VscLinkExternal } from "react-icons/vsc";
 import { SlPencil } from "react-icons/sl";
 import { BsTrash } from "react-icons/bs";
 import { IconAssignType, IconMoveDir } from "@src/icons";
+import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 
 const menuListLabel: Record<Actions, string> = {
   MOVE: "Move to",
@@ -16,6 +17,16 @@ const menuListLabel: Record<Actions, string> = {
   REMOVE: "Delete",
   ASSIGN_TYPE: "Assign Type",
   EDIT_METADATA: "Edit Metadata",
+};
+
+const tracking: Record<Actions, AvailableUserActionLogTypes> = {
+  MOVE: AvailableUserActionLogTypes.ctxDriveMove,
+  RENAME: AvailableUserActionLogTypes.ctxDriveRename,
+  PREVIEW: AvailableUserActionLogTypes.ctxDrivePreview,
+  DOWNLOAD: AvailableUserActionLogTypes.ctxDriveDownload,
+  REMOVE: AvailableUserActionLogTypes.ctxDriveDelete,
+  ASSIGN_TYPE: AvailableUserActionLogTypes.ctxDriveAssignType,
+  EDIT_METADATA: AvailableUserActionLogTypes.ctxDriveEditMetadata,
 };
 
 type IconType = React.FunctionComponent<
@@ -69,6 +80,9 @@ function MenuListItem({
 
     !disabled && onClick();
     handler[action]?.(file);
+    if (tracking[action]) {
+      postUserAction(tracking[action]);
+    }
   };
   const disabled = !handler[action] || disableAction;
 

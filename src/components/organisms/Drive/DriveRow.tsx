@@ -38,6 +38,7 @@ import {
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
 import ExternalService from "@src/components/atoms/ExternalServices";
+import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 
 function renderComponentIcon(file: DriveObject) {
   const foundEntry = findTarget(
@@ -109,6 +110,7 @@ export default function DriveRow({
             file.accessStatus !== AccessStatus.UPLOADING
           ) {
             dispatch(starComponentThunk({ item: file }));
+            postUserAction(AvailableUserActionLogTypes.btnDriveStarToggle);
           }
         }}
       >
@@ -206,6 +208,7 @@ export default function DriveRow({
           }
           onClick={() => {
             dispatch(setFileBeingCited(file));
+            postUserAction(AvailableUserActionLogTypes.btnDriveCite);
           }}
         >
           <IconQuotes />
@@ -221,6 +224,7 @@ export default function DriveRow({
           className="p-0 min-w-[28px] h-7"
           onClick={() => {
             dispatch(setFileBeingUsed(file));
+            postUserAction(AvailableUserActionLogTypes.btnDriveUse);
           }}
         >
           <IconPlayRounded className="p-0" />

@@ -151,6 +151,8 @@ import { ReactComponent as IconSvcYoutube } from "@images/icons/service-youtube.
 import { ReactComponent as IconSvcLink } from "@images/icons/service-any.svg";
 import { ReactComponent as IconAnnotate } from "@images/annotation.svg";
 import { ReactComponent as IconMoveDir } from "@images/icons/move-dir.svg";
+import { ReactComponent as IconAffiliation } from "@images/affiliation.svg";
+import { ReactComponent as IconRor } from "@images/ror.svg";
 
 export type SvgIconProps = FC<
   React.SVGProps<SVGSVGElement> & {
@@ -314,4 +316,6 @@ export {
   IconGitbook,
   IconPower,
   IconAnnotate,
+  IconAffiliation,
+  IconRor,
 };

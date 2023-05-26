@@ -6,7 +6,7 @@ import { useManuscriptController } from "@src/components/organisms/ManuscriptRea
 import ProfileInfo from "@src/components/organisms/ProfileInfo";
 import Profiler, {
   ProfileValues,
-} from "@src/components/organisms/WrapperProfileModal";
+} from "@src/components/organisms/Profiler";
 import Modal from "@src/components/molecules/Modal";
 
 export interface ProfilePopOverProps {
@@ -44,7 +44,7 @@ export function ProfileInfoWrapper(props: ProfilePopOverProps) {
       $scrollOverlay={true}
       $maxWidth={700}
     >
-      <div className="py-4 px-6 text-neutrals-gray-5 lg:w-[700px]">
+      <div className="py-4 px-6 text-neutrals-gray-5">
         <Modal.Header
           title="Complete my profile"
           subTitle="Enter a PDF link associated with your research manuscript to start
