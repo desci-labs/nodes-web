@@ -40,7 +40,7 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
           form="creditsModalForm"
           disabled={
             !methods.formState.isValid ||
-            !methods.formState.isDirty ||
+            // !methods.formState.isDirty ||
             methods.formState.isSubmitting
           }
         >

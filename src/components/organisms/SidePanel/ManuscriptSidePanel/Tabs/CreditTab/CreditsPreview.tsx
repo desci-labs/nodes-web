@@ -40,7 +40,7 @@ export default function CreditsPreview() {
                   {/* <Identicon string={author.name} size={20} /> */}
                   {author.organizations ? (
                     <span className="text-xs text-gray-400 truncate w-full">
-                      {author.organizations[0].name}
+                      {author.organizations[0]?.name}
                     </span>
                   ) : null}
                 </div>

@@ -111,11 +111,5 @@ export const authorsFormSchema = Yup.object({
         return true;
       },
     }),
-  organizations: Yup.mixed<ResearchObjectV1Organization[]>().test({
-    name: "Organization",
-    message: "Invalid organization",
-    test: (data) => {
-      return true;
-    },
-  }),
+  organizations: Yup.mixed<ResearchObjectV1Organization[]>().optional(),
 });

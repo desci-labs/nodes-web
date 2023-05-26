@@ -29,6 +29,7 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
     register,
     setValue,
     handleSubmit,
+    trigger,
     formState: { errors },
   } = useFormContext<AuthorFormValues>();
 
@@ -68,12 +69,12 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
         defaultValue={{ id: -1, name: "Role" }}
         data={authorRoles}
         value={authorRoles.find((role) => role.name === selectedRole)}
-        onSelect={(val) =>
+        onSelect={(val) => {
           setValue("role", val.name, {
             shouldDirty: true,
             shouldValidate: true,
-          })
-        }
+          });
+        }}
         {...register("role")}
       />
       <span className="text-red-400 text-xs">{errors.role?.message}</span>
@@ -110,7 +111,7 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
           <span className="text-red-400 text-xs h-8 block">
             {errors.orcid?.message}
           </span>
-        ) : (
+        ) : orcid ? (
           <a
             className="flex flex-row gap-1 items-center h-8 text-md font-extrabold text-tint-primary hover:text-tint-primary-hover tracking-tight disabled:text-neutrals-gray-4"
             href={`${errors?.orcid ? "" : `${ORCID_SITE}${orcid}`}`}
@@ -120,7 +121,7 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
           >
             Open ORCiD Record <ExternalLinkIcon height={16} />
           </a>
-        )}
+        ) : null}
       </div>
       <div className="mt-8">
         <Controller
@@ -128,7 +129,7 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
           control={control}
           render={({ field }: any) => (
             <AffiliateSelector
-              defaultValues={field.value ?? []}
+              defaultValues={field?.value ?? []}
               onChange={(val: ResearchObjectV1Organization[]) => {
                 setValue("organizations", val, {
                   shouldValidate: false,
