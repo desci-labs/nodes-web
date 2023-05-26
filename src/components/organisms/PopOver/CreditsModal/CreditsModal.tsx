@@ -19,7 +19,8 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
       googleScholar: props?.author?.googleScholar ?? "",
       role: props?.author?.role,
       orcid: props?.author?.orcid ?? "",
-      organizations: props?.author?.organizations ?? []
+      github: props?.author?.github ?? "",
+      organizations: props?.author?.organizations ?? [],
     },
     reValidateMode: "onChange",
     resolver: yupResolver(authorsFormSchema),
@@ -39,7 +40,7 @@ export default function CreditsModal(props: ModalProps & CreditModalProps) {
           form="creditsModalForm"
           disabled={
             !methods.formState.isValid ||
-            !methods.formState.isDirty ||
+            // !methods.formState.isDirty ||
             methods.formState.isSubmitting
           }
         >
