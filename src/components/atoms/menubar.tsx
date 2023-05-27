@@ -1,5 +1,3 @@
-"use client"
-
 import * as React from "react"
 import * as MenubarPrimitive from "@radix-ui/react-menubar"
 import { Check, ChevronRight, Circle } from "lucide-react"
@@ -97,14 +95,14 @@ const MenubarContent = React.forwardRef<
         alignOffset={alignOffset}
         sideOffset={sideOffset}
         className={cn(
-          "z-[9999999999999] min-w-[12rem] overflow-hidden rounded-md border bg-popover p-1 text-neutrals-gray-3 shadow-xl animate-in slide-in-from-top-1",
+          "z-[9999999999999] min-w-[12rem] overflow-hidden rounded-md border bg-popover p-1 text-neutrals-gray-3 shadow-lg animate-in slide-in-from-top-1",
           className
         )}
         {...props}
       />
     </MenubarPrimitive.Portal>
   )
-)
+);
 MenubarContent.displayName = MenubarPrimitive.Content.displayName
 
 const MenubarItem = React.forwardRef<
@@ -116,7 +114,7 @@ const MenubarItem = React.forwardRef<
   <MenubarPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex cursor-pointer gap-2 items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex cursor-pointer gap-2 items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg- focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       inset && "pl-8",
       className
     )}

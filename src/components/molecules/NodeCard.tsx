@@ -1,54 +1,29 @@
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
-import {
-  RESEARCH_OBJECT_NODES_PREFIX,
-  ResearchObjectV1,
-} from "@desci-labs/desci-models";
+import { RESEARCH_OBJECT_NODES_PREFIX } from "@desci-labs/desci-models";
 import { ResearchNode } from "@src/state/api/types";
-import {
-  IconCopyLink,
-  IconKebab,
-  IconNodeNoMetadata,
-  IconPenFancy,
-} from "@icons";
-import { MouseEvent, useEffect, useRef, useState } from "react";
+import { IconNodeNoMetadata } from "@icons";
 import { useNavigate } from "react-router-dom";
 import { app, site } from "@src/constants/routes";
 import { useSetter } from "@src/store/accessors";
-import { setEditNodeId, setPublicView } from "@src/state/nodes/nodeReader";
-import {
-  Menubar,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarPortal,
-  MenubarTrigger,
-} from "../atoms/menubar";
-import { getResearchObjectStub } from "@src/api";
-import { cleanupManifestUrl } from "../utils";
-import axios from "axios";
-import toast from "react-hot-toast";
+import { setPublicView } from "@src/state/nodes/nodeReader";
+import NodeCardMenu from "./NodeCardMenu";
 
 export interface NodeProps {
   id?: number;
   disabled?: boolean;
   isCurrent?: boolean;
   onClick?: () => void;
-  onHandleEdit?: () => void;
+  node: ResearchNode;
 }
 
 const NodeCard = ({
-  id,
-  uuid,
-  title,
-  updatedAt,
+  node,
+  isCurrent,
   disabled,
   isPublished,
-  isCurrent,
   onClick,
-  onHandleEdit,
 }: ResearchNode & NodeProps) => {
+  const { uuid, title, updatedAt } = node;
   const dispatch = useSetter();
-  const { setShowAddNewNode } = useManuscriptController([]);
   const navigate = useNavigate();
 
   const updatedTime: number = Date.parse(updatedAt || new Date().toString());
@@ -56,53 +31,7 @@ const NodeCard = ({
     dateStyle: "medium",
     timeStyle: "short",
   };
-  const targetUrl = `${site.app}${app.nodes}/${RESEARCH_OBJECT_NODES_PREFIX}${
-    uuid || id
-  }`;
-  const [showContext, setShowContext] = useState<boolean>(false);
-  const [manifest, setManifest] = useState<ResearchObjectV1>();
-  const pullRef = useRef(false);
-
-  useEffect(() => {
-    if (pullRef.current) return;
-    async function getManifest() {
-      try {
-        let targetManifest: ResearchObjectV1;
-        // const cid = convertHexToCID(decodeBase64UrlSafeToHex(uuid));
-        const { manifestData, uri, manifestUrl } = await getResearchObjectStub(
-          "objects/" + uuid
-        );
-        if (manifestData) {
-          targetManifest = manifestData;
-        } else {
-          const prepManifestUrl = cleanupManifestUrl(uri || manifestUrl);
-          const { data } = await axios.get(prepManifestUrl);
-
-          targetManifest = data;
-        }
-        setManifest(targetManifest);
-        pullRef.current = true;
-      } catch (e) {}
-    }
-    getManifest();
-  }, [uuid]);
-
-  const isDpidSupported = !!manifest?.dpid;
-  const copydPid = (e: MouseEvent) => {
-    e.stopPropagation();
-    const dpid = `https://${
-      manifest?.dpid?.prefix ? manifest.dpid.prefix + "." : ""
-    }dpid.org/${manifest?.dpid?.id}`;
-    navigator.clipboard.writeText(dpid);
-    toast.success("dPid copied", {
-      style: {
-        marginTop: 50,
-        borderRadius: "10px",
-        background: "#333333",
-        color: "#fff",
-      },
-    });
-  }
+  const targetUrl = `${site.app}${app.nodes}/${RESEARCH_OBJECT_NODES_PREFIX}${uuid}`;
 
   return (
     <div
@@ -131,57 +60,7 @@ const NodeCard = ({
                 {new Date(updatedTime).toLocaleString("en-US", options)}
               </div>
               <div className="ml-auto ">
-                <Menubar className="border-0 relative">
-                  <MenubarMenu>
-                    <MenubarTrigger className="cursor-pointer text-white p-2">
-                      <IconKebab
-                        width={20}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowContext(!showContext);
-                        }}
-                      />
-                    </MenubarTrigger>
-                    <MenubarPortal>
-                      <MenubarContent
-                        align="end"
-                        sideOffset={-30}
-                        alignOffset={30}
-                        className="border-0 bg-neutrals-gray-2"
-                      >
-                        <MenubarItem
-                          className="hover:bg-neutrals-gray-3"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            dispatch(
-                              setEditNodeId({
-                                uuid: uuid!,
-                                title,
-                                licenseType: null,
-                              })
-                            );
-                            onHandleEdit?.();
-                            setShowAddNewNode(true);
-                          }}
-                        >
-                          <span color="#ffffff">
-                            <IconPenFancy width={15} color="#fff" fill="#fff" />
-                          </span>
-                          <span className="text-white">Edit Metadata</span>
-                        </MenubarItem>
-                        {isDpidSupported ? (
-                          <MenubarItem
-                            className="hover:bg-neutrals-gray-3 disabled:hover:bg-transparent disabled:opacity-5"
-                            onClick={copydPid}
-                          >
-                            <IconCopyLink fill="white" width={15} />
-                            <span className="text-white">Copy dPid</span>
-                          </MenubarItem>
-                        ) : null}
-                      </MenubarContent>
-                    </MenubarPortal>
-                  </MenubarMenu>
-                </Menubar>
+                <NodeCardMenu node={node} />
               </div>
             </>
           ) : null}
