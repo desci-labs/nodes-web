@@ -1,7 +1,5 @@
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
-import {
-  ResearchObjectV1,
-} from "@desci-labs/desci-models";
+import { ResearchObjectV1 } from "@desci-labs/desci-models";
 import { ResearchNode } from "@src/state/api/types";
 import {
   IconCopyLink,
@@ -24,6 +22,7 @@ import { getResearchObjectStub } from "@src/api";
 import { cleanupManifestUrl } from "../utils";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useDeleteNodeMutation } from "@src/state/api/nodes";
 
 export default function NodeCardMenu({
   node: { uuid, title },
@@ -33,7 +32,10 @@ export default function NodeCardMenu({
   const dispatch = useSetter();
   const pullRef = useRef(false);
   const [manifest, setManifest] = useState<ResearchObjectV1>();
-  const { setShowAddNewNode } = useManuscriptController([]);
+  const { setShowAddNewNode, dialogs, setDialogs } = useManuscriptController([
+    "dialogs",
+  ]);
+  const [deleteNode, { isLoading: isDeleting }] = useDeleteNodeMutation();
 
   useEffect(() => {
     if (pullRef.current) return;
@@ -75,70 +77,129 @@ export default function NodeCardMenu({
       },
     });
   };
+
+  const handleDelete = () => {
+    setDialogs([
+      ...dialogs,
+      {
+        title: `Delete ${title}"`,
+        message: "Are you sure you want to delete this node?",
+        actions: ({ close }: { close: () => void }) => {
+          return (
+            <div className="flex gap-2 pt-4">
+              <button
+                className="text-md cursor-pointer rounded-md shadow-sm text-white bg-black px-3 py-1 hover:bg-neutrals-gray-2"
+                onClick={() => {
+                  close();
+                }}
+              >
+                Cancel
+              </button>
+
+              <button
+                className="text-md cursor-pointer rounded-md shadow-sm text-white bg-primary px-3 py-1 hover:bg-tint-primary"
+                onClick={async () => {
+                  const deleted = await deleteNode(uuid);
+                  if ("data" in deleted && deleted.data.ok === true) {
+                    close();
+                    toast.success("Node deleted!", {
+                      style: {
+                        marginTop: 50,
+                        borderRadius: "10px",
+                        background: "#333333",
+                        color: "#fff",
+                      },
+                    });
+                  } else {
+                    toast.success(
+                      "Error deleting node, check your connection and try again",
+                      {
+                        style: {
+                          marginTop: 50,
+                          borderRadius: "10px",
+                          background: "#333333",
+                          color: "#fff",
+                        },
+                      }
+                    );
+                  }
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          );
+        },
+      },
+    ]);
+  };
   return (
-      <Menubar className="border-0 relative">
-        <MenubarMenu>
-          <MenubarTrigger className="cursor-pointer text-white p-2">
-            <IconKebab
-              width={20}
+    <Menubar className="border-0 relative">
+      <MenubarMenu>
+        <MenubarTrigger className="cursor-pointer text-white p-2">
+          <IconKebab
+            width={20}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          />
+        </MenubarTrigger>
+        <MenubarPortal>
+          <MenubarContent
+            align="end"
+            sideOffset={-30}
+            alignOffset={30}
+            className="border-0 bg-neutrals-gray-2"
+          >
+            <MenubarItem
+              className="hover:bg-neutrals-gray-3"
               onClick={(e) => {
                 e.stopPropagation();
+                dispatch(
+                  setEditNodeId({
+                    uuid: uuid!,
+                    title,
+                    licenseType: null,
+                  })
+                );
+                setShowAddNewNode(true);
               }}
-            />
-          </MenubarTrigger>
-          <MenubarPortal>
-            <MenubarContent
-              align="end"
-              sideOffset={-30}
-              alignOffset={30}
-              className="border-0 bg-neutrals-gray-2"
             >
-              <MenubarItem
-                className="hover:bg-neutrals-gray-3"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  dispatch(
-                    setEditNodeId({
-                      uuid: uuid!,
-                      title,
-                      licenseType: null,
-                    })
-                  );
-                  setShowAddNewNode(true);
-                }}
-              >
-                <span color="#ffffff">
-                  <IconPenFancy width={15} color="#fff" fill="#fff" />
-                </span>
-                <span className="text-white">Edit Metadata</span>
-              </MenubarItem>
+              <span color="#ffffff">
+                <IconPenFancy width={15} color="#fff" fill="#fff" />
+              </span>
+              <span className="text-white">Edit Metadata</span>
+            </MenubarItem>
 
-              {isDpidSupported ? (
-                <MenubarItem
-                  className="hover:bg-neutrals-gray-3 disabled:hover:bg-transparent disabled:opacity-5"
-                  onClick={copydPid}
-                >
-                  <IconCopyLink fill="white" width={15} />
-                  <span className="text-white">Copy dPid</span>
-                </MenubarItem>
-              ) : null}
+            {isDpidSupported ? (
               <MenubarItem
-                className="hover:bg-neutrals-gray-3"
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
+                className="hover:bg-neutrals-gray-3 disabled:hover:bg-transparent disabled:opacity-5"
+                onClick={copydPid}
               >
-                <IconDeleteForever
-                  height={15}
-                  width={15}
-                  stroke="#C96664"
-                  fill="transparent"
-                />
-                <span className="text-states-error">Delete</span>
+                <IconCopyLink fill="white" width={15} />
+                <span className="text-white">Copy dPid</span>
               </MenubarItem>
-            </MenubarContent>
-          </MenubarPortal>
-        </MenubarMenu>
-      </Menubar>
+            ) : null}
+            <MenubarItem
+              className="hover:bg-neutrals-gray-3"
+              disabled={isDeleting}
+              onClick={(e) => {
+                console.log("ddddddddelete");
+                e.stopPropagation();
+                handleDelete();
+              }}
+            >
+              <IconDeleteForever
+                height={15}
+                width={15}
+                stroke="#C96664"
+                fill="transparent"
+              />
+              <span className="text-states-error">Delete</span>
+            </MenubarItem>
+          </MenubarContent>
+        </MenubarPortal>
+      </MenubarMenu>
+    </Menubar>
   );
 }
