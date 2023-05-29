@@ -10,7 +10,6 @@ import { DriveObject, FileType } from "@src/components/organisms/Drive";
 import useComponentDpid from "@src/components/organisms/Drive/hooks/useComponentDpid";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import useActionHandler from "@src/components/organisms/Drive/ContextMenu/useActionHandler";
-// import { useEffect, useRef, useState } from "react";
 import {
   setFileBeingUsed,
   setFileMetadataBeingEdited,
@@ -86,8 +85,8 @@ const ComponentUseModal = ({
               </div>
               <div>
                 <CopyBox
-                  title="dPID path"
-                  copyButtonText="Copy dPID path"
+                  title="dPID Path"
+                  copyButtonText="Copy dPID Path"
                   className="my-6 w-full overflow-hidden pr-2"
                   copyText={fqDpid}
                 >
