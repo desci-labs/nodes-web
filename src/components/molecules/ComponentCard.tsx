@@ -1,12 +1,12 @@
 import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
 import styled, { StyledComponent } from "styled-components";
-import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
+import { FlexColumn } from "@components/styled";
 
-import AnnotationSwitcher from "@components/atoms/AnnotationSwitcher";
+// import AnnotationSwitcher from "@components/atoms/AnnotationSwitcher";
 import {
   ExternalLinkComponent,
-  PdfComponentPayload,
+  // PdfComponentPayload,
   ResearchObjectComponentSubtypes,
   ResearchObjectComponentType,
   ResearchObjectV1Component,
@@ -63,10 +63,9 @@ const CardWrapper: StyledComponent<
   ${({ isHalfSelected }: any) =>
     isHalfSelected ? "border-color: #888 !important; " : ""}
 `;
-const HeaderWrapper = styled(FlexRowSpaceBetween).attrs({
-  className: " bg-zinc-200 dark:bg-muted-900 border-muted-300 dark:border-teal",
+const HeaderWrapper = styled.div.attrs({
+  className: "flex items-center justify-between bg-zinc-200 dark:bg-muted-900 border-muted-300 dark:border-teal",
 })`
-  align-items: center;
   padding: 0.75rem;
 `;
 
@@ -150,9 +149,9 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
   const isSelected =
     componentStack[componentStack?.length - 1]?.id === component.id;
 
-  const sortedAnnotations = [
-    ...((component.payload as PdfComponentPayload).annotations || []),
-  ].sort((b, a) => (b.pageIndex! - a.pageIndex!) * 10 + (b.startY - a.startY));
+  // const sortedAnnotations = [
+  //   ...((component.payload as PdfComponentPayload).annotations || []),
+  // ].sort((b, a) => (b.pageIndex! - a.pageIndex!) * 10 + (b.startY - a.startY));
 
   const drive = useMemo(() => {
     if (nodeTree && isSelected) {
@@ -282,108 +281,106 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
             transition: "height 0.1s ease-in",
           }}
         >
-          <FlexRowSpaceBetween>
-            <div className="flex justify-between dark:bg-muted-700 px-3 py-2 w-full">
-              <>
-                <div className="flex gap-2 justify-between w-full">
-                  <div id="section-left">
-                    <MetadataPreview
-                      isFair={false}
-                      component={component}
-                      text={getLicenseShortName(
-                        drive?.metadata.licenseType ||
-                          component.payload?.licenseType ||
-                          manifest?.defaultLicense
-                      )} //Should only ever hit unknown for deprecated tree
-                      className="w-auto bg-black hover:bg-neutrals-gray-2 text-white font-medium text-[11px] h-7"
-                    />
-                  </div>
-                  <div id="section-right" className="flex gap-2">
-                    {component.type === ResearchObjectComponentType.LINK ? (
-                      <TooltipButton
-                        tooltipContent={"Open Link"}
-                        side="top"
-                        className="p-[5px] rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray  disabled:bg-opacity-25 disabled:cursor-not-allowed w-7 h-7"
-                        onClick={(e) => {
-                          e!.stopPropagation();
-                          window.open(component.payload.url, "_blank");
-                          postUserAction(
-                            AvailableUserActionLogTypes.btnComponentCardViewLink
-                          );
-                        }}
-                      >
-                        <IconViewLink />
-                      </TooltipButton>
-                    ) : null}
-                    <TooltipButton
-                      className="py-[7px] px-[1px] rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray disabled:bg-opacity-25 disabled:cursor-not-allowed"
-                      disabled={false}
-                      onClick={(e) => {
-                        e!.stopPropagation();
-                        dispatch(
-                          navigateToDriveByPath({
-                            path: component.payload.path,
-                            selectPath: component.payload.path,
-                          })
-                        );
-                        if (
-                          component.type === ResearchObjectComponentType.DATA ||
-                          component.type === ResearchObjectComponentType.UNKNOWN
-                        ) {
-                          dispatch(setComponentStack([component]));
-                        } else {
-                          dispatch(setComponentStack([]));
-                        }
-                        postUserAction(
-                          AvailableUserActionLogTypes.btnComponentCardViewFile
-                        );
-                      }}
-                      tooltipContent={<>Show File Location</>}
-                    >
-                      <IconDrive className="p-0 min-w-[28px] scale-[1.2]" />
-                    </TooltipButton>
-                    {component.type !== ResearchObjectComponentType.PDF &&
-                    canCite ? (
-                      <TooltipButton
-                        tooltipContent={"Cite"}
-                        side="top"
-                        // dataFor={`cite_${component.id}`}
-                        className="`p-2 rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray  disabled:bg-opacity-25 disabled:cursor-not-allowed w-7 h-7"
-                        // disabled={!canCite}
-                        onClick={(e) => {
-                          e!.stopPropagation();
-                          dispatch(setFileBeingCited(drive));
-                          postUserAction(
-                            AvailableUserActionLogTypes.btnComponentCardCite
-                          );
-                        }}
-                      >
-                        <IconQuotes />
-                      </TooltipButton>
-                    ) : null}
+          <div className="flex justify-between dark:bg-muted-700 px-3 py-2 w-full">
+            <div className="flex gap-2 justify-between w-full">
+              <div id="section-left">
+                <MetadataPreview
+                  isFair={false}
+                  component={component}
+                  text={getLicenseShortName(
+                    drive?.metadata.licenseType ||
+                      component.payload?.licenseType ||
+                      manifest?.defaultLicense
+                  )} //Should only ever hit unknown for deprecated tree
+                  className="w-auto bg-black hover:bg-neutrals-gray-2 text-white font-medium text-[11px] h-7"
+                />
+              </div>
+              <div id="section-right" className="flex gap-2">
+                {component.type === ResearchObjectComponentType.LINK ? (
+                  <TooltipButton
+                    tooltipContent={"Open Link"}
+                    side="top"
+                    className="p-[5px] rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray  disabled:bg-opacity-25 disabled:cursor-not-allowed w-7 h-7"
+                    onClick={(e) => {
+                      e!.stopPropagation();
+                      window.open(component.payload.url, "_blank");
+                      postUserAction(
+                        AvailableUserActionLogTypes.btnComponentCardViewLink
+                      );
+                    }}
+                  >
+                    <IconViewLink />
+                  </TooltipButton>
+                ) : null}
+                <TooltipButton
+                  className="py-[7px] px-[1px] rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray disabled:bg-opacity-25 disabled:cursor-not-allowed"
+                  disabled={false}
+                  onClick={(e) => {
+                    e!.stopPropagation();
+                    dispatch(
+                      navigateToDriveByPath({
+                        path: component.payload.path,
+                        selectPath: component.payload.path,
+                      })
+                    );
+                    if (
+                      component.type === ResearchObjectComponentType.DATA ||
+                      component.type === ResearchObjectComponentType.UNKNOWN
+                    ) {
+                      dispatch(setComponentStack([component]));
+                    } else {
+                      dispatch(setComponentStack([]));
+                    }
+                    postUserAction(
+                      AvailableUserActionLogTypes.btnComponentCardViewFile
+                    );
+                  }}
+                  tooltipContent={<>Show File Location</>}
+                >
+                  <IconDrive className="p-0 min-w-[28px] scale-[1.2]" />
+                </TooltipButton>
+                {component.type !== ResearchObjectComponentType.PDF &&
+                canCite ? (
+                  <TooltipButton
+                    tooltipContent={"Cite"}
+                    side="top"
+                    // dataFor={`cite_${component.id}`}
+                    className="`p-2 rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray  disabled:bg-opacity-25 disabled:cursor-not-allowed w-7 h-7"
+                    // disabled={!canCite}
+                    onClick={(e) => {
+                      e!.stopPropagation();
+                      dispatch(setFileBeingCited(drive));
+                      postUserAction(
+                        AvailableUserActionLogTypes.btnComponentCardCite
+                      );
+                    }}
+                  >
+                    <IconQuotes />
+                  </TooltipButton>
+                ) : null}
 
-                    {[
-                      ResearchObjectComponentType.DATA,
-                      ResearchObjectComponentType.CODE,
-                      ResearchObjectComponentType.UNKNOWN,
-                    ].includes(component.type) ? (
-                      <TooltipButton
-                        tooltipContent={"Methods"}
-                        side="top"
-                        disabled={!drive}
-                        className="p-0 min-w-[28px] h-7 `p-2 rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray disabled:bg-opacity-25 disabled:cursor-not-allowed"
-                        onClick={(e) => {
-                          e!.stopPropagation();
-                          dispatch(setFileBeingUsed(drive));
-                          postUserAction(
-                            AvailableUserActionLogTypes.btnComponentCardUse
-                          );
-                        }}
-                      >
-                        <IconPlayRounded className="p-0" />
-                      </TooltipButton>
-                    ) : null}
-                    {/* <div
+                {[
+                  ResearchObjectComponentType.DATA,
+                  ResearchObjectComponentType.CODE,
+                  ResearchObjectComponentType.UNKNOWN,
+                ].includes(component.type) ? (
+                  <TooltipButton
+                    tooltipContent={"Methods"}
+                    side="top"
+                    disabled={!drive}
+                    className="p-0 min-w-[28px] h-7 `p-2 rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray disabled:bg-opacity-25 disabled:cursor-not-allowed"
+                    onClick={(e) => {
+                      e!.stopPropagation();
+                      dispatch(setFileBeingUsed(drive));
+                      postUserAction(
+                        AvailableUserActionLogTypes.btnComponentCardUse
+                      );
+                    }}
+                  >
+                    <IconPlayRounded className="p-0" />
+                  </TooltipButton>
+                ) : null}
+                {/* <div
                       style={{
                         display:
                           component.type === ResearchObjectComponentType.PDF
@@ -396,11 +393,9 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                         handleComponentClick={handleComponentClick}
                       />
                     </div> */}
-                  </div>
-                </div>
-              </>
+              </div>
             </div>
-          </FlexRowSpaceBetween>
+          </div>
         </div>
       </FlexColumn>
     </CardWrapper>

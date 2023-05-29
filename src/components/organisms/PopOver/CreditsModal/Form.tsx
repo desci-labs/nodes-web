@@ -103,12 +103,12 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
                   shouldDirty: true,
                 });
               }}
-              className="my-6 w-full"
+              className="my-3 w-full"
             />
           )}
         />
         {errors.orcid?.message ? (
-          <span className="text-red-400 text-xs h-8 block">
+          <span className="text-red-400 text-xs h-4 block">
             {errors.orcid?.message}
           </span>
         ) : orcid ? (

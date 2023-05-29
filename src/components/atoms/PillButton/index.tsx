@@ -1,5 +1,6 @@
-import { FlexRowAligned, FlexRowCentered } from "@components/styled";
-import React, { MouseEvent, MouseEventHandler, useEffect } from "react"
+import { FlexRowAligned } from "@components/styled";
+import { cn } from "@src/lib/utils";
+import React, { HTMLProps, MouseEvent, MouseEventHandler, useEffect } from "react"
 import ReactTooltip from "react-tooltip";
 import styled, { StyledComponent } from "styled-components";
 
@@ -13,28 +14,30 @@ const Wrapper: StyledComponent<'div', any, any> = styled(FlexRowAligned).attrs((
   height: 1.75rem;
   width: 4rem;
 `;
-const LeftComponent: StyledComponent<"div", any, any> = styled(
-  FlexRowCentered
-).attrs(({ disabled }: any) => ({
-  className: `rounded-l-md bg-black dark:text-white font-serif ${
-    disabled
-      ? "cursor-not-allowed"
-      : "group-hover:bg-gray-700 group-active:bg-gray-900"
-  }`,
-}))
-`
-  height: 100%;
-`;
-const RightComponent: StyledComponent<"div", any, any> = styled(
-  FlexRowCentered
-).attrs(({ disabled }: any) => ({
-  className: `bg-black text-white rounded-r-md ${
-    disabled ? "" : "group-hover:bg-gray-700 group-active:bg-gray-900 "
-  }`,
-}))
-`
-  height: 100%;
-`;
+
+export const LeftComponent = (props: HTMLProps<HTMLDivElement>) => (
+  <div
+    className={cn(
+      "flex items-center justify-center rounded-l-md bg-black dark:text-white font-serif group-hover:bg-gray-700 group-active:bg-gray-900 h-[100%]",
+      props.className,
+      props.disabled && "cursor-not-allowed"
+    )}
+  >
+    {props.children}
+  </div>
+);
+
+export const RightComponent = (props: HTMLProps<HTMLDivElement>) => (
+  <div
+    className={cn(
+      "flex items-center justify-center rounded-l-md bg-black dark:text-white font-serif group-hover:bg-gray-700 group-active:bg-gray-900 h-[100%]",
+      props.className,
+      props.disabled && "cursor-not-allowed"
+    )}
+  >
+    {props.children}
+  </div>
+);
 
 interface PillButtonProps {
   leftIcon: React.FC;

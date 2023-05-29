@@ -1,4 +1,3 @@
-import { FlexRowCentered } from "@components/styled";
 import { IconRemove } from "@icons";
 import { MouseEventHandler } from "react";
 import styled, { StyledComponent } from "styled-components";
@@ -8,9 +7,9 @@ export const Wrapper: StyledComponent<
   any,
   { visible: boolean },
   any
-> = styled(FlexRowCentered).attrs({
+> = styled.div.attrs({
   className:
-    "group-hover:bg-zinc-600 group-hover:border-zinc-800 group-hover:stroke-white dark:group-hover:bg-zinc-600 bg-white dark:bg-muted-500 stroke-[#212121] dark:stroke-white border:white dark:border-muted-900",
+    "flex items-center justify-center group-hover:bg-zinc-600 group-hover:border-zinc-800 group-hover:stroke-white dark:group-hover:bg-zinc-600 bg-white dark:bg-muted-500 stroke-[#212121] dark:stroke-white border:white dark:border-muted-900",
 })`
   position: absolute;
   ${(props: any) =>

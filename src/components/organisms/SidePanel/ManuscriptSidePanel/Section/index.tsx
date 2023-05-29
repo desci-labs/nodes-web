@@ -1,4 +1,4 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 import styled, { StyledComponent } from "styled-components";
 
 // TODO/FIXME: Rename to something more specific than Section
@@ -24,7 +24,7 @@ export interface SectionProps {
   header?: React.FC;
   footer?: React.FC;
   className?: string;
-  containerStyle?: any;
+  containerStyle?: CSSProperties;
   onClick?: React.MouseEventHandler;
   selected?: boolean;
 }

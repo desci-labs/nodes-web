@@ -4,8 +4,8 @@ import {
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
-import { IconPlay } from "@icons";
-import { PropsWithChildren, useCallback, useState } from "react";
+// import { IconPlay } from "@icons";
+import { PropsWithChildren, useCallback } from "react";
 import { useSetter } from "@src/store/accessors";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import {
@@ -14,7 +14,9 @@ import {
   setAnnotationLinkConfig,
 } from "@src/state/nodes/nodeReader";
 import { parseAnnotationLink } from "../molecules/AnnotationEditor/components";
-let execCount = 1;
+
+// let execCount = 1;
+
 const CodePillButton = ({
   children,
   href,
@@ -42,12 +44,12 @@ const CodePillButton = ({
       );
 
     return codeComponent;
-  }, [manifestData]);
+  }, [manifestData, thisLinkConfig.url]);
 
   const flipped =
-    annotationLinkConfig?.url == thisLinkConfig.url &&
-    annotationLinkConfig?.path == thisLinkConfig?.path &&
-    annotationLinkConfig?.line == thisLinkConfig?.line;
+    annotationLinkConfig?.url === thisLinkConfig.url &&
+    annotationLinkConfig?.path === thisLinkConfig?.path &&
+    annotationLinkConfig?.line === thisLinkConfig?.line;
 
   return (
     <button

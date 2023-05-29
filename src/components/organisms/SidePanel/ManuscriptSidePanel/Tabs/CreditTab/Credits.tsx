@@ -103,6 +103,7 @@ const Credits = (props: CreditsProps) => {
                     setIsPreviewOpen(true);
                     setSelectedIndex(index);
                   }}
+                  containerStyle={{ cursor: "pointer" }}
                   header={() => (
                     <SectionHeader
                       title={() => (
@@ -127,8 +128,11 @@ const Credits = (props: CreditsProps) => {
                           size={20}
                         />
                       )}
-                      className="w-full bg-zinc-100 dark:bg-muted-900 gap-1"
-                      containerStyle={{ alignItems: "start" }}
+                      className="w-full bg-zinc-100 dark:bg-muted-900 gap-1 cursor-pointer"
+                      containerStyle={{
+                        alignItems: "start",
+                        cursor: "pointer",
+                      }}
                     />
                   )}
                 ></Section>

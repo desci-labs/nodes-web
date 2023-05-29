@@ -46,9 +46,8 @@ const CardWrapper: StyledComponent<
     isHalfSelected ? "border-color: #888 !important; " : ""}
 `;
 const HeaderWrapper = styled(FlexRowSpaceBetween).attrs({
-  className: " bg-zinc-200 dark:bg-muted-900 border-muted-300 dark:border-teal",
+  className: "bg-zinc-200 dark:bg-muted-900 border-muted-300 dark:border-teal",
 })`
-  align-items: flex-start;
   padding: 0.75rem;
 `;
 
@@ -174,7 +173,9 @@ const MiniComponentCard = React.forwardRef(
       >
         <FlexColumn>
           <HeaderWrapper>
-            <span className="text-xs font-bold truncate">{component.name}</span>
+            <span className="text-xs font-bold truncate inline-block">
+              {component.name}
+            </span>
             <span className="flex flex-col items-center">
               <div className="border-tint-primary border-[2px] p-1 rounded-full scale-75 block -my-1">
                 <span

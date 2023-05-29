@@ -44,7 +44,7 @@ import {
   toggleResearchPanel,
 } from "@src/state/nodes/nodeReader";
 import { IconPower } from "@src/icons";
-import MetadataKeywords from "@src/components/organisms/SidePanel/ManuscriptSidePanel/Tabs/Components/MetadataKeywords";
+// import MetadataKeywords from "@src/components/organisms/SidePanel/ManuscriptSidePanel/Tabs/Components/MetadataKeywords";
 import useLocalStorageState from "@src/hooks/useLocalStorageState";
 import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 

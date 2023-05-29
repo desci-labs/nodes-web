@@ -33,9 +33,6 @@ interface GenericLinkPillProps {
 }
 
 const GenericLinkPill = (props: GenericLinkPillProps) => {
-  {
-    /** PNG TODO: change <img /> to <svg /> */
-  }
   const {
     leftIcon = () => <IconCircleX />,
     rightIcon = () => <IconCircleX />,

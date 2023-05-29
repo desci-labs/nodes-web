@@ -9,7 +9,7 @@ const AcmPillButton = (props: AcmPillButtonProps) => {
   const { link } = props
   return (
     <OpenLinkPillButton
-      leftIcon={() => <img src={IconAcm} style={{width: 22}} />}
+      leftIcon={() => <img alt="acm button icon" src={IconAcm} style={{width: 22}} />}
       link={link}
     />
   )

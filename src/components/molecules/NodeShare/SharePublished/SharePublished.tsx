@@ -12,44 +12,6 @@ import { FlexColumnCentered, FlexRowCentered } from "@src/components/styled";
 import { IconCopyLink, IconTwitter } from "@src/icons";
 import NodeMetadataPreview from "@src/components/molecules/NodeMetadataPreview";
 
-// function CopyButton(
-//   props: ButtonHTMLAttributes<HTMLButtonElement> & {
-//     value: string;
-//     label: string;
-//   }
-// ) {
-//   const { handleCopy, copied } = useCopier();
-
-//   return (
-//     <button
-//       {...props}
-//       className="text-sm font-bold text-white hover:text-tint-primary-hover disabled:text-neutrals-gray-4"
-//       onClick={() => handleCopy(props.value)}
-//     >
-//       {copied ? (
-//         <CheckIcon stroke="#28AAC4" strokeWidth={4} width={20} height={15} />
-//       ) : (
-//         props.label
-//       )}
-//     </button>
-//   );
-// }
-
-// function LinkCopier(
-//   props: PropsWithChildren<{ icon: JSX.Element; label: string; value: string }>
-// ) {
-//   return (
-//     <div className="relative flex gap-2 p-2 w-full bg-white dark:bg-[#272727] border border-transparent border-b border-b-[#969696] rounded-md shadow-sm text-left focus:outline-none sm:text-sm">
-//       {props.icon}
-//       <div className="grow">
-//         <span className="block text-xs dark:text-gray-400">{props.label}</span>
-//         <span className="block text-xs">{props.value}</span>
-//       </div>
-//       <CopyButton label="Copy" value={props.value} disabled={!props.value} />
-//     </div>
-//   );
-// }
-
 const shareCaption = "Check out this research:";
 const getTwitterShareLink = (text: string) =>
   `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
@@ -74,7 +36,6 @@ const SharePublished = React.memo(() => {
   const [requestedVersion, setRequestedVersion] = useState<number | undefined>(
     undefined
   );
-  // const [showAdvanced, setShowAdvanced] = useState(false);
 
   const versionForLink =
     publicView && versionParam ? versionParam : requestedVersion;
@@ -98,7 +59,6 @@ const SharePublished = React.memo(() => {
   );
   const dpidSplit = dpidLink.split("/");
   const dpidLinkLatest = dpidSplit.slice(0, 4).join("/");
-  // console.log("CITE::", dpidLink, dpidSplit, dpidLinkLatest);
 
   useEffect(() => {
     setLoading(true);
@@ -106,10 +66,8 @@ const SharePublished = React.memo(() => {
 
     (async () => {
       try {
-        // console.log("Get Versions", currentObjectId);
         if (currentObjectId) {
           const versionData = await getPublishedVersions(currentObjectId!);
-          // console.log("published versions", versionData);
           setNumVersions(versionData.versions.length);
           if (requestedVersion === undefined) {
             setRequestedVersion(versionData.versions.length - 1);
@@ -151,27 +109,10 @@ const SharePublished = React.memo(() => {
     </div>
   );
   if (!loading) {
-    // debugger;
     if (lastManifest && currentObjectId && (publicView || versions)) {
       const versionCount = numVersions;
       body = (
         <div className="font-inter">
-          {/* <div className="">Your Node is public</div> */}
-          {/* <div className="my-4 w-full">
-            <LinkCopier
-              icon={<IconNetwork height={15} stroke={"white"} width={15} />}
-              label="Public Share Link (always points to latest version)"
-              value={dpidLinkLatest}
-            />
-          </div>
-          <div className="my-4 w-full">
-            <LinkCopier
-              icon={<IconNetwork height={15} stroke={"white"} width={15} />}
-              label="Public Share Link (always points to this version)"
-              value={dpidLink}
-            />
-          </div> */}
-
           <FlexRowCentered className="mb-5">
             <NodeMetadataPreview
               uuid={currentObjectId}
@@ -179,9 +120,6 @@ const SharePublished = React.memo(() => {
               dpidLink={dpidLinkLatest}
             />
           </FlexRowCentered>
-          {/* <p className="text-center text-sm my-3">
-            Share the published version of your Node.
-          </p> */}
           <FlexRowCentered className="justify-center mt-8 mb-4">
             <FlexColumnCentered className="gap-1 max-w-[150px]">
               <a
@@ -211,100 +149,6 @@ const SharePublished = React.memo(() => {
               <p className="text-sm">Copy dPID Link</p>
             </FlexColumnCentered>
           </FlexRowCentered>
-          {/* <AdvancedSlideDown
-            closed={showAdvanced}
-            setClosed={setShowAdvanced}
-            className="overflow-hidden mt-5"
-          >
-
-            <PerfectScrollbar className="overflow-auto h-full max-h-96">
-              {versionCount ? (
-                <div className="pb-4 w-full">
-                  {manifestData?.components.map(
-                    (c: ResearchObjectV1Component, index: number) => {
-                      const fqi = isDpidSupported
-                        ? `${lastManifest?.dpid?.id}/${versionForLink}/${index}`
-                        : `${currentObjectId.replaceAll(
-                            ".",
-                            ""
-                          )}/${versionForLink}/${index}`;
-
-                      const link = isDpidSupported
-                        ? `${dpidLink}/${index}`
-                        : `${window.location.protocol}//${window.location.host}/${fqi}`;
-
-                      switch (c.type) {
-                        case ResearchObjectComponentType.CODE:
-                          return (
-                            <div
-                              className="my-2"
-                              key={`component-share-${c.id}`}
-                            >
-                              <LinkCopier
-                                icon={
-                                  <IconCodeBracket
-                                    height={12}
-                                    fill={"white"}
-                                    width={12}
-                                  />
-                                }
-                                label={`${c.name} Share Link`}
-                                value={`${window.location.protocol}//${window.location.host}/${fqi}`}
-                              />
-                              <div className="mt-2 w-[90%] -right-[10%] relative">
-                                <LinkCopier
-                                  icon={
-                                    <IconCode
-                                      height={12}
-                                      fill={"white"}
-                                      width={12}
-                                    />
-                                  }
-                                  label={`Import ${c.name} via desci-fetch`}
-                                  value={`with desci.fetch([('${c.name}.py', '${c.name}')], "${fqi}"):`}
-                                />
-                              </div>
-                              <div className="mt-2 w-[90%] -right-[10%] relative">
-                                <LinkCopier
-                                  icon={
-                                    <IconDocument
-                                      height={12}
-                                      fill={"white"}
-                                      width={12}
-                                    />
-                                  }
-                                  label={`Browse ${c.name} via HTTP`}
-                                  value={`${process.env.REACT_APP_NODES_API}/${fqi}/master/README.md?g=${process.env.REACT_APP_IPFS_RESOLVER_OVERRIDE}`}
-                                />
-                              </div>
-                            </div>
-                          );
-                        default:
-                          return (
-                            <div
-                              className="my-2"
-                              key={`component-share-${c.id}`}
-                            >
-                              <LinkCopier
-                                icon={
-                                  <IconFile
-                                    height={12}
-                                    fill={"white"}
-                                    width={12}
-                                  />
-                                }
-                                label={`${c.name} Share Link`}
-                                value={link}
-                              />
-                            </div>
-                          );
-                      }
-                    }
-                  )}
-                </div>
-              ) : null}
-            </PerfectScrollbar>
-          </AdvancedSlideDown> */}
         </div>
       );
     } else {
