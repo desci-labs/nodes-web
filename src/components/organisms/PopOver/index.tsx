@@ -1,8 +1,5 @@
 import { FC, useEffect, useRef } from "react";
 import styled, { CSSProperties } from "styled-components";
-
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
-import { FlexColumnAligned } from "@components/styled";
 import {
   APPROXIMATED_HEADER_HEIGHT,
   lockScroll,
@@ -13,7 +10,10 @@ import { useNodeReader } from "@src/state/nodes/hooks";
 
 const ANIM_TIME = "0.2s";
 
-const PopOverContainer: any = styled(FlexColumnAligned)`
+const PopOverContainer: any = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   position: fixed;
   bottom: 0;
   left: 0;

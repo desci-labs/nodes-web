@@ -2,7 +2,6 @@
 import { termsConsent } from "@api/index";
 import PrimaryButton from "@components/atoms/PrimaryButton";
 import RadioButton from "@components/atoms/RadioButton/RadioButton";
-import { FlexRowAligned } from "@components/styled";
 import { RadioGroup } from "@headlessui/react";
 import React, { useCallback, useImperativeHandle, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
@@ -91,7 +90,7 @@ const AdditionalInfoForm = React.forwardRef((props: any, ref: any) => {
         }}
         render={({ field }: any) => (
           <RadioGroup {...field} className="mt-2">
-            <FlexRowAligned className="gap-6">
+            <div className="flex items-center gap-6">
               <RadioGroup.Option value={"yes"}>
                 {({ checked }) => (
                   <RadioButton
@@ -110,7 +109,7 @@ const AdditionalInfoForm = React.forwardRef((props: any, ref: any) => {
                   />
                 )}
               </RadioGroup.Option>
-            </FlexRowAligned>
+            </div>
           </RadioGroup>
         )}
       />
@@ -127,7 +126,7 @@ const AdditionalInfoForm = React.forwardRef((props: any, ref: any) => {
             }}
             render={({ field }: any) => (
               <RadioGroup {...field} className="mt-2">
-                <FlexRowAligned className="gap-6">
+                <div className="flex items-center gap-6">
                   <RadioGroup.Option value={"yes"}>
                     {({ checked }) => (
                       <RadioButton
@@ -146,7 +145,7 @@ const AdditionalInfoForm = React.forwardRef((props: any, ref: any) => {
                       />
                     )}
                   </RadioGroup.Option>
-                </FlexRowAligned>
+                </div>
               </RadioGroup>
             )}
           />
@@ -205,7 +204,7 @@ const AdditionalInfoForm = React.forwardRef((props: any, ref: any) => {
           Terms of Service
         </a>
       </SectionText>
-      <FlexRowAligned style={{ marginTop: 20 }}>
+      <div className="flex items-center" style={{ marginTop: 20 }}>
         <CheckBox {...register("hasAcceptedTerms", { required: true })} />
         <CheckBoxText htmlFor="hasAcceptedTerms">
           I accept the DeSci Labs{" "}
@@ -218,12 +217,12 @@ const AdditionalInfoForm = React.forwardRef((props: any, ref: any) => {
             Terms of Service
           </a>
         </CheckBoxText>
-      </FlexRowAligned>
+      </div>
       <SlideDownContainer closed={isOriginalAuthor === "no"}>
         <SectionTitle style={{ marginTop: 20 }}>
           Declarations: Original Author
         </SectionTitle>
-        <FlexRowAligned style={{ marginTop: 20 }}>
+        <div className="flex items-center" style={{ marginTop: 20 }}>
           <CheckBox
             {...register("hasAcceptedDeclarations", {
               required: isOriginalAuthor !== "no",
@@ -232,7 +231,7 @@ const AdditionalInfoForm = React.forwardRef((props: any, ref: any) => {
           <CheckBoxText htmlFor="hasAcceptedDeclarations">
             I accept all the delarations below:
           </CheckBoxText>
-        </FlexRowAligned>
+        </div>
         <ul className="mt-2 ml-10 text-xs gap-2 flex flex-col -indent-4">
           <SectionText as="li">
             I confirm that I and my co-authors are the authors of the Research
@@ -258,7 +257,7 @@ const AdditionalInfoForm = React.forwardRef((props: any, ref: any) => {
       <SectionTitle style={{ marginTop: 20 }}>
         Declarations: Beta Tester
       </SectionTitle>
-      <FlexRowAligned style={{ marginTop: 20 }}>
+      <div className="flex items-center" style={{ marginTop: 20 }}>
         <CheckBox
           {...register("hasAcceptedAlphaConditions", { required: true })}
         />
@@ -266,7 +265,7 @@ const AdditionalInfoForm = React.forwardRef((props: any, ref: any) => {
           This Research Node is only created for testing purposes and DeSci Labs
           reserves the right to delete any content at any time
         </CheckBoxText>
-      </FlexRowAligned>
+      </div>
     </form>
   );
 });

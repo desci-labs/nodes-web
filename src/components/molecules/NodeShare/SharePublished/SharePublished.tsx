@@ -8,7 +8,6 @@ import { useParams } from "react-router-dom";
 import { useGetNodesQuery } from "@src/state/api/nodes";
 import { useNodeReader, useNodeVersions } from "@src/state/nodes/hooks";
 import Copier from "@src/components/molecules/Copier";
-import { FlexColumnCentered, FlexRowCentered } from "@src/components/styled";
 import { IconCopyLink, IconTwitter } from "@src/icons";
 import NodeMetadataPreview from "@src/components/molecules/NodeMetadataPreview";
 
@@ -113,15 +112,15 @@ const SharePublished = React.memo(() => {
       const versionCount = numVersions;
       body = (
         <div className="font-inter">
-          <FlexRowCentered className="mb-5">
+          <div className="flex justify-center mb-5">
             <NodeMetadataPreview
               uuid={currentObjectId}
               version={versionCount}
               dpidLink={dpidLinkLatest}
             />
-          </FlexRowCentered>
-          <FlexRowCentered className="justify-center mt-8 mb-4">
-            <FlexColumnCentered className="gap-1 max-w-[150px]">
+          </div>
+          <div className="flex justify-center justify-center mt-8 mb-4">
+            <div className="flex flex-col items-center justify-between gap-1 max-w-[150px]">
               <a
                 href={getTwitterShareLink(
                   `${shareCaption} ${manifest?.title} \n${dpidLinkLatest}`
@@ -133,8 +132,8 @@ const SharePublished = React.memo(() => {
                 <IconTwitter className="fill-social-twitter" width={25} />
               </a>
               <p className="text-sm">Twitter</p>
-            </FlexColumnCentered>
-            <FlexColumnCentered className="gap-1 max-w-[150px]">
+            </div>
+            <div className="flex flex-col items-center justify-between gap-1 max-w-[150px]">
               <div className="flex items-center justify-center text-center border border-social-twitter text-sm rounded-full p-2">
                 <Copier
                   text={dpidLinkLatest}
@@ -147,8 +146,8 @@ const SharePublished = React.memo(() => {
                 />
               </div>
               <p className="text-sm">Copy dPID Link</p>
-            </FlexColumnCentered>
-          </FlexRowCentered>
+            </div>
+          </div>
         </div>
       );
     } else {

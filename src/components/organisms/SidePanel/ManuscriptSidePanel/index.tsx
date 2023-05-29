@@ -1,10 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import {
-  FlexColumn,
-  FlexRowCentered,
-  FlexRowSpaceBetween,
-} from "@components/styled";
 import SidePanel from "@components/organisms/SidePanel";
 import HistoryTab from "@components/organisms/SidePanel/ManuscriptSidePanel/Tabs/History/HistoryTab";
 import CreditTab from "@src/components/organisms/SidePanel/ManuscriptSidePanel/Tabs/CreditTab";
@@ -51,11 +46,16 @@ import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 const ManuscriptSidePanelContainer = styled(SidePanel).attrs({
   className: "bg-light-gray dark:bg-dark-gray text-black dark:text-white",
 })``;
-const ContentWrapper = styled(FlexColumn)`
+const ContentWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
   position: relative;
   height: 100%;
 `;
-const ManuscriptHeader = styled(FlexRowSpaceBetween)`
+const ManuscriptHeader = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   padding: 0.6rem 1.625rem;
   flex: unset;
   justify-content: center;
@@ -261,14 +261,14 @@ const ManuscriptSidePanel = (props: ManuscriptSidePanelProps) => {
               postUserAction(AvailableUserActionLogTypes.btnPublish);
             }}
           >
-            <FlexRowCentered className="gap-1">
+            <div className="flex justify-center gap-1">
               <IconPower width={18} />
               <span className="inline-block">
                 {isCommitPanelOpen
                   ? "Finish in Commit Panel (Left)"
                   : "Publish Node"}
               </span>
-            </FlexRowCentered>
+            </div>
           </PrimaryButton>
         </div>
         <div className="px-4">

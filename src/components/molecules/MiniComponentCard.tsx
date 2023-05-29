@@ -1,7 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import styled, { StyledComponent } from "styled-components";
-import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
 
 import {
   ExternalLinkComponent,
@@ -45,8 +44,9 @@ const CardWrapper: StyledComponent<
   ${({ isHalfSelected }: any) =>
     isHalfSelected ? "border-color: #888 !important; " : ""}
 `;
-const HeaderWrapper = styled(FlexRowSpaceBetween).attrs({
-  className: "bg-zinc-200 dark:bg-muted-900 border-muted-300 dark:border-teal",
+const HeaderWrapper = styled.div.attrs({
+  className:
+    "flex items-center justify-between bg-zinc-200 dark:bg-muted-900 border-muted-300 dark:border-teal",
 })`
   padding: 0.75rem;
 `;
@@ -171,7 +171,7 @@ const MiniComponentCard = React.forwardRef(
         }
         onClick={handleComponentClick}
       >
-        <FlexColumn>
+        <div className="flex flex-col">
           <HeaderWrapper>
             <span className="text-xs font-bold truncate inline-block">
               {component.name}
@@ -194,7 +194,7 @@ const MiniComponentCard = React.forwardRef(
               </div>
             </span>
           </HeaderWrapper>
-        </FlexColumn>
+        </div>
       </CardWrapper>
     );
   }

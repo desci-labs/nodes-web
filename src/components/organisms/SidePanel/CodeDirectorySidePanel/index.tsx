@@ -1,6 +1,5 @@
 import PanelCloseButton from "@components/atoms/PanelCloseButton";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
-import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
 import { IconPlay } from "@icons";
 import { useCallback, useEffect, useState } from "react";
 import styled, { StyledComponent } from "styled-components";
@@ -11,11 +10,11 @@ import "react-folder-tree/dist/style.css";
 import PillButton from "@components/atoms/PillButton";
 import GithubFileTree from "@components/organisms/FileTree/GithubFileTree";
 import { CodeComponent } from "@desci-labs/desci-models";
-import { isWindows, __log } from "@components/utils";
+import { isWindows } from "@components/utils";
 import axios from "axios";
 import { useSetter } from "@src/store/accessors";
 import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
-import { popFromComponentStack } from "@src/state/nodes/viewer";
+import { popFromComponentStack } from "@src/state/nodes/nodeReader";
 
 // @ts-ignore
 const Wrapper: StyledComponent<"div", any, any, any> = styled(SidePanel).attrs({
@@ -36,22 +35,22 @@ const Wrapper: StyledComponent<"div", any, any, any> = styled(SidePanel).attrs({
   ${(props) => ((props as any).doPad ? `` : ``)}
   color: #000000;
 `;
-const ContentWrapper = styled(FlexColumn).attrs({
-  className: "px-2 pb-2 w-full",
+const ContentWrapper = styled.div.attrs<{ className: string }>({
+  className: "flex flex-col px-2 pb-2 w-full",
 })`
   flex: 1;
   overflow: hidden;
 `;
-const Header = styled(FlexRowSpaceBetween).attrs({
-  className: "w-full",
+const Header = styled.div.attrs<{ className: string }>({
+  className: "flex items-center justify-between w-full",
 })`
   padding: 1.25rem 1.625rem;
   flex: unset;
   justify-content: flex-start;
 `;
-const Title = styled.p.attrs({
-  className: "select-none text-lg font-bold",
-})``;
+// const Title = styled.p.attrs({
+//   className: "select-none text-lg font-bold",
+// })``;
 
 interface CodeDirectorySidePanelProps {}
 
@@ -65,7 +64,6 @@ const CodeDirectorySidePanel = (props: CodeDirectorySidePanelProps) => {
   ]);
 
   const [isVisible, setIsVisible] = useState<boolean>(false);
-  const [folderData, setFolderData] = useState<any>({});
   const [repoState, setRepoState] = useState({
     owner: "",
     repo: "",
@@ -92,16 +90,16 @@ const CodeDirectorySidePanel = (props: CodeDirectorySidePanelProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [componentStack, isEditingAnnotation]);
 
-  const handleNameClick = ({ defaultOnClick, nodeData }: any) => {
-    const newFolderData = { ...folderData };
-    const newChildren = newFolderData.children;
-    const newNodeData = { ...nodeData };
-    newNodeData.isOpen = !newNodeData.isOpen;
-    newChildren.splice(newChildren.indexOf(nodeData), 1, newNodeData);
-    newFolderData.children = newChildren;
-    setFolderData(newFolderData);
-    __log(newFolderData, newNodeData);
-  };
+  // const handleNameClick = ({ defaultOnClick, nodeData }: any) => {
+  //   const newFolderData = { ...folderData };
+  //   const newChildren = newFolderData.children;
+  //   const newNodeData = { ...nodeData };
+  //   newNodeData.isOpen = !newNodeData.isOpen;
+  //   newChildren.splice(newChildren.indexOf(nodeData), 1, newNodeData);
+  //   newFolderData.children = newChildren;
+  //   setFolderData(newFolderData);
+  //   __log(newFolderData, newNodeData);
+  // };
 
   const retrieveDefaultBranch = async (owner: string, repo: string) => {
     const url = `https://api.github.com/repos/${owner}/${repo}`;
@@ -158,13 +156,7 @@ const CodeDirectorySidePanel = (props: CodeDirectorySidePanelProps) => {
     }
     // setIsPanelOpen(false);
     // onClose();
-  }, [
-    componentStack,
-    dispatch,
-    popFromComponentStack,
-    setIsVisible,
-    isCodeActive,
-  ]);
+  }, [componentStack, dispatch, setIsVisible, isCodeActive]);
 
   return (
     <Wrapper

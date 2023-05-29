@@ -1,7 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
 import styled, { StyledComponent } from "styled-components";
-import { FlexColumn } from "@components/styled";
 
 // import AnnotationSwitcher from "@components/atoms/AnnotationSwitcher";
 import {
@@ -231,7 +230,7 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
       }
       onClick={handleComponentClick}
     >
-      <FlexColumn>
+      <div className="flex flex-col">
         <HeaderWrapper>
           <span className="inline-block text-xs font-bold truncate flex gap-1 items-center">
             {component.name}{" "}
@@ -397,7 +396,7 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
             </div>
           </div>
         </div>
-      </FlexColumn>
+      </div>
     </CardWrapper>
   );
 };

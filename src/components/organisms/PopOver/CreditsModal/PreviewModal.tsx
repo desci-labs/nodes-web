@@ -1,6 +1,5 @@
 import Modal, { ModalProps } from "@components/molecules/Modal";
 import { CreditModalProps } from "./schema";
-import { FlexColumnCentered, FlexRowCentered } from "@src/components/styled";
 import { IconGithub, IconGoogleScholar, IconOrcid } from "@src/icons";
 import { isMobile } from "react-device-detect";
 import clsx from "clsx";
@@ -22,7 +21,7 @@ export default function PreviewModal(props: ModalProps & CreditModalProps) {
         )}
       >
         <Modal.Header onDismiss={props?.onDismiss} />
-        <FlexColumnCentered className="mt-8 w-full">
+        <div className="flex flex-col items-center justify-between mt-8 w-full">
           <span className="font-bold capitalize text-lg">
             {props.author?.name}
           </span>
@@ -40,7 +39,7 @@ export default function PreviewModal(props: ModalProps & CreditModalProps) {
             <>
               <div className="h-[1px] w-[200px] bg-neutrals-gray-3 my-4"></div>
               <h1 className="font-bold mb-2">View External Profiles</h1>
-              <FlexRowCentered className="gap-1">
+              <div className="flex justify-center gap-1">
                 {props.author?.orcid ? (
                   <a
                     href={getOrcidUrl(props.author?.orcid)}
@@ -71,10 +70,10 @@ export default function PreviewModal(props: ModalProps & CreditModalProps) {
                     <IconGithub width={23} fill="white" />
                   </a>
                 ) : null}
-              </FlexRowCentered>{" "}
+              </div>{" "}
             </>
           ) : null}
-        </FlexColumnCentered>
+        </div>
       </div>
     </Modal>
   );

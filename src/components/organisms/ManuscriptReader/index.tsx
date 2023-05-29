@@ -2,7 +2,6 @@
 import React, { useEffect } from "react";
 import "react-pdf/dist/umd/Page/AnnotationLayer.css";
 import styled from "styled-components";
-import { FlexRow } from "@components/styled";
 import { APPROXIMATED_HEADER_HEIGHT, __log } from "@components/utils";
 import { AvailableUserActionLogTypes, postUserAction } from "@api/index";
 import LoadProgressManager from "@components/molecules/LoadProgressManager";
@@ -15,14 +14,16 @@ import PublicationDetailsModal from "@src/components/molecules/NodeVersionDetail
 import { useNodeReader } from "@src/state/nodes/hooks";
 import { useDrive } from "@src/state/drive/hooks";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
-import ComponentMetadataPopover from "../PopOver/ComponentMetadataPopover";
 import { setFileMetadataBeingEdited } from "@src/state/drive/driveSlice";
 import DriveDatasetMetadataPopOver from "@src/components/molecules/DriveDatasetMetadataPopOver";
 import { useSetter } from "@src/store/accessors";
 import ComponentUseModal from "@src/components/molecules/ComponentUseModal";
 import CitationPopover from "../PopOver/CitationPopover";
 
-const ManuscriptWrapper = styled(FlexRow)`
+const ManuscriptWrapper = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: row;
   background-color: #525659;
   position: relative;
   padding-top: ${APPROXIMATED_HEADER_HEIGHT}px;

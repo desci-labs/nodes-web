@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import styled, { StyledComponent } from "styled-components";
-import { FlexRowAligned } from "@components/styled";
+import styled from "styled-components";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { ResearchObjectComponentAnnotation } from "@desci-labs/desci-models";
 import { usePageZoomedOffset, usePdfReader } from "@src/state/nodes/hooks";
@@ -13,11 +12,8 @@ import {
 import ReactTooltip from "react-tooltip";
 import { AiFillCaretLeft, AiFillCaretRight } from "react-icons/ai";
 
-const Wrapper: StyledComponent<"div", any, any> = styled(FlexRowAligned)`
-  flex: unset;
-`;
-const MiddleElementWrapper = styled(FlexRowAligned).attrs({
-  className: "bg-zinc-100 dark:bg-muted-900 select-none",
+const MiddleElementWrapper = styled.div.attrs({
+  className: "flex items-center bg-zinc-100 dark:bg-muted-900 select-none",
 })`
   border-radius: 0.875rem;
   padding: 0.2rem 0.4rem;
@@ -207,20 +203,20 @@ const AnnotationSwitcher = (props: AnnotationSwitcherProps) => {
 
   if (!annotations.length) {
     return (
-      <Wrapper
-        className="cursor-not-allowed"
+      <div
+        className="flex items-center cursor-not-allowed"
         onClick={(e: any) => {
           e.preventDefault();
         }}
-      ></Wrapper>
+      ></div>
     );
   }
 
   return (
-    <Wrapper
+    <div
       onClick={(e: any) => e.stopPropagation()}
       data-annotation-switch
-      className="group mt-0.5"
+      className="flex items-center group mt-0.5"
     >
       <AiFillCaretLeft
         title="Previous annotation"
@@ -248,7 +244,7 @@ const AnnotationSwitcher = (props: AnnotationSwitcherProps) => {
         data-type="info"
         data-background-color="black"
       />
-    </Wrapper>
+    </div>
   );
 };
 

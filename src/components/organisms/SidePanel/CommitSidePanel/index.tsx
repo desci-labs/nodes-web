@@ -3,14 +3,12 @@ import PrimaryButton from "@components/atoms/PrimaryButton";
 import Footer from "@components/molecules/Footer";
 import CommitAdditionalInfoPopOver from "@components/organisms/PopOver/CommitAdditionalInfoPopover";
 import CommitStatusPopover from "@components/organisms/PopOver/CommitStatusPopover";
-import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
 import { useNodeValidator } from "@src/hooks/useNodeValidator";
 import { useCallback, useEffect, useState } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import styled, { StyledComponent } from "styled-components";
 import SidePanel from "..";
 import NodeChanges from "./Changes/NodeChanges";
-import useNodeDiff from "./Changes/useNodeDiff";
 import General from "./General";
 import NodeMetadata from "./NodeMetadata";
 import { lockScroll, restoreScroll } from "@src/components/utils";
@@ -26,7 +24,7 @@ const Wrapper: StyledComponent<"div", any, any, any> = styled(SidePanel).attrs({
 })`
   color: #000000;
 `;
-const ContentWrapper = styled(FlexColumn).attrs({
+const ContentWrapper = styled.div.attrs({
   className: "flex flex-col h-full",
 })`
   flex: 1;
@@ -40,7 +38,6 @@ const Subtitle = styled.p.attrs({
 })``;
 
 const FooterUpdatesText: any = styled.p.attrs((props: any) => ({
-  // children: `${props.numUpdates} updates`,
   className: "text-xs",
 }))``;
 
@@ -54,7 +51,6 @@ const CommitSidePanel = (props: CommitSidePanelProps) => {
   const dispatch = useSetter();
 
   const { isValid } = useNodeValidator();
-  const { isError: fail } = useNodeDiff();
 
   // Panel overlay transition
   const fadeTransition = useTransition(isCommitPanelOpen, {
@@ -64,7 +60,6 @@ const CommitSidePanel = (props: CommitSidePanelProps) => {
     leave: { opacity: 0 },
   });
 
-  // const [fail, setFail] = useState(true);
   const panelOrientation = "left";
 
   useEffect(() => {
@@ -93,7 +88,7 @@ const CommitSidePanel = (props: CommitSidePanelProps) => {
   const closePane = useCallback(() => {
     dispatch(toggleCommitPanel(false));
     postUserAction(AvailableUserActionLogTypes.commitPanelDismiss);
-  }, [dispatch, toggleCommitPanel]);
+  }, [dispatch]);
 
   if (!isCommitPanelOpen) {
     return (
@@ -153,7 +148,7 @@ const CommitSidePanel = (props: CommitSidePanelProps) => {
                       </div>
                     </PerfectScrollbar>
                     <Footer>
-                      <FlexRowSpaceBetween>
+                      <div className="flex items-center justify-between">
                         <FooterUpdatesText numUpdates={5} />
                         <PrimaryButton
                           onClick={() => {
@@ -166,7 +161,7 @@ const CommitSidePanel = (props: CommitSidePanelProps) => {
                         >
                           Continue
                         </PrimaryButton>
-                      </FlexRowSpaceBetween>
+                      </div>
                     </Footer>
                   </ContentWrapper>
                 </div>

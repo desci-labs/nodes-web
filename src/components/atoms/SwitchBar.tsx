@@ -1,4 +1,3 @@
-import { FlexRow } from "@src/components/styled";
 import { HTMLProps } from "react";
 import styled from "styled-components";
 
@@ -22,8 +21,8 @@ export const SwitchButton: any = styled.div.attrs(
   border-top: 0;
   border-bottom: 0;
 `;
-export const SwitchBar = styled(FlexRow).attrs({
-  className: "border-[1px] border-muted-300 dark:border-black",
+export const SwitchBar = styled.div.attrs({
+  className: "flex border-[1px] border-muted-300 dark:border-black",
 })`
   border-radius: 8px;
   overflow: hidden;

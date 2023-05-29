@@ -1,4 +1,3 @@
-import { FlexRowSpaceBetween } from "@components/styled";
 import styled from "styled-components";
 import { useState } from "react";
 import PrimaryButton from "@components/atoms/PrimaryButton";
@@ -54,15 +53,15 @@ const NodeChanges = (props: ChangesComponentProps) => {
           {!isLoading ? (
             <div>
               {changes.map((item: any, index: number) => (
-                <FlexRowSpaceBetween
+                <div
                   key={`change_${item}-${Math.random()}`}
-                  className="mt-2 py-2 cursor-pointer group hover:text-tint-primary-dark font-bold"
+                  className="flex items-center justify-between mt-2 py-2 cursor-pointer group hover:text-tint-primary-dark font-bold"
                   onClick={() => setSelectedDiff(index)}
                 >
                   <ChangeNameTitle>{item}</ChangeNameTitle>
                   <SearchIcon width={20} />
                   {/* <AddedText /> */}
-                </FlexRowSpaceBetween>
+                </div>
               ))}
               <div className="top-2 relative select-none cursor-pointer">
                 <div

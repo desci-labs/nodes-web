@@ -3,7 +3,6 @@ import {
   ResearchObjectV1,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
-import { FlexColumn, FlexRowSpaceBetween } from "@src/components/styled";
 import { EMPTY_FUNC } from "@src/components/utils";
 import styled from "styled-components";
 
@@ -23,11 +22,11 @@ export const TodoItem = (props: TodoProps) => {
     onFixClick = EMPTY_FUNC,
   } = props;
   return (
-    <FlexRowSpaceBetween className="mt-2 py-2">
-      <FlexColumn>
+    <div className="flex items-center justify-between mt-2 py-2">
+      <div className="flex flex-col">
         <TodoTitle>{title}</TodoTitle>
         <TodoSubtitle>{subtitle}</TodoSubtitle>
-      </FlexColumn>
+      </div>
       <TodoStatusText
         completed={completed}
         editable={props.editable}
@@ -39,7 +38,7 @@ export const TodoItem = (props: TodoProps) => {
       >
         {!completed ? "Fix" : editable ? "Edit" : "Complete"}
       </TodoStatusText>
-    </FlexRowSpaceBetween>
+    </div>
   );
 };
 

@@ -19,9 +19,11 @@ import Placeholder from "@components/organisms/ManuscriptReader/Placeholder";
 import Explorer from "@components/organisms/ManuscriptReader/MobileReader/Explorer";
 import ComponentStackModal from "@components/organisms/ManuscriptReader/MobileReader/ComponentStackModal";
 import { IconX } from "@src/icons";
-import { FlexColumn } from "@components/styled";
 
-const MobileWrapper = styled(FlexColumn)`
+const MobileWrapper = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   background-color: transparent;
   height: 100vh;
   width: 100%;

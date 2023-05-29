@@ -3,17 +3,22 @@ import styled from "styled-components";
 import {SlideDown} from 'react-slidedown'
 import 'react-slidedown/lib/slidedown.css'
 
-import { FlexColumn, FlexRow } from "@components/styled";
 
-const DropDownContainer = styled(FlexColumn)`
-  background-color: ${props => props.theme.colors.surface};
-  color: ${props => props.theme.colors.onSurface};
-`
-const DropDownHeader = styled(FlexRow)`
+const DropDownContainer = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  background-color: ${(props) => props.theme.colors.surface};
+  color: ${(props) => props.theme.colors.onSurface};
+`;
+const DropDownHeader = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: row;
   justify-content: space-between;
   padding: 1rem;
   cursor: pointer;
-`
+`;
 const DropDownContent = styled(SlideDown)`
   transition-duration: 0.25s;
   transition-timing-function: ease-in-out;

@@ -1,11 +1,6 @@
 import ButtonCopyLink from "@components/atoms/ButtonCopyLink";
 import TooltipIcon from "@components/atoms/TooltipIcon";
 import CollapsibleSection from "@components/organisms/CollapsibleSection";
-import {
-  FlexColumn,
-  FlexRowAligned,
-  FlexRowSpaceBetween,
-} from "@components/styled";
 import { IconInfo } from "@icons";
 import styled from "styled-components";
 import { useNodeReader } from "@src/state/nodes/hooks";
@@ -50,8 +45,8 @@ const EntryContainer = (props: any) => {
 const ReadOnlyComponent = (props: any) => {
   const { currentObjectId } = useNodeReader();
   return (
-    <FlexColumn className="mt-6 gap-3">
-      <FlexRowAligned className="gap-3">
+    <div className="flex mt-6 gap-3">
+      <div className="flex items-center gap-3">
         <CollapsibleSection
           title={
             <Title
@@ -76,18 +71,18 @@ const ReadOnlyComponent = (props: any) => {
           className={"flex-[2]"}
           headerStyle={{ padding: "0.25rem 0.75rem" }}
         />
-      </FlexRowAligned>
-      <FlexRowAligned className="gap-4">
+      </div>
+      <div className="flex items-center gap-4">
         <CollapsibleSection
           title={
-            <FlexRowSpaceBetween>
+            <div className="flex items-center justify-between">
               <Title
                 title="Component Metadata PID"
                 tooltipText="Permanent Identifier"
                 tooltipId="pid-metadata-ro"
               />
               <ButtonCopyLink text={`${currentObjectId}`} />
-            </FlexRowSpaceBetween>
+            </div>
           }
           expandable={false}
           className={"flex-[2]"}
@@ -95,7 +90,7 @@ const ReadOnlyComponent = (props: any) => {
         />
         <CollapsibleSection
           title={
-            <FlexRowSpaceBetween>
+            <div className="flex items-center justify-between">
               <Title
                 title="License"
                 tooltipText="Author-supplied license"
@@ -106,13 +101,13 @@ const ReadOnlyComponent = (props: any) => {
                   {props.file?.metadata?.licenseType}
                 </p>
               </div>
-            </FlexRowSpaceBetween>
+            </div>
           }
           expandable={false}
           className={"flex-[1]"}
           headerStyle={{ padding: "0.25rem 0.75rem" }}
         />
-      </FlexRowAligned>
+      </div>
       <CollapsibleSection
         startExpanded={true}
         title={
@@ -128,7 +123,7 @@ const ReadOnlyComponent = (props: any) => {
           <EntryContainer>
             <p className="text-xs font-bold">Keywords</p>
             <div className="my-1">
-              <FlexRowAligned className="gap-2 w-full flex-wrap">
+              <div className="flex items-center gap-2 w-full flex-wrap">
                 {props.file?.metadata?.keywords?.map((keyword: string) => {
                   return (
                     <div className="py-[2px] px-2 bg-tint-primary rounded-md text-black">
@@ -136,7 +131,7 @@ const ReadOnlyComponent = (props: any) => {
                     </div>
                   );
                 })}
-              </FlexRowAligned>
+              </div>
             </div>
           </EntryContainer>
           <EntryContainer>
@@ -149,7 +144,7 @@ const ReadOnlyComponent = (props: any) => {
           </EntryContainer>
         </div>
       </CollapsibleSection>
-    </FlexColumn>
+    </div>
   );
 };
 

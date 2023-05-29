@@ -12,7 +12,6 @@ import {
 import { ExternalLinkIcon } from "@heroicons/react/solid";
 import formatString from "format-string-by-pattern";
 import AffiliateSelector from "@src/components/molecules/AffiliateSelector";
-import { FlexRowSpaceBetween } from "@src/components/styled";
 
 const authorRoles = Object.values(ResearchObjectV1AuthorRole).map(
   (role, idx) => ({
@@ -29,7 +28,6 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
     register,
     setValue,
     handleSubmit,
-    trigger,
     formState: { errors },
   } = useFormContext<AuthorFormValues>();
 
@@ -139,7 +137,7 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
             />
           )}
         />
-        <FlexRowSpaceBetween className="justify-between gap-5 w-full">
+        <div className="flex items-center justify-between justify-between gap-5 w-full">
           <p className="text-sm text-neutrals-gray-5">
             Tap enter to add multiple affiliations.
           </p>
@@ -151,7 +149,7 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
           >
             Find ROR PID
           </a>
-        </FlexRowSpaceBetween>
+        </div>
       </div>
       <div className="mt-8">
         <Controller

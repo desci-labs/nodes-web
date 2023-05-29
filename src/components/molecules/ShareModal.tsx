@@ -24,7 +24,6 @@ import { tags } from "@src/state/api/tags";
 import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
 import { useUser } from "@src/state/user/hooks";
-import { FlexRowAligned } from "../styled";
 
 enum ShareTabs {
   Invite = "Invite",
@@ -122,7 +121,7 @@ const ShareModal = React.memo((props: ModalProps) => {
                 disabled={isLoading || isCreated}
                 onClick={() => createShareLink(currentObjectId!)}
               >
-                <FlexRowAligned>
+                <div className="flex items-center">
                   {isLoading ? (
                     <DefaultSpinner color="white" size={24} />
                   ) : (
@@ -137,7 +136,7 @@ const ShareModal = React.memo((props: ModalProps) => {
                   <span className="ml-1 font-inter capitalize">
                     {isLoading ? "Creating link" : "Create private link"}
                   </span>
-                </FlexRowAligned>
+                </div>
               </PrimaryButton>
             )}
 

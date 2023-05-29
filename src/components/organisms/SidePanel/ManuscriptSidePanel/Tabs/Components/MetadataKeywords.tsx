@@ -1,13 +1,15 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import TooltipIcon from "@components/atoms/TooltipIcon";
 import CollapsibleSection from "@components/organisms/CollapsibleSection";
-import { FlexRowAligned } from "@components/styled";
 import { IconInfo } from "icons";
 import styled from "styled-components";
 import uniq from "lodash.uniq";
 import { useNodeReader } from "@src/state/nodes/hooks";
 
-const ContentWrapper = styled(FlexRowAligned)`
+const ContentWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   flex-wrap: wrap;
   gap: 8px;
 `;

@@ -1,8 +1,9 @@
 import React from "react";
-import { FlexRowSpaceBetween } from "@components/styled";
 import styled from "styled-components";
 
-const Wrapper = styled(FlexRowSpaceBetween).attrs(({ className }: any) => ({}))`
+const Wrapper = styled.div.attrs<{ className: string }>({
+  className: "flex items-center justify-between",
+})`
   padding: 0.75rem 1rem;
 `;
 const Title = styled.p.attrs({

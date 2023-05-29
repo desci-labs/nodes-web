@@ -1,12 +1,11 @@
-import { FlexRowAligned } from "@components/styled";
 import { cn } from "@src/lib/utils";
 import React, { HTMLProps, MouseEvent, MouseEventHandler, useEffect } from "react"
 import ReactTooltip from "react-tooltip";
 import styled, { StyledComponent } from "styled-components";
 
-const Wrapper: StyledComponent<'div', any, any> = styled(FlexRowAligned).attrs(({ className }: any) => {
+const Wrapper: StyledComponent<'div', any, any> = styled.div.attrs(({ className }: any) => {
   return {
-    className: ` ${className} select-none group relative pill-button cursor-pointer`,
+    className: `flex items-center ${className} select-none group relative pill-button cursor-pointer`,
   };
 })
 `

@@ -1,8 +1,7 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 
 import SidePanel from "@components/organisms/SidePanel";
-import { Flex, FlexColumn, FlexColumnAligned, FlexRow, FlexRowSpaceBetween } from "@components/styled";
 
 const NUM_ATTRIBUTES_PER_ROW = 5
 
@@ -34,7 +33,10 @@ const Section = styled.div`
     margin-bottom: 0.2rem;
   }
 `
-const AttributesContainer = styled(FlexRowSpaceBetween)`
+const AttributesContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   flex-wrap: wrap;
   gap: 1.5rem;
 `
@@ -63,8 +65,8 @@ const NftSidePanel = () => {
 
   return (
     <NftSidePanelContainer isOpen style={{ gap: gapSize }} width={380}>
-      <FlexColumnAligned>
-        <FlexColumn>
+      <div className="flex flex-col items-center">
+        <div className="flex flex-col">
           <NftName>ColabFold - Making protein folding accessible to all</NftName>
           <NftOrigin>Genesis Collection #01</NftOrigin>
           <Section>
@@ -89,9 +91,9 @@ const NftSidePanel = () => {
             <h2>Scientific Authors</h2>
             <p>Milot Mirdita, Konstantin Schütze, Yoshitaka Moriwaki, Lim Heo, Sergey Ovchinnikov, and Martin Steinegger</p>
           </Section>
-        </FlexColumn>
+        </div>
         <CollectionButton />
-      </FlexColumnAligned>
+      </div>
     </NftSidePanelContainer>
   );
 };

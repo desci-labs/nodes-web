@@ -14,7 +14,6 @@ import { Organization } from "@src/types/client";
 import { IconRor, IconX } from "@src/icons";
 import useSWR from "swr";
 import { getRorQueries } from "@src/api";
-import { FlexRowSpaceBetween } from "../styled";
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
@@ -103,7 +102,7 @@ function AffiliateSelector(props: Props) {
       className="relative w-full"
       onSelect={onValueChanged}
     >
-      <FlexRowSpaceBetween className="bg-white dark:bg-[#272727] rounded-tr-md rounded-tl-md shadow-verifyInput">
+      <div className="flex items-center justify-between bg-white dark:bg-[#272727] rounded-tr-md rounded-tl-md shadow-verifyInput">
         <div
           className={`relative flex flex-wrap gap-0 w-full border-0 p-2 text-sm bg-transparent font-medium placeholder-white text-gray-900 dark:text-white focus:outline-none focus:group:bg-black focus:ring-0 ring-transparent dark:ring-transparent outline-none shadow-none text-left sm:text-sm`}
         >
@@ -129,7 +128,7 @@ function AffiliateSelector(props: Props) {
           />
         </div>
         <IconRor className="mr-2 fill-white" width={32} />
-      </FlexRowSpaceBetween>
+      </div>
 
       {(data || isFetching) && (
         <ComboboxPopover

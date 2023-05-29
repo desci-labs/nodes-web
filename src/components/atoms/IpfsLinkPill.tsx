@@ -5,25 +5,24 @@ import React, {
   useState,
 } from "react";
 import styled from "styled-components";
-import { FlexRowAligned, FlexRowCentered } from "@components/styled";
 import { IconCircleX } from "icons";
 
 // TODO/FIXME: This component is named very similar to other components but it seems to duplicate functionality of PillButton.tsx, should merge or rename
 
-const Wrapper = styled(FlexRowAligned).attrs({
-  className: "select-none group relative",
+const Wrapper = styled.div.attrs({
+  className: "flex items-center select-none group relative",
 })`
   flex: unset;
   height: 1.75rem;
   width: 4rem;
 `;
-const LeftComponent = styled(FlexRowCentered).attrs({
+const LeftComponent = styled.div.attrs({
   className:
-    "group-hover:bg-teal-200 h-full rounded-l-md group-active:bg-teal-100 bg-black",
+    "flex justify-center group-hover:bg-teal-200 h-full rounded-l-md group-active:bg-teal-100 bg-black",
 })``;
-const CopyLink = styled(FlexRowCentered).attrs({
+const CopyLink = styled.div.attrs({
   className:
-    "group-hover:bg-gray-700 h-full bg-black text-white rounded-r-md group-active:bg-gray-500",
+    "flex justify-center group-hover:bg-gray-700 h-full bg-black text-white rounded-r-md group-active:bg-gray-500",
 })``;
 
 interface GenericLinkPillProps {

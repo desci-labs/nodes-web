@@ -1,4 +1,3 @@
-import { FlexColumn, FlexRowSpaceBetween } from "@components/styled";
 import React from "react";
 import styled, { StyledComponent } from "styled-components";
 
@@ -25,8 +24,9 @@ const CardWrapper: StyledComponent<
   border-radius: 0.5rem;
   overflow: hidden;
 `;
-const HeaderWrapper = styled(FlexRowSpaceBetween).attrs({
-  className: "bg-zinc-200 dark:bg-muted-900 border-muted-300 dark:border-teal",
+const HeaderWrapper = styled.div.attrs({
+  className:
+    "flex items-center justify-between bg-zinc-200 dark:bg-muted-900 border-muted-300 dark:border-teal",
 })`
   align-items: flex-start;
   padding: 0.75rem;
@@ -44,7 +44,10 @@ export interface SectionCardProps {
   onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
-const ComponentWrapper = styled(FlexRowSpaceBetween)`
+const ComponentWrapper = styled.div.attrs({
+  className:
+    "flex items-center justify-between",
+})`
   padding: 0.5rem 0.75rem;
 `;
 
@@ -59,18 +62,18 @@ const SectionCard = (props: SectionCardProps) => {
   } = props;
   return (
     <CardWrapper isSelected={isSelected} onClick={onClick}>
-      <FlexColumn>
+      <div className="flex flex-col">
         <HeaderWrapper>
           {headerLeft({})}
           {headerRight({})}
         </HeaderWrapper>
-        <FlexRowSpaceBetween>
+        <div className="flex items-center justify-between">
           <ComponentWrapper>
             {controllerLeft({})}
             {controllerRight({})}
           </ComponentWrapper>
-        </FlexRowSpaceBetween>
-      </FlexColumn>
+        </div>
+      </div>
     </CardWrapper>
   );
 };

@@ -1,4 +1,3 @@
-import { FlexColumn, FlexRow, FlexRowAligned } from "@components/styled";
 import styled from "styled-components";
 import Modal, { ModalProps } from "@src/components/molecules/Modal";
 import { DriveObject } from "@components/organisms/Drive";
@@ -81,7 +80,7 @@ const ViewMetadataModal = (
   const licenseDescription = ALL_LICENSES.find(
     (license: any) =>
       license.name === licenseType ||
-      license.spdx == licenseType ||
+      license.spdx === licenseType ||
       license.shortName === licenseType
   )?.description;
 
@@ -94,7 +93,7 @@ const ViewMetadataModal = (
     >
       <div className="p-6 font-inter lg:min-w-[720px] w-full">
         <Modal.Header title="Metadata" onDismiss={props.onDismiss} />
-        <FlexColumn className="mt-6 gap-6 w-full">
+        <div className="flex flex-col mt-6 gap-6 w-full">
           <CardContainer>
             <Title title="Component Type" />
             <ContentWrapper>{componentTypeName || "Unknown"}</ContentWrapper>
@@ -130,11 +129,11 @@ const ViewMetadataModal = (
                   <CardContainer>
                     <Title title="Keywords" />
                     <ContentWrapper>
-                      <FlexRowAligned className="gap-2 w-full flex-wrap my-2">
+                      <div className="flex items-center gap-2 w-full flex-wrap my-2">
                         {metadata?.keywords?.map((keyword: string, idx) => {
                           return <Pill key={idx} keyword={keyword}></Pill>;
                         })}
-                      </FlexRowAligned>
+                      </div>
                     </ContentWrapper>
                   </CardContainer>
                 )}
@@ -172,13 +171,13 @@ const ViewMetadataModal = (
                   <CardContainer>
                     <Title title="Controlled Vocabulary Terms" />
                     <ContentWrapper>
-                      <FlexRowAligned className="gap-2 w-full flex-wrap my-2">
+                      <div className="flex items-center gap-2 w-full flex-wrap my-2">
                         {metadata?.controlledVocabTerms?.map(
                           (keyword: string, idx) => {
                             return <Pill key={idx} keyword={keyword}></Pill>;
                           }
                         )}
-                      </FlexRowAligned>
+                      </div>
                     </ContentWrapper>
                   </CardContainer>
                 )}
@@ -188,18 +187,18 @@ const ViewMetadataModal = (
           <Heading title="Licensing" />
           <CardContainer>
             <ContentWrapper>
-              <FlexRow className="my-1 items-start gap-2">
+              <div className="flex my-1 items-start gap-2">
                 <div className="mt-[8px] bg-states-success min-w-[8px] min-h-[8px] w-[8px] h-[8px] m-0 p-0 rounded-full border-none"></div>
-                <FlexColumn className="items-start gap-1">
+                <div className="flex flex-col items-start gap-1">
                   <p className="text-sm uppercase">
                     {licenseType || "Unknown License"}
                   </p>
                   <p className="text-xs">{licenseDescription}</p>
-                </FlexColumn>
-              </FlexRow>
+                </div>
+              </div>
             </ContentWrapper>
           </CardContainer>
-        </FlexColumn>
+        </div>
       </div>
     </Modal>
   );

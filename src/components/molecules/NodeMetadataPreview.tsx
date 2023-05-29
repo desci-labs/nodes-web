@@ -1,6 +1,5 @@
 import { useNodesMediaCoverQuery } from "@src/state/api/media";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import { FlexRowAligned } from "../styled";
 import { useMemo } from "react";
 import { getFormatter } from "@src/helper/citation";
 
@@ -27,7 +26,7 @@ export default function NodeMetadataPreview({
   if (isLoading || !isSuccess) return null; // return placeholder
 
   return (
-    <FlexRowAligned className="w-full max-w-[400px] bg-neutrals-gray-1 p-4 mt-5 rounded-lg justify-start gap-3">
+    <div className="flex items-center w-full max-w-[400px] bg-neutrals-gray-1 p-4 mt-5 rounded-lg justify-start gap-3">
       <img
         alt={`${data?.title} node cover banner`}
         className="rounded-md w-[62px] h-[62px]"
@@ -40,6 +39,6 @@ export default function NodeMetadataPreview({
         {authors && <p className="text-neutrals-gray-5 text-xs">{authors}</p>}
         <p className="text-xs text-neutrals-gray-5">{dpidLink}</p>
       </div>
-    </FlexRowAligned>
+    </div>
   );
 }

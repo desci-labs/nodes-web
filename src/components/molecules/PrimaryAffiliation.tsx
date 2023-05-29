@@ -1,7 +1,4 @@
 import * as Yup from "yup";
-
-import cx from "classnames";
-import { IconAffiliation } from "@icons";
 import { useUser } from "@src/state/user/hooks";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
@@ -10,11 +7,6 @@ import {
   useForm,
   useFormContext,
 } from "react-hook-form";
-import {
-  FlexColumnAligned,
-  FlexRowAligned,
-  FlexRowSpaceBetween,
-} from "@components/styled";
 import PrimaryButton from "../atoms/PrimaryButton";
 import AffiliateSelector from "./AffiliateSelector";
 import { Organization } from "@src/types/client";
@@ -36,7 +28,7 @@ export const AffiliationForm = () => {
   }>();
 
   return (
-    <FlexColumnAligned className="w-full">
+    <div className="flex flex-col items-center w-full">
       <Controller
         name="organization"
         control={control}
@@ -52,7 +44,7 @@ export const AffiliationForm = () => {
           />
         )}
       />
-      <FlexRowSpaceBetween className="justify-between gap-5 w-full mt-1">
+      <div className="flex justify-between gap-5 w-full mt-1">
         <p className="text-sm text-neutrals-gray-5">
           Tap enter to add multiple affiliations.
         </p>
@@ -64,8 +56,8 @@ export const AffiliationForm = () => {
         >
           Find ROR PID
         </a>
-      </FlexRowSpaceBetween>
-    </FlexColumnAligned>
+      </div>
+    </div>
   );
 };
 
@@ -93,7 +85,7 @@ export default function PrimaryAffiliation(props: {
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <FlexColumnAligned className="gap-3">
+        <div className="flex flex-col items-center gap-3">
           {/* <button
             type="button"
             disabled
@@ -103,13 +95,13 @@ export default function PrimaryAffiliation(props: {
             )}
           >
             <div className="text-sm font-medium text-gray-900 justify-start flex w-full">
-              <FlexRowAligned className="text-neutrals-gray-4 flex items-center gap-4 self-baseline">
+              <div className="flex items-center text-neutrals-gray-4 flex items-center gap-4 self-baseline">
                 <IconAffiliation
                   width={20}
                   className="-mb-1 inline-block self-baseline stroke-neutrals-gray-4"
                 />{" "}
                 Connect to your Institution (coming soon..)
-              </FlexRowAligned>
+              </div>
             </div>
           </button> */}
 
@@ -128,7 +120,7 @@ export default function PrimaryAffiliation(props: {
             />
           )}
         />
-        <FlexRowSpaceBetween className="justify-between gap-5 w-full">
+        <div className="flex items-center justify-between justify-between gap-5 w-full">
           <p className="text-sm text-neutrals-gray-5">
             Tap enter to add multiple affiliations.
           </p>
@@ -140,10 +132,10 @@ export default function PrimaryAffiliation(props: {
           >
             Find ROR PID
           </a>
-        </FlexRowSpaceBetween> */}
+        </div> */}
           <AffiliationForm />
           {isDirty ? (
-            <FlexRowAligned className="items-center justify-end w-full">
+            <div className="flex items-center justify-end w-full">
               <PrimaryButton
                 disabled={!isValid || isSubmitting}
                 className="flex gap-2"
@@ -151,9 +143,9 @@ export default function PrimaryAffiliation(props: {
               >
                 Save Affiliations
               </PrimaryButton>
-            </FlexRowAligned>
+            </div>
           ) : null}
-        </FlexColumnAligned>
+        </div>
       </form>
     </FormProvider>
   );

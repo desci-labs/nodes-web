@@ -3,7 +3,6 @@ import { showMetadataForComponent } from "@src/state/drive/driveSlice";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { FlexRowSpaceBetween } from "../styled";
 import { IconOrcidOutline } from "./Icons";
 import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 
@@ -37,7 +36,7 @@ const MetadataPreview: React.FC<MetadataPreviewProps> = ({
         );
       }}
     >
-      <FlexRowSpaceBetween>
+      <div className="flex items-center justify-between">
         <div className="bg-black rounded-tl-md rounded-bl-md h-7 shrink-0 px-2 flex items-center justify-center">
           <IconOrcidOutline width={18} />
         </div>
@@ -49,7 +48,7 @@ const MetadataPreview: React.FC<MetadataPreviewProps> = ({
           {text}
           {/* <span className="inline-block truncate line-clamp-1">{text}</span> */}
         </div>
-      </FlexRowSpaceBetween>
+      </div>
     </button>
   );
 };
