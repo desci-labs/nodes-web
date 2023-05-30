@@ -3,16 +3,29 @@ import React, { useImperativeHandle } from "react";
 
 import CreateableSelect from "@components/molecules/FormInputs/CreateableSelect";
 import {} from "@src/components/organisms/ManuscriptReader";
-import { DataComponent, DataComponentMetadata } from "@desci-labs/desci-models";
+import {
+  DataComponent,
+  DataComponentMetadata,
+  ResearchObjectComponentType,
+} from "@desci-labs/desci-models";
 import { Controller, useFormContext } from "react-hook-form";
 import InsetLabelSmallInput from "./FormInputs/InsetLabelSmallInput";
 import SpacerHorizontal from "@components/atoms/SpacerHorizontal";
 import SelectList from "@src/components/molecules/FormInputs/SelectList";
 import { DriveMetadata } from "@src/components/organisms/Drive";
-import { PDF_LICENSE_TYPES } from "@src/helper/license";
+import { CODE_LICENSE_TYPES, PDF_LICENSE_TYPES } from "@src/helper/license";
+import { useDrive } from "@src/state/drive/hooks";
 
 export const licenseSelectLabelRenderer = (l: any) => {
-  let licenseMapColor: { [key: string]: string } = {
+  const codeLicenseMap = CODE_LICENSE_TYPES.map((l) => l.name).reduce(
+    (map: Record<string, string>, licence) => {
+      map[licence] = "bg-green-500";
+      return map;
+    },
+    {}
+  );
+
+  let licenseMapColor: Record<string, string> = {
     "CC BY": "bg-green-500",
     "CC BY-SA": "bg-green-500",
     "CC BY-ND": "bg-red-500",
@@ -20,6 +33,7 @@ export const licenseSelectLabelRenderer = (l: any) => {
     "CC BY-NC-SA": "bg-yellow-300",
     "CC BY-NC-ND": "bg-red-500",
     CC0: "bg-green-500",
+    ...codeLicenseMap,
   };
   return (
     <div className="inline-flex justify-center gap-2 items-center h-4">
@@ -47,9 +61,7 @@ interface DatasetMetadataFormProps {
 
 export const DatasetMetadataForm = React.forwardRef(
   (props: DatasetMetadataFormProps, ref: any) => {
-    const defaultLicense = PDF_LICENSE_TYPES.find(
-      (l) => l.name === props.defaultLicense
-    );
+    const { fileMetadataBeingEdited } = useDrive();
 
     const { control, handleSubmit, watch } = useFormContext<DriveMetadata>();
     watch("description");
@@ -70,6 +82,23 @@ export const DatasetMetadataForm = React.forwardRef(
       }),
       [onSubmitHandler]
     );
+    const defaultLicense = PDF_LICENSE_TYPES.find(
+      (l) => l.name === props.defaultLicense
+    );
+
+    const getLicenseTypes = () => {
+      if (
+        fileMetadataBeingEdited?.componentType ===
+        ResearchObjectComponentType.PDF
+      )
+        return PDF_LICENSE_TYPES;
+      if (
+        fileMetadataBeingEdited?.componentType ===
+        ResearchObjectComponentType.CODE
+      )
+        return CODE_LICENSE_TYPES;
+      else return PDF_LICENSE_TYPES;
+    };
 
     return (
       <div>
@@ -245,12 +274,13 @@ export const DatasetMetadataForm = React.forwardRef(
             control={control}
             defaultValue={defaultLicense?.name}
             render={({ field }: any) => {
-              const val = PDF_LICENSE_TYPES.find((l) => l.name === field.value);
+              const licenses = getLicenseTypes();
+              const val = licenses.find((l) => l.name === field.value);
               return (
                 <SelectList
                   label="Choose license"
                   mandatory={true}
-                  data={PDF_LICENSE_TYPES}
+                  data={licenses}
                   labelRenderer={licenseSelectLabelRenderer}
                   field={{
                     ...field,
