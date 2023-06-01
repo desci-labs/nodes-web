@@ -6,10 +6,11 @@ import { AiOutlineDownload } from "react-icons/ai";
 import { VscLinkExternal } from "react-icons/vsc";
 import { SlPencil } from "react-icons/sl";
 import { BsTrash } from "react-icons/bs";
-import { IconAssignType } from "@src/icons";
+import { IconAssignType, IconMoveDir } from "@src/icons";
 import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 
 const menuListLabel: Record<Actions, string> = {
+  MOVE: "Move to",
   RENAME: "Rename",
   PREVIEW: "Preview",
   DOWNLOAD: "Download",
@@ -19,6 +20,7 @@ const menuListLabel: Record<Actions, string> = {
 };
 
 const tracking: Record<Actions, AvailableUserActionLogTypes> = {
+  MOVE: AvailableUserActionLogTypes.ctxDriveMove,
   RENAME: AvailableUserActionLogTypes.ctxDriveRename,
   PREVIEW: AvailableUserActionLogTypes.ctxDrivePreview,
   DOWNLOAD: AvailableUserActionLogTypes.ctxDriveDownload,
@@ -34,6 +36,7 @@ type IconType = React.FunctionComponent<
 >;
 
 const ActionIcons: Record<Actions, IconType> = {
+  MOVE: IconMoveDir,
   PREVIEW: VscLinkExternal,
   RENAME: SlPencil,
   DOWNLOAD: AiOutlineDownload,

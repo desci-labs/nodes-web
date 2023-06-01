@@ -150,6 +150,7 @@ import { ReactComponent as IconSvcResearchHub } from "@images/icons/service-rese
 import { ReactComponent as IconSvcYoutube } from "@images/icons/service-youtube.svg";
 import { ReactComponent as IconSvcLink } from "@images/icons/service-any.svg";
 import { ReactComponent as IconAnnotate } from "@images/annotation.svg";
+import { ReactComponent as IconMoveDir } from "@images/icons/move-dir.svg";
 import { ReactComponent as IconGoogleScholar } from "@images/google_scholar.svg";
 import { ReactComponent as IconAffiliation } from "@images/affiliation.svg";
 import { ReactComponent as IconRor } from "@images/ror.svg";
@@ -165,6 +166,7 @@ const IconZoomIn = React.memo(IconZoomInBase);
 const IconZoomOut = React.memo(IconZoomOutBase);
 
 export {
+  IconMoveDir,
   IconComponentOtherLink,
   IconSvcLink,
   IconSvcColab,

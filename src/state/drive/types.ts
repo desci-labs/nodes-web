@@ -60,6 +60,10 @@ export interface AssignTypeThunkPayload {
   type: ResearchObjectComponentType;
   subtype?: ResearchObjectComponentSubtypes;
 }
+export interface MoveFilesThunkPayload {
+  item: DriveObject;
+  newDirectory: DriveObject;
+}
 
 export type DrivePath = string;
 export type CidString = string;

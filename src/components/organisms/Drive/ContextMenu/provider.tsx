@@ -6,20 +6,29 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { DriveObject } from "../types";
 import { buildMenu } from "./MenuList";
+import DriveTableFilePicker, { DrivePickerMode } from "../../DriveFilePicker";
+import { useSetter } from "@src/store/accessors";
+import { moveFilesThunk } from "@src/state/drive/driveSlice";
+import { useClickAway } from "react-use";
+import { navigateToDrivePickerByPath } from "@src/state/drive/driveSlice";
+import toast from "react-hot-toast";
 
 type ShowMenuProps = { coords: { x: number; y: number }; file: DriveObject };
 const setContext = createContext<{
   showMenu: (props: ShowMenuProps) => void;
   renderMenu: (file: DriveObject) => void;
   closeMenu: () => void;
+  openDrivePicker: () => void;
 }>({
   showMenu: () => {},
   closeMenu: () => {},
   renderMenu: () => {},
+  openDrivePicker: () => {},
 });
 const getContext = createContext<{ coords: { x: number; y: number } | null }>({
   coords: { x: 0, y: 0 },
@@ -40,7 +49,12 @@ function calMaxHeight() {
 export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
   const [coords, setCoords] = useState<{ x: number; y: number } | null>(null);
   const [Menu, setMenu] = useState<ReactNode>();
+  const [showDrivePicker, setShowDrivePicker] = useState<boolean>(false);
   const escKeyPressed = useKeyPress("Escape");
+  const [lastFile, setLastFile] = useState<DriveObject | undefined>(undefined);
+  const pickerRef = useRef<HTMLDivElement>(null);
+
+  const dispatch = useSetter();
 
   const handleClick = useCallback((event: MouseEvent) => {
     const path = event.composedPath && event.composedPath();
@@ -58,13 +72,27 @@ export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
 
   const renderMenu = (file: DriveObject) => {
     const menuToRender = buildMenu(file);
+    setLastFile(file);
     setMenu(menuToRender);
   };
 
   const closeMenu = () => {
     setMenu(null);
-    setCoords(null);
+    // setCoords(null);
   };
+
+  const openDrivePicker = () => {
+    dispatch(
+      navigateToDrivePickerByPath({
+        path: lastFile?.path!,
+      })
+    );
+    setShowDrivePicker(true);
+  };
+
+  useClickAway(pickerRef, (e) => {
+    setShowDrivePicker(false);
+  });
 
   useEffect(() => {
     if (escKeyPressed) {
@@ -78,7 +106,9 @@ export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
   );
 
   return (
-    <setContext.Provider value={{ showMenu, closeMenu, renderMenu }}>
+    <setContext.Provider
+      value={{ showMenu, closeMenu, renderMenu, openDrivePicker }}
+    >
       <getContext.Provider value={{ coords }}>
         {!!Menu && (
           <div
@@ -101,6 +131,47 @@ export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
           </div>
         )}
         {props.children}
+        {showDrivePicker && (
+          <div
+            ref={pickerRef}
+            className="w-64 absolute bg-neutrals-black rounded-xl text-white h-fit shadow-lg before:w-5 before:h-5 before:absolute before:rotate-45 before:-inset-2 before:left-20 before:bg-neutrals-black"
+            style={{
+              left: coords?.x,
+              top: coords?.y! - 50,
+            }}
+          >
+            <DriveTableFilePicker
+              onRequestClose={() => {
+                setShowDrivePicker(false);
+              }}
+              onInsert={(newDir: DriveObject) => {
+                if (newDir.contains?.some((f) => f.name === lastFile?.name)) {
+                  toast.error(
+                    `Move failed, '${lastFile?.name}' already exists in '${newDir.name}'`,
+                    {
+                      position: "top-center",
+                      duration: 5000,
+                      style: {
+                        marginTop: 55,
+                        borderRadius: "10px",
+                        background: "#111",
+                        color: "#fff",
+                        zIndex: 150,
+                      },
+                    }
+                  );
+                  return;
+                }
+                dispatch(
+                  moveFilesThunk({ item: lastFile!, newDirectory: newDir })
+                );
+                setShowDrivePicker(false);
+              }}
+              mode={DrivePickerMode.MOVE}
+              contextDrive={lastFile}
+            />
+          </div>
+        )}
       </getContext.Provider>
     </setContext.Provider>
   );
