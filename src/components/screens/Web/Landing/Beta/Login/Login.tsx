@@ -176,6 +176,15 @@ export default function Login() {
   };
   const [focused, setFocused] = useState(false);
 
+  const focusText = () => {
+    if (step === Steps.VerifyCode) {
+      codeRef.current?.focus();
+    }
+    if (step === Steps.ConfirmEmail) {
+      inputRef.current?.focus();
+    }
+  }
+
   return (
     <>
       <PdfHeader />(
@@ -196,16 +205,10 @@ export default function Login() {
           // eslint-disable-next-line react-hooks/exhaustive-deps
           [step, goBack, isLoading]
         )}
-        onClick={() => {
-          if (step === Steps.VerifyCode) {
-            codeRef.current?.focus();
-          }
-          if (step === Steps.ConfirmEmail) {
-            inputRef.current?.focus();
-          }
-        }}
+        onClickBody={focusText}
+        onClick={focusText}
       >
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} >
           <div className="px-6 pt-5">
             <div className="flex flex-row justify-between items-start ">
               <div className="text-left flex gap-0.5 flex-col">

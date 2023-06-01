@@ -92,6 +92,7 @@ export interface PopOverProps {
   zIndex?: number;
   displayCloseIcon?: boolean;
   onClick?: (e: any) => void;
+  onClickBody?: (e: any) => void;
 }
 
 const PopOver = (props: React.PropsWithChildren<PopOverProps>) => {
@@ -105,6 +106,7 @@ const PopOver = (props: React.PropsWithChildren<PopOverProps>) => {
     style = {},
     className = "",
     onClick,
+    onClickBody
     // footer,
     // displayCloseIcon = true,
   } = props;
@@ -153,6 +155,7 @@ const PopOver = (props: React.PropsWithChildren<PopOverProps>) => {
         className={className}
         onClick={(e: any) => {
           e.stopPropagation();
+          onClickBody?.(e);
         }}
       >
         <div className="relative">
