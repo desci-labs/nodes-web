@@ -125,6 +125,8 @@ module.exports = {
         "success-pending": "#ffc01e",
         success: "rgb(0, 161, 128)",
         superblue: "#2772E0",
+        popover: "#333333",
+        "popover-foreground": "#525659",
         "neutrals-gray-1": "#272727",
         "neutrals-gray-2": "#333333",
         "neutrals-gray-3": "#525659",
@@ -170,6 +172,7 @@ module.exports = {
       },
       boxShadow: {
         upperTealShadow: "inset 0px 1px 0 0 rgba(40, 170, 196, 1)",
+        popover: "0px 4px 8px rgba(0, 0, 0, 0.5)",
         Input: "inset 0px -2px 0px #555659",
         InputActive: "inset 0px -2px 0px #65C3CA",
         verifyInput: "inset 0px -1px 0px #555659",
