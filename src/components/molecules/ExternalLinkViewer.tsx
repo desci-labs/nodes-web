@@ -6,13 +6,27 @@ interface Props {
   component: ExternalLinkComponent;
 }
 const ExternalLinkViewer = ({ component }: Props) => {
+
+  const sanitizeUrl = (link: string) => {
+    try {
+      new URL(link);
+      return link
+    } catch (e) {
+      console.log('error sanitizing', e)
+      return "";
+    }
+  };
+
+  const sanitizedUrl = sanitizeUrl(component.payload.url);
+
   return (
     <div className="w-screen h-screen text-white text-center justify-center items-center flex">
-      <div
+      <button
         onClick={() => {
-          window.open(component.payload.url, "_blank");
+          sanitizedUrl && window.open(component.payload.url, "_blank");
         }}
-        className="-mt-48 rounded-md bg-neutrals-gray-1 w-96 mx-auto text-sm flex flex-col items-center gap-8 p-8 hover:bg-neutrals-gray-2 cursor-pointer group"
+        disabled={!sanitizedUrl}
+        className="-mt-48 rounded-md bg-neutrals-gray-1 w-96 mx-auto text-sm flex flex-col items-center gap-8 p-8 hover:bg-neutrals-gray-2 disabled:bg-neutrals-gray-4 cursor-pointer group"
       >
         <h1>External Link</h1>
         <div className="bg-black p-4 rounded-md shadow-inner w-64 break-all block font-mono text-[10px]">
@@ -21,7 +35,7 @@ const ExternalLinkViewer = ({ component }: Props) => {
         <button className="flex gap-1">
           Visit URL <IconViewLink />
         </button>
-      </div>
+      </button>
     </div>
   );
 };
