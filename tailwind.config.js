@@ -174,9 +174,9 @@ module.exports = {
         upperTealShadow: "inset 0px 1px 0 0 rgba(40, 170, 196, 1)",
         popover: "0px 4px 8px rgba(0, 0, 0, 0.5)",
         Input: "inset 0px -2px 0px #555659",
-        InputActive: "inset 0px -2px 0px #65C3CA",
+        InputActive: "inset 0px -2px 0px #28AAC4",
         verifyInput: "inset 0px -1px 0px #555659",
-        verifyInputActive: "inset 0px -1px 0px #65C3CA",
+        verifyInputActive: "inset 0px -1px 0px #28AAC4",
       },
       minWidth: {
         "49xl": "490xl",
