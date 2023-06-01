@@ -38,6 +38,7 @@ const NodeCard = ({
       className={`select-none flex flex-col cursor-pointer group`}
       onClick={() => {
         if (!disabled) {
+          console.log("open node", disabled, targetUrl);
           dispatch(setPublicView(false));
           onClick && onClick();
           navigate(targetUrl);
@@ -45,7 +46,7 @@ const NodeCard = ({
       }}
     >
       <div
-        className={`rounded-t-md p-4 bg-[#333333] gap-2 flex flex-col group-hover:!border-neutrals-gray-3 border-2 border-transparent border-b-0 ${
+        className={`rounded-t-md p-2 bg-[#333333] gap-2 flex flex-col group-hover:!border-neutrals-gray-3 border-2 border-transparent border-b-0 ${
           isCurrent ? "!border-white" : ""
         }`}
       >

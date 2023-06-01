@@ -71,8 +71,8 @@ export default React.memo(function PaneNodeCollection() {
             node={node}
             key={`node-card-sidepanel-${node.uuid}`}
             isCurrent={node.uuid === currentObjectId}
-            // onHandleEdit={() => setOpen(true)}
             onClick={() => {
+              console.log('clicked')
               setTimeout(() => {
                 setIsAddingComponent(false);
                 setIsAddingSubcomponent(false);

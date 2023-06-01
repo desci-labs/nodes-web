@@ -134,11 +134,11 @@ export default function NodeCardMenu({
     ]);
   };
   return (
-    <Menubar className="border-0 relative">
+    <Menubar className="border-0 relative h-8 p-0">
       <MenubarMenu>
-        <MenubarTrigger className="cursor-pointer text-white p-2">
+        <MenubarTrigger className="cursor-pointer text-white p-0">
           <IconKebab
-            width={20}
+            width={18}
             onClick={(e) => {
               e.stopPropagation();
             }}
@@ -184,7 +184,6 @@ export default function NodeCardMenu({
               className="hover:bg-neutrals-gray-3"
               disabled={isDeleting}
               onClick={(e) => {
-                console.log("ddddddddelete");
                 e.stopPropagation();
                 handleDelete();
               }}
