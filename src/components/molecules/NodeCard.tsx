@@ -1,35 +1,29 @@
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { RESEARCH_OBJECT_NODES_PREFIX } from "@desci-labs/desci-models";
 import { ResearchNode } from "@src/state/api/types";
-import { IconKebab, IconNodeNoMetadata, IconPen } from "@icons";
-import { useState } from "react";
+import { IconNodeNoMetadata } from "@icons";
 import { useNavigate } from "react-router-dom";
 import { app, site } from "@src/constants/routes";
-import ContextMenu from "../organisms/ContextMenu";
 import { useSetter } from "@src/store/accessors";
-import { setEditNodeId, setPublicView } from "@src/state/nodes/nodeReader";
+import { setPublicView } from "@src/state/nodes/nodeReader";
+import NodeCardMenu from "./NodeCardMenu";
 
 export interface NodeProps {
   id?: number;
   disabled?: boolean;
   isCurrent?: boolean;
   onClick?: () => void;
-  onHandleEdit?: () => void;
+  node: ResearchNode;
 }
 
 const NodeCard = ({
-  id,
-  uuid,
-  title,
-  updatedAt,
+  node,
+  isCurrent,
   disabled,
   isPublished,
-  isCurrent,
   onClick,
-  onHandleEdit,
 }: ResearchNode & NodeProps) => {
+  const { uuid, title, updatedAt } = node;
   const dispatch = useSetter();
-  const { setShowAddNewNode } = useManuscriptController([]);
   const navigate = useNavigate();
 
   const updatedTime: number = Date.parse(updatedAt || new Date().toString());
@@ -37,10 +31,7 @@ const NodeCard = ({
     dateStyle: "medium",
     timeStyle: "short",
   };
-  const targetUrl = `${site.app}${app.nodes}/${RESEARCH_OBJECT_NODES_PREFIX}${
-    uuid || id
-  }`;
-  const [showContext, setShowContext] = useState<boolean>(false);
+  const targetUrl = `${site.app}${app.nodes}/${RESEARCH_OBJECT_NODES_PREFIX}${uuid}`;
 
   return (
     <div
@@ -68,37 +59,8 @@ const NodeCard = ({
                 Last update:{" "}
                 {new Date(updatedTime).toLocaleString("en-US", options)}
               </div>
-              <div className="ml-auto relative">
-                <IconKebab
-                  width={20}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowContext(!showContext);
-                  }}
-                />
-                {showContext && (
-                  <ContextMenu
-                    items={[
-                      {
-                        icon: <IconPen fill="white" />,
-                        label: <span>Edit</span>,
-                        onClick: () => {
-                          dispatch(
-                            setEditNodeId({
-                              uuid: uuid!,
-                              title,
-                              licenseType: null,
-                            })
-                          );
-                          onHandleEdit?.();
-                          setShowAddNewNode(true);
-                        },
-                      },
-                    ]}
-                    close={() => setShowContext(false)}
-                    className={"right-0"}
-                  />
-                )}
+              <div className="ml-auto ">
+                <NodeCardMenu node={node} />
               </div>
             </>
           ) : null}

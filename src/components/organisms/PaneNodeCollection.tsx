@@ -25,9 +25,8 @@ export interface EditNodeInfo {
 }
 
 export default React.memo(function PaneNodeCollection() {
-  const { setIsAddingComponent, setIsAddingSubcomponent, setShowAddNewNode } =
+  const { showAddNewNode, setIsAddingComponent, setIsAddingSubcomponent, setShowAddNewNode } =
     useManuscriptController(["showAddNewNode"]);
-  const [isOpen, setOpen] = useState(false);
 
   const dispatch = useSetter();
   const { isNew, currentObjectId } = useNodeReader();
@@ -69,9 +68,10 @@ export default React.memo(function PaneNodeCollection() {
         nodes?.map((node) => (
           <NodeCard
             {...node}
+            node={node}
             key={`node-card-sidepanel-${node.uuid}`}
             isCurrent={node.uuid === currentObjectId}
-            onHandleEdit={() => setOpen(true)}
+            // onHandleEdit={() => setOpen(true)}
             onClick={() => {
               setTimeout(() => {
                 setIsAddingComponent(false);
@@ -121,7 +121,6 @@ export default React.memo(function PaneNodeCollection() {
             onClick={() => {
               dispatch(setPublicView(false));
               setShowAddNewNode(true);
-              setOpen(true);
               postUserAction(AvailableUserActionLogTypes.btnCreateNewNode);
             }}
             className="h-10 text-lg"
@@ -132,7 +131,10 @@ export default React.memo(function PaneNodeCollection() {
         <PerfectScrollbar className="overflow-y-scroll w-full justify-center flex h-full px-4 sm:px-0">
           {isLoading ? <NodeCollectionLoader /> : <LoadedNodesCollection />}
         </PerfectScrollbar>
-        <CreateNodeModal isOpen={isOpen} onDismiss={() => setOpen(false)} />
+        <CreateNodeModal
+          isOpen={showAddNewNode}
+          onDismiss={() => setShowAddNewNode(false)}
+        />
       </div>
     </div>
   );

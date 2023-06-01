@@ -8,6 +8,7 @@ import { useUser } from "@src/state/user/hooks";
 import ProfilePopOver from "@src/components/screens/Profile";
 import { useGetter } from "@src/store/accessors";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
+import DialogViewer from "@src/components/molecules/DialogViewer";
 
 export default function AppWrapper(props: PropsWithChildren<{}>) {
   const userProfile = useUser();
@@ -66,7 +67,10 @@ export function Popovers() {
    ]);
   return (
     <>
-      {showProfileUpdater && <ProfilePopOver onClose={() => setShowProfileUpdater(false)} />}
+      <DialogViewer />
+      {showProfileUpdater && (
+        <ProfilePopOver onClose={() => setShowProfileUpdater(false)} />
+      )}
     </>
   );
 }

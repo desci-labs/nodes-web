@@ -1,9 +1,7 @@
-import { addComponentToDraft } from "@api/index";
 import PrimaryButton from "@components/atoms/PrimaryButton";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import {
   capitalize,
-  cleanupManifestUrl,
   extractCodeRepoName,
 } from "@components/utils";
 import {
@@ -13,14 +11,11 @@ import {
   IconRightArrowThin,
   IconX,
 } from "@icons";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import AddDocumentComponent from "@components/molecules/AddComponentFlow/AddDocumentComponent";
 import AddCodeComponent from "@components/molecules/AddComponentFlow/AddCodeComponent";
 
-import { useNavigate } from "react-router-dom";
 import {
-  RESEARCH_OBJECT_NODES_PREFIX,
   ResearchObjectComponentLinkSubtype,
   ResearchObjectComponentType,
   ResearchObjectV1,
@@ -32,23 +27,17 @@ import { useNodeReader } from "@src/state/nodes/hooks";
 import { useSetter } from "@src/store/accessors";
 import {
   setComponentStack,
-  setCurrentObjectId,
-  setManifest,
 } from "@src/state/nodes/nodeReader";
 import Modal, { ModalProps } from "@src/components/molecules/Modal";
-import { useDispatch } from "react-redux";
 import {
   addExternalLinkThunk,
   addFilesToDrive,
 } from "@src/state/drive/driveSlice";
 import { useFileUpload } from "react-use-file-upload/dist/lib/useFileUpload";
-import { ExternalUrl } from "@src/state/drive/types";
 import { useDrive } from "@src/state/drive/hooks";
 import {
-  DRIVE_FULL_EXTERNAL_LINKS_PATH,
   findUniqueName,
 } from "@src/state/drive/utils";
-import toast from "react-hot-toast";
 
 export const componentData = {
   [ResearchObjectComponentType.PDF]: {
@@ -120,8 +109,6 @@ const AddComponentPopOver = (
   const { nodeTree, currentDrive } = useDrive();
   // const [fileLink, setFileLink] = useState<string>();
   const { files, clearAllFiles, setFiles } = useFileUpload();
-
-  const navigate = useNavigate();
 
   const close = (force: boolean) => {
     setError(undefined);
@@ -209,10 +196,22 @@ const AddComponentPopOver = (
           addComponentType === ResearchObjectComponentType.CODE &&
           urlOrDoi?.length
         );
+      case ResearchObjectComponentType.LINK:
+        return !validateLink(urlOrDoi || "");
       default:
         return false;
     }
   };
+
+  const validateLink = (link: string) => {
+     try {
+       new URL(link);
+       return true;
+     } catch (e) {
+       console.log("error validation link", link, e);
+       return false;
+     }
+  }
 
   const handleSaveNewComponent = async () => {
     setError(undefined);
