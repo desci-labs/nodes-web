@@ -1,10 +1,5 @@
-import { RESEARCH_OBJECT_NODES_PREFIX } from "@desci-labs/desci-models";
 import { ResearchNode } from "@src/state/api/types";
 import { IconNodeNoMetadata } from "@icons";
-import { useNavigate } from "react-router-dom";
-import { app, site } from "@src/constants/routes";
-import { useSetter } from "@src/store/accessors";
-import { setPublicView } from "@src/state/nodes/nodeReader";
 import NodeCardMenu from "./NodeCardMenu";
 
 export interface NodeProps {
@@ -22,27 +17,23 @@ const NodeCard = ({
   isPublished,
   onClick,
 }: ResearchNode & NodeProps) => {
-  const { uuid, title, updatedAt } = node;
-  const dispatch = useSetter();
-  const navigate = useNavigate();
+  const { title, updatedAt } = node;
+  // const dispatch = useSetter();
+  // const navigate = useNavigate();
 
   const updatedTime: number = Date.parse(updatedAt || new Date().toString());
   const options: Intl.DateTimeFormatOptions = {
     dateStyle: "medium",
     timeStyle: "short",
   };
-  const targetUrl = `${site.app}${app.nodes}/${RESEARCH_OBJECT_NODES_PREFIX}${uuid}`;
+  // const targetUrl = `${site.app}${app.nodes}/${RESEARCH_OBJECT_NODES_PREFIX}${uuid}`;
 
   return (
     <div
       className={`select-none flex flex-col cursor-pointer group`}
-      onClick={() => {
-        if (!disabled) {
-          console.log("open node", disabled, targetUrl);
-          dispatch(setPublicView(false));
-          onClick && onClick();
-          navigate(targetUrl);
-        }
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick?.();
       }}
     >
       <div

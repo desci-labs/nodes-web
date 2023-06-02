@@ -18,6 +18,9 @@ import {
 import CreateNodeModal from "./CreateNodeModal/CreateNodeModal";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
+import { useNavigate } from "react-router-dom";
+import { app, site } from "@src/constants/routes";
+import { RESEARCH_OBJECT_NODES_PREFIX } from "@desci-labs/desci-models";
 export interface EditNodeInfo {
   uuid: string;
   title: string;
@@ -27,6 +30,7 @@ export interface EditNodeInfo {
 export default React.memo(function PaneNodeCollection() {
   const { showAddNewNode, setIsAddingComponent, setIsAddingSubcomponent, setShowAddNewNode } =
     useManuscriptController(["showAddNewNode"]);
+  const navigate = useNavigate();
 
   const dispatch = useSetter();
   const { isNew, currentObjectId } = useNodeReader();
@@ -73,7 +77,12 @@ export default React.memo(function PaneNodeCollection() {
             isCurrent={node.uuid === currentObjectId}
             onClick={() => {
               console.log('clicked')
+              dispatch(setPublicView(false));
+              const targetUrl = `${site.app}${app.nodes}/${RESEARCH_OBJECT_NODES_PREFIX}${node.uuid}`;
+              
               setTimeout(() => {
+                navigate(targetUrl);
+                console.log("navigate", targetUrl);
                 setIsAddingComponent(false);
                 setIsAddingSubcomponent(false);
                 dispatch(toggleResearchPanel(true));
