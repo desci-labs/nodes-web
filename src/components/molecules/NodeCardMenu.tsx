@@ -134,11 +134,11 @@ export default function NodeCardMenu({
     ]);
   };
   return (
-    <Menubar className="border-0 relative">
+    <Menubar className="border-0 relative h-8 p-0">
       <MenubarMenu>
-        <MenubarTrigger className="cursor-pointer text-white p-2">
+        <MenubarTrigger className="cursor-pointer text-white p-0">
           <IconKebab
-            width={20}
+            width={18}
             onClick={(e) => {
               e.stopPropagation();
             }}
@@ -149,10 +149,10 @@ export default function NodeCardMenu({
             align="end"
             sideOffset={-30}
             alignOffset={30}
-            className="border-0 bg-neutrals-gray-2"
+            className="border-0"
           >
             <MenubarItem
-              className="hover:bg-neutrals-gray-3"
+              className=""
               onClick={(e) => {
                 e.stopPropagation();
                 dispatch(
@@ -173,7 +173,7 @@ export default function NodeCardMenu({
 
             {isDpidSupported ? (
               <MenubarItem
-                className="hover:bg-neutrals-gray-3 disabled:hover:bg-transparent disabled:opacity-5"
+                className="disabled:hover:bg-transparent disabled:opacity-5"
                 onClick={copydPid}
               >
                 <IconCopyLink fill="white" width={15} />
@@ -181,10 +181,9 @@ export default function NodeCardMenu({
               </MenubarItem>
             ) : null}
             <MenubarItem
-              className="hover:bg-neutrals-gray-3"
+              className=""
               disabled={isDeleting}
               onClick={(e) => {
-                console.log("ddddddddelete");
                 e.stopPropagation();
                 handleDelete();
               }}
