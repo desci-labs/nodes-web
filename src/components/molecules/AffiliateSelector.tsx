@@ -45,7 +45,7 @@ function AffiliateSelector(props: Props) {
   const dataCacheRef = useRef<{ [key: string]: Organization }>({});
 
   const onHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value.trim());
+    setInput(e.target.value);
   };
 
   const defaultValues = useMemo(

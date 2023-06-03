@@ -7,6 +7,18 @@
   --tint-primary-hover: #77dde4;
 }
 
+@layer base {
+  :root {
+    --popover: #333333;
+    --popover-foreground: #525659;
+  }
+
+  .dark {
+    --popover: #333333;
+    --popover-foreground: #525659;
+  }
+}
+
 @font-face {
   font-family: RomanSerif;
   src: url("https://static1.squarespace.com/static/6194ac0755c08d159c52743c/t/61ec5eaf3ad0a2796cea8f64/1642880687453/RomanSerif.ttf");
@@ -148,7 +160,6 @@ input:-webkit-autofill:active {
       rgba(2, 0, 36, 0.015865721288515378) 0%,
       rgba(0, 0, 0, 0.8618040966386554) 100%
     );
-     
   }
 
   .mobile-reader-header {
