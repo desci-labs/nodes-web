@@ -47,7 +47,6 @@ const ActionIcons: Record<Actions, IconType> = {
 
 function MenuList({ file }: { file: DriveObject }) {
   const { closeMenu } = useContextMenu();
-  console.log(file);
   return (
     <ul className="py-1">
       {Object.keys(menuListLabel).map((action, i) => (

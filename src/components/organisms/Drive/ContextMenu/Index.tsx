@@ -26,8 +26,9 @@ const normalizePosition = (
   }
 
   if (outOfBoundsOnY) {
-    normalizedY =
-      scopeOffsetY + scope.clientHeight - $contextMenu.clientHeight + 100;
+    const extra = mouseY + $contextMenu.clientHeight - $body.clientHeight;
+    // normalizedY = scopeOffsetY + scope.clientHeight - $contextMenu.clientHeight + 100;
+    normalizedY = normalizedY - extra < 0 ?  scopeOffsetY + scope.clientHeight - $contextMenu.clientHeight + 100 : normalizedY - extra;
   }
 
   return { x: normalizedX, y: normalizedY };
