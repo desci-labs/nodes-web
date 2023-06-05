@@ -49,7 +49,7 @@ export const historySlice = createSlice({
         payload,
       }: PayloadAction<{ id: string; commits: ResearchObjectV1History[] }>
     ) => {
-      if (state.pendingCommits[payload.id]) {
+      if (!state.pendingCommits[payload.id]) {
         state.pendingCommits[payload.id] = [];
       }
 

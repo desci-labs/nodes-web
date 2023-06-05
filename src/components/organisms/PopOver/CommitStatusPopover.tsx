@@ -21,10 +21,7 @@ import {
 import WarningSign from "@components/atoms/warning-sign";
 import { publishResearchObject, updateDraft } from "@api/index";
 import axios from "axios";
-import {
-  ResearchObjectComponentType,
-  ResearchObjectV1,
-} from "@desci-labs/desci-models";
+import { ResearchObjectV1 } from "@desci-labs/desci-models";
 import { SpinnerCircular } from "spinners-react";
 import { Wallet } from "@src/state/api/types";
 import { useHistoryReader, useNodeReader } from "@src/state/nodes/hooks";
@@ -36,7 +33,6 @@ import { nodesApi } from "@src/state/api/nodes";
 import Modal, { ModalProps } from "@src/components/molecules/Modal";
 import WalletManagerModal from "@src/components/molecules/WalletManagerModal";
 import { fetchTreeThunk } from "@src/state/drive/driveSlice";
-import { useNodesMediaCoverQuery } from "@src/state/api/media";
 
 export const LOCALSTORAGE_TXN_LIST = "desci:txn-list";
 
@@ -212,6 +208,7 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
           date: new Date().getTime(),
           transaction: {
             id: tx.hash,
+            cid: modifiedObject.cid,
           },
         };
         dispatch(
@@ -277,6 +274,7 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
     } finally {
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [manifestCid, manifestData, currentObjectId, address, setError]);
 
   const { wallets } = useManuscriptController(["wallets"]);
