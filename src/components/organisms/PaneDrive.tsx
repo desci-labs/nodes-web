@@ -2,7 +2,6 @@ import DropTargetFullScreen from "@components/atoms/DropTargetFullScreen";
 import SpacerHorizontal from "@components/atoms/SpacerHorizontal";
 import SidePanelStorage from "@components/molecules/SidePanelStorage";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
-// import { __log } from "@components/utils";
 import { useEffect, useRef, useState } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import DriveTable, { DriveObject } from "./Drive";
@@ -15,9 +14,7 @@ import { useDrive } from "@src/state/drive/hooks";
 import { addFilesToDrive } from "@src/state/drive/driveSlice";
 import { isMobile } from "react-device-detect";
 import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
-import PrimaryButton from "../atoms/PrimaryButton";
 import { EyeIcon } from "@heroicons/react/solid";
-import ContextMenu from "./ContextMenu";
 import ButtonSecondary from "../atoms/ButtonSecondary";
 import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 
