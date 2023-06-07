@@ -2,7 +2,6 @@ import ButtonMysterious from "@src/components/atoms/ButtonMysterious";
 import DropTargetFullScreen from "@src/components/atoms/DropTargetFullScreen";
 import IndicatorSaving from "@src/components/atoms/IndicatorSaving";
 import SavingIndicator from "@src/components/atoms/SavingIndicator";
-import DialogViewer from "@src/components/molecules/DialogViewer";
 import FloatingActionBar from "@src/components/molecules/FloatingActionBar";
 import PopOverAlphaConsent from "@src/components/molecules/PopOverAlphaConsent";
 import ComponentAdd from "@src/components/screens/ComponentAdd";
@@ -68,7 +67,6 @@ export default function Editor({ isLoading }: ReaderViewerProps) {
         }, [dispatch])}
       />
       <IndicatorSaving />
-      <DialogViewer />
       <ButtonMysterious />
       <PopOverAlphaConsent />
       <SavingIndicator />

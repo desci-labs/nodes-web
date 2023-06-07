@@ -12,6 +12,7 @@ import { useManuscriptController } from "@src/components/organisms/ManuscriptRea
 import { useSetter } from "@src/store/accessors";
 import { removeAuthor, saveManifestDraft } from "@src/state/nodes/nodeReader";
 import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
+import PreviewModal from "@src/components/organisms/PopOver/CreditsModal/PreviewModal";
 
 interface CreditsProps {}
 
@@ -20,6 +21,7 @@ const Credits = (props: CreditsProps) => {
   const { manifest: manifestData, mode, publicView } = useNodeReader();
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number>();
 
   if (
@@ -97,6 +99,10 @@ const Credits = (props: CreditsProps) => {
               >
                 <Section
                   key={index}
+                  onClick={() => {
+                    setIsPreviewOpen(true);
+                    setSelectedIndex(index);
+                  }}
                   header={() => (
                     <SectionHeader
                       title={() => (
@@ -107,12 +113,21 @@ const Credits = (props: CreditsProps) => {
                           <span className="text-xs text-gray-400">
                             {author.role}
                           </span>
+                          {author.organizations ? (
+                            <span className="text-xs text-gray-400">
+                              {author.organizations[0]?.name}
+                            </span>
+                          ) : null}
                         </div>
                       )}
                       action={() => (
-                        <Identicon string={author.name} size={20} />
+                        <Identicon
+                          className="rounded-full"
+                          string={author.name}
+                          size={20}
+                        />
                       )}
-                      className="w-full bg-zinc-100 dark:bg-muted-900"
+                      className="w-full bg-zinc-100 dark:bg-muted-900 gap-1"
                       containerStyle={{ alignItems: "start" }}
                     />
                   )}
@@ -128,6 +143,17 @@ const Credits = (props: CreditsProps) => {
           isOpen={isOpen}
           onDismiss={() => {
             setIsOpen(false);
+            setSelectedIndex(undefined);
+          }}
+        />
+      )}
+      {isPreviewOpen && (
+        <PreviewModal
+          author={manifestData?.authors?.[selectedIndex ?? -1]}
+          id={selectedIndex}
+          isOpen={isPreviewOpen}
+          onDismiss={() => {
+            setIsPreviewOpen(false);
             setSelectedIndex(undefined);
           }}
         />

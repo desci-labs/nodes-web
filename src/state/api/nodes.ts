@@ -60,8 +60,7 @@ export const nodesApi = api.injectEndpoints({
           } catch (error) {}
         },
       }
-    ),
-    
+    ),  
     revokeShareLink: builder.mutation<{ shareId: string; ok: boolean }, string>(
       {
         query: (shareId: string) => {
@@ -85,12 +84,34 @@ export const nodesApi = api.injectEndpoints({
         },
       }
     ),
+    deleteNode: builder.mutation<{ ok: boolean }, string>(
+      {
+        query: (uuid: string) => {
+          return {
+            url: `${endpoints.v1.nodes.index}/${uuid}`,
+            method: "DELETE",
+          };
+        },
+        async onQueryStarted(args: string, { dispatch, queryFulfilled }) {
+          try {
+            console.log("start delete", args);
+            await queryFulfilled;
+            dispatch(
+              nodesApi.util.invalidateTags([
+                { type: tags.nodes },
+              ])
+            );
+          } catch (error) {}
+        },
+      }
+    ),
   }),
 });
 
 export const {
   useGetNodesQuery,
   usePrivateShareQuery,
+  useDeleteNodeMutation,
   useRevokeShareLinkMutation,
   useCreateShareLinkMutation,
 } = nodesApi;

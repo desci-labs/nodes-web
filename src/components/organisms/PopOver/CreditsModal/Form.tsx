@@ -5,9 +5,14 @@ import DividerSimple from "@src/components/atoms/DividerSimple";
 import { AuthorFormValues, CreditModalProps, ORCID_PATTERN } from "./schema";
 import useCreditsForm from "./useCreditsForm";
 import SelectList from "@src/components/molecules/FormInputs/SelectList";
-import { ResearchObjectV1AuthorRole } from "@desci-labs/desci-models";
+import {
+  ResearchObjectV1AuthorRole,
+  ResearchObjectV1Organization,
+} from "@desci-labs/desci-models";
 import { ExternalLinkIcon } from "@heroicons/react/solid";
 import formatString from "format-string-by-pattern";
+import AffiliateSelector from "@src/components/molecules/AffiliateSelector";
+import { FlexRowSpaceBetween } from "@src/components/styled";
 
 const authorRoles = Object.values(ResearchObjectV1AuthorRole).map(
   (role, idx) => ({
@@ -24,6 +29,7 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
     register,
     setValue,
     handleSubmit,
+    trigger,
     formState: { errors },
   } = useFormContext<AuthorFormValues>();
 
@@ -60,14 +66,15 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
       <SelectList
         label="Role"
         mandatory={true}
+        defaultValue={{ id: -1, name: "Role" }}
         data={authorRoles}
         value={authorRoles.find((role) => role.name === selectedRole)}
-        onSelect={(val) =>
+        onSelect={(val) => {
           setValue("role", val.name, {
             shouldDirty: true,
             shouldValidate: true,
-          })
-        }
+          });
+        }}
         {...register("role")}
       />
       <span className="text-red-400 text-xs">{errors.role?.message}</span>
@@ -104,7 +111,7 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
           <span className="text-red-400 text-xs h-8 block">
             {errors.orcid?.message}
           </span>
-        ) : (
+        ) : orcid ? (
           <a
             className="flex flex-row gap-1 items-center h-8 text-md font-extrabold text-tint-primary hover:text-tint-primary-hover tracking-tight disabled:text-neutrals-gray-4"
             href={`${errors?.orcid ? "" : `${ORCID_SITE}${orcid}`}`}
@@ -114,7 +121,37 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
           >
             Open ORCiD Record <ExternalLinkIcon height={16} />
           </a>
-        )}
+        ) : null}
+      </div>
+      <div className="mt-8">
+        <Controller
+          name="organizations"
+          control={control}
+          render={({ field }: any) => (
+            <AffiliateSelector
+              defaultValues={field?.value ?? []}
+              onChange={(val: ResearchObjectV1Organization[]) => {
+                setValue("organizations", val, {
+                  shouldValidate: false,
+                  shouldDirty: true,
+                });
+              }}
+            />
+          )}
+        />
+        <FlexRowSpaceBetween className="justify-between gap-5 w-full">
+          <p className="text-sm text-neutrals-gray-5">
+            Tap enter to add multiple affiliations.
+          </p>
+          <a
+            className="flex flex-row gap-1 items-center text-sm font-extrabold text-tint-primary hover:text-tint-primary-hover tracking-tight disabled:text-neutrals-gray-4"
+            href="https://ror.org/search"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Find ROR PID
+          </a>
+        </FlexRowSpaceBetween>
       </div>
       <div className="mt-8">
         <Controller
@@ -132,6 +169,21 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
         <span className="text-red-400 text-xs">
           {errors.googleScholar?.message}
         </span>
+      </div>
+      <div className="mt-8">
+        <Controller
+          name="github"
+          control={control}
+          render={({ field }) => (
+            <InsetLabelSmallInput
+              label="Github profile"
+              {...field}
+              ref={register("github").ref}
+              optional={true}
+            />
+          )}
+        />
+        <span className="text-red-400 text-xs">{errors.github?.message}</span>
       </div>
     </form>
   );

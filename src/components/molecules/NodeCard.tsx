@@ -1,60 +1,43 @@
-import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
-import { RESEARCH_OBJECT_NODES_PREFIX } from "@desci-labs/desci-models";
 import { ResearchNode } from "@src/state/api/types";
-import { IconKebab, IconNodeNoMetadata, IconPen } from "@icons";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { app, site } from "@src/constants/routes";
-import ContextMenu from "../organisms/ContextMenu";
-import { useSetter } from "@src/store/accessors";
-import { setEditNodeId, setPublicView } from "@src/state/nodes/nodeReader";
+import { IconNodeNoMetadata } from "@icons";
+import NodeCardMenu from "./NodeCardMenu";
 
 export interface NodeProps {
   id?: number;
   disabled?: boolean;
   isCurrent?: boolean;
   onClick?: () => void;
-  onHandleEdit?: () => void;
+  node: ResearchNode;
 }
 
 const NodeCard = ({
-  id,
-  uuid,
-  title,
-  updatedAt,
+  node,
+  isCurrent,
   disabled,
   isPublished,
-  isCurrent,
   onClick,
-  onHandleEdit,
 }: ResearchNode & NodeProps) => {
-  const dispatch = useSetter();
-  const { setShowAddNewNode } = useManuscriptController([]);
-  const navigate = useNavigate();
+  const { title, updatedAt } = node;
+  // const dispatch = useSetter();
+  // const navigate = useNavigate();
 
   const updatedTime: number = Date.parse(updatedAt || new Date().toString());
   const options: Intl.DateTimeFormatOptions = {
     dateStyle: "medium",
     timeStyle: "short",
   };
-  const targetUrl = `${site.app}${app.nodes}/${RESEARCH_OBJECT_NODES_PREFIX}${
-    uuid || id
-  }`;
-  const [showContext, setShowContext] = useState<boolean>(false);
+  // const targetUrl = `${site.app}${app.nodes}/${RESEARCH_OBJECT_NODES_PREFIX}${uuid}`;
 
   return (
     <div
       className={`select-none flex flex-col cursor-pointer group`}
-      onClick={() => {
-        if (!disabled) {
-          dispatch(setPublicView(false));
-          onClick && onClick();
-          navigate(targetUrl);
-        }
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick?.();
       }}
     >
       <div
-        className={`rounded-t-md p-4 bg-[#333333] gap-2 flex flex-col group-hover:!border-neutrals-gray-3 border-2 border-transparent border-b-0 ${
+        className={`rounded-t-md p-2 bg-[#333333] gap-2 flex flex-col group-hover:!border-neutrals-gray-3 border-2 border-transparent border-b-0 ${
           isCurrent ? "!border-white" : ""
         }`}
       >
@@ -68,37 +51,8 @@ const NodeCard = ({
                 Last update:{" "}
                 {new Date(updatedTime).toLocaleString("en-US", options)}
               </div>
-              <div className="ml-auto relative">
-                <IconKebab
-                  width={20}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowContext(!showContext);
-                  }}
-                />
-                {showContext && (
-                  <ContextMenu
-                    items={[
-                      {
-                        icon: <IconPen fill="white" />,
-                        label: <span>Edit</span>,
-                        onClick: () => {
-                          dispatch(
-                            setEditNodeId({
-                              uuid: uuid!,
-                              title,
-                              licenseType: null,
-                            })
-                          );
-                          onHandleEdit?.();
-                          setShowAddNewNode(true);
-                        },
-                      },
-                    ]}
-                    close={() => setShowContext(false)}
-                    className={"right-0"}
-                  />
-                )}
+              <div className="ml-auto ">
+                <NodeCardMenu node={node} />
               </div>
             </>
           ) : null}

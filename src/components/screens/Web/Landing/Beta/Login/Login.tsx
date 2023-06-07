@@ -5,13 +5,12 @@ import InsetLabelInput from "@src/components/molecules/FormInputs/InsetLabelInpu
 import PdfHeader from "@src/components/organisms/PdfHeader";
 import PopOver from "@src/components/organisms/PopOver";
 import { site } from "@src/constants/routes";
-import { IconGreenCheck, IconInfo, IconWarning, IconX } from "@src/icons";
+import { IconGreenCheck, IconWarning, IconX } from "@src/icons";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useLogin, { Steps } from "./useLogin";
 import { useGetter } from "@src/store/accessors";
 import VerificationInput from "react-verification-input";
-import { MailIcon } from "@heroicons/react/solid";
 import { termsConsent } from "@src/api";
 
 const labels: Record<Steps, { title: string; caption: string }> = {
@@ -38,6 +37,32 @@ const labels: Record<Steps, { title: string; caption: string }> = {
   },
 };
 
+function TermsAndPrivacy() {
+  return (
+    <div className="w-[270px] px-4 text-white text-xs">
+      By clicking Log In, you agree to the DeSci Labs{" "}
+      <Link
+        className="text-tint-primary hover:text-tint-primary-hover"
+        to={site.terms}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Terms of Service
+      </Link>{" "}
+      and{" "}
+      <Link
+        className="text-tint-primary hover:text-tint-primary-hover"
+        to={site.privacy}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Privacy Policy
+      </Link>
+      .
+    </div>
+  );
+}
+
 const Footer = ({ step, goBack, nextStep, isLoading, code }: any) => {
   const { checkingCode } = useGetter((state) => state.preferences);
   return (
@@ -60,33 +85,11 @@ const Footer = ({ step, goBack, nextStep, isLoading, code }: any) => {
           </PrimaryButton>
         )}
         {/** terms of service description*/}
-        {[Steps.ConfirmEmail].includes(step) && (
-          <div className="w-[270px] px-4 text-white text-xs">
-            By clicking Log In, you agree to the DeSci Labs{" "}
-            <Link
-              className="text-tint-primary hover:text-tint-primary-hover"
-              to={site.terms}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Terms of Service
-            </Link>{" "}
-            and{" "}
-            <Link
-              className="text-tint-primary hover:text-tint-primary-hover"
-              to={site.privacy}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Privacy Policy
-            </Link>
-            .
-          </div>
-        )}
+        {[Steps.ConfirmEmail].includes(step) && <TermsAndPrivacy />}
         {[Steps.ConfirmEmail, Steps.VerifyCode].includes(step) && (
           <PrimaryButton
             disabled={
-              isLoading || (step == Steps.VerifyCode && code?.length < 6)
+              isLoading || (step === Steps.VerifyCode && code?.length < 6)
             }
             type="submit"
             onClick={nextStep}
@@ -96,7 +99,7 @@ const Footer = ({ step, goBack, nextStep, isLoading, code }: any) => {
             {isLoading && checkingCode && (
               <DefaultSpinner color="white" size={20} />
             )}
-            {step == Steps.VerifyCode && isLoading && !checkingCode && (
+            {step === Steps.VerifyCode && isLoading && !checkingCode && (
               <IconGreenCheck width={20} />
             )}
           </PrimaryButton>
@@ -124,7 +127,6 @@ export default function Login() {
   const codeRef = useRef<HTMLInputElement | null>(null);
 
   const handleRef = useCallback((node) => {
-    console.log("Node", node);
     if (node) {
       inputRef.current = node;
     }
@@ -174,6 +176,15 @@ export default function Login() {
   };
   const [focused, setFocused] = useState(false);
 
+  const focusText = () => {
+    if (step === Steps.VerifyCode) {
+      codeRef.current?.focus();
+    }
+    if (step === Steps.ConfirmEmail) {
+      inputRef.current?.focus();
+    }
+  }
+
   return (
     <>
       <PdfHeader />(
@@ -194,16 +205,10 @@ export default function Login() {
           // eslint-disable-next-line react-hooks/exhaustive-deps
           [step, goBack, isLoading]
         )}
-        onClick={() => {
-          if (step === Steps.VerifyCode) {
-            codeRef.current?.focus();
-          }
-          if (step === Steps.ConfirmEmail) {
-            inputRef.current?.focus();
-          }
-        }}
+        onClickBody={focusText}
+        onClick={focusText}
       >
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} >
           <div className="px-6 pt-5">
             <div className="flex flex-row justify-between items-start ">
               <div className="text-left flex gap-0.5 flex-col">
@@ -260,11 +265,11 @@ export default function Login() {
                         ? "!border-transparent !outline-transparent !ring-none"
                         : ""
                     }`,
-                    character: `text-white !outline-0 bg-neutrals-gray-1 border-b-4 border-b-neutrals-gray-5  rounded-md rounded-b-none`,
+                    character: `text-white !outline-0 bg-neutrals-gray-1 rounded-md rounded-b-none shadow-Input`,
                     characterSelected: ` ${
-                      focused ? "!border-b-tint-primary" : " !text-transparent"
+                      focused ? "shadow-verifyInputActive" : "!text-transparent"
                     } `,
-                    characterInactive: "text-transparent",
+                    characterInactive: "text-transparent shadow-verifyInput",
                   }}
                   onBlur={() => {
                     setFocused(false);

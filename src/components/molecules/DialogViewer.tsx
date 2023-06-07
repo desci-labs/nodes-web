@@ -2,6 +2,7 @@ import { useManuscriptController } from "@src/components/organisms/ManuscriptRea
 
 const DialogViewer = () => {
   const { dialogs, setDialogs } = useManuscriptController(["dialogs"]);
+
   return dialogs.length ? (
     <div
       className="fixed w-screen h-screen bg-[rgba(0,0,0,0.4)] z-[1150] top-0"

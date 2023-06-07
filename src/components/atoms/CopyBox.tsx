@@ -1,3 +1,4 @@
+import { cn } from "@src/lib/utils";
 import React, { useState } from "react";
 
 interface Props {
@@ -15,12 +16,14 @@ const CopyBox = ({
   children,
   className,
 }: Props) => {
-  const [copyBtn, setCopyBtn] = useState<string>(copyButtonText);
+  const [copied, setCopied] = useState(false);
 
   function handleCopy() {
-    setCopyBtn("Copied!");
+    setCopied((prev) => true);
     navigator.clipboard.writeText(copyText);
-    setTimeout(() => setCopyBtn(copyButtonText), 750);
+    setTimeout(() => {
+      setCopied((prev) => false);
+    }, 750);
   }
   return (
     <div
@@ -29,11 +32,14 @@ const CopyBox = ({
       <h1 className="font-bold select-none">{title}</h1>
       <div className="my-1">{children}</div>
       <button
-        className="text-tint-primary font-bold hover:text-tint-primary-hover disabled:text-neutrals-gray-4"
+        className={cn(
+          "text-tint-primary font-bold hover:text-tint-primary-hover disabled:text-neutrals-gray-4",
+          copied && "text-states-success hover:text-states-success"
+        )}
         onClick={handleCopy}
         disabled={!copyText}
       >
-        {copyBtn}
+        {copied ? "Copied!" : copyButtonText}
       </button>
     </div>
   );

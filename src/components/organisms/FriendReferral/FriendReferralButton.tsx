@@ -6,7 +6,7 @@ const FriendReferralButton = (props: { onHandleClick?: () => void }) => {
 
   return (
     <button
-      className="text-left text-xs hover:bg-[#222429] cursor-pointer w-full py-2 focus:bg-[#222429] outline-none"
+      className="text-left group text-xs hover:bg-[#222429] cursor-pointer w-full py-2 focus:bg-[#222429] outline-none"
       onClick={() => {
         props?.onHandleClick?.();
         dispatch(setShowReferralModal(true));

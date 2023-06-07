@@ -121,7 +121,7 @@ const UserMenu = (props: Props) => {
       }}
       className={`${
         open ? "rounded-b-lg" : "rounded-2xl"
-      } relative inline-block duration-100 text-left z-[110] select-none group overflow-hidden  transition-all shadow-sm`}
+      } relative inline-block duration-100 text-left z-[110] select-none overflow-hidden  transition-all shadow-sm`}
       style={{
         marginRight: doPad ? 10 : undefined,
         height: open ? (isAdmin ? 460 : 260) : 35,
@@ -192,7 +192,7 @@ const UserMenu = (props: Props) => {
           }}
         >
           <div
-            className="px-4 py-4 hover:bg-[#222429] bg-[#191B1C] cursor-pointer group"
+            className="px-4 py-2 hover:bg-[#222429] bg-[#191B1C] cursor-pointer group"
             onClick={() => {
               navigate(`${site.app}${app.profile}`);
             }}
@@ -307,7 +307,7 @@ const UserMenu = (props: Props) => {
                 type="button"
                 className={classNames(
                   false ? "bg-gray-100" : "",
-                  "block w-full text-left px-4 py-4 text-xs hover:bg-[#222429] bg-[#191B1C] text-white"
+                  "block w-full text-left px-4 py-2 text-xs hover:bg-[#222429] bg-[#191B1C] text-white"
                 )}
                 onClick={async (e) => {
                   dispatch(setOrcid({ orcidData: {} }));

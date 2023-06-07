@@ -125,6 +125,10 @@ module.exports = {
         "success-pending": "#ffc01e",
         success: "rgb(0, 161, 128)",
         superblue: "#2772E0",
+        popover: {
+          DEFAULT: "var(--popover)",
+          foreground: "var(--popover-foreground)",
+        },
         "neutrals-gray-1": "#272727",
         "neutrals-gray-2": "#333333",
         "neutrals-gray-3": "#525659",
@@ -146,6 +150,9 @@ module.exports = {
         "state-success": "#00A180",
         "state-pending": "#FFC01E",
         "state-error": "#C96664",
+        social: {
+          twitter: "#00ACEE",
+        },
         muted: {
           100: "#969696",
           200: "#cccccc",
@@ -167,6 +174,11 @@ module.exports = {
       },
       boxShadow: {
         upperTealShadow: "inset 0px 1px 0 0 rgba(40, 170, 196, 1)",
+        popovers: "0 1px 20px 1px rgba(0, 0, 0, .5)",
+        Input: "inset 0px -2px 0px #555659",
+        InputActive: "inset 0px -2px 0px #28AAC4",
+        verifyInput: "inset 0px -1px 0px #555659",
+        verifyInputActive: "inset 0px -1px 0px #28AAC4",
       },
       minWidth: {
         "49xl": "490xl",

@@ -14,7 +14,7 @@ export default function LoaderHistoryEntry({
 }: LoaderHistoryEntryProps) {
   return (
     <div
-      className={`relative ml-6 w-[258px] -mr-6 mt-4 h-[110px] animate-pulse duration-100 opacity-25`}
+      className={`relative ml-6 w-[258px] -mr-6 mt-4 h-[110px] animate-pulse duration-1000 opacity-25`}
     >
       <TimelineGutterBulletLayer>
         <TimelineBullet selected={selected}>

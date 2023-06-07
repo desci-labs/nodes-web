@@ -44,11 +44,11 @@ export default function InsetLabelInput(props: InsetLabelInputProps) {
     <div
       className={`${
         fieldState?.isTouched && mandatory && !field.value
-          ? "border border-rose-400"
-          : "border border-transparent border-b border-b-[#969696]"
+          ? "border-none border-rose-400"
+          : "border-none border-transparent border-b border-b-[#969696]"
       } ${
-        focused ? "!border-b-tint-primary" : ""
-      } group border-b-4 rounded-b-none rounded-md px-3 py-2 shadow-sm bg-white dark:bg-[#272727] w-full ${className}`}
+        focused ? "shadow-InputActive" : "shadow-Input"
+      } group rounded-md rounded-b-none px-3 py-2 bg-white dark:bg-[#272727] w-full ${className}`}
     >
       <label
         className={`block text-xs font-bold text-gray-900 dark:text-white pointer-events-none ${props.labelClassName}`}

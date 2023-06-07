@@ -1,3 +1,5 @@
+import { Organization } from "@src/types/client";
+
 export interface Wallet {
   address: string;
   nickname: string;
@@ -12,6 +14,8 @@ export interface UserProfile {
     googleScholarUrl: string;
     name: string;
     orcid: string;
+    // rorPid?: string[];
+    userOrganization?: Organization[];
   };
   wallets: Wallet[];
 }

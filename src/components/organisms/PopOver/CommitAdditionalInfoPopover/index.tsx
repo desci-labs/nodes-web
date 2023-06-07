@@ -19,6 +19,7 @@ import {
   toggleResearchPanel,
 } from "@src/state/nodes/nodeReader";
 import Modal, { ModalProps } from "@src/components/molecules/Modal";
+import { CheckBox, CheckBoxText } from "@src/components/atoms/Checkbox";
 
 // const GATEWAY_OPTIONS = [
 //   {
@@ -33,19 +34,6 @@ const SectionTitle = styled.p.attrs({
 const SectionText = styled<any>("p").attrs((props) => ({
   className: `text-xs font-medium ${props.className}`,
 }))``;
-
-const CheckBox = styled.input.attrs((props) => ({
-  type: "checkbox",
-  className: `focus:ring-tint-primary h-4 w-4 text-tint-primary border-2 border-tint-primary bg-transparent rounded`,
-  name: props.name,
-  id: props.name,
-}))``;
-const CheckBoxText = styled<any>("label").attrs((props) => ({
-  for: props.htmlFor,
-  className: "cursor-pointer select-none text-xs",
-}))`
-  margin-left: 0.5rem;
-`;
 
 export const SlideDownContainer = styled(SlideDown)<{ overflow?: boolean }>`
   transition-duration: 0.25s;

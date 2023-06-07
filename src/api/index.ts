@@ -15,12 +15,13 @@ import {
   PublicDataReferenceOnIpfsMirror,
 } from "@src/types/client";
 import {
-  CidString,
+  // CidString,
   DrivePath,
   ExternalCid,
   ExternalUrl,
 } from "@src/state/drive/types";
 import { arrayXor } from "@src/components/utils";
+import { UserProfile } from "@src/state/api/types";
 import mixpanel from "mixpanel-browser";
 import { segmentAnalytics } from "@src/App/App";
 import * as amplitude from "@amplitude/analytics-browser";
@@ -48,6 +49,7 @@ export const config = (preset?: AxiosRequestConfig): AxiosRequestConfig => {
     withCredentials: true,
     headers: {
       authorization: `Bearer ${localStorage.getItem("auth")}`,
+      ...preset?.headers,
     },
   };
 };
@@ -77,6 +79,13 @@ export const termsConsent = async (obj: any, uuid: string) => {
       ...obj,
       uuid,
     },
+    config()
+  );
+  return data;
+};
+export const checkConsent = async () => {
+  const { data } = await axios.get(
+    `${SCIWEAVE_URL}/v1/nodes/consent`,
     config()
   );
   return data;
@@ -271,13 +280,26 @@ export const retrieveDoi = async (
 };
 
 export const getUserData = async () => {
-  const { data } = await axios.get(`${SCIWEAVE_URL}/v1/auth/profile`, config());
+  const { data } = await axios.get<any, { data: UserProfile }>(
+    `${SCIWEAVE_URL}/v1/auth/profile`,
+    config()
+  );
   return data;
 };
 
 export const getResearchFields = async (search: string = "") => {
   const { data } = await axios.get(
     `${SCIWEAVE_URL}/v1/researchFields?q=${search}`,
+    config()
+  );
+  return data;
+};
+
+// { items: { id: string; name: string }
+// AxiosResponse<{ items: { id: string; name: string } }
+export const getRorQueries = async (value: string = "") => {
+  const { data } = await axios.get<any, any>(
+    `${SCIWEAVE_URL}/v1/ror?query=${value.trim()}`,
     config()
   );
   return data;
@@ -490,6 +512,23 @@ export const renameData = async (
   return data;
 };
 
+export const moveData = async (
+  uuid: string,
+  oldPath: string,
+  newPath: string
+) => {
+  const { data } = await axios.post(
+    `${SCIWEAVE_URL}/v1/data/move`,
+    {
+      uuid,
+      oldPath,
+      newPath,
+    },
+    config()
+  );
+  return data;
+};
+
 export const query = async (query: string) => {
   const payload = JSON.stringify({
     query,
@@ -588,6 +627,7 @@ export enum AvailableUserActionLogTypes {
   btnDriveStarToggle = "btnDriveStarToggle",
   saveMetadata = "saveMetadata",
   btnInspectMetadata = "btnInspectMetadata",
+  ctxDriveMove = "ctxDriveMove",
   ctxDriveRename = "ctxDriveRename",
   ctxDrivePreview = "ctxDrivePreview",
   ctxDriveDownload = "ctxDriveDownload",

@@ -1,4 +1,5 @@
 export enum Actions {
+  MOVE = "MOVE",
   RENAME = "RENAME",
   DOWNLOAD = "DOWNLOAD",
   PREVIEW = "PREVIEW",

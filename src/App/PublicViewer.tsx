@@ -8,26 +8,32 @@ import { useLocation, useNavigate } from "react-router-dom";
 import PdfHeader from "@src/components/organisms/PdfHeader";
 import ManuscriptReader from "@src/components/organisms/ManuscriptReader";
 import MobileReader from "@src/components/organisms/ManuscriptReader/MobileReader/MobileReader";
+import { useSetter } from "@src/store/accessors";
+import { tags } from "@src/state/api/tags";
+import { api } from "@src/state/api";
 
-const auth = localStorage.getItem("auth");
+// const auth = localStorage.getItem("auth");
 export default function PublicViewer() {
   // page scroll behaviour init hook
   useScroll();
   const user = useUser();
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useSetter();
 
   useEffect(() => {
-    if (auth) {
-      if (user) {
-        if (location.pathname === "/" || location.pathname === "web/magic") {
-          navigate(`${site.app}${app.nodes}`);
-        }
+    dispatch(api.util.invalidateTags([{ type: tags.user }]));
+
+    if (user.userId > 0) {
+      if (location.pathname === "/" || location.pathname === "web/magic") {
+        navigate(`${site.app}${app.nodes}/start`);
       }
-    } else if (location.pathname === "/") {
-      navigate(`${site.web}${location.search}`);
+    } else {
+      if (location.pathname === "/") {
+        navigate(`${site.web}${location.search}`);
+      }
     }
-  }, [user, location.pathname, navigate, location.search]);
+  }, [user.userId, location.pathname, navigate, location.search, dispatch]);
 
   return (
     <div

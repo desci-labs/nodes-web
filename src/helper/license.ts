@@ -1,4 +1,12 @@
-export const PDF_LICENSE_TYPES = [
+export type License = {
+  id: number;
+  name: string;
+  shortName: string;
+  spdx: string;
+  description: string;
+};
+
+export const PDF_LICENSE_TYPES: Array<License> = [
   {
     id: 1,
     name: "CC BY",
@@ -57,7 +65,7 @@ export const PDF_LICENSE_TYPES = [
   },
 ];
 
-export const CODE_LICENSE_TYPES = [
+export const CODE_LICENSE_TYPES: Array<License> = [
   {
     id: 10,
     name: "MIT License",

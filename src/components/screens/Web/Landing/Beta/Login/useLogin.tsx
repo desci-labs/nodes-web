@@ -107,19 +107,16 @@ export default function useLogin() {
 
     try {
       const data = await redeemMagicLink({ email, code }).unwrap();
-
       const referralUuid = queryString.parse(search).referralUuid as string;
 
       if (!data.user.token) {
         throw Error("Login failed");
       }
-
       localStorage.setItem("auth", data.user.token);
-
       const userData = await getUserData();
       dispatch(setUser(userData));
       dispatch(api.util.invalidateTags([{ type: tags.user }]));
-
+      
       if (referralUuid) {
         /**
          * TODO: We likely want to show a success or something similar
@@ -132,7 +129,8 @@ export default function useLogin() {
       // setIsLoading(false);
       // setCheckingCode(false);
       dispatch(setCheckingCode(false));
-      setTimeout(() => {
+
+      setTimeout(async () => {
         navigate(`${site.app}${app.nodes}/start`);
       }, 500);
     } catch (err) {
@@ -143,7 +141,7 @@ export default function useLogin() {
         if (errorMessage === "Not found") {
           errorMessage = "Code invalid or expired";
           setStep((prevStep) =>
-            prevStep != Steps.VerifyCode || Steps.AutoLogin
+            prevStep !== Steps.VerifyCode || Steps.AutoLogin
               ? prevStep
               : Steps.VerifyCode
           );

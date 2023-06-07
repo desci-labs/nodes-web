@@ -18,6 +18,9 @@ import {
 import CreateNodeModal from "./CreateNodeModal/CreateNodeModal";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
+import { useNavigate } from "react-router-dom";
+import { app, site } from "@src/constants/routes";
+import { RESEARCH_OBJECT_NODES_PREFIX } from "@desci-labs/desci-models";
 export interface EditNodeInfo {
   uuid: string;
   title: string;
@@ -25,9 +28,9 @@ export interface EditNodeInfo {
 }
 
 export default React.memo(function PaneNodeCollection() {
-  const { setIsAddingComponent, setIsAddingSubcomponent, setShowAddNewNode } =
+  const { showAddNewNode, setIsAddingComponent, setIsAddingSubcomponent, setShowAddNewNode } =
     useManuscriptController(["showAddNewNode"]);
-  const [isOpen, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   const dispatch = useSetter();
   const { isNew, currentObjectId } = useNodeReader();
@@ -69,11 +72,17 @@ export default React.memo(function PaneNodeCollection() {
         nodes?.map((node) => (
           <NodeCard
             {...node}
+            node={node}
             key={`node-card-sidepanel-${node.uuid}`}
             isCurrent={node.uuid === currentObjectId}
-            onHandleEdit={() => setOpen(true)}
             onClick={() => {
+              console.log('clicked')
+              dispatch(setPublicView(false));
+              const targetUrl = `${site.app}${app.nodes}/${RESEARCH_OBJECT_NODES_PREFIX}${node.uuid}`;
+              
               setTimeout(() => {
+                navigate(targetUrl);
+                console.log("navigate", targetUrl);
                 setIsAddingComponent(false);
                 setIsAddingSubcomponent(false);
                 dispatch(toggleResearchPanel(true));
@@ -121,7 +130,6 @@ export default React.memo(function PaneNodeCollection() {
             onClick={() => {
               dispatch(setPublicView(false));
               setShowAddNewNode(true);
-              setOpen(true);
               postUserAction(AvailableUserActionLogTypes.btnCreateNewNode);
             }}
             className="h-10 text-lg"
@@ -132,7 +140,10 @@ export default React.memo(function PaneNodeCollection() {
         <PerfectScrollbar className="overflow-y-scroll w-full justify-center flex h-full px-4 sm:px-0">
           {isLoading ? <NodeCollectionLoader /> : <LoadedNodesCollection />}
         </PerfectScrollbar>
-        <CreateNodeModal isOpen={isOpen} onDismiss={() => setOpen(false)} />
+        <CreateNodeModal
+          isOpen={showAddNewNode}
+          onDismiss={() => setShowAddNewNode(false)}
+        />
       </div>
     </div>
   );

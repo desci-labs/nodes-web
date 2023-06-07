@@ -1,8 +1,11 @@
 import React, { useEffect } from "react";
 import "./style.scss";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useGetUser } from "@src/hooks/useGetUser";
 import { site } from "@src/constants/routes";
+// import { checkConsent } from "@src/api";
+// import { useSetter } from "@src/store/accessors";
+// import { setPreferences } from "@src/state/preferences/preferencesSlice";
+import { useUser } from "@src/state/user/hooks";
 import { useEffectOnce } from "react-use";
 import mixpanel from "mixpanel-browser";
 import { AnalyticsBrowser } from "@segment/analytics-next";
@@ -23,7 +26,15 @@ if (process.env.REACT_APP_SEGMENT_TOKEN) {
 const App = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { userData, error } = useGetUser();
+  // const dispatch = useSetter();
+  const userProfile = useUser();
+
+  // const runCheck = useCallback(async () => {
+  //   const { consent } = await checkConsent();
+  //   if (!consent) {
+  //     dispatch(setPreferences({ showProfileRegistration: true }));
+  //   }
+  // }, [dispatch]);
 
   useEffectOnce(() => {
     if (process.env.REACT_APP_MIXPANEL_TOKEN) {
@@ -46,37 +57,30 @@ const App = () => {
   });
 
   useEffect(() => {
-    if (error) {
-      console.error(error);
+    const userId = userProfile.userId;
 
-      if (location.pathname.indexOf("/nodes/start") > -1) {
-        navigate(site.app);
+    if (userId > 0) {
+      if (process.env.REACT_APP_MIXPANEL_TOKEN) {
+        mixpanel.identify(`${userId}`);
       }
-      return;
-    }
-
-    if (userData) {
-      let user = userData;
-      if (user) {
-        if (process.env.REACT_APP_MIXPANEL_TOKEN) {
-          mixpanel.identify(user.userId);
-        }
-        if (process.env.REACT_APP_SEGMENT_TOKEN) {
-          segmentAnalytics.identify(user.userId);
-        }
-        if (process.env.REACT_APP_AMPLITUDE_TOKEN) {
-          amplitude.setUserId(`${user.userId}`);
-        }
-
-        if (
-          !location.pathname.includes("/app/") ||
-          location.pathname === "/login"
-        ) {
-          navigate(`${site.app}/nodes/start`);
-        }
+      if (process.env.REACT_APP_SEGMENT_TOKEN) {
+        segmentAnalytics.identify(`${userId}`);
       }
+      if (process.env.REACT_APP_AMPLITUDE_TOKEN) {
+        amplitude.setUserId(`${userId}`);
+      }
+
+      if (
+        !location.pathname.includes("/app/") ||
+        location.pathname === "/login"
+      ) {
+        navigate(`${site.app}/nodes/start`);
+      }
+    } else {
+      // console.log("Redirect to login page", userProfile);
+      // navigate(`${site.web}`);
     }
-  }, [userData, error, location.pathname, navigate]);
+  }, [userProfile, location.pathname, navigate]);
 
   useEffect(() => {
     trackPage(location.pathname);
