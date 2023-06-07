@@ -24,6 +24,7 @@ export default function NodeMetadataPreview({
   const formatter = useMemo(() => getFormatter("APA"), []);
   const { authors } = formatter({ manifest: manifest!, dpidLink, isPublished: true })
 
+  // console.log('dpid', isLoading, isSuccess, data, manifest)
   if (isLoading || !isSuccess) return null; // return placeholder
 
   return (
