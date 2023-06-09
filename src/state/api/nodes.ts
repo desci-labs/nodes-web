@@ -2,8 +2,8 @@ import { api } from ".";
 import { setPublishedNodes } from "../nodes/history";
 import { PublishedMap } from "../nodes/types";
 import { endpoints } from "./endpoint";
-import { tags } from "./tags";
-import { ResearchNode } from "./types";
+import { nodes, tags } from "./tags";
+import { NodeCreditRoles, ResearchNode } from "./types";
 
 export const nodesApi = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -29,6 +29,22 @@ export const nodesApi = api.injectEndpoints({
             dispatch(setPublishedNodes(map));
           }
         } catch (error) {}
+      },
+    }),
+    getAccessRoles: builder.query<NodeCreditRoles[], void>({
+      providesTags: [{ type: tags.nodes, id: nodes.roles }],
+      query: () => endpoints.v1.nodes.roles,
+      transformResponse: (response: { roles: NodeCreditRoles[] }) => {
+        return response.roles;
+      },
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          console.log('fetch roles', args);
+          const { data } = await queryFulfilled;
+          console.log("getContributorRoles response", data);
+
+        } catch (error) {
+        }
       },
     }),
     privateShare: builder.query<string, string>({
@@ -60,7 +76,7 @@ export const nodesApi = api.injectEndpoints({
           } catch (error) {}
         },
       }
-    ),  
+    ),
     revokeShareLink: builder.mutation<{ shareId: string; ok: boolean }, string>(
       {
         query: (shareId: string) => {
@@ -84,33 +100,28 @@ export const nodesApi = api.injectEndpoints({
         },
       }
     ),
-    deleteNode: builder.mutation<{ ok: boolean }, string>(
-      {
-        query: (uuid: string) => {
-          return {
-            url: `${endpoints.v1.nodes.index}/${uuid}`,
-            method: "DELETE",
-          };
-        },
-        async onQueryStarted(args: string, { dispatch, queryFulfilled }) {
-          try {
-            console.log("start delete", args);
-            await queryFulfilled;
-            dispatch(
-              nodesApi.util.invalidateTags([
-                { type: tags.nodes },
-              ])
-            );
-          } catch (error) {}
-        },
-      }
-    ),
+    deleteNode: builder.mutation<{ ok: boolean }, string>({
+      query: (uuid: string) => {
+        return {
+          url: `${endpoints.v1.nodes.index}/${uuid}`,
+          method: "DELETE",
+        };
+      },
+      async onQueryStarted(args: string, { dispatch, queryFulfilled }) {
+        try {
+          console.log("start delete", args);
+          await queryFulfilled;
+          dispatch(nodesApi.util.invalidateTags([{ type: tags.nodes }]));
+        } catch (error) {}
+      },
+    }),
   }),
 });
 
 export const {
   useGetNodesQuery,
   usePrivateShareQuery,
+  useGetAccessRolesQuery,
   useDeleteNodeMutation,
   useRevokeShareLinkMutation,
   useCreateShareLinkMutation,

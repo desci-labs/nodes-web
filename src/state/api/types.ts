@@ -1,3 +1,7 @@
+import {
+  ResearchObjectContributorRole,
+  ResearchObjectCredits,
+} from "@desci-labs/desci-models";
 import { Organization } from "@src/types/client";
 
 export interface Wallet {
@@ -49,3 +53,10 @@ interface VersionResponseVersion {
   id: string;
   time: string;
 }
+
+export type NodeCreditRoles = {
+  id: number;
+  credit: ResearchObjectCredits;
+  role: ResearchObjectContributorRole;
+  name: string;
+};

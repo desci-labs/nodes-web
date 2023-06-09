@@ -6,6 +6,7 @@ export const endpoints = {
     },
     nodes: {
       index: "/nodes",
+      roles: "nodes/accessRoles",
       share: {
         index: "/nodes/share",
         revoke: "/nodes/revokeShare",

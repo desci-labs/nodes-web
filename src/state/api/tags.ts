@@ -7,7 +7,9 @@ export enum tags {
   mediaCover = "mediaCover",
 }
 
-export enum nodes {}
+export enum nodes {
+  roles = "roles",
+}
 
 export enum user {
   profile = "profile",

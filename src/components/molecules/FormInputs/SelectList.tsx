@@ -40,6 +40,7 @@ interface SelectListProps {
   className?: string;
   title?: string;
   optionsWrapperClassName?: string;
+  disabled?: boolean;
 }
 
 // TODO: create a custom Popover component to use
@@ -53,6 +54,7 @@ export default function SelectList(props: SelectListProps) {
     mandatory = false,
     defaultValue,
     title,
+    disabled,
     labelRenderer,
   } = props;
   const { ref, ...fieldWithoutRef } = field;
@@ -65,6 +67,7 @@ export default function SelectList(props: SelectListProps) {
   const labelId = `select-list-${1}`;
 
   const onHandleChange = (value: any) => {
+    if (disabled) return;
     if (value === label || value.id === defaultValue?.id) return;
     onSelect?.(value);
   };
@@ -88,7 +91,8 @@ export default function SelectList(props: SelectListProps) {
                 ? "border border-rose-400"
                 : "border border-transparent border-b border-b-[#969696]",
               "rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-pointer focus:outline-none sm:text-sm",
-              props.className
+              props.className,
+              disabled ? "" : ""
             )}
           >
             {title && <span className="text-xs font-bold">{title}</span>}
@@ -98,14 +102,25 @@ export default function SelectList(props: SelectListProps) {
                   {value ? chosen.avatar : null}
                 </div>
               ) : null}
-              <span className="block truncate font-bold text-white">
+              <span
+                className={cn(
+                  "block truncate font-bold text-white capitalize",
+                  disabled && "text-neutrals-gray-4"
+                )}
+              >
                 {(value?.name && labelRenderer
                   ? labelRenderer(value)
                   : value?.name) || label}
               </span>
             </span>
             <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-              <TfiAngleDown className="h-4 w-4 text-white" aria-hidden="true" />
+              <TfiAngleDown
+                className={cn(
+                  "h-4 w-4 text-white",
+                  disabled && "text-neutrals-gray-4"
+                )}
+                aria-hidden="true"
+              />
             </span>
           </div>
         </ListboxButton>
@@ -123,7 +138,7 @@ export default function SelectList(props: SelectListProps) {
             className={`max-h-96 h-fit overflow-hidden overflow-y-scroll`}
           >
             <Transition
-              show={true}
+              show={!disabled && true}
               as={Fragment}
               leave="transition ease-in duration-100"
               leaveFrom="opacity-100"
@@ -189,7 +204,7 @@ export default function SelectList(props: SelectListProps) {
                                 {person.avatar}
                               </div>
                             ) : null}{" "}
-                            <span className="pl-2">
+                            <span className="pl-2 capitalize">
                               {labelRenderer
                                 ? labelRenderer(person)
                                 : person.name}
