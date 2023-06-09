@@ -62,7 +62,6 @@ const nodeInviteSchema = Yup.object().shape({
     name: "creditRole",
     message: "Select a node access control",
     test: (data) => {
-      console.log("validate credit role", data);
       return true;
     },
   }),
@@ -102,17 +101,17 @@ function NodeInviteForm() {
         <InputFormGroup
           required
           isTouched={true}
-          label="email"
+          label="Email"
           isValid={!!watch("email")}
         >
           <Controller
             name="email"
             control={control}
-            render={({ field }: any) => (
+            render={({ field: { ref, ...fields} }: any) => (
               <input
                 type="text"
                 className="relative block w-full border-0 mt-2 p-0 text-sm leading-3 bg-transparent font-medium text-gray-900 dark:text-white dark:disabled:text-neutrals-gray-4 focus:outline-none focus:group:bg-black focus:ring-0 outline-none shadow-none"
-                {...field}
+                {...fields}
               />
             )}
           />
@@ -127,6 +126,7 @@ function NodeInviteForm() {
                   data={creditRoles}
                   field={field}
                   className="border-none border-0 border-transparent"
+                  optionsWrapperClassName="min-w-[300px] left-0"
                 />
               );
             }}
@@ -180,7 +180,7 @@ const InputFormGroup = (
     >
       <label
         className={`absolute font-medium text-sm text-gray-900 dark:text-white pointer-events-none ${labelClassName} ${
-          isValid ? "top-0 text-[10px]" : "top-2"
+          isValid ? "top-0 text-[10px]" : "top-6 capitalize"
         } ${disabled ? "dark:text-neutrals-gray-4 text-neutrals-gray-4" : ""}`}
       >
         {label}

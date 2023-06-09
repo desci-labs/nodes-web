@@ -39,6 +39,7 @@ interface SelectListProps {
   defaultValue?: SelectOption;
   className?: string;
   title?: string;
+  optionsWrapperClassName?: string;
 }
 
 // TODO: create a custom Popover component to use
@@ -69,7 +70,7 @@ export default function SelectList(props: SelectListProps) {
   };
 
   const isDefaultSelected = !value || value.id === defaultValue?.id;
-  console.log("creditRole value", value);
+
   return (
     <div>
       <StyledListBoxInput
@@ -119,7 +120,7 @@ export default function SelectList(props: SelectListProps) {
             style={{
               minHeight: data.length > 2 ? 120 : data.length * 42,
             }}
-            className={`max-h-96 h-fit w-fit overflow-hidden overflow-y-scroll`}
+            className={`max-h-96 h-fit overflow-hidden overflow-y-scroll`}
           >
             <Transition
               show={true}
@@ -128,7 +129,12 @@ export default function SelectList(props: SelectListProps) {
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <div className="absolute z-[1044] w-full h-full bg-white dark:bg-[#272727] shadow-lg rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm list-none border border-neutrals-gray-4">
+              <div
+                className={cn(
+                  "absolute z-[1044] w-full h-full bg-white dark:bg-[#272727] shadow-lg rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm list-none border border-neutrals-gray-4",
+                  props.optionsWrapperClassName
+                )}
+              >
                 {defaultValue ? (
                   <ListboxOption
                     key={`listbox_${defaultValue?.id}`}
