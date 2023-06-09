@@ -1,7 +1,5 @@
 import * as Yup from "yup";
 
-import cx from "classnames";
-import { IconAffiliation } from "@icons";
 import { useUser } from "@src/state/user/hooks";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {

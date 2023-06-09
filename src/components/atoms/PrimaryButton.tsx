@@ -3,9 +3,10 @@ import { SpinnerCircular } from "spinners-react";
 
 // TODO: Change to ButtonPrimary (follow the naming convention of Base->Descriptor->Subdescriptor)
 
-const PrimaryButton = (
-  props: ButtonHTMLAttributes<any> & { isLoading?: boolean }
-) => {
+const PrimaryButton = ({
+  isLoading,
+  ...props
+}: ButtonHTMLAttributes<HTMLButtonElement> & { isLoading?: boolean }) => {
   return (
     <button
       {...props}
@@ -18,7 +19,7 @@ const PrimaryButton = (
       }`}
     >
       {props.children}{" "}
-      {props.isLoading && <SpinnerCircular color="white" size={20} />}
+      {isLoading && <SpinnerCircular color="white" size={20} />}
     </button>
   );
 };

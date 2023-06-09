@@ -1,7 +1,7 @@
 /* This example requires Tailwind CSS v2.0+ */
 import { Fragment, useState } from "react";
 import { Transition } from "@headlessui/react";
-import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
+import { CheckIcon } from "@heroicons/react/solid";
 import {
   ListboxInput,
   ListboxButton,
@@ -9,6 +9,8 @@ import {
   ListboxOption,
 } from "@reach/listbox";
 import styled from "styled-components";
+import { TfiAngleDown } from "react-icons/tfi";
+import { cn } from "@src/lib/utils";
 
 const StyledListBoxInput = styled(ListboxInput)<{}>`
   [data-reach-listbox-input] {
@@ -67,6 +69,7 @@ export default function SelectList(props: SelectListProps) {
   };
 
   const isDefaultSelected = !value || value.id === defaultValue?.id;
+  console.log("creditRole value", value);
   return (
     <div>
       <StyledListBoxInput
@@ -78,11 +81,14 @@ export default function SelectList(props: SelectListProps) {
       >
         <ListboxButton className="border-0 border-transparent w-full p-0 m-0">
           <div
-            className={`relative w-full bg-white dark:bg-[#272727] ${
+            className={cn(
+              "relative w-full bg-white dark:bg-[#272727]",
               touched && mandatory && !field.value
                 ? "border border-rose-400"
-                : "border border-transparent border-b border-b-[#969696]"
-            } rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-pointer focus:outline-none sm:text-sm`}
+                : "border border-transparent border-b border-b-[#969696]",
+              "rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-pointer focus:outline-none sm:text-sm",
+              props.className
+            )}
           >
             {title && <span className="text-xs font-bold">{title}</span>}
             <span className="flex items-center ">
@@ -98,16 +104,13 @@ export default function SelectList(props: SelectListProps) {
               </span>
             </span>
             <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-              <SelectorIcon
-                className="h-5 w-5 text-gray-400"
-                aria-hidden="true"
-              />
+              <TfiAngleDown className="h-4 w-4 text-white" aria-hidden="true" />
             </span>
           </div>
         </ListboxButton>
         <ListboxPopover
           portal={true}
-          className="relative max-h-96"
+          className="relative max-h-96 w-full"
           onBlur={() => {
             setTouched(true);
           }}
@@ -116,7 +119,7 @@ export default function SelectList(props: SelectListProps) {
             style={{
               minHeight: data.length > 2 ? 120 : data.length * 42,
             }}
-            className={`max-h-96 h-fit overflow-hidden overflow-y-scroll`}
+            className={`max-h-96 h-fit w-fit overflow-hidden overflow-y-scroll`}
           >
             <Transition
               show={true}

@@ -9,7 +9,6 @@ import {
 } from "./schema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import CreditsForm from "./Form";
-import { ResearchObjectV1AuthorRole } from "@desci-labs/desci-models";
 
 export default function CreditsModal(props: ModalProps & CreditModalProps) {
   const methods = useForm<AuthorFormValues>({

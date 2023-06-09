@@ -29,7 +29,6 @@ export default function CreditsForm(props: ModalProps & CreditModalProps) {
     register,
     setValue,
     handleSubmit,
-    trigger,
     formState: { errors },
   } = useFormContext<AuthorFormValues>();
 

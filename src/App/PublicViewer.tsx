@@ -22,7 +22,7 @@ export default function PublicViewer() {
   const dispatch = useSetter();
 
   useEffect(() => {
-    dispatch(api.util.invalidateTags([{ type: tags.user }]));
+    // dispatch(api.util.invalidateTags([{ type: tags.user }]));
     // console.log("auth", auth, user);
 
     // if (!auth && location.pathname === "/") {
