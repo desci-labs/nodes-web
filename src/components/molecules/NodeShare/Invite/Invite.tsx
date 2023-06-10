@@ -17,6 +17,7 @@ import {
 import { useNodeReader } from "@src/state/nodes/hooks";
 import toast from "react-hot-toast";
 import { CustomError } from "@src/state/api";
+import { useUser } from "@src/state/user/hooks";
 
 interface ContributorParam {
   id: number;
@@ -43,7 +44,7 @@ const nodeInviteSchema = Yup.object().shape({
 
 export default function NodeInvite() {
   return (
-    <div className="min-h-56 font-inter">
+    <div className="min-h-56 font-inter my-5">
       <NodeInviteForm />
     </div>
   );
@@ -51,6 +52,7 @@ export default function NodeInvite() {
 
 function NodeInviteForm() {
   const { currentObjectId } = useNodeReader();
+  const userProfile = useUser();
   const { data: creditRoles, isLoading, isError } = useGetAccessRolesQuery();
   const [sendInvite, { isLoading: isSendingInvite }] =
     useSendNodeInviteMutation();
@@ -66,6 +68,10 @@ function NodeInviteForm() {
   });
 
   const onSubmit = async (data: InviteFormProps) => {
+    if (data.email.toLowerCase() === userProfile.email.toLowerCase()) {
+      return;
+    }
+
     const res = await sendInvite({
       roleId: data.creditRole.id,
       email: data.email,

@@ -88,7 +88,7 @@ const ShareModal = React.memo((props: ModalProps) => {
         {canSharePublished && canSendInvite ? (
           <div className="flex items-center justify-center w-full">
             <SwitchBar
-              style={{ margin: "1rem 0 1rem 0", height: 35, maxWidth: 400 }}
+              style={{ marginTop: "1rem", height: 35, maxWidth: 400 }}
             >
               <SwitchButton
                 isSelected={currentTab === ShareTabs.Invite}
