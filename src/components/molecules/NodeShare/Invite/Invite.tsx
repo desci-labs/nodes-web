@@ -10,7 +10,13 @@ import {
   ResearchObjectContributorRole,
   ResearchObjectCredits,
 } from "@desci-labs/desci-models";
-import { useGetAccessRolesQuery } from "@src/state/api/nodes";
+import {
+  useGetAccessRolesQuery,
+  useSendNodeInviteMutation,
+} from "@src/state/api/nodes";
+import { useNodeReader } from "@src/state/nodes/hooks";
+import toast from "react-hot-toast";
+import { CustomError } from "@src/state/api";
 
 interface ContributorParam {
   id: number;
@@ -18,39 +24,6 @@ interface ContributorParam {
   role: ResearchObjectContributorRole;
   name: string;
 }
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-// const creditRolesFallback: Array<ContributorParam> = [
-//   {
-//     id: 0,
-//     credit: ResearchObjectCredits.AUTHOR,
-//     role: ResearchObjectContributorRole.ADMIN,
-//     name: "Author - Admin",
-//   },
-//   {
-//     id: 1,
-//     credit: ResearchObjectCredits.AUTHOR,
-//     role: ResearchObjectContributorRole.VIEWER,
-//     name: "Author - Viewer",
-//   },
-//   {
-//     id: 2,
-//     credit: ResearchObjectCredits.NODE_STEWARD,
-//     role: ResearchObjectContributorRole.ADMIN,
-//     name: "Node Steward - Admin",
-//   },
-//   {
-//     id: 3,
-//     credit: ResearchObjectCredits.NODE_STEWARD,
-//     role: ResearchObjectContributorRole.VIEWER,
-//     name: "Node Steward - Viewer",
-//   },
-//   {
-//     id: 4,
-//     credit: ResearchObjectCredits.NONE,
-//     role: ResearchObjectContributorRole.VIEWER,
-//     name: "Viewer",
-//   },
-// ];
 
 type InviteFormProps = {
   email: string;
@@ -77,8 +50,11 @@ export default function NodeInvite() {
 }
 
 function NodeInviteForm() {
+  const { currentObjectId } = useNodeReader();
   const { data: creditRoles, isLoading, isError } = useGetAccessRolesQuery();
-  console.log("useGetAccessRolesQuery", isLoading, isError);
+  const [sendInvite, { isLoading: isSendingInvite }] =
+    useSendNodeInviteMutation();
+
   const methods = useForm<InviteFormProps>({
     mode: "onChange",
     reValidateMode: "onChange",
@@ -89,8 +65,48 @@ function NodeInviteForm() {
     resolver: yupResolver(nodeInviteSchema),
   });
 
-  const onSubmit = (data: InviteFormProps) => {
-    console.log("submit", data);
+  const onSubmit = async (data: InviteFormProps) => {
+    const res = await sendInvite({
+      roleId: data.creditRole.id,
+      email: data.email,
+      uuid: currentObjectId!,
+    });
+
+    if ("data" in res && res.data?.ok === true) {
+      toast.success(res.data.message || "Invitation sent", {
+        style: {
+          marginTop: 50,
+          borderRadius: "10px",
+          background: "#333333",
+          color: "#fff",
+        },
+      });
+    } else {
+      const error = "error" in res && (res.error as CustomError);
+
+      if (typeof error !== "boolean" && "data" in error) {
+        toast.error(error.data.message, {
+          style: {
+            marginTop: 50,
+            borderRadius: "10px",
+            background: "#333333",
+            color: "#fff",
+          },
+        });
+      } else {
+        toast.error(
+          "Error sending invite, check your network connection and try again!",
+          {
+            style: {
+              marginTop: 50,
+              borderRadius: "10px",
+              background: "#333333",
+              color: "#fff",
+            },
+          }
+        );
+      }
+    }
   };
 
   const { control, handleSubmit, formState, watch } = methods;
@@ -143,12 +159,12 @@ function NodeInviteForm() {
           />
         </InputFormGroup>
         <PrimaryButton
-          disabled={!formState.isValid}
-          isLoading={false}
-          className="w-[120px] py-4 font-bold px-1"
+          disabled={isSendingInvite || !formState.isValid}
+          isLoading={isSendingInvite}
+          className="min-w-[120px] shrink-0 py-4 font-bold px-1 flex justify-center gap-2"
           type="submit"
         >
-          Send Invite
+          {isSendingInvite ? "pending" : "Send Invite"}
         </PrimaryButton>
       </form>
       <span className="text-red-400 text-xs">

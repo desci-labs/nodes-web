@@ -31,22 +31,6 @@ export const nodesApi = api.injectEndpoints({
         } catch (error) {}
       },
     }),
-    getAccessRoles: builder.query<NodeCreditRoles[], void>({
-      providesTags: [{ type: tags.nodes, id: nodes.roles }],
-      query: () => endpoints.v1.nodes.roles,
-      transformResponse: (response: { roles: NodeCreditRoles[] }) => {
-        return response.roles;
-      },
-      async onQueryStarted(args, { dispatch, queryFulfilled }) {
-        try {
-          console.log('fetch roles', args);
-          const { data } = await queryFulfilled;
-          console.log("getContributorRoles response", data);
-
-        } catch (error) {
-        }
-      },
-    }),
     privateShare: builder.query<string, string>({
       providesTags: (_, error, arg) => [{ type: tags.privateShare, id: arg }],
       query: (uuid: string) => `${endpoints.v1.nodes.share.index}/${uuid}`,
@@ -115,6 +99,48 @@ export const nodesApi = api.injectEndpoints({
         } catch (error) {}
       },
     }),
+    getAccessRoles: builder.query<NodeCreditRoles[], void>({
+      providesTags: [{ type: tags.nodes, id: nodes.roles }],
+      query: () => endpoints.v1.nodes.roles,
+      transformResponse: (response: { roles: NodeCreditRoles[] }) => {
+        return response.roles;
+      },
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          console.log("fetch roles", args);
+          const { data } = await queryFulfilled;
+          console.log("getContributorRoles response", data);
+        } catch (error) {}
+      },
+    }),
+    sendNodeInvite: builder.mutation<
+      { ok: boolean; message: string },
+      { roleId: number; email: string; uuid: string }
+    >({
+      query: (args) => {
+        return {
+          url: `${endpoints.v1.nodes.index}/${args.uuid}/accessInvite`,
+          method: "POST",
+          body: { ...args },
+          
+        };
+      },
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          console.log("sendNodeInvite", args);
+          const { data } = await queryFulfilled;
+          // dispatch(
+          //   nodesApi.util.updateQueryData("privateShare", args, () => shareId)
+          // );
+          console.log("sendNodeInvite response", data);
+          dispatch(
+            nodesApi.util.invalidateTags([
+              { type: tags.nodes, id: nodes.invites },
+            ])
+          );
+        } catch (error) {}
+      },
+    }),
   }),
 });
 
@@ -123,6 +149,7 @@ export const {
   usePrivateShareQuery,
   useGetAccessRolesQuery,
   useDeleteNodeMutation,
+  useSendNodeInviteMutation,
   useRevokeShareLinkMutation,
   useCreateShareLinkMutation,
 } = nodesApi;
