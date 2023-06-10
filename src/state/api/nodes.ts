@@ -105,12 +105,19 @@ export const nodesApi = api.injectEndpoints({
       transformResponse: (response: { roles: NodeCreditRoles[] }) => {
         return response.roles;
       },
-      async onQueryStarted(args, { dispatch, queryFulfilled }) {
-        try {
-          console.log("fetch roles", args);
-          const { data } = await queryFulfilled;
-          console.log("getContributorRoles response", data);
-        } catch (error) {}
+    }),
+    getInvites: builder.query<NodeCreditRoles[], string>({
+      providesTags: [{ type: tags.nodes, id: nodes.invites }],
+      query: (uuid) => `${endpoints.v1.nodes.index}/${uuid}/invites`,
+      transformResponse: (response: { roles: NodeCreditRoles[] }) => {
+        return response.roles;
+      },
+    }),
+    getContributors: builder.query<NodeCreditRoles[], string>({
+      providesTags: [{ type: tags.nodes, id: nodes.contributors }],
+      query: (uuid) => `${endpoints.v1.nodes.index}/${uuid}/contributors`,
+      transformResponse: (response: { roles: NodeCreditRoles[] }) => {
+        return response.roles;
       },
     }),
     sendNodeInvite: builder.mutation<
@@ -122,17 +129,11 @@ export const nodesApi = api.injectEndpoints({
           url: `${endpoints.v1.nodes.index}/${args.uuid}/accessInvite`,
           method: "POST",
           body: { ...args },
-          
         };
       },
       async onQueryStarted(args, { dispatch, queryFulfilled }) {
         try {
-          console.log("sendNodeInvite", args);
-          const { data } = await queryFulfilled;
-          // dispatch(
-          //   nodesApi.util.updateQueryData("privateShare", args, () => shareId)
-          // );
-          console.log("sendNodeInvite response", data);
+          await queryFulfilled;
           dispatch(
             nodesApi.util.invalidateTags([
               { type: tags.nodes, id: nodes.invites },
@@ -146,9 +147,11 @@ export const nodesApi = api.injectEndpoints({
 
 export const {
   useGetNodesQuery,
+  useGetInvitesQuery,
   usePrivateShareQuery,
   useGetAccessRolesQuery,
   useDeleteNodeMutation,
+  useGetContributorsQuery,
   useSendNodeInviteMutation,
   useRevokeShareLinkMutation,
   useCreateShareLinkMutation,

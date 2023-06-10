@@ -43,7 +43,8 @@ const staggeredBaseQueryWithBailOut = retry(
   }
 );
 
-const baseQueryWithRetry = retry(
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _baseQueryWithRetry = retry(
   fetchBaseQuery({
     baseUrl: `${API_URL}/v1`,
     mode: "cors",

@@ -9,7 +9,8 @@ export enum tags {
 
 export enum nodes {
   roles = "roles",
-  invites = "invites"
+  invites = "invites",
+  contributors = "contributors"
 }
 
 export enum user {

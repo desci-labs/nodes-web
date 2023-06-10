@@ -12,6 +12,8 @@ import {
 } from "@desci-labs/desci-models";
 import {
   useGetAccessRolesQuery,
+  useGetContributorsQuery,
+  useGetInvitesQuery,
   useSendNodeInviteMutation,
 } from "@src/state/api/nodes";
 import { useNodeReader } from "@src/state/nodes/hooks";
@@ -43,6 +45,12 @@ const nodeInviteSchema = Yup.object().shape({
 });
 
 export default function NodeInvite() {
+  const { currentObjectId: uuid } = useNodeReader();
+  useGetInvitesQuery(uuid!, {
+    skip: !uuid,
+  });
+  useGetContributorsQuery(uuid!, { skip: !uuid });
+
   return (
     <div className="min-h-56 font-inter my-5">
       <NodeInviteForm />
