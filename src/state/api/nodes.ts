@@ -3,7 +3,13 @@ import { setPublishedNodes } from "../nodes/history";
 import { PublishedMap } from "../nodes/types";
 import { endpoints } from "./endpoint";
 import { nodes, tags } from "./tags";
-import { NodeCreditRoles, ResearchNode } from "./types";
+import {
+  AccessRolesResponse,
+  ApiResponse,
+  Contributor,
+  InviteResponse,
+  ResearchNode,
+} from "./types";
 
 export const nodesApi = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -87,7 +93,7 @@ export const nodesApi = api.injectEndpoints({
     deleteNode: builder.mutation<{ ok: boolean }, string>({
       query: (uuid: string) => {
         return {
-          url: `${endpoints.v1.nodes.index}/${uuid}`,
+          url: `nodes/${uuid}`,
           method: "DELETE",
         };
       },
@@ -99,25 +105,25 @@ export const nodesApi = api.injectEndpoints({
         } catch (error) {}
       },
     }),
-    getAccessRoles: builder.query<NodeCreditRoles[], void>({
+    getAccessRoles: builder.query<AccessRolesResponse[], void>({
       providesTags: [{ type: tags.nodes, id: nodes.roles }],
       query: () => endpoints.v1.nodes.roles,
-      transformResponse: (response: { roles: NodeCreditRoles[] }) => {
+      transformResponse: (response: { roles: AccessRolesResponse[] }) => {
         return response.roles;
       },
     }),
-    getInvites: builder.query<NodeCreditRoles[], string>({
+    getInvites: builder.query<InviteResponse[], string>({
       providesTags: [{ type: tags.nodes, id: nodes.invites }],
-      query: (uuid) => `${endpoints.v1.nodes.index}/${uuid}/invites`,
-      transformResponse: (response: { roles: NodeCreditRoles[] }) => {
-        return response.roles;
+      query: (uuid) => `nodes/${uuid}/invites`,
+      transformResponse: (response: ApiResponse<InviteResponse[]>) => {
+        return response.data;
       },
     }),
-    getContributors: builder.query<NodeCreditRoles[], string>({
+    getContributors: builder.query<Contributor[], string>({
       providesTags: [{ type: tags.nodes, id: nodes.contributors }],
-      query: (uuid) => `${endpoints.v1.nodes.index}/${uuid}/contributors`,
-      transformResponse: (response: { roles: NodeCreditRoles[] }) => {
-        return response.roles;
+      query: (uuid) => `nodes/${uuid}/contributors`,
+      transformResponse: (response: ApiResponse<Contributor[]>) => {
+        return response.data;
       },
     }),
     sendNodeInvite: builder.mutation<
@@ -126,7 +132,7 @@ export const nodesApi = api.injectEndpoints({
     >({
       query: (args) => {
         return {
-          url: `${endpoints.v1.nodes.index}/${args.uuid}/accessInvite`,
+          url: `nodes/${args.uuid}/accessInvite`,
           method: "POST",
           body: { ...args },
         };

@@ -1,10 +1,9 @@
 import PrimaryButton from "@src/components/atoms/PrimaryButton";
-// import InsetLabelSmallInput from "@components/molecules/FormInputs/InsetLabelSmallInput";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { HTMLProps, PropsWithChildren } from "react";
-import { FlexRowSpaceBetween } from "@src/components/styled";
+import { FlexColumnAligned, FlexRowSpaceBetween } from "@src/components/styled";
 import SelectList from "@components/molecules/FormInputs/SelectList";
 import {
   ResearchObjectContributorRole,
@@ -20,6 +19,7 @@ import { useNodeReader } from "@src/state/nodes/hooks";
 import toast from "react-hot-toast";
 import { CustomError } from "@src/state/api";
 import { useUser } from "@src/state/user/hooks";
+import { Contributor, InviteResponse } from "@src/state/api/types";
 
 interface ContributorParam {
   id: number;
@@ -44,16 +44,42 @@ const nodeInviteSchema = Yup.object().shape({
   }),
 });
 
+function NodeAccessRow(props: { collaborator: Contributor }) {
+  const { collaborator: accessUser } = props;
+
+  return (
+    <span>
+      {accessUser.user?.name || accessUser.user.email} - {accessUser.role.credit}
+    </span>
+  );
+}
+
+function PendingInvite(props: { invite: InviteResponse }) {
+  const { invite } = props;
+
+  return (
+    <span>
+      {invite?.receiver?.name ?? invite.email} - {invite.role.credit}
+    </span>
+  );
+}
+
 export default function NodeInvite() {
   const { currentObjectId: uuid } = useNodeReader();
-  useGetInvitesQuery(uuid!, {
+  const { data: invites } = useGetInvitesQuery(uuid!, {
     skip: !uuid,
   });
-  useGetContributorsQuery(uuid!, { skip: !uuid });
+  const { data: items } = useGetContributorsQuery(uuid!, {
+    skip: !uuid,
+  });
 
   return (
     <div className="min-h-56 font-inter my-5">
       <NodeInviteForm />
+      <FlexColumnAligned className="mt-5">
+        {items && items.map((item) => <NodeAccessRow collaborator={item} />)}
+        {invites && invites.map((item) => <PendingInvite invite={item} />)}
+      </FlexColumnAligned>
     </div>
   );
 }

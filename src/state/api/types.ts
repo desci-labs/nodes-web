@@ -58,5 +58,51 @@ export type NodeCreditRoles = {
   id: number;
   credit: ResearchObjectCredits;
   role: ResearchObjectContributorRole;
+};
+
+export type NodeAccess = {
+  id: number;
+  uuid: string;
+  userId: number;
+  roleId: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type AuthorInvite = {
+  id: number;
+  createdAt: Date;
+  updatedAt: Date;
+  email: string;
+  senderId: number;
+  receiverId: number | null;
+  nodeId: number;
+  roleId: number;
+  inviteCode: string;
+  status: AuthorInviteStatus;
+  expired: boolean;
+  expiresAt: Date;
+};
+
+export type AuthorInviteStatus =
+  | "ACCEPTED"
+  | "REJECTED"
+  | "PENDING"
+  | "EXPIRED";
+
+export type InviteResponse = AuthorInvite & {
+  sender: { id: true; email: true; name: true };
+  receiver: { id: true; email: true; name: true };
+  role: NodeCreditRoles;
+};
+
+export type AccessRolesResponse = NodeCreditRoles & {
   name: string;
 };
+
+export type Contributor = NodeAccess & {
+  user: { id: true; email: true; name: true };
+  role: NodeCreditRoles;
+};
+
+export type ApiResponse<T> = { data: T, ok: boolean };
