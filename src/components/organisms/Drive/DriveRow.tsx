@@ -1,16 +1,12 @@
 import BlackGenericButton from "@components/atoms/BlackGenericButton";
 import { BytesToHumanFileSize } from "@components/utils";
 import {
-  IconCodeRepo,
-  IconData,
   IconDirectory,
   IconPlayRounded,
   IconQuotes,
-  IconResearchNode,
-  IconResearchReport,
   IconStar,
 } from "@icons";
-import React, { useCallback, useRef } from "react";
+import { useCallback, useRef } from "react";
 import {
   AccessStatus,
   DriveNonComponentTypes,
@@ -30,9 +26,6 @@ import {
 } from "@src/state/drive/driveSlice";
 import { useSetter } from "@src/store/accessors";
 import {
-  COMPONENT_LIBRARY,
-  EXTERNAL_COMPONENTS,
-  UiComponentDefinition,
   findTarget,
 } from "../ComponentLibrary";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";

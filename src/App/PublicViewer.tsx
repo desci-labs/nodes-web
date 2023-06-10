@@ -22,15 +22,9 @@ export default function PublicViewer() {
   const dispatch = useSetter();
 
   useEffect(() => {
-    // dispatch(api.util.invalidateTags([{ type: tags.user }]));
-    // console.log("auth", auth, user);
+    dispatch(api.util.invalidateTags([{ type: tags.user }]));
 
-    // if (!auth && location.pathname === "/") {
-    //   navigate(`${site.web}${location.search}`);
-    //   return;
-    // }
-
-    if (user && user.userId > 0) {
+    if (user.userId > 0) {
       if (location.pathname === "/" || location.pathname === "web/magic") {
         navigate(`${site.app}${app.nodes}/start`);
       }
@@ -38,9 +32,8 @@ export default function PublicViewer() {
       if (location.pathname === "/") {
         navigate(`${site.web}${location.search}`);
       }
-      // localStorage.removeItem("auth");
     }
-  }, [user, location.pathname, navigate, location.search, dispatch]);
+  }, [user.userId, location.pathname, navigate, location.search, dispatch]);
 
   return (
     <div
