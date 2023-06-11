@@ -91,8 +91,8 @@ export type AuthorInviteStatus =
   | "EXPIRED";
 
 export type InviteResponse = AuthorInvite & {
-  sender: { id: true; email: true; name: true };
-  receiver: { id: true; email: true; name: true };
+  sender: { id: true; email: string; name: string };
+  receiver: { id: true; email: string; name: string };
   role: NodeCreditRoles;
 };
 
@@ -101,7 +101,7 @@ export type AccessRolesResponse = NodeCreditRoles & {
 };
 
 export type Contributor = NodeAccess & {
-  user: { id: true; email: true; name: true };
+  user: { id: true; email: string; name: string };
   role: NodeCreditRoles;
 };
 

@@ -3,7 +3,11 @@ import { Controller, FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { HTMLProps, PropsWithChildren } from "react";
-import { FlexColumnAligned, FlexRowSpaceBetween } from "@src/components/styled";
+import {
+  FlexColumnAligned,
+  FlexRowAligned,
+  FlexRowSpaceBetween,
+} from "@src/components/styled";
 import SelectList from "@components/molecules/FormInputs/SelectList";
 import {
   ResearchObjectContributorRole,
@@ -20,6 +24,8 @@ import toast from "react-hot-toast";
 import { CustomError } from "@src/state/api";
 import { useUser } from "@src/state/user/hooks";
 import { Contributor, InviteResponse } from "@src/state/api/types";
+import { TfiAngleDown } from "react-icons/tfi";
+import Identicon from "@src/components/atoms/Identicon";
 
 interface ContributorParam {
   id: number;
@@ -44,13 +50,41 @@ const nodeInviteSchema = Yup.object().shape({
   }),
 });
 
+const isNone = (credit: ResearchObjectCredits) =>
+  credit.toLowerCase() === "none";
+
 function NodeAccessRow(props: { collaborator: Contributor }) {
   const { collaborator: accessUser } = props;
 
   return (
-    <span>
-      {accessUser.user?.name || accessUser.user.email} - {accessUser.role.credit}
-    </span>
+    <FlexRowSpaceBetween className="w-full justify-between">
+      <FlexRowAligned className="gap-2">
+        <Identicon
+          className="rounded-full"
+          string={accessUser.user.email}
+          size={20}
+        />
+        {accessUser.user?.name ? (
+          <span className="capitalize font-bold">{accessUser.user.name}</span>
+        ) : (
+          <span> {accessUser.user.email.toLowerCase()}</span>
+        )}
+      </FlexRowAligned>
+      <button className="flex items-center justify-end gap-2 hover:text-neutrals-gray-4 group">
+        <span className="capitalize">
+          {isNone(accessUser.role.credit)
+            ? ""
+            : accessUser.role.credit.toLowerCase().replaceAll("_", " ") +
+              " -"}{" "}
+          {accessUser.role.role.toLowerCase()}
+        </span>
+        <TfiAngleDown
+          className="h-4 w-4 text-white group-hover:text-neutrals-gray-4"
+          stroke="2"
+          aria-hidden="true"
+        />
+      </button>
+    </FlexRowSpaceBetween>
   );
 }
 
@@ -58,9 +92,33 @@ function PendingInvite(props: { invite: InviteResponse }) {
   const { invite } = props;
 
   return (
-    <span>
-      {invite?.receiver?.name ?? invite.email} - {invite.role.credit}
-    </span>
+    <FlexRowSpaceBetween className="w-full justify-between">
+      <FlexRowAligned className="gap-2">
+        <Identicon
+          className="rounded-full"
+          string={invite.email}
+          size={20}
+        />
+        {invite.receiver?.name ? (
+          <span className="capitalize font-bold">{invite.receiver.name}</span>
+        ) : (
+          <span> {invite.email.toLowerCase()}</span>
+        )}
+      </FlexRowAligned>
+      <button className="flex items-center justify-end gap-2 hover:text-neutrals-gray-4 group">
+        <span className="capitalize">
+          {isNone(invite.role.credit)
+            ? ""
+            : invite.role.credit.toLowerCase().replaceAll("_", " ") + " -"}{" "}
+          {invite.role.role.toLowerCase()}
+        </span>
+        <TfiAngleDown
+          className="h-4 w-4 text-white group-hover:text-neutrals-gray-4"
+          stroke="2"
+          aria-hidden="true"
+        />
+      </button>
+    </FlexRowSpaceBetween>
   );
 }
 
@@ -76,7 +134,7 @@ export default function NodeInvite() {
   return (
     <div className="min-h-56 font-inter my-5">
       <NodeInviteForm />
-      <FlexColumnAligned className="mt-5">
+      <FlexColumnAligned className="mt-5 gap-6">
         {items && items.map((item) => <NodeAccessRow collaborator={item} />)}
         {invites && invites.map((item) => <PendingInvite invite={item} />)}
       </FlexColumnAligned>
