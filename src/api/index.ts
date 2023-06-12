@@ -356,20 +356,25 @@ export const publishResearchObject = async (input: {
   return data;
 };
 
-export const getDatasetTree = async (
-  cid: string,
-  nodeUuid: string,
-  pub = false,
-  shareId = ""
-) => {
-  const route = pub ? "pubTree" : "retrieveTree";
-  console.log("fetch dataset tree", pub, route);
-  const { data } = await axios.get(
-    `${SCIWEAVE_URL}/v1/data/${route}/${nodeUuid}/${cid}${
-      shareId ? "/" + shareId : ""
-    }`,
-    config()
-  );
+export interface GetDatasetTreeInput {
+  rootCid?: string;
+  nodeUuid: string;
+  manifestCid: string;
+  pub: boolean;
+  shareId: string;
+}
+
+export const getDatasetTree = async (params: GetDatasetTreeInput) => {
+  const url = params.pub
+    ? `${SCIWEAVE_URL}/v1/data/pubTree/${params.nodeUuid}/${
+        params.manifestCid
+      }${params.rootCid ? "/" + params.rootCid : ""}`
+    : `${SCIWEAVE_URL}/v1/data/retrieveTree/${params.nodeUuid}/${
+        params.manifestCid
+      }${params.shareId ? "/" + params.shareId : ""}`;
+
+  console.log("fetch dataset tree", params.pub, url);
+  const { data } = await axios.get(url, config());
   return data;
 };
 
