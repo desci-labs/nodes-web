@@ -360,8 +360,8 @@ export interface GetDatasetTreeInput {
   rootCid?: string;
   nodeUuid: string;
   manifestCid: string;
-  pub: boolean;
-  shareId: string;
+  pub?: boolean;
+  shareId?: string;
 }
 
 export const getDatasetTree = async (params: GetDatasetTreeInput) => {

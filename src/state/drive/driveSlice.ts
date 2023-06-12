@@ -556,13 +556,12 @@ export const fetchTreeThunk = createAsyncThunk(
               c.type === ResearchObjectComponentType.DATA_BUCKET
           );
     if (hasDataBucket) {
-      const rootCid = hasDataBucket.payload.cid;
-      const { tree } = await getDatasetTree(
-        rootCid,
-        currentObjectId!,
-        publicView, //  state.nodes.nodeReader.mode === "reader", this would be inferred from the node access control guard
-        shareId
-      );
+      const { tree } = await getDatasetTree({
+        manifestCid,
+        nodeUuid: currentObjectId!,
+        pub: publicView, //  state.nodes.nodeReader.mode === "reader", this would be inferred from the node access control guard
+        shareId,
+      });
       return { tree, manifest };
     } else {
       //fallback to construct deprecated tree
@@ -584,6 +583,7 @@ export const fetchTreeThunk = createAsyncThunk(
         rootDrive,
         currentObjectId!,
         manifest!,
+        manifestCid,
         {
           pathUidMap: provideMap,
           public: publicView,
