@@ -174,61 +174,17 @@ export function hasPublic(tree: DriveObject): boolean {
 // Prevent rendering certain files in the tree in the drive view
 const FILTER_LIST = [".nodeKeep", ".DS_Store"];
 
-//Convert IPFS tree to DriveObject tree V2
-export function convertIpfsTreeToDriveObjectTree(
-  tree: DriveObject[],
-  pathToCompMap: Record<DrivePath, ResearchObjectV1Component>,
-  pathToSizeMap: Record<DrivePath, number>
-) {
+// Fill in the remaining details the backend tree doesn't return, so far; date format and filtering.
+export function transformTree(tree: DriveObject[]) {
   tree = tree.filter((branch) => !FILTER_LIST.includes(branch.name));
   tree.forEach((branch) => {
-    const fileDirBranch = branch as FileDir;
-    const neutralPath = neutralizePath(branch.path!);
-    branch.path = neutralPath;
-    const component = pathToCompMap[branch.path!];
-    const ancestorComponent: ResearchObjectV1Component | null =
-      getAncestorComponent(branch, pathToCompMap);
-    branch.componentType =
-      component?.type ||
-      ancestorComponent?.type ||
-      ResearchObjectComponentType.UNKNOWN;
-
-    if (component) {
-      const subtype =
-        "subtype" in component
-          ? (component["subtype"] as ResearchObjectComponentSubtypes)
-          : undefined;
-      if (subtype) branch.componentSubtype = subtype;
-    }
-    // useful for annotation insert on file tree under a code component for example (refer to component id later)
-    branch.componentId = component?.id || ancestorComponent?.id;
-    branch.accessStatus = fileDirBranch.published
-      ? AccessStatus.PUBLIC
-      : AccessStatus.PRIVATE;
-
-    //Determine partials
-    if (!fileDirBranch.published && branch.contains && branch.contains.length) {
-      const isPartial = hasPublic(branch);
-      if (isPartial) branch.accessStatus = AccessStatus.PARTIAL;
-    }
-
-    if (branch.external) branch.accessStatus = AccessStatus.EXTERNAL;
-
-    branch.metadata = inheritMetadata(branch.path, pathToCompMap);
-    branch.starred = component?.starred || false;
-    branch.uid = component?.id || uuidv4(); //add cached uuids
     branch.lastModified = formatDbDate(branch.lastModified) || tempDate;
     if (
       branch.contains &&
       branch.contains.length &&
       branch.type === FileType.DIR
     ) {
-      branch.size = pathToSizeMap[branch.path!] || 0;
-      branch.contains = convertIpfsTreeToDriveObjectTree(
-        branch.contains,
-        pathToCompMap,
-        pathToSizeMap
-      );
+      branch.contains = transformTree(branch.contains);
     }
   });
   return tree;

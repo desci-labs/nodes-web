@@ -42,6 +42,7 @@ import {
   defaultSort,
   GENERIC_NEW_LINK_NAME,
   DRIVE_FULL_EXTERNAL_LINKS_PATH,
+  transformTree,
 } from "./utils";
 import {
   AddFilesToDrivePayload,
@@ -370,17 +371,8 @@ export const driveSlice = createSlice({
           contains: [],
         });
 
-        //Generate a map of existing components
-        const pathToCompMap = generatePathCompMap(manifest);
-        const pathToDriveMap = generateFlatPathDriveMap(tree);
-        const pathToSizeMap = generatePathSizeMap(pathToDriveMap); //Sources dir sizes
-
-        //Convert IPFS tree to DriveObject tree
-        const driveObjectTree = convertIpfsTreeToDriveObjectTree(
-          tree as DriveObject[],
-          pathToCompMap,
-          pathToSizeMap
-        );
+        // Frontend tree processing; date formatting and file filtering
+        const driveObjectTree = transformTree(tree as DriveObject[]);
         root.contains = driveObjectTree;
 
         //Add links
