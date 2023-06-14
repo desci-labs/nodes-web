@@ -23,22 +23,16 @@ import {
   SessionStorageKeys,
 } from "@src/components/driveUtils";
 import {
-  convertIpfsTreeToDriveObjectTree,
-  deleteAllParents,
   driveBfsByPath,
   DRIVE_EXTERNAL_LINKS_PATH,
-  generatePathCompMap,
   urlOrCid,
   findDriveByPath,
-  generateFlatPathDriveMap,
-  generatePathSizeMap,
   constructBreadCrumbs,
   bfsDriveSearch,
   getComponentCid,
   findUniqueName,
   GENERIC_NEW_FOLDER_NAME,
   CID_PENDING,
-  // getAncestorComponent,
   defaultSort,
   GENERIC_NEW_LINK_NAME,
   DRIVE_FULL_EXTERNAL_LINKS_PATH,
@@ -582,7 +576,7 @@ export const fetchTreeThunk = createAsyncThunk(
         },
         shareId
       );
-      return { tree: deleteAllParents(rootDrive), deprecated: true };
+      return { tree: rootDrive, deprecated: true };
     }
   }
 );
