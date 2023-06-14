@@ -1,20 +1,14 @@
 import {
-  ResearchObjectComponentSubtypes,
   ResearchObjectComponentType,
-  ResearchObjectV1,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 import { DRIVE_NODE_ROOT_PATH, tempDate } from "@src/components/driveUtils";
 import {
-  AccessStatus,
-  DriveMetadata,
-  // DriveNonComponentTypes,
   DriveObject,
   FileDir,
   FileType,
 } from "@src/components/organisms/Drive";
 
-import { v4 as uuidv4 } from "uuid";
 import { BreadCrumb, DrivePath } from "./types";
 import { __log } from "@src/components/utils";
 
