@@ -357,7 +357,7 @@ export const publishResearchObject = async (input: {
 };
 
 export interface GetDatasetTreeInput {
-  rootCid?: string;
+  rootCid?: string; // for deprecated datasets
   nodeUuid: string;
   manifestCid: string;
   pub?: boolean;
