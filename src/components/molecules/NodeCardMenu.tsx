@@ -1,6 +1,7 @@
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { ResearchObjectV1 } from "@desci-labs/desci-models";
 import { ResearchNode } from "@src/state/api/types";
+import * as MenubarPrimitive from "@radix-ui/react-menubar";
 import {
   IconCopyLink,
   IconDeleteForever,
@@ -37,7 +38,9 @@ export default function NodeCardMenu({
   ]);
   const [deleteNode, { isLoading: isDeleting }] = useDeleteNodeMutation();
 
+  const triggerRef = useRef<any>(null);
   useEffect(() => {
+    if (triggerRef?.current["data-state"] !== "open") return;
     if (pullRef.current) return;
     async function getManifest() {
       try {
@@ -136,7 +139,10 @@ export default function NodeCardMenu({
   return (
     <Menubar className="border-0 relative h-8 p-0">
       <MenubarMenu>
-        <MenubarTrigger className="cursor-pointer text-white p-0">
+        <MenubarTrigger
+          className="cursor-pointer text-white p-0"
+          ref={triggerRef}
+        >
           <IconKebab
             width={18}
             onClick={(e) => {
