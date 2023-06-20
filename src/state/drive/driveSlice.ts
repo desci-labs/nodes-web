@@ -23,25 +23,20 @@ import {
   SessionStorageKeys,
 } from "@src/components/driveUtils";
 import {
-  convertIpfsTreeToDriveObjectTree,
-  deleteAllParents,
   driveBfsByPath,
   DRIVE_EXTERNAL_LINKS_PATH,
-  generatePathCompMap,
   urlOrCid,
   findDriveByPath,
-  generateFlatPathDriveMap,
-  generatePathSizeMap,
   constructBreadCrumbs,
   bfsDriveSearch,
   getComponentCid,
   findUniqueName,
   GENERIC_NEW_FOLDER_NAME,
   CID_PENDING,
-  // getAncestorComponent,
   defaultSort,
   GENERIC_NEW_LINK_NAME,
   DRIVE_FULL_EXTERNAL_LINKS_PATH,
+  transformTree,
 } from "./utils";
 import {
   AddFilesToDrivePayload,
@@ -370,17 +365,8 @@ export const driveSlice = createSlice({
           contains: [],
         });
 
-        //Generate a map of existing components
-        const pathToCompMap = generatePathCompMap(manifest);
-        const pathToDriveMap = generateFlatPathDriveMap(tree);
-        const pathToSizeMap = generatePathSizeMap(pathToDriveMap); //Sources dir sizes
-
-        //Convert IPFS tree to DriveObject tree
-        const driveObjectTree = convertIpfsTreeToDriveObjectTree(
-          tree as DriveObject[],
-          pathToCompMap,
-          pathToSizeMap
-        );
+        // Frontend tree processing; date formatting and file filtering
+        const driveObjectTree = transformTree(tree as DriveObject[]);
         root.contains = driveObjectTree;
 
         //Add links
@@ -556,13 +542,12 @@ export const fetchTreeThunk = createAsyncThunk(
               c.type === ResearchObjectComponentType.DATA_BUCKET
           );
     if (hasDataBucket) {
-      const rootCid = hasDataBucket.payload.cid;
-      const { tree } = await getDatasetTree(
-        rootCid,
-        currentObjectId!,
-        publicView, //  state.nodes.nodeReader.mode === "reader", this would be inferred from the node access control guard
-        shareId
-      );
+      const { tree } = await getDatasetTree({
+        manifestCid,
+        nodeUuid: currentObjectId!,
+        pub: publicView, //  state.nodes.nodeReader.mode === "reader", this would be inferred from the node access control guard
+        shareId,
+      });
       return { tree, manifest };
     } else {
       //fallback to construct deprecated tree
@@ -584,13 +569,14 @@ export const fetchTreeThunk = createAsyncThunk(
         rootDrive,
         currentObjectId!,
         manifest!,
+        manifestCid,
         {
           pathUidMap: provideMap,
           public: publicView,
         },
         shareId
       );
-      return { tree: deleteAllParents(rootDrive), deprecated: true };
+      return { tree: rootDrive, deprecated: true };
     }
   }
 );
