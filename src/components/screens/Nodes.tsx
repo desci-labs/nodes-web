@@ -3,6 +3,7 @@ import {
   RESEARCH_OBJECT_NODES_PREFIX,
 } from "@desci-labs/desci-models";
 import {
+  getPublishedVersions,
   getRecentPublishedManifest,
   getResearchObjectStub,
   resolvePrivateResearchObjectStub,
@@ -11,7 +12,7 @@ import {
 } from "@src/api";
 import axios from "axios";
 import { LoaderFunctionArgs, Outlet, Params } from "react-router-dom";
-import { cleanupManifestUrl } from "../utils";
+import { cleanupManifestUrl, convertHexToCID } from "../utils";
 import { ReaderMode } from "@src/state/nodes/nodeReader";
 
 export type ManuscriptLoaderData =
@@ -31,6 +32,7 @@ export type ManuscriptLoaderData =
       annotationIndex: string;
       manifest: ResearchObjectV1;
       params: Params<string>;
+      manifestUrl: string;
     }
   | {
       error: boolean;
@@ -99,8 +101,17 @@ export const manuscriptLoader = async ({
         ? await resolvePublishedManifest(uuid, version)
         : await getRecentPublishedManifest(uuid);
 
+      // Resolve manifest cid
+      const versions = await getPublishedVersions(uuid);
+      const reversedVersions = versions.versions.reverse();
+      const specificVersion = version
+        ? reversedVersions[version]
+        : reversedVersions[reversedVersions.length - 1];
+      const manifestCid = convertHexToCID(specificVersion.cid);
+
       return {
         uuid,
+        manifestUrl: manifestCid,
         version,
         manifest,
         componentIndex,

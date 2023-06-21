@@ -5,10 +5,7 @@ import {
   ResearchObjectComponentType,
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
-import {
-  cleanupManifestUrl,
-  triggerTooltips,
-} from "@src/components/utils";
+import { cleanupManifestUrl, triggerTooltips } from "@src/components/utils";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import {
   setCurrentPdf,
@@ -94,18 +91,20 @@ export default function useManuscriptReader(publicView: boolean = false) {
       if ("manifestUrl" in parsedManuscript)
         localStorage.setItem("manifest-url", parsedManuscript.manifestUrl);
     } else {
-      setIsError(true)
+      setIsError(true);
     }
   };
 
   const initPublicViewer = async (cid: string) => {
     if ("uuid" in parsedManuscript && !!parsedManuscript.uuid) {
-      const { uuid } = parsedManuscript;
+      const { uuid, manifestUrl } = parsedManuscript;
 
       dispatch(setCurrentPdf(""));
       setIsNew(false);
       setIsAnnotating(false);
       const currentId = uuid;
+
+      dispatch(setManifestCid(manifestUrl));
 
       if ("manifest" in parsedManuscript && !!parsedManuscript.manifest) {
         const defaultComponent = getDefaultComponentForView(
@@ -182,7 +181,7 @@ export default function useManuscriptReader(publicView: boolean = false) {
           dispatch(setComponentStack([targetComponent]));
         }
       } else {
-        setIsError(true)
+        setIsError(true);
       }
       dispatch(setCurrentObjectId(currentId));
       dispatch(setResearchPanelTab(ResearchTabs.current));
@@ -197,7 +196,7 @@ export default function useManuscriptReader(publicView: boolean = false) {
    */
   useEffect(() => {
     if ("error" in parsedManuscript) {
-      setIsError(true)
+      setIsError(true);
     }
     if (publicView) {
       const uuid = "uuid" in parsedManuscript ? parsedManuscript.uuid : "";
