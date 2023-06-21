@@ -363,7 +363,7 @@ export interface GetDatasetTreeInput {
   pub?: boolean;
   shareId?: string;
 }
-debugger;
+
 export const getDatasetTree = async (params: GetDatasetTreeInput) => {
   const url = params.pub
     ? `${SCIWEAVE_URL}/v1/data/pubTree/${params.nodeUuid}/${
