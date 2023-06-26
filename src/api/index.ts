@@ -486,6 +486,37 @@ export const updateDag = async ({
   return data;
 };
 
+export interface UpdateDagExternalCid {
+  uuid: string;
+  contextPath: DrivePath;
+  componentType?: ResearchObjectComponentType;
+  componentSubtype?: ResearchObjectComponentSubtypes;
+  externalCids?: ExternalCid[];
+  onProgress?: (e: ProgressEvent) => void;
+}
+
+export const updateDagExternalCid = async ({
+  uuid,
+  externalCids,
+  contextPath,
+  onProgress,
+  componentType,
+  componentSubtype,
+}: UpdateDagExternalCid) => {
+  const adjustedConfig: any = config();
+  if (onProgress) {
+    adjustedConfig.onUploadProgress = (e: ProgressEvent) => onProgress(e);
+  }
+
+  const { data } = await axios.post(
+    `${SCIWEAVE_URL}/v1/data/updateExternalCid`,
+    { uuid, externalCids, contextPath, componentType, componentSubtype },
+    adjustedConfig
+  );
+
+  return data;
+};
+
 export const deleteData = async (uuid: string, path: string) => {
   const { data } = await axios.post(
     `${SCIWEAVE_URL}/v1/data/delete`,

@@ -1,6 +1,11 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
-import { getDatasetTree, moveData, updateDag } from "@src/api";
+import {
+  getDatasetTree,
+  moveData,
+  updateDag,
+  updateDagExternalCid,
+} from "@src/api";
 import {
   AccessStatus,
   DriveObject,
@@ -732,6 +737,7 @@ export const addFilesToDrive = createAsyncThunk(
     const contextPath = overwritePathContext || state.drive.currentDrive!.path!;
     const snapshotNodeUuid = currentObjectId!;
     try {
+      // debugger;
       const {
         manifest: updatedManifest,
         error,
@@ -739,28 +745,36 @@ export const addFilesToDrive = createAsyncThunk(
         manifestCid,
         // tree,
         // date,
-      } = await updateDag({
-        uuid: currentObjectId!,
-        files,
-        manifest,
-        contextPath,
-        externalCids,
-        externalUrl,
-        componentType,
-        componentSubtype,
-        newFolderName,
-        onProgress: (e) => {
-          if (batchUid === undefined) return;
-          const perc = Math.ceil((e.loaded / e.total) * 100);
-          const passedPerc = perc < 90 ? perc : 90;
-          dispatch(
-            updateBatchUploadProgress({
-              batchUid,
-              progress: passedPerc,
-            })
-          );
-        },
-      });
+      } = !externalCids
+        ? await updateDag({
+            uuid: currentObjectId!,
+            files,
+            manifest,
+            contextPath,
+            externalCids,
+            externalUrl,
+            componentType,
+            componentSubtype,
+            newFolderName,
+            onProgress: (e) => {
+              if (batchUid === undefined) return;
+              const perc = Math.ceil((e.loaded / e.total) * 100);
+              const passedPerc = perc < 90 ? perc : 90;
+              dispatch(
+                updateBatchUploadProgress({
+                  batchUid,
+                  progress: passedPerc,
+                })
+              );
+            },
+          })
+        : await updateDagExternalCid({
+            uuid: currentObjectId!,
+            contextPath,
+            externalCids,
+            componentType,
+            componentSubtype,
+          });
       if (error) console.error(`[addFilesToDrive] Error: ${error}`);
       if (onSuccess) onSuccess(updatedManifest);
       if (batchUid !== undefined) {
