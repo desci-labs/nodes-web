@@ -363,15 +363,10 @@ export const driveSlice = createSlice({
 
         const manifest: ResearchObjectV1 = action.payload.manifest!;
         //Process the IPFS tree into a DriveObject tree
-        const root = createVirtualDrive({
-          name: "Node Root",
-          componentType: ResearchObjectComponentType.DATA_BUCKET,
-          path: DRIVE_NODE_ROOT_PATH,
-          contains: [],
-        });
+        const root = tree[0] as DriveObject;
 
         // Frontend tree processing; date formatting and file filtering
-        const driveObjectTree = transformTree(tree as DriveObject[]);
+        const driveObjectTree = transformTree(root.contains as DriveObject[]);
         root.contains = driveObjectTree;
 
         //Add links
