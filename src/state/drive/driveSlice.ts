@@ -531,7 +531,6 @@ export const fetchTreeThunk = createAsyncThunk(
     const state = getState() as RootState;
     const { manifest, currentObjectId, manifestCid, publicView, shareId } =
       state.nodes.nodeReader;
-
     //determines if it's a old or new manifest
     // debugger;
     const hasDataBucket =
@@ -547,6 +546,8 @@ export const fetchTreeThunk = createAsyncThunk(
         nodeUuid: currentObjectId!,
         pub: publicView, //  state.nodes.nodeReader.mode === "reader", this would be inferred from the node access control guard
         shareId,
+        dataPath: state.drive.currentDrive?.path!,
+        depth: 1,
       });
       return { tree, manifest };
     } else {

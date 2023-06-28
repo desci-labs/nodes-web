@@ -362,16 +362,23 @@ export interface GetDatasetTreeInput {
   manifestCid: string;
   pub?: boolean;
   shareId?: string;
+  dataPath: string;
+  depth?: number;
 }
 
 export const getDatasetTree = async (params: GetDatasetTreeInput) => {
+  const depth = params.depth ? params.depth : 1;
+  const driveQuery = params.dataPath
+    ? `?dataPath=${params.dataPath}&depth=${params.depth}`
+    : "";
+  debugger;
   const url = params.pub
     ? `${SCIWEAVE_URL}/v1/data/pubTree/${params.nodeUuid}/${
         params.manifestCid
-      }${params.rootCid ? "/" + params.rootCid : ""}`
+      }${params.rootCid?.length ? "/" + params.rootCid : ""}${driveQuery}`
     : `${SCIWEAVE_URL}/v1/data/retrieveTree/${params.nodeUuid}/${
         params.manifestCid
-      }${params.shareId ? "/" + params.shareId : ""}`;
+      }${params.shareId?.length ? "/" + params.shareId : ""}${driveQuery}`;
 
   console.log("fetch dataset tree", params.pub, url);
   const { data } = await axios.get(url, config());

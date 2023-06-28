@@ -6,7 +6,10 @@ import { IconChevronLeft, IconDirectory, IconIpfs, IconX } from "@icons";
 import { useEffect, useState } from "react";
 import ReactTooltip from "react-tooltip";
 import { DriveNonComponentTypes, DriveObject, FileType } from "./Drive";
-import { navigateToDrivePickerByPath } from "@src/state/drive/driveSlice";
+import {
+  fetchTreeThunk,
+  navigateToDrivePickerByPath,
+} from "@src/state/drive/driveSlice";
 import { useDrive } from "@src/state/drive/hooks";
 import { useSetter } from "@src/store/accessors";
 import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
@@ -52,6 +55,7 @@ const DriveTableFilePicker: React.FC<DriveTableProps> = ({
     drive: DriveObject
   ) {
     dispatch(navigateToDrivePickerByPath({ path: drive.path! }));
+    dispatch(fetchTreeThunk());
     setSelected(undefined);
   }
 
