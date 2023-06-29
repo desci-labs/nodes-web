@@ -54,6 +54,7 @@ const DriveTable: React.FC = () => {
 
   function eatBreadCrumb(index: number) {
     dispatch(navigateToDriveByPath({ path: breadCrumbs[index].path! }));
+    dispatch(fetchTreeThunk());
   }
 
   //checks if selected is of the same type
