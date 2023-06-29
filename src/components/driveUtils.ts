@@ -222,6 +222,7 @@ export async function getAllTrees(
 
   const dates: Date[] = [];
   const dataDrive = nodeDrived.contains[dataDriveIdx];
+  debugger;
   const newData = await Promise.all(
     dataDrive.contains!.map(async (dataComp) => {
       const { tree, date } = await getDatasetTree({
@@ -229,6 +230,8 @@ export async function getAllTrees(
         nodeUuid: nodeUuid,
         manifestCid,
         pub: options?.public,
+        dataPath: nodeDrived.path!,
+        depth: 1,
       });
       if (!tree) return dataComp;
       // debugger;

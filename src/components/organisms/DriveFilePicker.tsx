@@ -54,8 +54,9 @@ const DriveTableFilePicker: React.FC<DriveTableProps> = ({
     name: FileDir["name"] | DriveObject["name"],
     drive: DriveObject
   ) {
+    debugger;
     dispatch(navigateToDrivePickerByPath({ path: drive.path! }));
-    dispatch(fetchTreeThunk());
+    // dispatch(fetchTreeThunk());
     setSelected(undefined);
   }
 

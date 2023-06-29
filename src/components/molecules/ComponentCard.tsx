@@ -21,6 +21,7 @@ import { setComponentStack } from "@src/state/nodes/nodeReader";
 import { updatePdfPreferences } from "@src/state/nodes/pdf";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import {
+  fetchTreeThunk,
   navigateToDriveByPath,
   setFileBeingCited,
   setFileBeingUsed,
@@ -187,6 +188,14 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
           //     path: DRIVE_NODE_ROOT_PATH + "/" + DRIVE_DATA_PATH,
           //   })
           // );
+          debugger;
+          dispatch(
+            navigateToDriveByPath({
+              path: component.payload.path,
+              selectPath: component.payload.path,
+            })
+          );
+          dispatch(fetchTreeThunk());
           dispatch(
             navigateToDriveByPath({
               path: component.payload.path,

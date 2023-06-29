@@ -9,6 +9,7 @@ import { useNodeReader } from "@src/state/nodes/hooks";
 import { useDrive } from "@src/state/drive/hooks";
 import {
   addFilesToDrive,
+  fetchTreeThunk,
   navigateToDriveByPath,
   toggleSelectFileInCurrentDrive,
 } from "@src/state/drive/driveSlice";
@@ -48,6 +49,7 @@ const DriveTable: React.FC = () => {
     drive: DriveObject
   ) {
     dispatch(navigateToDriveByPath({ path: drive.path! }));
+    dispatch(fetchTreeThunk());
   }
 
   function eatBreadCrumb(index: number) {

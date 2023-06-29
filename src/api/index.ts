@@ -369,12 +369,11 @@ export interface GetDatasetTreeInput {
 export const getDatasetTree = async (params: GetDatasetTreeInput) => {
   const depth = params.depth ? params.depth : 1;
   const driveQuery = params.dataPath
-    ? `?dataPath=${params.dataPath}&depth=${params.depth}`
-    : "";
-  debugger;
+    ? `?dataPath=${params.dataPath}&depth=${depth}`
+    : "?depth=1";
   const url = params.pub
-    ? `${SCIWEAVE_URL}/v1/data/pubTree/${params.nodeUuid}/${
-        params.manifestCid
+    ? `${SCIWEAVE_URL}/v1/data/pubTree/${params.nodeUuid}${
+        params.manifestCid?.length ? "/" + params.manifestCid : ""
       }${params.rootCid?.length ? "/" + params.rootCid : ""}${driveQuery}`
     : `${SCIWEAVE_URL}/v1/data/retrieveTree/${params.nodeUuid}/${
         params.manifestCid
