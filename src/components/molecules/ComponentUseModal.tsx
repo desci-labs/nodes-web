@@ -26,7 +26,7 @@ const ComponentUseModal = ({
 }: ModalProps & ComponentUseModalProps) => {
   const { manifest: manifestData, mode } = useNodeReader();
   const { dpid, cid, license } = useComponentDpid(file);
-  const fqDpid = `${dpid}/${file.path?.replace(/^root\//, "data/")}`;
+  const fqDpid = `${dpid}/${file.path}`;
 
   const handler = useActionHandler();
   const dispatch = useSetter();
