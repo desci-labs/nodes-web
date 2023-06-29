@@ -159,7 +159,6 @@ const navigateToDriveGeneric =
 
     state[keyBreadcrumbs] = constructBreadCrumbs(driveFound.path!);
     driveFound.contains?.sort(state.sortingFunction);
-    console.log("[driv] found", driveFound);
     state[keyCurrentDrive] = driveFound;
   };
 
@@ -996,10 +995,10 @@ export const navigateFetchThunk = createAsyncThunk(
   "drive/navigateFetchThunk",
   async (payload: NavigateFetchThunkPayload, { getState, dispatch }) => {
     const state = getState() as RootState;
-    const { path, driveKey, selectPath } = payload;
-    const { manifest, currentObjectId, manifestCid, publicView, shareId } =
+    const { path, driveKey, selectPath, dontNavigate, onSuccess } = payload;
+    const { currentObjectId, manifestCid, publicView, shareId } =
       state.nodes.nodeReader;
-
+    // debugger;
     const { tree: treeRes } = await getDatasetTree({
       manifestCid,
       nodeUuid: currentObjectId!,
@@ -1018,13 +1017,13 @@ export const navigateFetchThunk = createAsyncThunk(
     const tree = formattedTree[0];
     dispatch(mutateTreeForNavigation(tree));
 
+    onSuccess?.();
+    if (dontNavigate) return;
     if (driveKey === "") {
       dispatch(navigateToDriveByPath({ path, selectPath }));
     } else {
       dispatch(navigateToDrivePickerByPath({ path, selectPath }));
     }
-    console.log("[driv]nodeTree", state.drive.nodeTree);
-    console.log("[driv]currentDrive", state.drive.currentDrive);
   }
 );
 

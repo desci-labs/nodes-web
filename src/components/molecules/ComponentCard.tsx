@@ -21,9 +21,7 @@ import { setComponentStack } from "@src/state/nodes/nodeReader";
 import { updatePdfPreferences } from "@src/state/nodes/pdf";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import {
-  fetchTreeThunk,
   navigateFetchThunk,
-  navigateToDriveByPath,
   setFileBeingCited,
   setFileBeingUsed,
 } from "@src/state/drive/driveSlice";
@@ -189,7 +187,6 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
           //     path: DRIVE_NODE_ROOT_PATH + "/" + DRIVE_DATA_PATH,
           //   })
           // );
-          debugger;
           dispatch(
             navigateFetchThunk({
               driveKey: "",

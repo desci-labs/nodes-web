@@ -1,11 +1,14 @@
 import { ResearchObjectV1Component } from "@desci-labs/desci-models";
-import { showMetadataForComponent } from "@src/state/drive/driveSlice";
+import {
+  navigateFetchThunk,
+  showMetadataForComponent,
+} from "@src/state/drive/driveSlice";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import React from "react";
-import { useDispatch } from "react-redux";
 import { FlexRowSpaceBetween } from "../styled";
 import { IconOrcidOutline } from "./Icons";
 import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
+import { useSetter } from "@src/store/accessors";
 
 interface MetadataPreviewProps {
   isFair: boolean;
@@ -20,7 +23,7 @@ const MetadataPreview: React.FC<MetadataPreviewProps> = ({
   className,
   text = "FAIR",
 }) => {
-  const dispatch = useDispatch();
+  const dispatch = useSetter();
   const { mode } = useNodeReader();
 
   return (
@@ -30,7 +33,15 @@ const MetadataPreview: React.FC<MetadataPreviewProps> = ({
       data-for={`fair_${component.id}`}
       className={`bg-neutrals-black select-none hover:bg-dark-gray w-8 h-7 flex justify-start items-start rounded-md ${className}`}
       onClick={(e: React.MouseEvent) => {
-        dispatch(showMetadataForComponent(component));
+        dispatch(
+          navigateFetchThunk({
+            driveKey: "",
+            path: component.payload.path,
+            dontNavigate: true,
+            onSuccess: () => dispatch(showMetadataForComponent(component)),
+          })
+        );
+
         e.stopPropagation();
         postUserAction(
           AvailableUserActionLogTypes.btnComponentCardViewMetadata

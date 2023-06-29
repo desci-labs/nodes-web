@@ -70,6 +70,8 @@ export interface NavigateFetchThunkPayload {
   path: DrivePath;
   selectPath?: string;
   driveKey: DriveKey;
+  dontNavigate?: boolean;
+  onSuccess?: () => void;
 }
 
 export type DrivePath = string;

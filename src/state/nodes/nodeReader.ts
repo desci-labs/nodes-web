@@ -585,7 +585,6 @@ export const saveManifestDraft = createAsyncThunk(
   async (args: SaveManifestProps, { dispatch, getState }) => {
     const state = getState() as RootState;
     const { manifest: manifestData, currentObjectId } = state.nodes.nodeReader;
-    debugger;
 
     if (!manifestData) return;
     // console.log("Save Manifest", manifestData);

@@ -21,11 +21,15 @@ import {
 import { useSetter } from "@src/store/accessors";
 import Modal from "../Modal";
 import { FormProvider, useForm } from "react-hook-form";
-import { DriveMetadata } from "@src/components/organisms/Drive/types";
+import { DriveMetadata, FileType } from "@src/components/organisms/Drive/types";
 import { useManuscriptController } from "@src/components/organisms/ManuscriptReader/ManuscriptController";
 import { useDrive } from "@src/state/drive/hooks";
 import { v4 as uuidv4 } from "uuid";
-import { fetchTreeThunk } from "@src/state/drive/driveSlice";
+import {
+  clearCachedTree,
+  fetchTreeThunk,
+  navigateFetchThunk,
+} from "@src/state/drive/driveSlice";
 import ViewMetadataModal from "@src/components/organisms/PopOver/ComponentMetadataPopover/ViewMetadataModal";
 import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
 
@@ -143,13 +147,23 @@ const DriveDatasetMetadataEditor = (
           };
           dispatch(addComponent({ component: newComponent }));
         }
+        const containingDirPath =
+          fileMetadataBeingEdited!.type === FileType.DIR
+            ? fileMetadataBeingEdited!.path!
+            : fileMetadataBeingEdited!.path!.substring(
+                0,
+                fileMetadataBeingEdited!.path!.lastIndexOf("/")
+              );
         dispatch(
           saveManifestDraft({
             onError: () => {
               setIsSaving(false);
             },
             onSucess: () => {
-              dispatch(fetchTreeThunk());
+              dispatch(clearCachedTree({ path: containingDirPath }));
+              dispatch(
+                navigateFetchThunk({ path: containingDirPath, driveKey: "" })
+              );
               setIsSaving(false);
               setOverWrite(false);
               setShowOverwriteDialog(false);

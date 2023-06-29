@@ -6,8 +6,11 @@ import CollapsibleSection from "@components/organisms/CollapsibleSection";
 import { useNodeValidator } from "@src/hooks/useNodeValidator";
 import { ComponentTodoItem } from "./TodoItem";
 import { useNodeReader } from "@src/state/nodes/hooks";
-import { showMetadataForComponent } from "@src/state/drive/driveSlice";
-import { useDispatch } from "react-redux";
+import {
+  navigateFetchThunk,
+  showMetadataForComponent,
+} from "@src/state/drive/driveSlice";
+import { useSetter } from "@src/store/accessors";
 
 interface NodeMetadataProps {
   className?: string;
@@ -15,7 +18,7 @@ interface NodeMetadataProps {
 
 const NodeMetadata = (props: NodeMetadataProps) => {
   const { manifest: manifestData, mode, currentObjectId } = useNodeReader();
-  const dispatch = useDispatch();
+  const dispatch = useSetter();
   const { nodeValidity: validationObj } = useNodeValidator();
 
   // one entry for each component, one entry for wallet, one entry for network
@@ -42,9 +45,17 @@ const NodeMetadata = (props: NodeMetadataProps) => {
               .filter((a) => a.type != ResearchObjectComponentType.DATA_BUCKET)
               .map((component: ResearchObjectV1Component, idx) => (
                 <ComponentTodoItem
-                  onHandleSelect={() =>
-                    dispatch(showMetadataForComponent(component))
-                  }
+                  onHandleSelect={() => {
+                    dispatch(
+                      navigateFetchThunk({
+                        driveKey: "",
+                        path: component.payload.path,
+                        dontNavigate: true,
+                        onSuccess: () =>
+                          dispatch(showMetadataForComponent(component)),
+                      })
+                    );
+                  }}
                   currentObjectId={currentObjectId!}
                   manifestData={manifestData}
                   mode={mode}
