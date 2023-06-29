@@ -209,6 +209,7 @@ export async function getAllTrees(
   nodeDrived: DriveObject,
   nodeUuid: string,
   manifest: ResearchObjectV1,
+  manifestCid: string,
   options?: GetAllTreesOptions,
   shareId?: string
 ) {
@@ -223,12 +224,12 @@ export async function getAllTrees(
   const dataDrive = nodeDrived.contains[dataDriveIdx];
   const newData = await Promise.all(
     dataDrive.contains!.map(async (dataComp) => {
-      const { tree, date } = await getDatasetTree(
-        dataComp.cid!,
-        nodeUuid,
-        options?.public,
-        shareId
-      );
+      const { tree, date } = await getDatasetTree({
+        rootCid: dataComp.cid,
+        nodeUuid: nodeUuid,
+        manifestCid,
+        pub: options?.public,
+      });
       if (!tree) return dataComp;
       // debugger;
       gracefullyAssignTreeUids(
