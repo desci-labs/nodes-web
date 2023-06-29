@@ -16,7 +16,6 @@ import axios from "axios";
 import { AvailableUserActionLogTypes, postUserAction } from "@api/index";
 import { separateFileNameAndExtension } from "@src/state/drive/utils";
 import {
-  fetchTreeThunk,
   navigateFetchThunk,
   removeFileFromCurrentDrive,
   setFileBeingRenamed,
@@ -143,7 +142,7 @@ export default function useActionHandler() {
         dispatch(
           navigateFetchThunk({
             driveKey: "",
-            path: file.path!,
+            path: file.path!.substring(0, file.path!.lastIndexOf("/")),
             dontNavigate: true,
           })
         );

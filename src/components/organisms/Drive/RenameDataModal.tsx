@@ -13,7 +13,6 @@ import { useSetter } from "@src/store/accessors";
 import React, { useEffect, useState } from "react";
 import { DriveObject } from "./types";
 import {
-  fetchTreeThunk,
   navigateFetchThunk,
   renameFileInCurrentDrive,
   setFileBeingRenamed,

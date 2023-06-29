@@ -36,10 +36,11 @@ import Modal from "@src/components/molecules/Modal";
 import { useManuscriptController } from "../../ManuscriptReader/ManuscriptController";
 import { useDrive } from "@src/state/drive/hooks";
 import { v4 as uuidv4 } from "uuid";
-import { fetchTreeThunk } from "@src/state/drive/driveSlice";
+import { navigateFetchThunk } from "@src/state/drive/driveSlice";
 import { DriveObject } from "../../Drive";
 import ViewMetadataModal from "./ViewMetadataModal";
 import { CODE_LICENSE_TYPES, PDF_LICENSE_TYPES } from "@src/helper/license";
+import { last } from "rxjs";
 
 const getLicenseTypes = () => {
   return PDF_LICENSE_TYPES.concat(CODE_LICENSE_TYPES);
@@ -294,7 +295,15 @@ const EditMetadataModal = (
       dispatch(
         saveManifestDraft({
           onSucess: () => {
-            dispatch(fetchTreeThunk());
+            dispatch(
+              navigateFetchThunk({
+                driveKey: "",
+                path: fileMetadataBeingEdited!.path!.substring(
+                  0,
+                  fileMetadataBeingEdited?.path?.lastIndexOf("/")
+                ),
+              })
+            );
             props.onClose();
           },
         })

@@ -27,7 +27,6 @@ import { useDrive } from "@src/state/drive/hooks";
 import { v4 as uuidv4 } from "uuid";
 import {
   clearCachedTree,
-  fetchTreeThunk,
   navigateFetchThunk,
 } from "@src/state/drive/driveSlice";
 import ViewMetadataModal from "@src/components/organisms/PopOver/ComponentMetadataPopover/ViewMetadataModal";

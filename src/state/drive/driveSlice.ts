@@ -910,7 +910,17 @@ export const starComponentThunk = createAsyncThunk(
       };
       dispatch(addComponent({ component: newComponent }));
     }
-    dispatch(saveManifestDraft({ onSucess: () => dispatch(fetchTreeThunk()) }));
+    dispatch(
+      saveManifestDraft({
+        onSucess: () =>
+          dispatch(
+            navigateFetchThunk({
+              driveKey: "",
+              path: item.path!.substring(0, item.path!.lastIndexOf("/")),
+            })
+          ),
+      })
+    );
   }
 );
 
