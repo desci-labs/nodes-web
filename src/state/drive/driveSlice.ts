@@ -21,10 +21,12 @@ import {
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 import {
+  createStubTreeNode,
   createVirtualDrive,
   DRIVE_NODE_ROOT_PATH,
   getAllTrees,
   manifestToVirtualDrives,
+  navigateWithStubs,
   SessionStorageKeys,
 } from "@src/components/driveUtils";
 import {
@@ -123,6 +125,9 @@ const navigateToDriveGeneric =
       | "currentDrive"
       | "currentDrivePicker" = `currentDrive${key}`;
     if (state.status !== "succeeded" || !state.nodeTree!) return;
+    // prep for jump
+    debugger;
+    navigateWithStubs(createStubTreeNode(action.payload.path), state.nodeTree!);
     const { path, selectPath } = action.payload;
     let fileSelectionType: ResearchObjectComponentType | undefined;
     let driveFound = state.deprecated
@@ -402,52 +407,10 @@ export const driveSlice = createSlice({
         });
         if (externalLinks.contains?.length) root.contains?.push(externalLinks);
         debugger;
-        const splitPath = root.path!.split("/");
-        let curPath = "";
-        let curObject = state.nodeTree!;
-        if (splitPath!.length <= 1) {
+        if (root.path!.split("/").length <= 1) {
           state.nodeTree = root;
         } else {
-          // add this subtree to the tree
-          let curFolder = splitPath?.shift();
-          curPath += curFolder;
-          while (splitPath!.length) {
-            curFolder = splitPath?.shift();
-            curPath += "/" + curFolder;
-
-            const nextFolder = curObject!.contains!.find(
-              (d) => d.name === curFolder
-            );
-            let newObject: DriveObject = {
-              name: curFolder!,
-              componentType: ResearchObjectComponentType.UNKNOWN,
-              type: FileType.DIR,
-              uid: uuidv4(),
-              cid: "stub",
-              path: curPath,
-              contains: [],
-              accessStatus: AccessStatus.PRIVATE,
-              lastModified: new Date().toISOString(),
-              size: 0,
-              metadata: {},
-            };
-
-            if (!nextFolder) {
-              // create stub folder for this path
-              if (splitPath!.length === 0) {
-                newObject = root;
-              }
-              curObject.contains = newObject.contains;
-              curObject = newObject;
-            } else {
-              if (splitPath!.length === 0) {
-                newObject = root;
-                nextFolder.contains = newObject.contains;
-              }
-              curObject = nextFolder;
-              console.log("nextFolder", JSON.stringify(nextFolder));
-            }
-          }
+          navigateWithStubs(root, state.nodeTree!);
         }
 
         if (!state.nodeTree) {

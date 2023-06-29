@@ -18,6 +18,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { UploadQueueItem } from "@src/state/drive/types";
 import { formatDbDate, recursiveFlattenTree } from "@src/state/drive/utils";
+import { DriveState } from "@src/state/drive/driveSlice";
 
 export const tempDate = "12/02/2022 7:00PM";
 
@@ -202,6 +203,70 @@ export const DRIVE_NODE_ROOT_PATH = "root";
 interface GetAllTreesOptions {
   pathUidMap?: Record<string, string>;
   public?: boolean;
+}
+
+export async function navigateWithStubs(
+  newTreeNode: DriveObject,
+  nodeTree: DriveObject
+) {
+  debugger;
+  const splitPath = newTreeNode.path!.split("/");
+  let curPath = "";
+  let curObject = nodeTree;
+  if (splitPath!.length <= 1) {
+    throw new Error(
+      "Attempted to navigate with stubs to root, but this should be handled in reducer"
+    );
+  } else {
+    // add this subtree to the tree
+    let curFolder = splitPath?.shift();
+    curPath += curFolder;
+    while (splitPath!.length) {
+      curFolder = splitPath?.shift();
+      curPath += "/" + curFolder;
+
+      const nextFolder = curObject!.contains!.find((d) => d.name === curFolder);
+      let newObject: DriveObject = createStubTreeNode(curPath);
+
+      if (!nextFolder) {
+        // create stub folder for this path
+        if (splitPath!.length === 0) {
+          newObject = newTreeNode;
+        }
+        if (newObject.type === FileType.FILE) {
+          curObject.contains = newObject.contains;
+        } else {
+          curObject.contains = [newObject];
+        }
+
+        curObject = newObject;
+      } else {
+        if (splitPath!.length === 0) {
+          newObject = newTreeNode;
+          nextFolder.contains = newObject.contains;
+        }
+        curObject = nextFolder;
+        console.log("nextFolder", JSON.stringify(nextFolder));
+      }
+    }
+  }
+}
+
+export function createStubTreeNode(path: string): DriveObject {
+  const folder = path.split("/").pop();
+  return {
+    name: folder!,
+    componentType: ResearchObjectComponentType.UNKNOWN,
+    type: FileType.DIR,
+    uid: uuidv4(),
+    cid: "stub",
+    path: path,
+    contains: [],
+    accessStatus: AccessStatus.PRIVATE,
+    lastModified: new Date().toISOString(),
+    size: 0,
+    metadata: {},
+  };
 }
 
 //mutable
