@@ -14,6 +14,7 @@ import React, { useEffect, useState } from "react";
 import { DriveObject } from "./types";
 import {
   fetchTreeThunk,
+  navigateFetchThunk,
   renameFileInCurrentDrive,
   setFileBeingRenamed,
 } from "@src/state/drive/driveSlice";
@@ -95,7 +96,13 @@ const RenameDataModal: React.FC<RenameDataModalProps> = ({ file }) => {
       if (newManifestCid && newManifest) {
         dispatch(setManifest(newManifest));
         dispatch(setManifestCid(newManifestCid));
-        dispatch(fetchTreeThunk());
+        dispatch(
+          navigateFetchThunk({
+            driveKey: "",
+            path: file.path!,
+            dontNavigate: true,
+          })
+        );
         close();
       }
     } catch (e: any) {
@@ -109,7 +116,13 @@ const RenameDataModal: React.FC<RenameDataModalProps> = ({ file }) => {
         dispatch(setManifest(snapshotManifest!));
         dispatch(setManifestCid(snapshotManifestCid));
       }
-      dispatch(fetchTreeThunk());
+      dispatch(
+        navigateFetchThunk({
+          driveKey: "",
+          path: file.path!,
+          dontNavigate: true,
+        })
+      );
       close();
     }
   };
