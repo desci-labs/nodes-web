@@ -13,7 +13,10 @@ import { DriveObject } from "../types";
 import { buildMenu } from "./MenuList";
 import DriveTableFilePicker, { DrivePickerMode } from "../../DriveFilePicker";
 import { useSetter } from "@src/store/accessors";
-import { moveFilesThunk } from "@src/state/drive/driveSlice";
+import {
+  moveFilesThunk,
+  navigateFetchThunk,
+} from "@src/state/drive/driveSlice";
 import { useClickAway } from "react-use";
 import { navigateToDrivePickerByPath } from "@src/state/drive/driveSlice";
 import toast from "react-hot-toast";
@@ -83,8 +86,9 @@ export default function ContextMenuProvider(props: PropsWithChildren<{}>) {
 
   const openDrivePicker = () => {
     dispatch(
-      navigateToDrivePickerByPath({
+      navigateFetchThunk({
         path: lastFile?.path!,
+        driveKey: "Picker",
       })
     );
     setShowDrivePicker(true);

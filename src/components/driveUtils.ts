@@ -205,14 +205,15 @@ interface GetAllTreesOptions {
   public?: boolean;
 }
 
-export async function navigateWithStubs(
+export function navigateWithStubs(
   newTreeNode: DriveObject,
   nodeTree: DriveObject
 ) {
   debugger;
   const splitPath = newTreeNode.path!.split("/");
   let curPath = "";
-  let curObject = nodeTree;
+  let nodeTreeCopy = { ...nodeTree };
+  let curObject = nodeTreeCopy;
   if (splitPath!.length <= 1) {
     throw new Error(
       "Attempted to navigate with stubs to root, but this should be handled in reducer"
@@ -249,6 +250,7 @@ export async function navigateWithStubs(
         console.log("nextFolder", JSON.stringify(nextFolder));
       }
     }
+    return nodeTreeCopy;
   }
 }
 

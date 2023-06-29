@@ -59,7 +59,10 @@ import { useNodeReader, usePdfReader } from "@src/state/nodes/hooks";
 import { useDrive } from "@src/state/drive/hooks";
 import { bfsDriveSearch } from "@src/state/drive/utils";
 import { useSetter } from "@src/store/accessors";
-import { navigateToDrivePickerByPath } from "@src/state/drive/driveSlice";
+import {
+  navigateFetchThunk,
+  navigateToDrivePickerByPath,
+} from "@src/state/drive/driveSlice";
 
 const HOTKEYS: any = {
   "mod+b": "bold",
@@ -848,7 +851,10 @@ const DirectoryButton = ({
       <Button
         onClick={() => {
           dispatch(
-            navigateToDrivePickerByPath({ path: breadCrumbsPicker[0].path! })
+            navigateFetchThunk({
+              path: breadCrumbsPicker[0].path!,
+              driveKey: "Picker",
+            })
           );
           setShowDirectory(!showDirectory);
         }}

@@ -22,6 +22,7 @@ import { updatePdfPreferences } from "@src/state/nodes/pdf";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import {
   fetchTreeThunk,
+  navigateFetchThunk,
   navigateToDriveByPath,
   setFileBeingCited,
   setFileBeingUsed,
@@ -190,12 +191,13 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
           // );
           debugger;
           dispatch(
-            navigateToDriveByPath({
+            navigateFetchThunk({
+              driveKey: "",
               path: component.payload.path,
               selectPath: component.payload.path,
             })
           );
-          dispatch(fetchTreeThunk());
+          // dispatch(fetchTreeThunk());
           dispatch(setComponentStack([component]));
         } else {
           if (!isSelected) {
@@ -324,7 +326,8 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                       onClick={(e) => {
                         e!.stopPropagation();
                         dispatch(
-                          navigateToDriveByPath({
+                          navigateFetchThunk({
+                            driveKey: "",
                             path: component.payload.path,
                             selectPath: component.payload.path,
                           })

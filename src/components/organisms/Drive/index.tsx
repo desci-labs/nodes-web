@@ -10,6 +10,7 @@ import { useDrive } from "@src/state/drive/hooks";
 import {
   addFilesToDrive,
   fetchTreeThunk,
+  navigateFetchThunk,
   navigateToDriveByPath,
   toggleSelectFileInCurrentDrive,
 } from "@src/state/drive/driveSlice";
@@ -48,13 +49,15 @@ const DriveTable: React.FC = () => {
     name: FileDir["name"] | DriveObject["name"],
     drive: DriveObject
   ) {
-    dispatch(navigateToDriveByPath({ path: drive.path! }));
-    dispatch(fetchTreeThunk());
+    dispatch(navigateFetchThunk({ path: drive.path!, driveKey: "" }));
+    // dispatch(fetchTreeThunk());
   }
 
   function eatBreadCrumb(index: number) {
-    dispatch(navigateToDriveByPath({ path: breadCrumbs[index].path! }));
-    dispatch(fetchTreeThunk());
+    dispatch(
+      navigateFetchThunk({ path: breadCrumbs[index].path!, driveKey: "" })
+    );
+    // dispatch(fetchTreeThunk());
   }
 
   //checks if selected is of the same type

@@ -17,6 +17,7 @@ import { setComponentStack } from "@src/state/nodes/nodeReader";
 import { updatePdfPreferences } from "@src/state/nodes/pdf";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import {
+  navigateFetchThunk,
   navigateToDriveByPath,
 } from "@src/state/drive/driveSlice";
 // import { useDrive } from "@src/state/drive/hooks";
@@ -80,8 +81,7 @@ const iconFor = (
 const MiniComponentCard = React.forwardRef(
   ({ component }: MiniComponentCardProps, orderRef: any) => {
     const dispatch = useSetter();
-    const { componentStack, recentlyAddedComponent } =
-      useNodeReader();
+    const { componentStack, recentlyAddedComponent } = useNodeReader();
     // const { nodeTree } = useDrive();
     /***
      * Use local click tracking for fast click response
@@ -118,7 +118,6 @@ const MiniComponentCard = React.forwardRef(
     const isSelected =
       componentStack[componentStack?.length - 1]?.id === component.id;
 
-
     const handleComponentClick = () => {
       setClicked(true);
       setTimeout(() => {
@@ -140,7 +139,9 @@ const MiniComponentCard = React.forwardRef(
             component.type === ResearchObjectComponentType.UNKNOWN
           ) {
             sessionStorage.removeItem(SessionStorageKeys.lastDirUid);
-            dispatch(navigateToDriveByPath(component.payload.path));
+            dispatch(
+              navigateFetchThunk({ path: component.payload.path, driveKey: "" })
+            );
             dispatch(setComponentStack([component]));
           } else {
             if (!isSelected) {
@@ -162,7 +163,6 @@ const MiniComponentCard = React.forwardRef(
 
     const Icon = iconFor(component, false);
 
-    
     return (
       <CardWrapper
         isSelected={isSelected}

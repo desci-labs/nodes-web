@@ -49,15 +49,23 @@ const FILTER_LIST = [".nodeKeep", ".DS_Store"];
 
 // Fill in the remaining details the backend tree doesn't return, so far; date format and filtering.
 export function transformTree(tree: DriveObject[]) {
-  tree = tree.filter((branch) => !FILTER_LIST.includes(branch.name));
+  // tree = tree.filter((branch) => !FILTER_LIST.includes(branch.name));
   tree.forEach((branch) => {
-    branch.lastModified = formatDbDate(branch.lastModified) || tempDate;
+    try {
+      branch.lastModified = formatDbDate(branch.lastModified);
+    } catch (e) {
+      branch.lastModified = tempDate;
+    }
     if (
       branch.contains &&
       branch.contains.length &&
       branch.type === FileType.DIR
     ) {
-      branch.contains = transformTree(branch.contains);
+      branch.contains = branch.contains.filter(
+        (branch) => !FILTER_LIST.includes(branch.name)
+      );
+
+      //   branch.contains = transformTree(branch.contains);
     }
   });
   return tree;
