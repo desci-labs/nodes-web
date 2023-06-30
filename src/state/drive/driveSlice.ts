@@ -1029,29 +1029,37 @@ export const navigateFetchThunk = createAsyncThunk(
       DRIVE_FULL_EXTERNAL_LINKS_PATH
     );
     if (notBrowsingExternalLinks) {
-      dispatch(setDriveLoading(true));
-      try {
-        const { tree: treeRes } = await getDatasetTree({
-          manifestCid,
-          nodeUuid: currentObjectId!,
-          pub: publicView, //  state.nodes.nodeReader.mode === "reader", this would be inferred from the node access control guard
-          shareId,
-          dataPath: path,
-          depth: 1,
-        });
-        if (!state.drive.nodeTree) {
-          throw new Error(
-            "Attempt to fetch a node tree when there is no node tree in the store"
-          );
+      debugger;
+      const targetTreeNode = findDriveByPath(state.drive.nodeTree!, path);
+      if (
+        !targetTreeNode ||
+        targetTreeNode.cid === "stub" ||
+        !targetTreeNode.contains?.length
+      ) {
+        dispatch(setDriveLoading(true));
+        try {
+          const { tree: treeRes } = await getDatasetTree({
+            manifestCid,
+            nodeUuid: currentObjectId!,
+            pub: publicView, //  state.nodes.nodeReader.mode === "reader", this would be inferred from the node access control guard
+            shareId,
+            dataPath: path,
+            depth: 1,
+          });
+          if (!state.drive.nodeTree) {
+            throw new Error(
+              "Attempt to fetch a node tree when there is no node tree in the store"
+            );
+          }
+          const formattedTree = transformTree(treeRes);
+          const tree = formattedTree[0];
+          dispatch(mutateTreeForNavigation(tree));
+        } catch (e) {
+          toast.error(`Error fetching drive`);
+          console.error(e);
+        } finally {
+          dispatch(setDriveLoading(false));
         }
-        const formattedTree = transformTree(treeRes);
-        const tree = formattedTree[0];
-        dispatch(mutateTreeForNavigation(tree));
-      } catch (e) {
-        toast.error(`Error fetching drive`);
-        console.error(e);
-      } finally {
-        dispatch(setDriveLoading(false));
       }
     }
     onSuccess?.();
