@@ -22,6 +22,7 @@ import ContextMenu from "../ContextMenu";
 import { FolderAddIcon } from "@heroicons/react/solid";
 import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
 import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
+import DefaultSpinner from "@src/components/atoms/DefaultSpinner";
 
 const Empty = () => {
   return <div className="p-5 text-xs col-span-7">No files</div>;
@@ -35,8 +36,14 @@ const DriveTable: React.FC = () => {
   const { publicView, mode } = useNodeReader();
   const { setAddFilesWithoutContext, setIsAddingComponent } =
     useManuscriptController();
-  const { currentDrive, deprecated, breadCrumbs, fileBeingRenamed, selected } =
-    useDrive();
+  const {
+    currentDrive,
+    deprecated,
+    breadCrumbs,
+    fileBeingRenamed,
+    selected,
+    driveLoading,
+  } = useDrive();
 
   const [showAddBtnSelectMenu, setShowAddBtnSelectMenu] =
     useState<boolean>(false);
@@ -50,14 +57,12 @@ const DriveTable: React.FC = () => {
     drive: DriveObject
   ) {
     dispatch(navigateFetchThunk({ path: drive.path!, driveKey: "" }));
-    // dispatch(fetchTreeThunk());
   }
 
   function eatBreadCrumb(index: number) {
     dispatch(
       navigateFetchThunk({ path: breadCrumbs[index].path!, driveKey: "" })
     );
-    // dispatch(fetchTreeThunk());
   }
 
   //checks if selected is of the same type
@@ -142,7 +147,7 @@ const DriveTable: React.FC = () => {
       ) : null}
       <DriveBreadCrumbs eatBreadCrumb={eatBreadCrumb} />
       <div
-        className="bg-neutrals-gray-1 h-full w-full rounded-xl outline-none"
+        className={`bg-neutrals-gray-1 h-full w-full rounded-xl outline-none`}
         ref={containerRef}
       >
         <ul

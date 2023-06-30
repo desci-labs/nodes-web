@@ -25,6 +25,7 @@ import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
 import ExternalService from "@src/components/atoms/ExternalServices";
 import { AvailableUserActionLogTypes, postUserAction } from "@src/api";
+import { useDrive } from "@src/state/drive/hooks";
 
 function renderComponentIcon(file: DriveObject) {
   const foundEntry = findTarget(
@@ -49,6 +50,7 @@ export default function DriveRow({
   const { init } = useDriveContext(file);
   const { handleDbClick } = useInteractionHandler();
   const { mode } = useNodeReader();
+  const { driveLoading } = useDrive();
 
   const dispatch = useSetter();
 
@@ -71,7 +73,7 @@ export default function DriveRow({
     <div
       ref={handleRef}
       className={`singleRow contents !bg-neutrals-gray-2 ${
-        selected ? "singleRowSelected" : null
+        selected ? "singleRowSelected" : ""
       }`}
       onDoubleClick={(e) => handleDbClick(e, file)}
       onClick={(e) => {
@@ -142,7 +144,9 @@ export default function DriveRow({
         </div>
         <span
           title={file.name}
-          className="truncate max-w-[17rem] w-full align-middle leading-loose"
+          className={`truncate max-w-[17rem] w-full align-middle leading-loose ${
+            driveLoading ? "animate-pulse duration-500" : ""
+          }`}
         >
           {file.name}
         </span>

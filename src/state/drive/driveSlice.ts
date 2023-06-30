@@ -69,6 +69,8 @@ import {
   setManifestCid,
   updateComponent,
 } from "../nodes/nodeReader";
+import toast from "react-hot-toast";
+import { dispatch } from "react-hot-toast/dist/core/store";
 
 export interface DriveState {
   status: RequestStatus;
@@ -79,6 +81,7 @@ export interface DriveState {
   uploadQueue: UploadQueueItem[];
   batchUploadProgress: Record<string, number>;
   showUploadPanel: boolean;
+  driveLoading: boolean;
   deprecated: boolean | undefined;
   componentTypeBeingAssignedTo: DrivePath | null;
   fileMetadataBeingEdited: DriveObject | null;
@@ -104,6 +107,7 @@ const initialState: DriveState = {
   uploadQueue: [],
   batchUploadProgress: {},
   showUploadPanel: false,
+  driveLoading: true,
   componentTypeBeingAssignedTo: null,
   fileMetadataBeingEdited: null,
   fileBeingRenamed: null,
@@ -171,6 +175,9 @@ export const driveSlice = createSlice({
     },
     navigateToDriveByPath: navigateToDriveGeneric(""),
     navigateToDrivePickerByPath: navigateToDriveGeneric("Picker"),
+    setDriveLoading: (state, action: { payload: boolean }) => {
+      state.driveLoading = action.payload;
+    },
     setShowUploadPanel: (state, action: { payload: boolean }) => {
       state.showUploadPanel = action.payload;
     },
@@ -533,6 +540,7 @@ export const {
   addItemsToUploadQueue,
   updateBatchUploadProgress,
   cleanupUploadProgressMap,
+  setDriveLoading,
   setShowUploadPanel,
   removeBatchFromUploadQueue,
   starComponent,
@@ -602,7 +610,7 @@ export const addExternalLinkThunk = createAsyncThunk(
 
 export const fetchTreeThunk = createAsyncThunk(
   "drive/fetchTree",
-  async (_, { getState }) => {
+  async (_, { getState, dispatch }) => {
     const state = getState() as RootState;
     const { manifest, currentObjectId, manifestCid, publicView, shareId } =
       state.nodes.nodeReader;
@@ -616,15 +624,22 @@ export const fetchTreeThunk = createAsyncThunk(
               c.type === ResearchObjectComponentType.DATA_BUCKET
           );
     if (hasDataBucket) {
-      const { tree } = await getDatasetTree({
-        manifestCid,
-        nodeUuid: currentObjectId!,
-        pub: publicView, //  state.nodes.nodeReader.mode === "reader", this would be inferred from the node access control guard
-        shareId,
-        dataPath: state.drive.currentDrive?.path!,
-        depth: 1,
-      });
-      return { tree, manifest };
+      try {
+        dispatch(setDriveLoading(true));
+        const { tree } = await getDatasetTree({
+          manifestCid,
+          nodeUuid: currentObjectId!,
+          pub: publicView, //  state.nodes.nodeReader.mode === "reader", this would be inferred from the node access control guard
+          shareId,
+          dataPath: state.drive.currentDrive?.path!,
+          depth: 1,
+        });
+        return { tree, manifest };
+      } catch (e) {
+        throw e;
+      } finally {
+        dispatch(setDriveLoading(false));
+      }
     } else {
       //fallback to construct deprecated tree
       const rootDrive = manifestToVirtualDrives(manifest!, manifestCid);
@@ -1008,26 +1023,36 @@ export const navigateFetchThunk = createAsyncThunk(
     const { path, driveKey, selectPath, dontNavigate, onSuccess } = payload;
     const { currentObjectId, manifestCid, publicView, shareId } =
       state.nodes.nodeReader;
-    // debugger;
+    debugger;
 
-    if (!path.startsWith(DRIVE_FULL_EXTERNAL_LINKS_PATH)) {
-      const { tree: treeRes } = await getDatasetTree({
-        manifestCid,
-        nodeUuid: currentObjectId!,
-        pub: publicView, //  state.nodes.nodeReader.mode === "reader", this would be inferred from the node access control guard
-        shareId,
-        dataPath: path,
-        depth: 1,
-      });
-
-      if (!state.drive.nodeTree) {
-        throw new Error(
-          "Attempt to fetch a node tree when there is no node tree in the store"
-        );
+    const notBrowsingExternalLinks = !path.startsWith(
+      DRIVE_FULL_EXTERNAL_LINKS_PATH
+    );
+    if (notBrowsingExternalLinks) {
+      dispatch(setDriveLoading(true));
+      try {
+        const { tree: treeRes } = await getDatasetTree({
+          manifestCid,
+          nodeUuid: currentObjectId!,
+          pub: publicView, //  state.nodes.nodeReader.mode === "reader", this would be inferred from the node access control guard
+          shareId,
+          dataPath: path,
+          depth: 1,
+        });
+        if (!state.drive.nodeTree) {
+          throw new Error(
+            "Attempt to fetch a node tree when there is no node tree in the store"
+          );
+        }
+        const formattedTree = transformTree(treeRes);
+        const tree = formattedTree[0];
+        dispatch(mutateTreeForNavigation(tree));
+      } catch (e) {
+        toast.error(`Error fetching drive`);
+        console.error(e);
+      } finally {
+        dispatch(setDriveLoading(false));
       }
-      const formattedTree = transformTree(treeRes);
-      const tree = formattedTree[0];
-      dispatch(mutateTreeForNavigation(tree));
     }
     onSuccess?.();
     if (dontNavigate) return;
