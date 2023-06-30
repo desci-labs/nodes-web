@@ -11,6 +11,7 @@ import { addFilesToDrive } from "@src/state/drive/driveSlice";
 import { useSetter } from "@src/store/accessors";
 import { ResearchObjectComponentType } from "@desci-labs/desci-models";
 import { useDrive } from "@src/state/drive/hooks";
+import { useGetUser } from "@src/hooks/useGetUser";
 
 interface Props {
   close: () => void;
@@ -136,6 +137,15 @@ const AddDataComponent = ({ close }: Props) => {
   const { currentDrive } = useDrive();
   const dispatch = useSetter();
 
+  const [isAdmin, setIsAdmin] = useState(false);
+  const { userData } = useGetUser();
+
+  useEffect(() => {
+    if (userData && userData.email?.includes("@desci.com")) {
+      setIsAdmin(true);
+    }
+  }, [userData]);
+
   const handleAddExternalCid = () => {
     if (!externalCidName.length || !externalCid.length) return;
     if (!strIsCid(externalCid)) {
@@ -170,10 +180,12 @@ const AddDataComponent = ({ close }: Props) => {
       <div className="py-3 flex items-center gap-3 text-white">
         <ButtonAddData id="file_data" close={close} />
         <ButtonAddData id="folder_data" directory={true} close={close} />
-        <AddExternalCidButton
-          setShowCidFields={setShowCidFields}
-          showCidFields={showCidFields}
-        />
+        {isAdmin && (
+          <AddExternalCidButton
+            setShowCidFields={setShowCidFields}
+            showCidFields={showCidFields}
+          />
+        )}
       </div>
       {showCidFields && (
         <div className="text-white mt-2 flex flex-col gap-3">

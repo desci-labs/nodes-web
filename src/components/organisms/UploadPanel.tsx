@@ -16,6 +16,7 @@ import { setComponentStack } from "@src/state/nodes/nodeReader";
 import { useDrive } from "@src/state/drive/hooks";
 import {
   cleanupUploadProgressMap,
+  navigateFetchThunk,
   navigateToDriveByPath,
   setShowUploadPanel,
 } from "@src/state/drive/driveSlice";
@@ -150,9 +151,10 @@ const UploadPanel: React.FC<UploadPanelProps> = ({ show }) => {
                     data-background-color="black"
                     onClick={() => {
                       dispatch(
-                        navigateToDriveByPath({
+                        navigateFetchThunk({
                           path: qI.path,
                           selectPath: qI.path,
+                          driveKey: "",
                         })
                       );
                       if (componentStack.length) {

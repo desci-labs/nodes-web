@@ -1,6 +1,11 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
-import { getDatasetTree, moveData, updateDag } from "@src/api";
+import {
+  getDatasetTree,
+  moveData,
+  updateDag,
+  updateDagExternalCid,
+} from "@src/api";
 import {
   AccessStatus,
   DriveObject,
@@ -16,10 +21,12 @@ import {
   ResearchObjectV1Component,
 } from "@desci-labs/desci-models";
 import {
+  createStubTreeNode,
   createVirtualDrive,
   DRIVE_NODE_ROOT_PATH,
   getAllTrees,
   manifestToVirtualDrives,
+  navigateWithStubs,
   SessionStorageKeys,
 } from "@src/components/driveUtils";
 import {
@@ -45,6 +52,7 @@ import {
   BreadCrumb,
   DrivePath,
   MoveFilesThunkPayload,
+  NavigateFetchThunkPayload,
   NavigateToDriveByPathAction,
   removeBatchFromUploadQueueAction,
   StarComponentThunkPayload,
@@ -61,6 +69,8 @@ import {
   setManifestCid,
   updateComponent,
 } from "../nodes/nodeReader";
+import toast from "react-hot-toast";
+import { dispatch } from "react-hot-toast/dist/core/store";
 
 export interface DriveState {
   status: RequestStatus;
@@ -71,6 +81,7 @@ export interface DriveState {
   uploadQueue: UploadQueueItem[];
   batchUploadProgress: Record<string, number>;
   showUploadPanel: boolean;
+  driveLoading: boolean;
   deprecated: boolean | undefined;
   componentTypeBeingAssignedTo: DrivePath | null;
   fileMetadataBeingEdited: DriveObject | null;
@@ -96,6 +107,7 @@ const initialState: DriveState = {
   uploadQueue: [],
   batchUploadProgress: {},
   showUploadPanel: false,
+  driveLoading: true,
   componentTypeBeingAssignedTo: null,
   fileMetadataBeingEdited: null,
   fileBeingRenamed: null,
@@ -108,8 +120,10 @@ const initialState: DriveState = {
   selected: {},
 };
 
+export type DriveKey = "" | "Picker";
+
 const navigateToDriveGeneric =
-  (key: "" | "Picker") =>
+  (key: DriveKey) =>
   (state: DriveState, action: NavigateToDriveByPathAction) => {
     const keyBreadcrumbs:
       | "breadCrumbs"
@@ -117,8 +131,10 @@ const navigateToDriveGeneric =
     const keyCurrentDrive:
       | "currentDrive"
       | "currentDrivePicker" = `currentDrive${key}`;
-
     if (state.status !== "succeeded" || !state.nodeTree!) return;
+    // // prep for jump
+    // debugger;
+    // navigateWithStubs(createStubTreeNode(action.payload.path), state.nodeTree!);
     const { path, selectPath } = action.payload;
     let fileSelectionType: ResearchObjectComponentType | undefined;
     let driveFound = state.deprecated
@@ -159,6 +175,9 @@ export const driveSlice = createSlice({
     },
     navigateToDriveByPath: navigateToDriveGeneric(""),
     navigateToDrivePickerByPath: navigateToDriveGeneric("Picker"),
+    setDriveLoading: (state, action: { payload: boolean }) => {
+      state.driveLoading = action.payload;
+    },
     setShowUploadPanel: (state, action: { payload: boolean }) => {
       state.showUploadPanel = action.payload;
     },
@@ -320,6 +339,69 @@ export const driveSlice = createSlice({
     resetSelected: (state) => {
       state.selected = {};
     },
+    mutateTreeForNavigation: (
+      state,
+      { payload }: PayloadAction<DriveObject>
+    ) => {
+      const tree = payload;
+      // const newNodeTree = navigateWithStubs(tree, state.nodeTree!);
+      const splitPath = tree.path!.split("/");
+      let curPath = "";
+
+      let curObject = state.nodeTree!;
+      if (splitPath!.length <= 1) {
+        return;
+      } else {
+        // add this subtree to the tree
+        let curFolder = splitPath?.shift();
+        curPath += curFolder;
+        while (splitPath!.length) {
+          curFolder = splitPath?.shift();
+          curPath += "/" + curFolder;
+
+          const nextFolder = curObject!.contains!.find(
+            (d) => d.name === curFolder
+          );
+          let newObject: DriveObject = createStubTreeNode(curPath);
+
+          if (!nextFolder) {
+            // create stub folder for this path
+            if (splitPath!.length === 0) {
+              newObject = tree;
+            }
+            if (newObject.type === FileType.FILE) {
+              curObject.contains = newObject.contains;
+            } else {
+              curObject.contains = [newObject];
+            }
+
+            curObject = newObject;
+          } else {
+            if (splitPath!.length === 0) {
+              newObject = tree;
+              nextFolder.contains = newObject.contains;
+            }
+            curObject = nextFolder;
+            console.log("nextFolder", JSON.stringify(nextFolder));
+          }
+        }
+      }
+    },
+    clearCachedTree: (state, { payload }: PayloadAction<{ path: string }>) => {
+      debugger;
+      const node = findDriveByPath(state.nodeTree!, payload.path);
+      debugger;
+      if (!node) {
+        console.warn("Failed to clear cache tree", payload.path);
+        return;
+      }
+      node.contains = [];
+      node.cid = "stub";
+
+      console.log("cleared cache for path", payload.path);
+      // findDriveByPath()
+      // state.nodeTree
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -330,7 +412,6 @@ export const driveSlice = createSlice({
         state.status = "succeeded";
         state.error = null;
         const { tree } = action.payload;
-        // debugger;
         if (action.payload.deprecated) {
           console.log(
             "[DRIVE]Deprecated node detected. Using old drive format."
@@ -358,16 +439,7 @@ export const driveSlice = createSlice({
 
         const manifest: ResearchObjectV1 = action.payload.manifest!;
         //Process the IPFS tree into a DriveObject tree
-        const root = createVirtualDrive({
-          name: "Node Root",
-          componentType: ResearchObjectComponentType.DATA_BUCKET,
-          path: DRIVE_NODE_ROOT_PATH,
-          contains: [],
-        });
-
-        // Frontend tree processing; date formatting and file filtering
-        const driveObjectTree = transformTree(tree as DriveObject[]);
-        root.contains = driveObjectTree;
+        const root = transformTree(tree)[0] as DriveObject;
 
         //Add links
         const externalLinks = createVirtualDrive({
@@ -403,7 +475,15 @@ export const driveSlice = createSlice({
           }
         });
         if (externalLinks.contains?.length) root.contains?.push(externalLinks);
-        state.nodeTree = root;
+        if (root.path!.split("/").length <= 1) {
+          state.nodeTree = root;
+        } else {
+          state.nodeTree = navigateWithStubs(root, state.nodeTree!);
+        }
+
+        if (!state.nodeTree) {
+          throw new Error("Node tree not set!");
+        }
 
         if (!state.breadCrumbsPicker.length) {
           state.breadCrumbsPicker = [
@@ -452,12 +532,15 @@ export const driveSlice = createSlice({
 });
 
 export const {
+  clearCachedTree,
   reset,
   navigateToDriveByPath,
+  mutateTreeForNavigation,
   navigateToDrivePickerByPath,
   addItemsToUploadQueue,
   updateBatchUploadProgress,
   cleanupUploadProgressMap,
+  setDriveLoading,
   setShowUploadPanel,
   removeBatchFromUploadQueue,
   starComponent,
@@ -527,11 +610,10 @@ export const addExternalLinkThunk = createAsyncThunk(
 
 export const fetchTreeThunk = createAsyncThunk(
   "drive/fetchTree",
-  async (_, { getState }) => {
+  async (_, { getState, dispatch }) => {
     const state = getState() as RootState;
     const { manifest, currentObjectId, manifestCid, publicView, shareId } =
       state.nodes.nodeReader;
-
     //determines if it's a old or new manifest
     // debugger;
     const hasDataBucket =
@@ -542,13 +624,22 @@ export const fetchTreeThunk = createAsyncThunk(
               c.type === ResearchObjectComponentType.DATA_BUCKET
           );
     if (hasDataBucket) {
-      const { tree } = await getDatasetTree({
-        manifestCid,
-        nodeUuid: currentObjectId!,
-        pub: publicView, //  state.nodes.nodeReader.mode === "reader", this would be inferred from the node access control guard
-        shareId,
-      });
-      return { tree, manifest };
+      try {
+        dispatch(setDriveLoading(true));
+        const { tree } = await getDatasetTree({
+          manifestCid,
+          nodeUuid: currentObjectId!,
+          pub: publicView, //  state.nodes.nodeReader.mode === "reader", this would be inferred from the node access control guard
+          shareId,
+          dataPath: state.drive.currentDrive?.path!,
+          depth: 1,
+        });
+        return { tree, manifest };
+      } catch (e) {
+        throw e;
+      } finally {
+        dispatch(setDriveLoading(false));
+      }
     } else {
       //fallback to construct deprecated tree
       const rootDrive = manifestToVirtualDrives(manifest!, manifestCid);
@@ -732,6 +823,7 @@ export const addFilesToDrive = createAsyncThunk(
     const contextPath = overwritePathContext || state.drive.currentDrive!.path!;
     const snapshotNodeUuid = currentObjectId!;
     try {
+      // debugger;
       const {
         manifest: updatedManifest,
         error,
@@ -739,28 +831,36 @@ export const addFilesToDrive = createAsyncThunk(
         manifestCid,
         // tree,
         // date,
-      } = await updateDag({
-        uuid: currentObjectId!,
-        files,
-        manifest,
-        contextPath,
-        externalCids,
-        externalUrl,
-        componentType,
-        componentSubtype,
-        newFolderName,
-        onProgress: (e) => {
-          if (batchUid === undefined) return;
-          const perc = Math.ceil((e.loaded / e.total) * 100);
-          const passedPerc = perc < 90 ? perc : 90;
-          dispatch(
-            updateBatchUploadProgress({
-              batchUid,
-              progress: passedPerc,
-            })
-          );
-        },
-      });
+      } = !externalCids
+        ? await updateDag({
+            uuid: currentObjectId!,
+            files,
+            manifest,
+            contextPath,
+            externalCids,
+            externalUrl,
+            componentType,
+            componentSubtype,
+            newFolderName,
+            onProgress: (e) => {
+              if (batchUid === undefined) return;
+              const perc = Math.ceil((e.loaded / e.total) * 100);
+              const passedPerc = perc < 90 ? perc : 90;
+              dispatch(
+                updateBatchUploadProgress({
+                  batchUid,
+                  progress: passedPerc,
+                })
+              );
+            },
+          })
+        : await updateDagExternalCid({
+            uuid: currentObjectId!,
+            contextPath,
+            externalCids,
+            componentType,
+            componentSubtype,
+          });
       if (error) console.error(`[addFilesToDrive] Error: ${error}`);
       if (onSuccess) onSuccess(updatedManifest);
       if (batchUid !== undefined) {
@@ -825,7 +925,17 @@ export const starComponentThunk = createAsyncThunk(
       };
       dispatch(addComponent({ component: newComponent }));
     }
-    dispatch(saveManifestDraft({ onSucess: () => dispatch(fetchTreeThunk()) }));
+    dispatch(
+      saveManifestDraft({
+        onSucess: () =>
+          dispatch(
+            navigateFetchThunk({
+              driveKey: "",
+              path: item.path!.substring(0, item.path!.lastIndexOf("/")),
+            })
+          ),
+      })
+    );
   }
 );
 
@@ -835,7 +945,7 @@ export const assignTypeThunk = createAsyncThunk(
     dispatch(setComponentTypeBeingAssignedTo(null));
     const state = getState() as RootState;
     const { manifest } = state.nodes.nodeReader;
-    const { deprecated } = state.drive;
+    const { deprecated, currentDrive } = state.drive;
     const { item, type, subtype } = payload;
 
     //Deprecated type assignment unhandled, temporarily disabled to prevent errors
@@ -873,7 +983,12 @@ export const assignTypeThunk = createAsyncThunk(
       };
       dispatch(addComponent({ component: newComponent }));
     }
-    dispatch(saveManifestDraft({ onSucess: () => dispatch(fetchTreeThunk()) }));
+    const cb = () => {
+      dispatch(clearCachedTree({ path: currentDrive!.path! }));
+      dispatch(navigateFetchThunk({ path: currentDrive!.path!, driveKey: "" }));
+    };
+
+    dispatch(saveManifestDraft({ onSucess: cb }));
   }
 );
 
@@ -897,6 +1012,62 @@ export const moveFilesThunk = createAsyncThunk(
       dispatch(setManifest(updatedManifest));
       dispatch(setManifestCid(manifestCid));
       dispatch(fetchTreeThunk());
+    }
+  }
+);
+
+export const navigateFetchThunk = createAsyncThunk(
+  "drive/navigateFetchThunk",
+  async (payload: NavigateFetchThunkPayload, { getState, dispatch }) => {
+    const state = getState() as RootState;
+    const { path, driveKey, selectPath, dontNavigate, onSuccess } = payload;
+    const { currentObjectId, manifestCid, publicView, shareId } =
+      state.nodes.nodeReader;
+    debugger;
+
+    const notBrowsingExternalLinks = !path.startsWith(
+      DRIVE_FULL_EXTERNAL_LINKS_PATH
+    );
+    if (notBrowsingExternalLinks) {
+      debugger;
+      const targetTreeNode = findDriveByPath(state.drive.nodeTree!, path);
+      if (
+        !targetTreeNode ||
+        targetTreeNode.cid === "stub" ||
+        !targetTreeNode.contains?.length
+      ) {
+        dispatch(setDriveLoading(true));
+        try {
+          const { tree: treeRes } = await getDatasetTree({
+            manifestCid,
+            nodeUuid: currentObjectId!,
+            pub: publicView, //  state.nodes.nodeReader.mode === "reader", this would be inferred from the node access control guard
+            shareId,
+            dataPath: path,
+            depth: 1,
+          });
+          if (!state.drive.nodeTree) {
+            throw new Error(
+              "Attempt to fetch a node tree when there is no node tree in the store"
+            );
+          }
+          const formattedTree = transformTree(treeRes);
+          const tree = formattedTree[0];
+          dispatch(mutateTreeForNavigation(tree));
+        } catch (e) {
+          toast.error(`Error fetching drive`);
+          console.error(e);
+        } finally {
+          dispatch(setDriveLoading(false));
+        }
+      }
+    }
+    onSuccess?.();
+    if (dontNavigate) return;
+    if (driveKey === "") {
+      dispatch(navigateToDriveByPath({ path, selectPath }));
+    } else {
+      dispatch(navigateToDrivePickerByPath({ path, selectPath }));
     }
   }
 );

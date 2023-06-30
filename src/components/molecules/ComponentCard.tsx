@@ -15,13 +15,13 @@ import { cleanupManifestUrl } from "@components/utils";
 import TooltipIcon from "@components/atoms/TooltipIcon";
 import { findTarget } from "@components/organisms/ComponentLibrary";
 import MetadataPreview from "@src/components/atoms/MetadataPreview";
-import { SessionStorageKeys } from "../driveUtils";
+import { SessionStorageKeys, navigateWithStubs } from "../driveUtils";
 import { useSetter } from "@src/store/accessors";
 import { setComponentStack } from "@src/state/nodes/nodeReader";
 import { updatePdfPreferences } from "@src/state/nodes/pdf";
 import { useNodeReader } from "@src/state/nodes/hooks";
 import {
-  navigateToDriveByPath,
+  navigateFetchThunk,
   setFileBeingCited,
   setFileBeingUsed,
 } from "@src/state/drive/driveSlice";
@@ -188,11 +188,13 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
           //   })
           // );
           dispatch(
-            navigateToDriveByPath({
+            navigateFetchThunk({
+              driveKey: "",
               path: component.payload.path,
               selectPath: component.payload.path,
             })
           );
+          // dispatch(fetchTreeThunk());
           dispatch(setComponentStack([component]));
         } else {
           if (!isSelected) {
@@ -321,7 +323,8 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                       onClick={(e) => {
                         e!.stopPropagation();
                         dispatch(
-                          navigateToDriveByPath({
+                          navigateFetchThunk({
+                            driveKey: "",
                             path: component.payload.path,
                             selectPath: component.payload.path,
                           })

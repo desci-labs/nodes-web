@@ -4,10 +4,11 @@ import {
   ResearchObjectV1,
 } from "@src/../../nodes/desci-models/dist";
 import { DriveObject } from "@src/components/organisms/Drive";
+import { DriveKey } from "./driveSlice";
 
 export interface NavigateToDriveByPathAction {
   payload: {
-    path: string;
+    path: DrivePath;
     selectPath?: string;
   };
 }
@@ -63,6 +64,14 @@ export interface AssignTypeThunkPayload {
 export interface MoveFilesThunkPayload {
   item: DriveObject;
   newDirectory: DriveObject;
+}
+
+export interface NavigateFetchThunkPayload {
+  path: DrivePath;
+  selectPath?: string;
+  driveKey: DriveKey;
+  dontNavigate?: boolean;
+  onSuccess?: () => void;
 }
 
 export type DrivePath = string;
