@@ -289,7 +289,7 @@ export async function getAllTrees(
 
   const dates: Date[] = [];
   const dataDrive = nodeDrived.contains[dataDriveIdx];
-  debugger;
+  // debugger;
   const newData = await Promise.all(
     dataDrive.contains!.map(async (dataComp) => {
       const { tree, date } = await getDatasetTree({
