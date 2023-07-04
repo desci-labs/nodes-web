@@ -8,7 +8,7 @@ import {
 } from "@components/utils";
 import { useWeb3React } from "@web3-react/core";
 
-import { ethers } from "ethers";
+import { Contract, ethers } from "ethers";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
@@ -17,6 +17,7 @@ import {
   CHAIN_DEPLOYMENT,
   doSwitchChain,
   DPID_CHAIN_DEPLOYMENT,
+  PAYMASTER_ADDRESS,
 } from "@components/../chains";
 import WarningSign from "@components/atoms/warning-sign";
 import { publishResearchObject, updateDraft } from "@api/index";
@@ -37,8 +38,23 @@ import Modal, { ModalProps } from "@src/components/molecules/Modal";
 import WalletManagerModal from "@src/components/molecules/WalletManagerModal";
 import { fetchTreeThunk } from "@src/state/drive/driveSlice";
 import { useNodesMediaCoverQuery } from "@src/state/api/media";
+import { wrapContract } from "@opengsn/provider/dist/WrapContract";
+// import { RelayProvider } from "@opengsn/provider";
 
 export const LOCALSTORAGE_TXN_LIST = "desci:txn-list";
+
+export const useWrapContract = () => {
+  return <T extends Contract>(contract: T, chainId: number) => {
+    console.log("paymaster ", PAYMASTER_ADDRESS[chainId]);
+    return wrapContract(contract, {
+      paymasterAddress: PAYMASTER_ADDRESS[chainId],
+      performDryRunViewRelayCall: false,
+      loggerConfiguration: {
+        logLevel: "debug",
+      },
+    });
+  };
+};
 
 const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
   const [loading, setLoading] = useState(false);
@@ -65,6 +81,8 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
   const { usePriorityProvider } = hooks;
   const provider = usePriorityProvider();
 
+  const wrapResearchObjectContract = useWrapContract();
+
   useEffect(() => {
     setAddress(account!);
   }, [account]);
@@ -76,6 +94,7 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
       setError(undefined);
       if (provider) {
         const contractAddress = CHAIN_DEPLOYMENT.address;
+        const chainId = (await provider.getNetwork()).chainId;
 
         let contract = new ethers.Contract(
           contractAddress,
@@ -99,12 +118,20 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
         contract = connect(contract);
         dpidContract = connect(dpidContract);
 
+        console.log("chainid", chainId);
+        const wrappedContract = await wrapResearchObjectContract(
+          contract,
+          chainId
+        );
+        console.log("wrappedContract", wrappedContract);
         let base64UuidToBase16 = convertUUIDToHex(currentObjectId!);
 
         console.log("Publish CID", base64UuidToBase16, manifestCid);
         let exists = false;
         try {
-          exists = (await contract.functions.exists(base64UuidToBase16))[0];
+          exists = (
+            await wrappedContract.functions.exists(base64UuidToBase16)
+          )[0];
         } catch (err) {
           console.warn(err);
         }
@@ -118,7 +145,10 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
           DEFAULT_DPID_PREFIX_STRING
         );
         if (exists) {
-          tx = await contract.functions.updateMetadata(base64UuidToBase16, cid);
+          tx = await wrappedContract.functions.updateMetadata(
+            base64UuidToBase16,
+            cid
+          );
         } else {
           const expectedDpidTx = await dpidContract.functions.getOrganization(
             DEFAULT_DPID_PREFIX
@@ -145,7 +175,9 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
 
           const regFee = await dpidContract.functions.getFee();
           const hashBytes = getBytesFromCIDString(hash);
-          tx = await contract.functions.mintWithDpid(
+          const trustedForwarder = await wrappedContract.getTrustedForwarder();
+          console.log("getTrustedForwarder()", trustedForwarder);
+          tx = await wrappedContract.functions.mintWithDpid(
             base64UuidToBase16,
             hashBytes,
             DEFAULT_DPID_PREFIX,

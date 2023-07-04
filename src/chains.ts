@@ -27,6 +27,12 @@ import goerliInfoDpid from "./desci-contracts-config/goerli-dpid.json";
 import localhostDpid from "./desci-contracts-artifacts/contracts/DpidRegistry.sol/DpidRegistry.json";
 // import goerliDpid from "./desci-contracts-artifacts/contracts/DpidRegistry.sol/DpidRegistry.json";
 
+export const PAYMASTER_ADDRESS: Record<number, string> = {
+  5: "",
+  1337: "0x9A676e781A523b5d0C0e43731313A708CB607508",
+  // [ChainIds.MAINNET]: "0xda497347D894Fdb9D2DB43192e65A99371747c5C",
+};
+
 export const CHAIN_DEPLOYMENT = {
   address: process.env.REACT_APP_DEBUG
     ? localhostInfo.proxies[localhostInfo.proxies.length - 1].address
