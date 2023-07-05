@@ -18,6 +18,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { UploadQueueItem } from "@src/state/drive/types";
 import { formatDbDate, recursiveFlattenTree } from "@src/state/drive/utils";
+import { DriveState } from "@src/state/drive/driveSlice";
 
 export const tempDate = "12/02/2022 7:00PM";
 
@@ -204,11 +205,78 @@ interface GetAllTreesOptions {
   public?: boolean;
 }
 
+export function navigateWithStubs(
+  newTreeNode: DriveObject,
+  nodeTree: DriveObject
+) {
+  debugger;
+  const splitPath = newTreeNode.path!.split("/");
+  let curPath = "";
+  let nodeTreeCopy = { ...nodeTree };
+  let curObject = nodeTreeCopy;
+  if (splitPath!.length <= 1) {
+    throw new Error(
+      "Attempted to navigate with stubs to root, but this should be handled in reducer"
+    );
+  } else {
+    // add this subtree to the tree
+    let curFolder = splitPath?.shift();
+    curPath += curFolder;
+    while (splitPath!.length) {
+      curFolder = splitPath?.shift();
+      curPath += "/" + curFolder;
+
+      const nextFolder = curObject!.contains!.find((d) => d.name === curFolder);
+      let newObject: DriveObject = createStubTreeNode(curPath);
+
+      if (!nextFolder) {
+        // create stub folder for this path
+        if (splitPath!.length === 0) {
+          newObject = newTreeNode;
+        }
+        if (newObject.type === FileType.FILE) {
+          curObject.contains = newObject.contains;
+        } else {
+          curObject.contains = [newObject];
+        }
+
+        curObject = newObject;
+      } else {
+        if (splitPath!.length === 0) {
+          newObject = newTreeNode;
+          nextFolder.contains = newObject.contains;
+        }
+        curObject = nextFolder;
+        console.log("nextFolder", JSON.stringify(nextFolder));
+      }
+    }
+    return nodeTreeCopy;
+  }
+}
+
+export function createStubTreeNode(path: string): DriveObject {
+  const folder = path.split("/").pop();
+  return {
+    name: folder!,
+    componentType: ResearchObjectComponentType.UNKNOWN,
+    type: FileType.DIR,
+    uid: uuidv4(),
+    cid: "stub",
+    path: path,
+    contains: [],
+    accessStatus: AccessStatus.PRIVATE,
+    lastModified: new Date().toISOString(),
+    size: 0,
+    metadata: {},
+  };
+}
+
 //mutable
 export async function getAllTrees(
   nodeDrived: DriveObject,
   nodeUuid: string,
   manifest: ResearchObjectV1,
+  manifestCid: string,
   options?: GetAllTreesOptions,
   shareId?: string
 ) {
@@ -221,14 +289,17 @@ export async function getAllTrees(
 
   const dates: Date[] = [];
   const dataDrive = nodeDrived.contains[dataDriveIdx];
+  // debugger;
   const newData = await Promise.all(
     dataDrive.contains!.map(async (dataComp) => {
-      const { tree, date } = await getDatasetTree(
-        dataComp.cid!,
-        nodeUuid,
-        options?.public,
-        shareId
-      );
+      const { tree, date } = await getDatasetTree({
+        rootCid: dataComp.cid,
+        nodeUuid: nodeUuid,
+        manifestCid,
+        pub: options?.public,
+        dataPath: nodeDrived.path!,
+        depth: 1,
+      });
       if (!tree) return dataComp;
       // debugger;
       gracefullyAssignTreeUids(

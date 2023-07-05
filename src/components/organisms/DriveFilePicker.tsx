@@ -6,7 +6,11 @@ import { IconChevronLeft, IconDirectory, IconIpfs, IconX } from "@icons";
 import { useEffect, useState } from "react";
 import ReactTooltip from "react-tooltip";
 import { DriveNonComponentTypes, DriveObject, FileType } from "./Drive";
-import { navigateToDrivePickerByPath } from "@src/state/drive/driveSlice";
+import {
+  fetchTreeThunk,
+  navigateFetchThunk,
+  navigateToDrivePickerByPath,
+} from "@src/state/drive/driveSlice";
 import { useDrive } from "@src/state/drive/hooks";
 import { useSetter } from "@src/store/accessors";
 import { DRIVE_FULL_EXTERNAL_LINKS_PATH } from "@src/state/drive/utils";
@@ -51,13 +55,18 @@ const DriveTableFilePicker: React.FC<DriveTableProps> = ({
     name: FileDir["name"] | DriveObject["name"],
     drive: DriveObject
   ) {
-    dispatch(navigateToDrivePickerByPath({ path: drive.path! }));
+    // debugger;
+    dispatch(navigateFetchThunk({ path: drive.path!, driveKey: "Picker" }));
+    // dispatch(fetchTreeThunk());
     setSelected(undefined);
   }
 
   function eatBreadCrumb(index: number) {
     dispatch(
-      navigateToDrivePickerByPath({ path: breadCrumbsPicker[index - 1].path! })
+      navigateFetchThunk({
+        path: breadCrumbsPicker[index - 1].path!,
+        driveKey: "Picker",
+      })
     );
     setSelected(undefined);
   }
@@ -68,7 +77,10 @@ const DriveTableFilePicker: React.FC<DriveTableProps> = ({
     // reset to root on close
     return () => {
       dispatch(
-        navigateToDrivePickerByPath({ path: breadCrumbsPicker[0].path! })
+        navigateFetchThunk({
+          path: breadCrumbsPicker[0].path!,
+          driveKey: "Picker",
+        })
       );
     };
   }, []);

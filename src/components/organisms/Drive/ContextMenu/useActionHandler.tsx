@@ -16,7 +16,7 @@ import axios from "axios";
 import { AvailableUserActionLogTypes, postUserAction } from "@api/index";
 import { separateFileNameAndExtension } from "@src/state/drive/utils";
 import {
-  fetchTreeThunk,
+  navigateFetchThunk,
   removeFileFromCurrentDrive,
   setFileBeingRenamed,
   setFileMetadataBeingEdited,
@@ -139,7 +139,13 @@ export default function useActionHandler() {
       if (newManifestCid && newManifest) {
         dispatch(setManifest(newManifest));
         dispatch(setManifestCid(newManifestCid));
-        dispatch(fetchTreeThunk());
+        dispatch(
+          navigateFetchThunk({
+            driveKey: "",
+            path: file.path!.substring(0, file.path!.lastIndexOf("/")),
+            dontNavigate: true,
+          })
+        );
       }
     } catch (e: any) {
       console.error(
@@ -152,7 +158,13 @@ export default function useActionHandler() {
         dispatch(setManifest(snapshotManifest!));
         dispatch(setManifestCid(snapshotManifestCid));
       }
-      dispatch(fetchTreeThunk());
+      dispatch(
+        navigateFetchThunk({
+          driveKey: "",
+          path: file.path!,
+          dontNavigate: true,
+        })
+      );
     }
   }
 

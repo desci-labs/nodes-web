@@ -356,20 +356,31 @@ export const publishResearchObject = async (input: {
   return data;
 };
 
-export const getDatasetTree = async (
-  cid: string,
-  nodeUuid: string,
-  pub = false,
-  shareId = ""
-) => {
-  const route = pub ? "pubTree" : "retrieveTree";
-  console.log("fetch dataset tree", pub, route);
-  const { data } = await axios.get(
-    `${SCIWEAVE_URL}/v1/data/${route}/${nodeUuid}/${cid}${
-      shareId ? "/" + shareId : ""
-    }`,
-    config()
-  );
+export interface GetDatasetTreeInput {
+  rootCid?: string; // for deprecated datasets
+  nodeUuid: string;
+  manifestCid: string;
+  pub?: boolean;
+  shareId?: string;
+  dataPath: string;
+  depth?: number;
+}
+
+export const getDatasetTree = async (params: GetDatasetTreeInput) => {
+  const depth = params.depth ? params.depth : 1;
+  const driveQuery = params.dataPath
+    ? `?dataPath=${params.dataPath}&depth=${depth}`
+    : "?depth=1";
+  const url = params.pub
+    ? `${SCIWEAVE_URL}/v1/data/pubTree/${params.nodeUuid}${
+        params.manifestCid?.length ? "/" + params.manifestCid : ""
+      }${params.rootCid?.length ? "/" + params.rootCid : ""}${driveQuery}`
+    : `${SCIWEAVE_URL}/v1/data/retrieveTree/${params.nodeUuid}/${
+        params.manifestCid
+      }${params.shareId?.length ? "/" + params.shareId : ""}${driveQuery}`;
+
+  console.log("fetch dataset tree", params.pub, url);
+  const { data } = await axios.get(url, config());
   return data;
 };
 
@@ -478,6 +489,37 @@ export const updateDag = async ({
     formData,
     adjustedConfig
   );
+  return data;
+};
+
+export interface UpdateDagExternalCid {
+  uuid: string;
+  contextPath: DrivePath;
+  componentType?: ResearchObjectComponentType;
+  componentSubtype?: ResearchObjectComponentSubtypes;
+  externalCids?: ExternalCid[];
+  onProgress?: (e: ProgressEvent) => void;
+}
+
+export const updateDagExternalCid = async ({
+  uuid,
+  externalCids,
+  contextPath,
+  onProgress,
+  componentType,
+  componentSubtype,
+}: UpdateDagExternalCid) => {
+  const adjustedConfig: any = config();
+  if (onProgress) {
+    adjustedConfig.onUploadProgress = (e: ProgressEvent) => onProgress(e);
+  }
+
+  const { data } = await axios.post(
+    `${SCIWEAVE_URL}/v1/data/updateExternalCid`,
+    { uuid, externalCids, contextPath, componentType, componentSubtype },
+    adjustedConfig
+  );
+
   return data;
 };
 

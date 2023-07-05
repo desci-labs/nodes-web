@@ -88,8 +88,8 @@ const CitationComponent = () => {
     ]
   );
 
-  const { dpid, cid, license } = useComponentDpid(fileBeingCited);
-  const fqDpid = `${dpid}/${fileBeingCited.path?.replace(/^root\//, "data/")}`;
+  const { dpid, cid, license } = useComponentDpid(fileBeingCited!);
+  const fqDpid = `${dpid}/${fileBeingCited!.path}`;
 
   const canCite = !!manifestData && manifestData?.authors?.length;
   const formatter = useMemo(() => getFormatter(format.name), [format.name]);
