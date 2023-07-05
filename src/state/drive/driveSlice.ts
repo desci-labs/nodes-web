@@ -393,7 +393,6 @@ export const driveSlice = createSlice({
     clearCachedTree: (state, { payload }: PayloadAction<{ path: string }>) => {
       let node = findDriveByPath(state.nodeTree!, payload.path);
       console.log("nodeTree:", current(state.nodeTree));
-      debugger;
       // make sure node being cleared is always a dir
       if (node?.type === FileType.FILE)
         node = findDriveByPath(
