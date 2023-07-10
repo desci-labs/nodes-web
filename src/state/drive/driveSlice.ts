@@ -1,4 +1,9 @@
-import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import {
+  PayloadAction,
+  createAsyncThunk,
+  createSlice,
+  current,
+} from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 import {
   getDatasetTree,
@@ -70,7 +75,6 @@ import {
   updateComponent,
 } from "../nodes/nodeReader";
 import toast from "react-hot-toast";
-import { dispatch } from "react-hot-toast/dist/core/store";
 
 export interface DriveState {
   status: RequestStatus;
@@ -133,7 +137,6 @@ const navigateToDriveGeneric =
       | "currentDrivePicker" = `currentDrive${key}`;
     if (state.status !== "succeeded" || !state.nodeTree!) return;
     // // prep for jump
-    // debugger;
     // navigateWithStubs(createStubTreeNode(action.payload.path), state.nodeTree!);
     const { path, selectPath } = action.payload;
     let fileSelectionType: ResearchObjectComponentType | undefined;
@@ -388,19 +391,25 @@ export const driveSlice = createSlice({
       }
     },
     clearCachedTree: (state, { payload }: PayloadAction<{ path: string }>) => {
-      debugger;
-      const node = findDriveByPath(state.nodeTree!, payload.path);
-      debugger;
+      let node = findDriveByPath(state.nodeTree!, payload.path);
+      console.log("nodeTree:", current(state.nodeTree));
+      // make sure node being cleared is always a dir
+      if (node?.type === FileType.FILE)
+        node = findDriveByPath(
+          state.nodeTree!,
+          payload.path.substring(0, payload.path.lastIndexOf("/"))
+        );
+
       if (!node) {
         console.warn("Failed to clear cache tree", payload.path);
         return;
       }
+
       node.contains = [];
       node.cid = "stub";
 
       console.log("cleared cache for path", payload.path);
-      // findDriveByPath()
-      // state.nodeTree
+      console.log("nodeTree after:", current(state.nodeTree));
     },
   },
   extraReducers: (builder) => {
@@ -615,7 +624,6 @@ export const fetchTreeThunk = createAsyncThunk(
     const { manifest, currentObjectId, manifestCid, publicView, shareId } =
       state.nodes.nodeReader;
     //determines if it's a old or new manifest
-    // debugger;
     const hasDataBucket =
       manifest?.components[0].type === ResearchObjectComponentType.DATA_BUCKET
         ? manifest.components[0]
@@ -675,7 +683,6 @@ export const fetchTreeThunk = createAsyncThunk(
 export const addFilesToDrive = createAsyncThunk(
   "drive/addFiles",
   async (payload: AddFilesToDrivePayload, { getState, dispatch }) => {
-    // debugger;
     const state = getState() as RootState;
     const { manifest, currentObjectId } = state.nodes.nodeReader;
     const { nodeTree } = state.drive;
@@ -823,7 +830,6 @@ export const addFilesToDrive = createAsyncThunk(
     const contextPath = overwritePathContext || state.drive.currentDrive!.path!;
     const snapshotNodeUuid = currentObjectId!;
     try {
-      // debugger;
       const {
         manifest: updatedManifest,
         error,
@@ -904,7 +910,6 @@ export const starComponentThunk = createAsyncThunk(
       (c: ResearchObjectV1Component) => c.payload.path === item.path
     );
 
-    // debugger;
     if (starCompIdx !== -1) {
       dispatch(
         updateComponent({
@@ -1009,6 +1014,7 @@ export const moveFilesThunk = createAsyncThunk(
     );
 
     if (updatedManifest) {
+      dispatch(clearCachedTree({ path: newDirectory.path! }));
       dispatch(setManifest(updatedManifest));
       dispatch(setManifestCid(manifestCid));
       dispatch(fetchTreeThunk());
@@ -1023,13 +1029,11 @@ export const navigateFetchThunk = createAsyncThunk(
     const { path, driveKey, selectPath, dontNavigate, onSuccess } = payload;
     const { currentObjectId, manifestCid, publicView, shareId } =
       state.nodes.nodeReader;
-    debugger;
 
     const notBrowsingExternalLinks = !path.startsWith(
       DRIVE_FULL_EXTERNAL_LINKS_PATH
     );
     if (notBrowsingExternalLinks) {
-      debugger;
       const targetTreeNode = findDriveByPath(state.drive.nodeTree!, path);
       if (
         !targetTreeNode ||
