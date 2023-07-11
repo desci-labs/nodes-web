@@ -88,9 +88,9 @@ const ComponentUseModal = ({
                   title="dPID Path"
                   copyButtonText="Copy dPID Path"
                   className="my-6 w-full overflow-hidden pr-2"
-                  copyText={fqDpid}
+                  copyText={`${fqDpid}?raw`}
                 >
-                  <>{fqDpid}</>
+                  <>{`${fqDpid}?raw`}</>
                 </CopyBox>
               </div>
               <div className="mt-6">
