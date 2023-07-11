@@ -39,7 +39,7 @@ interface ManuscriptReaderProps {
   publicView?: boolean;
 }
 const ManuscriptReader = ({ publicView }: ManuscriptReaderProps) => {
-  console.log("Render manuscript reader");
+  console.log("Render manuscript reader", publicView);
   const dispatch = useSetter();
   const { currentObjectId } = useNodeReader();
   const { isLoading } = useManuscriptReader(publicView);
