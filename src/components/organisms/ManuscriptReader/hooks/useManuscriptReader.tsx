@@ -23,6 +23,7 @@ import {
   setIsNew,
   setManifest,
   setManifestCid,
+  setPublicView,
   setResearchPanelTab,
   toggleMode,
 } from "@src/state/nodes/nodeReader";
@@ -99,6 +100,7 @@ export default function useManuscriptReader(publicView: boolean = false) {
     if ("uuid" in parsedManuscript && !!parsedManuscript.uuid) {
       const { uuid, manifestUrl } = parsedManuscript;
 
+      dispatch(setPublicView(true));
       dispatch(setCurrentPdf(""));
       setIsNew(false);
       setIsAnnotating(false);
