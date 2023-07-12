@@ -922,7 +922,8 @@ export const starComponentThunk = createAsyncThunk(
       const newComponent: ResearchObjectV1Component = {
         id: uuidv4(),
         name: item.name,
-        type: ResearchObjectComponentType.UNKNOWN,
+        type: item.componentType as ResearchObjectComponentType,
+        ...(item.componentSubtype ? { subtype: item.componentSubtype } : {}),
         payload: {
           path: item.path,
           cid: item.cid,
