@@ -38,6 +38,13 @@ export NODES_DIR=path/to/nodes
 yarn start
 ```
 
+## Standalone build
+To work on the frontend standalone, without depending on any local dependencies, you can use these commands:
+```bash
+yarn start:standalone
+yarn build:standalone
+```
+
 # Bundling
 This project uses create-react-app and is not ejected. Webpack config is handled by [CRACO](https://github.com/gsoft-inc/craco).
 

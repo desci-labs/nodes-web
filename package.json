@@ -7,7 +7,9 @@
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "start": "make && REACT_APP_VERSION=$npm_package_version TAILWIND_MODE=watch craco start",
+    "start:standalone": "make standalone && REACT_APP_VERSION=$npm_package_version TAILWIND_MODE=watch craco start",
     "build": "make && REACT_APP_VERSION=$npm_package_version GENERATE_SOURCEMAP=false craco build && yarn terser",
+    "build:standalone": "make standalone && REACT_APP_VERSION=$npm_package_version GENERATE_SOURCEMAP=false craco build && yarn terser",
     "test": "craco test",
     "eject": "react-scripts eject",
     "terser": "terser ./build/static/js/*.js -c -m --mangle-props regex=/_$/",
