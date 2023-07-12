@@ -1,12 +1,44 @@
 # Quickstart
+First, make sure you have set up the [nodes](https://github.com/desci-labs/nodes) repository and that its `./dockerDev.sh` script is running.
+
+Then, run `yarn start` in this repository and visit http://localhost:3000.
+
+_Note:_ `nodes-web` by default assumes `nodes` is in a sibling directory. See details on this in the [Building](#building) section
+
+_Note:_ If running for the first time, you may have to wait until the `dockerDev.sh` script shows `desci_nodes_backend | Server running on port 5420`.
+
+<br>
+
+Login with your email (or `noreply@desci.com`) and input the verification code logged in the `dockerDev.sh` output:
 
 ```
-yarn
+Simulating email to noreply@desci.com token: 123456
+```
+
+# Building
+Run `yarn build` to build the project or `yarn start` to run the devserver.
+
+The dependency on [`nodes`](https://github.com/desci-labs/nodes) (`desci-models` and `desci-contracts`) is managed by the [`Makefile`](./Makefile). Building this project will make sure the `nodes` repo is built as well, which may take a while the first time. The `@desci-labs/desci-models` package is linked to `node_modules` as part of the build process. This alone is not enough to actually _run_ the backend cluster; see the [nodes README.me](https://github.com/desci-labs/nodes/blob/develop/README.md) for details on doing that.
+
+To reset the repository state, i.e. wiping dependencies, artifacts, and unlinking local packages:
+```bash
+make clean
+```
+
+## Configure `nodes` location
+If building against a `nodes` repo that is not in a sibling directory, set the `NODES_DIR` environment variable. This can be done inline:
+```bash
+NODES_DIR=path/to/nodes yarn start
+NODES_DIR=path/to/nodes make
+```
+
+...or by exporting the variable:
+```bash
+export NODES_DIR=path/to/nodes
 yarn start
 ```
 
-Note: Make sure you have the [nodes backend](https://github.com/desci-labs/nodes) running and cloned as a sibling to `nodes-web`. Standalone `nodes-web` configuration is not currently streamlined.
-
+# Bundling
 This project uses create-react-app and is not ejected. Webpack config is handled by [CRACO](https://github.com/gsoft-inc/craco).
 
 This project uses [Webpack v5](https://webpack.js.org/migrate/5/) under the hood
