@@ -48,10 +48,7 @@ export default function useComponentDpid(componentToUse?: DriveObject) {
     };
     if (!componentToUse) return { ...DEFAULT_WITH_LICENSE, dpid: dpidLink };
 
-    const component =
-      componentToUse.type === FileType.DIR
-        ? componentToUse?.contains?.[0] ?? null
-        : componentToUse;
+    const component = componentToUse;
 
     if (!component) return { ...DEFAULT_WITH_LICENSE, dpid: dpidLink };
 

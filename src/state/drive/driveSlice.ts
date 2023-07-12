@@ -624,6 +624,7 @@ export const fetchTreeThunk = createAsyncThunk(
     const { manifest, currentObjectId, manifestCid, publicView, shareId } =
       state.nodes.nodeReader;
     //determines if it's a old or new manifest
+
     const hasDataBucket =
       manifest?.components[0].type === ResearchObjectComponentType.DATA_BUCKET
         ? manifest.components[0]
