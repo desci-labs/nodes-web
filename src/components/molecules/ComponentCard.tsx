@@ -317,6 +317,19 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                         <IconViewLink />
                       </TooltipButton>
                     ) : null}
+                    <div
+                      style={{
+                        display:
+                          component.type === ResearchObjectComponentType.PDF
+                            ? ""
+                            : "none",
+                      }}
+                    >
+                      <AnnotationSwitcher
+                        annotations={sortedAnnotations}
+                        handleComponentClick={handleComponentClick}
+                      />
+                    </div>
                     <TooltipButton
                       className="py-[7px] px-[1px] rounded-md cursor-pointer text-xs bg-black flex items-center justify-center gap-1.5 hover:bg-dark-gray disabled:bg-opacity-25 disabled:cursor-not-allowed"
                       disabled={false}
@@ -386,19 +399,6 @@ const ComponentCard = ({ component }: ComponentCardProps) => {
                         <IconPlayRounded className="p-0" />
                       </TooltipButton>
                     ) : null}
-                    {/* <div
-                      style={{
-                        display:
-                          component.type === ResearchObjectComponentType.PDF
-                            ? ""
-                            : "none",
-                      }}
-                    >
-                      <AnnotationSwitcher
-                        annotations={sortedAnnotations}
-                        handleComponentClick={handleComponentClick}
-                      />
-                    </div> */}
                   </div>
                 </div>
               </>
