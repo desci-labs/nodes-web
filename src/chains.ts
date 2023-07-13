@@ -7,15 +7,6 @@ import { ethers } from "ethers";
 
 /**
  * NOTE: This is assuming that the desci-nodes-be repo is one level up from this repo
- *
- * Requires a symlink from desci-nodes-be
- * const artifacts = 'desci-nodes/desci-contracts/artifacts'
- * From root
- * ln -s ../../nodes/desci-contracts/artifacts ./src/desci-contracts-artifacts
- *
- * const config = 'desci-nodes/desci-contracts/.openzeppelin'
- * From root
- * ln -s ../../nodes/desci-contracts/.openzeppelin/ ./src/desci-contracts-config
  */
 import localhostInfo from "./desci-contracts-config/unknown-research-object.json";
 import goerliInfo from "./desci-contracts-config/goerli-research-object.json";

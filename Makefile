@@ -1,14 +1,19 @@
+# Force stub contract generation by setting this variable
+FORCE_STUB?=""
 # Override this location with env `NODES_DIR=../some/path`
 NODES_DIR?=../nodes
 NODES_ABS=$(realpath $(NODES_DIR))
 
 .PHONY: build
 build: .env install nodes
+	# Vercel builds require stubs, but if we generate them always it can prevent
+	# ganache deployment happening in dockerDev.sh
+	if [ ! -z "$(FORCE_STUB)" ]; then ./stubContract.sh; fi
 
 .PHONY: standalone
 standalone: .env clean install
 	# For clarity: depends on the "clean" target to wipe any local linking
-	# Stub contracts to allow building without desci-contracts
+	# Stub contracts to allow building without them being deployed
 	./stubContract.sh
 
 .PHONY: nodes
@@ -25,7 +30,6 @@ nodes:
 	# -T treat target as a file (otherwise it will nest in an existing dir link)
 	ln -sT $(NODES_ABS)/desci-contracts/artifacts src/desci-contracts-artifacts
 	ln -sT $(NODES_ABS)/desci-contracts/.openzeppelin src/desci-contracts-config
-
 
 .PHONY: install
 install:
