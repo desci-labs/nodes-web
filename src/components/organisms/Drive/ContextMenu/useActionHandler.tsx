@@ -44,9 +44,7 @@ export const getActionState = (action: Actions, file: DriveObject) => {
       };
     case Actions.DOWNLOAD:
       return {
-        disabled:
-          file.componentType === ResearchObjectComponentType.LINK ||
-          file.type === FileType.DIR,
+        disabled: file.componentType === ResearchObjectComponentType.LINK,
       };
     case Actions.REMOVE:
       return {
@@ -179,8 +177,24 @@ export default function useActionHandler() {
       AvailableUserActionLogTypes.btnDownloadData,
       JSON.stringify({ nodeUuid: currentObjectId, cid: file.cid })
     );
-    const url = `${IPFS_URL}/${file.cid}`;
-    const { fileName, extension } = separateFileNameAndExtension(file.name);
+    let url = `${IPFS_URL}/${file.cid}`;
+    let fileName: string, extension: string | undefined;
+    if (file.type === FileType.DIR) {
+      // handle dirs differently
+      fileName = file.name;
+      extension = "tar.gz";
+      let resolvedUrl = IPFS_URL!;
+      if (IPFS_URL && !IPFS_URL.includes("maritime")) {
+        resolvedUrl = resolvedUrl.replace("/ipfs", "");
+      }
+      url = `${resolvedUrl}/api/v0/get?arg=${file.cid}&compression=true&archive=true`;
+      console.log(`getting url for folder download ${url}`);
+    } else {
+      const results = separateFileNameAndExtension(file.name);
+      fileName = results.fileName;
+      extension = results.extension;
+    }
+
     axios({
       url,
       method: "GET",
