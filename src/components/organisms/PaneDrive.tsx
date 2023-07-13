@@ -36,6 +36,9 @@ const PaneDrive = () => {
   useEffect(() => {
     if (status === "succeeded") {
       (window as any).document.scrollingElement!.scrollTop = 0;
+      setTimeout(() => {
+        (window as any).document.scrollingElement!.scrollTop = 0;
+      }, 500);
       setLoading(false);
     }
   }, [loading, status]);
