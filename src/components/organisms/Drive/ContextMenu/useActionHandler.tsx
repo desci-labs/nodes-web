@@ -185,7 +185,7 @@ export default function useActionHandler() {
       extension = "tar.gz";
       let resolvedUrl = IPFS_URL!;
       if (IPFS_URL && !IPFS_URL.includes("maritime")) {
-        resolvedUrl = resolvedUrl.replace("/ipfs", "");
+        resolvedUrl = resolvedUrl.replace(/\/ipfs$/, "");
       }
       url = `${resolvedUrl}/api/v0/get?arg=${file.cid}&compression=true&archive=true`;
       console.log(`getting url for folder download ${url}`);
