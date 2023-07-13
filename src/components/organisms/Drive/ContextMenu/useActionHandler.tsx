@@ -184,7 +184,8 @@ export default function useActionHandler() {
       fileName = file.name;
       extension = "tar";
 
-      url = `${PUB_IPFS_URL ? PUB_IPFS_URL : IPFS_URL}/${file.cid}?format=tar`;
+      const resolver = PUB_IPFS_URL ? PUB_IPFS_URL : IPFS_URL;
+      url = `https://ipfs.io/ipfs/${file.cid}?format=tar`;
       console.log(`getting url for folder download ${url}`);
     } else {
       const results = separateFileNameAndExtension(file.name);
