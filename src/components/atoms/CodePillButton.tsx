@@ -66,7 +66,6 @@ const CodePillButton = ({
           : () => {
               let drivePath = getDrivePath();
               if (drivePath) {
-                debugger;
                 dispatch(
                   navigateFetchThunk({
                     path: drivePath,
