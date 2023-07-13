@@ -12,8 +12,11 @@ import {
   popFromComponentStack,
   pushToComponentStack,
   setAnnotationLinkConfig,
+  setComponentStack,
 } from "@src/state/nodes/nodeReader";
 import { parseAnnotationLink } from "../molecules/AnnotationEditor/components";
+import { SessionStorageKeys } from "../driveUtils";
+import { navigateFetchThunk } from "@src/state/drive/driveSlice";
 let execCount = 1;
 const CodePillButton = ({
   children,
@@ -44,6 +47,12 @@ const CodePillButton = ({
     return codeComponent;
   }, [manifestData]);
 
+  const getDrivePath = useCallback(() => {
+    const path = thisLinkConfig.url?.split("#/data/")[1];
+
+    return path ? `root/${decodeURIComponent(path)}` : path;
+  }, [manifestData]);
+
   const flipped =
     annotationLinkConfig?.url == thisLinkConfig.url &&
     annotationLinkConfig?.path == thisLinkConfig?.path &&
@@ -55,6 +64,22 @@ const CodePillButton = ({
         onClick
           ? onClick
           : () => {
+              let drivePath = getDrivePath();
+              if (drivePath) {
+                debugger;
+                dispatch(
+                  navigateFetchThunk({
+                    path: drivePath,
+                    selectPath: drivePath,
+                    driveKey: "",
+                  })
+                );
+                if (componentStack.length) {
+                  sessionStorage.removeItem(SessionStorageKeys.lastDirUid);
+                  dispatch(setComponentStack([]));
+                }
+                return;
+              }
               const codeComponent = getCodeComponent();
               if (codeComponent) {
                 if (flipped) {
