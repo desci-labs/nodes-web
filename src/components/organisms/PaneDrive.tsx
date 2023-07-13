@@ -34,7 +34,10 @@ const PaneDrive = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    if (status === "succeeded") setLoading(false);
+    if (status === "succeeded") {
+      (window as any).document.scrollingElement!.scrollTop = 0;
+      setLoading(false);
+    }
   }, [loading, status]);
 
   const directoryRef = useRef<DriveObject[]>();
