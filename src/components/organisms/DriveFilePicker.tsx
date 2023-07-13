@@ -227,7 +227,10 @@ function DriveRow({
         }`}
       onClick={(e) => {
         e.stopPropagation();
-        if (mode === DrivePickerMode.ANNOTATION && !file.contains) {
+        if (
+          mode === DrivePickerMode.ANNOTATION &&
+          file.type === FileType.FILE
+        ) {
           toggleSelected(index, file.componentType);
         }
       }}

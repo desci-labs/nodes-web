@@ -47,7 +47,9 @@ import {
   LatexLogo,
 } from "@icons";
 import useClickAway from "react-use/lib/useClickAway";
-import DriveTable from "@components/organisms/DriveFilePicker";
+import DriveTable, {
+  DrivePickerMode,
+} from "@components/organisms/DriveFilePicker";
 import {
   isAlphaNumeric,
   isDirectoryLink,
@@ -868,6 +870,7 @@ const DirectoryButton = ({
         >
           <DriveTable
             onRequestClose={() => setShowDirectory(false)}
+            mode={DrivePickerMode.ANNOTATION}
             onInsert={(file: any) => {
               const ancestorComponent = manifest?.components.find(
                 (c) => c.id === file.componentId
