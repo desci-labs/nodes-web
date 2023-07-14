@@ -4,11 +4,45 @@
   "version": "0.3.4",
   "private": true,
   "engine": "16.13.1",
+  "scripts": {
+    "analyze": "source-map-explorer 'build/static/js/*.js'",
+    "start": "make && REACT_APP_VERSION=$npm_package_version TAILWIND_MODE=watch craco start",
+    "start:standalone": "make standalone && REACT_APP_VERSION=$npm_package_version TAILWIND_MODE=watch craco start",
+    "build": "make && REACT_APP_VERSION=$npm_package_version GENERATE_SOURCEMAP=false craco build && yarn terser",
+    "build:standalone": "make standalone && REACT_APP_VERSION=$npm_package_version GENERATE_SOURCEMAP=false craco build && yarn terser",
+    "test": "craco test",
+    "eject": "react-scripts eject",
+    "terser": "terser ./build/static/js/*.js -c -m --mangle-props regex=/_$/",
+    "tunnel": "./tunnel.sh",
+    "tunnel:stop": "./tunnelKill.sh"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "resolutions": {
+    "styled-components": "^5",
+    "webpack-dev-server": "4.6.0"
+  },
   "dependencies": {
     "@amplitude/analytics-browser": "^1.10.3",
     "@coinbase/wallet-sdk": "^3.0.1",
     "@craco/craco": "^6.4.3",
-    "@desci-labs/desci-models": "link:../nodes/desci-models",
+    "@desci-labs/desci-models": "^0.1.8",
     "@emotion/css": "^11.10.0",
     "@ethersproject/bignumber": "^5.4.2",
     "@ethersproject/experimental": "^5.5.0",
@@ -149,41 +183,6 @@
     "valid-url": "^1.0.9",
     "web-vitals": "^1.0.1",
     "yup": "^1.0.2"
-  },
-  "resolutions": {
-    "styled-components": "^5",
-    "webpack-dev-server": "4.6.0"
-  },
-  "scripts": {
-    "analyze": "source-map-explorer 'build/static/js/*.js'",
-    "models:compile": "cd ../nodes/desci-models && yarn && yarn build && cd ../../nodes-web && rm node_modules/.yarn-integrity && yarn",
-    "contracts:compile": "cd ../nodes/desci-contracts && yarn && npx hardhat compile --network ganache && cd ../../nodes-web && rm node_modules/.yarn-integrity && yarn",
-    "start": "yarn models:compile && yarn contracts:compile && REACT_APP_VERSION=$npm_package_version TAILWIND_MODE=watch craco start",
-    "build": "yarn stub && yarn models:compile && yarn contracts:compile && REACT_APP_VERSION=$npm_package_version GENERATE_SOURCEMAP=false craco build && yarn terser",
-    "stub": "./stubContract.sh",
-    "test": "craco test",
-    "eject": "react-scripts eject",
-    "terser": "terser ./build/static/js/*.js -c -m --mangle-props regex=/_$/",
-    "tunnel": "./tunnel.sh",
-    "tunnel:stop": "./tunnelKill.sh"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
   },
   "devDependencies": {
     "@babel/core": "^7.17.5",

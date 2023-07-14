@@ -1,5 +1,7 @@
 {
   "github": {
     "silent": true
-  }
+  },
+  "buildCommand": "git clone --single-branch --branch m0ar/build-system https://github.com/desci-labs/nodes.git ../nodes && FORCE_STUB=yes yarn build",
+  "installCommand": ""
 }
