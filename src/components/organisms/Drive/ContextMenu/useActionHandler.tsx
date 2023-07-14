@@ -182,12 +182,10 @@ export default function useActionHandler() {
     if (file.type === FileType.DIR) {
       // handle dirs differently
       fileName = file.name;
-      extension = "tar.gz";
-      let resolvedUrl = IPFS_URL!;
-      if (IPFS_URL && !IPFS_URL.includes("maritime")) {
-        resolvedUrl = resolvedUrl.replace("/ipfs", "");
-      }
-      url = `${resolvedUrl}/api/v0/get?arg=${file.cid}&compression=true&archive=true`;
+      extension = "tar";
+
+      const resolver = PUB_IPFS_URL ? PUB_IPFS_URL : IPFS_URL;
+      url = `https://ipfs.io/ipfs/${file.cid}?format=tar`;
       console.log(`getting url for folder download ${url}`);
     } else {
       const results = separateFileNameAndExtension(file.name);
