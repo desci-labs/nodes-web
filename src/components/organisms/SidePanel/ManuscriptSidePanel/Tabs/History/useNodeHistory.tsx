@@ -118,26 +118,33 @@ export default function useNodeHistory() {
 
       refresh();
 
-      const readOnlyProvider = new ethers.providers.JsonRpcProvider(
-        process.env.REACT_APP_DEFAULT_RPC_URL
-      );
-      readOnlyProvider.pollingInterval = 5000;
-      const contractAddress = CHAIN_DEPLOYMENT.address;
-
-      let contract = new ethers.Contract(contractAddress, CHAIN_DEPLOYMENT.abi);
-      contract = contract.connect(readOnlyProvider);
-      // const eventFilter = contract.filters.VersionPush();
-      contract.on("VersionPush", (event) => {
-        console.log("Event VersionPush", event);
-        const update = pendingHistory.filter(
-          (commit) => commit.transaction?.id !== event.transactionHash
+      try {
+        const readOnlyProvider = new ethers.providers.JsonRpcProvider(
+          process.env.REACT_APP_DEFAULT_RPC_URL
         );
-        updatePendingCommits(update);
-        refresh();
-        // wait for graph node index
-        setTimeout(refresh, 5000);
-        setTimeout(refresh, 10000);
-      });
+        readOnlyProvider.pollingInterval = 5000;
+        const contractAddress = CHAIN_DEPLOYMENT.address;
+
+        let contract = new ethers.Contract(
+          contractAddress,
+          CHAIN_DEPLOYMENT.abi
+        );
+        contract = contract.connect(readOnlyProvider);
+        // const eventFilter = contract.filters.VersionPush();
+        contract.on("VersionPush", (event) => {
+          console.log("Event VersionPush", event);
+          const update = pendingHistory.filter(
+            (commit) => commit.transaction?.id !== event.transactionHash
+          );
+          updatePendingCommits(update);
+          refresh();
+          // wait for graph node index
+          setTimeout(refresh, 5000);
+          setTimeout(refresh, 10000);
+        });
+      } catch (e) {
+        console.error("activity history tab error", e);
+      }
 
       loadRef.current = true;
     }
