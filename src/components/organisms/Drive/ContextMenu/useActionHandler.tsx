@@ -177,20 +177,26 @@ export default function useActionHandler() {
       AvailableUserActionLogTypes.btnDownloadData,
       JSON.stringify({ nodeUuid: currentObjectId, cid: file.cid })
     );
+    debugger;
     let url = `${IPFS_URL}/${file.cid}`;
     let fileName: string, extension: string | undefined;
+    const resolver = PUB_IPFS_URL ? PUB_IPFS_URL : IPFS_URL;
     if (file.type === FileType.DIR) {
       // handle dirs differently
       fileName = file.name;
       extension = "tar";
 
-      const resolver = PUB_IPFS_URL ? PUB_IPFS_URL : IPFS_URL;
       url = `https://ipfs.io/ipfs/${file.cid}?format=tar`;
       console.log(`getting url for folder download ${url}`);
     } else {
       const results = separateFileNameAndExtension(file.name);
       fileName = results.fileName;
       extension = results.extension;
+      if (file.external) {
+        url = `${PUB_IPFS_URL || "https://ipfs.io/ipfs"}/${file.cid}?filename=${
+          file.name
+        }`;
+      }
     }
 
     axios({

@@ -29,3 +29,6 @@ yarn-error.log*
 .npmrc
 
 .idea
+
+# contract symlinks
+src/desci-contracts-*
