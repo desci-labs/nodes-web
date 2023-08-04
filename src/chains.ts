@@ -32,6 +32,9 @@ export const DPID_CHAIN_DEPLOYMENT = {
   abi: localhostDpid.abi,
 };
 
+(window as any).DPID_CHAIN_DEPLOYMENT = DPID_CHAIN_DEPLOYMENT;
+(window as any).CHAIN_DEPLOYMENT = CHAIN_DEPLOYMENT;
+
 const ETH: AddEthereumChainParameter["nativeCurrency"] = {
   name: "Ether",
   symbol: "ETH",
