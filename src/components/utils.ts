@@ -135,7 +135,7 @@ export const cleanupManifestUrl = (url: string) => {
 };
 
 export const __log = (...message: any[]) => {
-  if (process.env.REACT_APP_DEBUG) {
+  if (process.env.REACT_APP_DEBUG === "1") {
     const errstack = Error().stack?.split("\n");
     console.log(
       "[d]",
