@@ -34,6 +34,13 @@ export const DPID_CHAIN_DEPLOYMENT = {
 
 (window as any).DPID_CHAIN_DEPLOYMENT = DPID_CHAIN_DEPLOYMENT;
 (window as any).CHAIN_DEPLOYMENT = CHAIN_DEPLOYMENT;
+(window as any).APP_DEBUG = {
+  REACT_APP_DEBUG: process.env.REACT_APP_DEBUG,
+  goerliInfoDpid,
+  localhostInfoDpid,
+  goerliInfo,
+  localhostInfo,
+};
 
 const ETH: AddEthereumChainParameter["nativeCurrency"] = {
   name: "Ether",
