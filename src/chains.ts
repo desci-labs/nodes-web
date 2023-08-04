@@ -9,12 +9,12 @@ import { ethers } from "ethers";
  * NOTE: This is assuming that the desci-nodes-be repo is one level up from this repo
  */
 import localhostInfo from "./desci-contracts-config/unknown-research-object.json";
-import goerliInfo from "./desci-contracts-config/goerli-research-object.json";
+import goerliInfo from "./contract-config/goerli-research-object.json";
 import localhost from "./desci-contracts-artifacts/contracts/ResearchObject.sol/ResearchObject.json";
 import goerli from "./desci-contracts-artifacts/contracts/ResearchObject.sol/ResearchObject.json";
 
 import localhostInfoDpid from "./desci-contracts-config/unknown-dpid.json";
-import goerliInfoDpid from "./desci-contracts-config/goerli-dpid.json";
+import goerliInfoDpid from "./contract-config/goerli-dpid.json";
 import localhostDpid from "./desci-contracts-artifacts/contracts/DpidRegistry.sol/DpidRegistry.json";
 // import goerliDpid from "./desci-contracts-artifacts/contracts/DpidRegistry.sol/DpidRegistry.json";
 
