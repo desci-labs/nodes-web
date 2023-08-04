@@ -11,7 +11,7 @@ import { ethers } from "ethers";
 import localhostInfo from "./desci-contracts-config/unknown-research-object.json";
 import goerliInfo from "./contract-config/goerli-research-object.json";
 import localhost from "./desci-contracts-artifacts/contracts/ResearchObject.sol/ResearchObject.json";
-import goerli from "./desci-contracts-artifacts/contracts/ResearchObject.sol/ResearchObject.json";
+import goerli from "./contract-config/ResearchObject.json";
 
 import localhostInfoDpid from "./desci-contracts-config/unknown-dpid.json";
 import goerliInfoDpid from "./contract-config/goerli-dpid.json";
