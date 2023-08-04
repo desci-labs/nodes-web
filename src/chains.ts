@@ -19,17 +19,29 @@ import localhostDpid from "./desci-contracts-artifacts/contracts/DpidRegistry.so
 // import goerliDpid from "./desci-contracts-artifacts/contracts/DpidRegistry.sol/DpidRegistry.json";
 
 export const CHAIN_DEPLOYMENT = {
-  address: process.env.REACT_APP_DEBUG
-    ? localhostInfo.proxies[localhostInfo.proxies.length - 1].address
-    : goerliInfo.proxies[goerliInfo.proxies.length - 1].address,
+  address:
+    process.env.REACT_APP_DEBUG === "1"
+      ? localhostInfo.proxies[localhostInfo.proxies.length - 1].address
+      : goerliInfo.proxies[goerliInfo.proxies.length - 1].address,
   abi: process.env.REACT_APP_DEBUG ? localhost.abi : goerli.abi,
 };
 
 export const DPID_CHAIN_DEPLOYMENT = {
-  address: process.env.REACT_APP_DEBUG
-    ? localhostInfoDpid.proxies[localhostInfoDpid.proxies.length - 1].address
-    : goerliInfoDpid.proxies[goerliInfoDpid.proxies.length - 1].address,
+  address:
+    process.env.REACT_APP_DEBUG === "1"
+      ? localhostInfoDpid.proxies[localhostInfoDpid.proxies.length - 1].address
+      : goerliInfoDpid.proxies[goerliInfoDpid.proxies.length - 1].address,
   abi: localhostDpid.abi,
+};
+
+(window as any).DPID_CHAIN_DEPLOYMENT = DPID_CHAIN_DEPLOYMENT;
+(window as any).CHAIN_DEPLOYMENT = CHAIN_DEPLOYMENT;
+(window as any).APP_DEBUG = {
+  REACT_APP_DEBUG: process.env.REACT_APP_DEBUG === "1",
+  goerliInfoDpid,
+  localhostInfoDpid,
+  goerliInfo,
+  localhostInfo,
 };
 
 const ETH: AddEthereumChainParameter["nativeCurrency"] = {
