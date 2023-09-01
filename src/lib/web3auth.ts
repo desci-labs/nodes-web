@@ -35,7 +35,7 @@ export class Web3AuthConnector extends Connector {
     return (this.eagerConnection = new Promise(async (resolve, reject) => {
       let torus = (window as any).torus;
       if (!torus) {
-        (window as any).torus = new (window as any).Torus();
+        (window as any).torus = new (window as any).Torus.default();
         torus = (window as any).torus;
       }
 
@@ -63,7 +63,7 @@ export class Web3AuthConnector extends Connector {
           },
           showTorusButton: true,
           integrity: {
-            version: "1.11.0",
+            version: "2.2.9",
             check: false,
             // hash: 'sha384-jwXOV6VJu+PM89ksbCSZyQRjf5FdX8n39nWfE/iQBMh4r5m027ua2tkQ+83FPdp9'
           },
