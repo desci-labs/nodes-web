@@ -4,6 +4,7 @@ import {
   ResearchObjectComponentSubtypes,
   ResearchObjectComponentType,
   ResearchObjectV1Component,
+  isNodeRoot,
 } from "@desci-labs/desci-models";
 import ButtonSecondary from "@src/components/atoms/ButtonSecondary";
 import EmptyPreview from "@src/components/molecules/EmptyPreview";
@@ -23,7 +24,8 @@ const ROOT_COMPONENTS_PATHS = [
 ];
 const isDriveComponent = (component: ResearchObjectV1Component) =>
   !ROOT_COMPONENTS_PATHS.includes(component.payload?.path) &&
-  component.type !== ResearchObjectComponentType.DATA_BUCKET;
+  (component.type !== ResearchObjectComponentType.DATA_BUCKET ||
+    !isNodeRoot(component));
 
 export default function ComponentsPreview() {
   const { manifest: manifestData, mode } = useNodeReader();

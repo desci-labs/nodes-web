@@ -24,6 +24,7 @@ import {
   ResearchObjectComponentType,
   ResearchObjectV1,
   ResearchObjectV1Component,
+  isNodeRoot,
 } from "@desci-labs/desci-models";
 import {
   createStubTreeNode,
@@ -626,11 +627,10 @@ export const fetchTreeThunk = createAsyncThunk(
     //determines if it's a old or new manifest
 
     const hasDataBucket =
-      manifest?.components[0].type === ResearchObjectComponentType.DATA_BUCKET
+      manifest?.components[0] && isNodeRoot(manifest?.components[0])
         ? manifest.components[0]
-        : manifest?.components.find(
-            (c: ResearchObjectV1Component) =>
-              c.type === ResearchObjectComponentType.DATA_BUCKET
+        : manifest?.components.find((c: ResearchObjectV1Component) =>
+            isNodeRoot(c)
           );
     if (hasDataBucket) {
       try {
