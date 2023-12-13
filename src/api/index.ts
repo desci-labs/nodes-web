@@ -741,3 +741,28 @@ export const stopTracking = async () => {
     amplitude.reset();
   }
 };
+
+export type PrepublishResponse =
+  | PrepublishSuccessResponse
+  | PrepublishErrorResponse;
+export interface PrepublishSuccessResponse {
+  ok: boolean;
+  updatedManifestCid: string;
+  updatedManifest: ResearchObjectV1;
+  version?: NodeVersion;
+}
+
+export interface PrepublishErrorResponse {
+  ok: false;
+  error: string;
+  status?: number;
+}
+
+export const prepublish = async (uuid: string): Promise<PrepublishResponse> => {
+  const { data } = await axios.post(
+    `${SCIWEAVE_URL}/v1/nodes/prepublish`,
+    { uuid },
+    config()
+  );
+  return data;
+};

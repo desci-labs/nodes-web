@@ -19,7 +19,14 @@ import {
   DPID_CHAIN_DEPLOYMENT,
 } from "@components/../chains";
 import WarningSign from "@components/atoms/warning-sign";
-import { publishResearchObject, updateDraft } from "@api/index";
+import {
+  prepublish,
+  PrepublishErrorResponse,
+  PrepublishResponse,
+  PrepublishSuccessResponse,
+  publishResearchObject,
+  updateDraft,
+} from "@api/index";
 import axios from "axios";
 import {
   ResearchObjectComponentType,
@@ -133,6 +140,7 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
             },
           };
 
+          // This is to set the DPID in the manifest
           const {
             hash,
             uri,
@@ -143,6 +151,25 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
             manifest: newManifestData,
           });
 
+          // This is to DAGify the draft tree, and update the root data bucket CID in the manifest
+          let publishManifest;
+          let publishManifestCid;
+          const prepubRes: PrepublishResponse = await prepublish(
+            currentObjectId!
+          );
+          if (prepubRes.ok) {
+            const { updatedManifestCid, updatedManifest } =
+              prepubRes as PrepublishSuccessResponse;
+            publishManifest = updatedManifest;
+            publishManifestCid = updatedManifestCid;
+          } else {
+            throw new Error(
+              `Prepublish failed: ${
+                (prepubRes as PrepublishErrorResponse).error
+              }`
+            );
+          }
+
           const regFee = await dpidContract.functions.getFee();
           const hashBytes = getBytesFromCIDString(hash);
           tx = await contract.functions.mintWithDpid(
@@ -152,19 +179,19 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
             expectedDpidTx[0],
             { value: regFee[0], gasLimit: 350000 }
           );
-          if (retrievedManifestData) {
+          if (publishManifest) {
             // FIXME: this never hits
-            modifiedObject.cid = hash;
-            modifiedObject.manifest = retrievedManifestData;
-            dispatch(setManifest(retrievedManifestData));
-            dispatch(setManifestCid(hash));
+            modifiedObject.cid = publishManifestCid;
+            modifiedObject.manifest = publishManifest;
+            dispatch(setManifest(publishManifest));
+            dispatch(setManifestCid(publishManifestCid));
           } else {
-            const newManifestUrl = cleanupManifestUrl(uri || manifestUrl);
+            const newManifestUrl = cleanupManifestUrl(publishManifestCid);
             const { data } = await axios.get(newManifestUrl);
-            modifiedObject.cid = hash;
+            modifiedObject.cid = publishManifestCid;
             modifiedObject.manifest = data;
             dispatch(setManifest(data));
-            dispatch(setManifestCid(hash));
+            dispatch(setManifestCid(publishManifestCid));
           }
         }
         // console.log("GOT COUNT", resp);
