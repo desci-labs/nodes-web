@@ -78,7 +78,15 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
 
   const createCommit = useCallback(async () => {
     setLoading(true);
-    const modifiedObject = { cid: manifestCid, manifest: manifestData };
+    const modifiedObject: {
+      cid: string;
+      manifest: ResearchObjectV1 | undefined;
+      nodeVersionId?: number | undefined;
+    } = {
+      cid: manifestCid,
+      manifest: manifestData,
+      nodeVersionId: undefined,
+    };
     try {
       setError(undefined);
       if (provider) {
@@ -125,7 +133,24 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
           DEFAULT_DPID_PREFIX_STRING
         );
         if (exists) {
-          tx = await contract.functions.updateMetadata(base64UuidToBase16, cid);
+          const prepubRes: PrepublishResponse = await prepublish(
+            currentObjectId!
+          );
+          if (prepubRes.ok) {
+            const { updatedManifestCid, updatedManifest, version } =
+              prepubRes as PrepublishSuccessResponse;
+            cid = getBytesFromCIDString(updatedManifestCid);
+            tx = await contract.functions.updateMetadata(
+              base64UuidToBase16,
+              cid
+            );
+          } else {
+            throw new Error(
+              `Prepublish failed: ${
+                (prepubRes as PrepublishErrorResponse).error
+              }`
+            );
+          }
         } else {
           const expectedDpidTx = await dpidContract.functions.getOrganization(
             DEFAULT_DPID_PREFIX
@@ -154,14 +179,16 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
           // This is to DAGify the draft tree, and update the root data bucket CID in the manifest
           let publishManifest;
           let publishManifestCid;
+          let publishNodeVersion;
           const prepubRes: PrepublishResponse = await prepublish(
             currentObjectId!
           );
           if (prepubRes.ok) {
-            const { updatedManifestCid, updatedManifest } =
+            const { updatedManifestCid, updatedManifest, version } =
               prepubRes as PrepublishSuccessResponse;
             publishManifest = updatedManifest;
             publishManifestCid = updatedManifestCid;
+            publishNodeVersion = version?.id;
           } else {
             throw new Error(
               `Prepublish failed: ${
@@ -183,6 +210,7 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
             // FIXME: this never hits
             modifiedObject.cid = publishManifestCid;
             modifiedObject.manifest = publishManifest;
+            modifiedObject.nodeVersionId = publishNodeVersion;
             dispatch(setManifest(publishManifest));
             dispatch(setManifestCid(publishManifestCid));
           } else {
@@ -262,6 +290,7 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
             cid: modifiedObject.cid,
             manifest: modifiedObject.manifest!,
             transactionId: tx.hash,
+            nodeVersionId: modifiedObject.nodeVersionId,
           });
         }
 

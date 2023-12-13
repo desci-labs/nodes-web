@@ -344,6 +344,7 @@ export const publishResearchObject = async (input: {
   cid: string;
   manifest: ResearchObjectV1;
   transactionId: string;
+  nodeVersionId?: number;
 }) => {
   const options: AxiosRequestConfig = config();
   options.headers["content-type"] = "application/json";
