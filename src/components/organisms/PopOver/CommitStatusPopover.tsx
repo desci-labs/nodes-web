@@ -144,6 +144,9 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
               base64UuidToBase16,
               cid
             );
+            modifiedObject.manifest = updatedManifest;
+            modifiedObject.cid = updatedManifestCid;
+            modifiedObject.nodeVersionId = version?.id;
           } else {
             throw new Error(
               `Prepublish failed: ${
@@ -284,7 +287,7 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
         // );
         if (currentObjectId && manifestCid && manifestData) {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-
+          // debugger;
           publishResearchObject({
             uuid: currentObjectId,
             cid: modifiedObject.cid,
