@@ -344,6 +344,7 @@ export const publishResearchObject = async (input: {
   cid: string;
   manifest: ResearchObjectV1;
   transactionId: string;
+  nodeVersionId?: number;
 }) => {
   const options: AxiosRequestConfig = config();
   options.headers["content-type"] = "application/json";
@@ -740,4 +741,29 @@ export const stopTracking = async () => {
   if (process.env.REACT_APP_AMPLITUDE_TOKEN) {
     amplitude.reset();
   }
+};
+
+export type PrepublishResponse =
+  | PrepublishSuccessResponse
+  | PrepublishErrorResponse;
+export interface PrepublishSuccessResponse {
+  ok: boolean;
+  updatedManifestCid: string;
+  updatedManifest: ResearchObjectV1;
+  version?: NodeVersion;
+}
+
+export interface PrepublishErrorResponse {
+  ok: false;
+  error: string;
+  status?: number;
+}
+
+export const prepublish = async (uuid: string): Promise<PrepublishResponse> => {
+  const { data } = await axios.post(
+    `${SCIWEAVE_URL}/v1/nodes/prepublish`,
+    { uuid },
+    config()
+  );
+  return data;
 };

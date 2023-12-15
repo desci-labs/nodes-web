@@ -19,7 +19,14 @@ import {
   DPID_CHAIN_DEPLOYMENT,
 } from "@components/../chains";
 import WarningSign from "@components/atoms/warning-sign";
-import { publishResearchObject, updateDraft } from "@api/index";
+import {
+  prepublish,
+  PrepublishErrorResponse,
+  PrepublishResponse,
+  PrepublishSuccessResponse,
+  publishResearchObject,
+  updateDraft,
+} from "@api/index";
 import axios from "axios";
 import {
   ResearchObjectComponentType,
@@ -71,7 +78,15 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
 
   const createCommit = useCallback(async () => {
     setLoading(true);
-    const modifiedObject = { cid: manifestCid, manifest: manifestData };
+    const modifiedObject: {
+      cid: string;
+      manifest: ResearchObjectV1 | undefined;
+      nodeVersionId?: number | undefined;
+    } = {
+      cid: manifestCid,
+      manifest: manifestData,
+      nodeVersionId: undefined,
+    };
     try {
       setError(undefined);
       if (provider) {
@@ -118,7 +133,27 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
           DEFAULT_DPID_PREFIX_STRING
         );
         if (exists) {
-          tx = await contract.functions.updateMetadata(base64UuidToBase16, cid);
+          const prepubRes: PrepublishResponse = await prepublish(
+            currentObjectId!
+          );
+          if (prepubRes.ok) {
+            const { updatedManifestCid, updatedManifest, version } =
+              prepubRes as PrepublishSuccessResponse;
+            cid = getBytesFromCIDString(updatedManifestCid);
+            tx = await contract.functions.updateMetadata(
+              base64UuidToBase16,
+              cid
+            );
+            modifiedObject.manifest = updatedManifest;
+            modifiedObject.cid = updatedManifestCid;
+            modifiedObject.nodeVersionId = version?.id;
+          } else {
+            throw new Error(
+              `Prepublish failed: ${
+                (prepubRes as PrepublishErrorResponse).error
+              }`
+            );
+          }
         } else {
           const expectedDpidTx = await dpidContract.functions.getOrganization(
             DEFAULT_DPID_PREFIX
@@ -133,6 +168,7 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
             },
           };
 
+          // This is to set the DPID in the manifest
           const {
             hash,
             uri,
@@ -143,8 +179,29 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
             manifest: newManifestData,
           });
 
+          // This is to DAGify the draft tree, and update the root data bucket CID in the manifest
+          let publishManifest;
+          let publishManifestCid;
+          let publishNodeVersion;
+          const prepubRes: PrepublishResponse = await prepublish(
+            currentObjectId!
+          );
+          if (prepubRes.ok) {
+            const { updatedManifestCid, updatedManifest, version } =
+              prepubRes as PrepublishSuccessResponse;
+            publishManifest = updatedManifest;
+            publishManifestCid = updatedManifestCid;
+            publishNodeVersion = version?.id;
+          } else {
+            throw new Error(
+              `Prepublish failed: ${
+                (prepubRes as PrepublishErrorResponse).error
+              }`
+            );
+          }
+
           const regFee = await dpidContract.functions.getFee();
-          const hashBytes = getBytesFromCIDString(hash);
+          const hashBytes = getBytesFromCIDString(publishManifestCid);
           tx = await contract.functions.mintWithDpid(
             base64UuidToBase16,
             hashBytes,
@@ -152,19 +209,20 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
             expectedDpidTx[0],
             { value: regFee[0], gasLimit: 350000 }
           );
-          if (retrievedManifestData) {
+          if (publishManifest) {
             // FIXME: this never hits
-            modifiedObject.cid = hash;
-            modifiedObject.manifest = retrievedManifestData;
-            dispatch(setManifest(retrievedManifestData));
-            dispatch(setManifestCid(hash));
+            modifiedObject.cid = publishManifestCid;
+            modifiedObject.manifest = publishManifest;
+            modifiedObject.nodeVersionId = publishNodeVersion;
+            dispatch(setManifest(publishManifest));
+            dispatch(setManifestCid(publishManifestCid));
           } else {
-            const newManifestUrl = cleanupManifestUrl(uri || manifestUrl);
+            const newManifestUrl = cleanupManifestUrl(publishManifestCid);
             const { data } = await axios.get(newManifestUrl);
-            modifiedObject.cid = hash;
+            modifiedObject.cid = publishManifestCid;
             modifiedObject.manifest = data;
             dispatch(setManifest(data));
-            dispatch(setManifestCid(hash));
+            dispatch(setManifestCid(publishManifestCid));
           }
         }
         // console.log("GOT COUNT", resp);
@@ -229,12 +287,13 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
         // );
         if (currentObjectId && manifestCid && manifestData) {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-
+          // debugger;
           publishResearchObject({
             uuid: currentObjectId,
             cid: modifiedObject.cid,
             manifest: modifiedObject.manifest!,
             transactionId: tx.hash,
+            nodeVersionId: modifiedObject.nodeVersionId,
           });
         }
 
