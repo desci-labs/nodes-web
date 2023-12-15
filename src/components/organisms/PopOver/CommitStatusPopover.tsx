@@ -201,7 +201,7 @@ const CommitStatusPopover = (props: ModalProps & { onSuccess: () => void }) => {
           }
 
           const regFee = await dpidContract.functions.getFee();
-          const hashBytes = getBytesFromCIDString(hash);
+          const hashBytes = getBytesFromCIDString(publishManifestCid);
           tx = await contract.functions.mintWithDpid(
             base64UuidToBase16,
             hashBytes,
